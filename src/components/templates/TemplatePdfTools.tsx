@@ -22,6 +22,7 @@ export const TemplatePdfTools: React.FC<TemplatePdfToolsProps> = ({ toolName, to
   const [dpi, setDpi] = useState<150 | 300>(150);
   const [imageFormat, setImageFormat] = useState<'jpg' | 'png'>('jpg');
   const [pageSize, setPageSize] = useState<'fit' | 'a4' | 'letter'>('fit');
+  const [orientation, setOrientation] = useState<'auto' | 'portrait' | 'landscape'>('auto');
   const [margin, setMargin] = useState(10);
 
   const isMultiPdf = toolSlug === 'merge-pdf';
@@ -60,7 +61,7 @@ export const TemplatePdfTools: React.FC<TemplatePdfToolsProps> = ({ toolName, to
         setOutputs([{ name: 'merged-document.pdf', blob: result.blob, note: `${result.pageCount} pages · ${formatBytes(result.size)}` }]);
         setMessage('PDF files merged successfully.');
       } else if (toolSlug === 'jpg-to-pdf') {
-        const result = await imagesToPdf(files, pageSize, margin);
+        const result = await imagesToPdf(files, pageSize, margin, orientation);
         setOutputs([{ name: 'images-to-pdf.pdf', blob: result.blob, note: `${result.pageCount} page(s)` }]);
         setMessage('Images converted to PDF successfully.');
       } else if (toolSlug === 'split-pdf') {
@@ -158,6 +159,7 @@ export const TemplatePdfTools: React.FC<TemplatePdfToolsProps> = ({ toolName, to
           {isImages && (
             <div className="space-y-3">
               <label className="block space-y-1"><span className="text-xs font-semibold text-stone-700">Page size</span><select value={pageSize} onChange={(event) => setPageSize(event.target.value as typeof pageSize)} className="w-full px-3 py-2.5 rounded-lg border border-stone-200 bg-stone-50 text-sm text-stone-900"><option value="fit">Fit image dimensions</option><option value="a4">A4</option><option value="letter">US Letter</option></select></label>
+              <label className="block space-y-1"><span className="text-xs font-semibold text-stone-700">Orientation</span><select value={orientation} onChange={(event) => setOrientation(event.target.value as typeof orientation)} className="w-full px-3 py-2.5 rounded-lg border border-stone-200 bg-stone-50 text-sm text-stone-900"><option value="auto">Match each image</option><option value="portrait">Portrait</option><option value="landscape">Landscape</option></select></label>
               <label className="block space-y-1"><span className="text-xs font-semibold text-stone-700">Margin (mm)</span><input type="number" min="0" max="30" value={margin} onChange={(event) => setMargin(Math.max(0, Math.min(30, Number(event.target.value) || 0)))} className="w-full px-3 py-2.5 rounded-lg border border-stone-200 bg-stone-50 text-sm text-stone-900" /></label>
               <p className="text-[11px] text-stone-500">One image per PDF page. JPG and PNG are supported.</p>
             </div>
