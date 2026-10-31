@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Download, FileText, Layers, RefreshCw, Scissors, RotateCw, Upload, AlertCircle } from 'lucide-react';
+import { ArrowDown, ArrowUp, Download, FileText, RefreshCw, Upload, AlertCircle, X } from 'lucide-react';
 import { countPdfPages, imagesToPdf, mergePdfFiles, renderPdfToImages, rotatePdfFile, splitPdfFile } from '../../engines/pdf/browser';
 
 interface TemplatePdfToolsProps {
@@ -39,6 +39,22 @@ export const TemplatePdfTools: React.FC<TemplatePdfToolsProps> = ({ toolName, to
     setFiles(Array.from(selected));
     setOutputs([]);
     setError('');
+    setMessage('');
+  };
+
+  const moveFile = (index: number, direction: 'up' | 'down') => {
+    const target = direction === 'up' ? index - 1 : index + 1;
+    if (target < 0 || target >= files.length) return;
+    setFiles((previous) => {
+      const next = [...previous];
+      [next[index], next[target]] = [next[target], next[index]];
+      return next;
+    });
+  };
+
+  const removeFile = (index: number) => {
+    setFiles((previous) => previous.filter((_, current) => current !== index));
+    setOutputs([]);
     setMessage('');
   };
 
@@ -125,7 +141,23 @@ export const TemplatePdfTools: React.FC<TemplatePdfToolsProps> = ({ toolName, to
           <div className="flex items-center justify-between gap-3"><h3 className="text-xs font-semibold text-stone-800">Selected files ({files.length})</h3><button type="button" onClick={() => setFiles([])} className="text-[11px] text-stone-500 hover:text-red-600">Clear list</button></div>
           {files.length === 0 ? <p className="text-xs text-stone-400 py-4 text-center">No files selected yet.</p> : (
             <ul className="space-y-2 max-h-72 overflow-y-auto">
-              {files.map((file, index) => <li key={file.name + file.size + index} className="flex items-center justify-between gap-3 rounded-xl bg-stone-50 border border-stone-100 p-3"><span className="min-w-0 text-xs text-stone-800 truncate">{index + 1}. {file.name}</span><span className="shrink-0 text-[11px] text-stone-500">{formatBytes(file.size)}</span></li>)}
+              {files.map((file, index) => (
+                <li key={file.name + file.size + index} className="flex items-center justify-between gap-2 rounded-xl bg-stone-50 border border-stone-100 p-3">
+                  <div className="min-w-0">
+                    <p className="text-xs text-stone-800 truncate">{index + 1}. {file.name}</p>
+                    <p className="text-[11px] text-stone-500">{formatBytes(file.size)}</p>
+                  </div>
+                  <div className="flex items-center gap-1 shrink-0">
+                    {multiple && (
+                      <>
+                        <button type="button" onClick={() => moveFile(index, 'up')} disabled={index === 0} className="p-1.5 rounded-md hover:bg-stone-200 text-stone-500 disabled:opacity-30" title="Move file up"><ArrowUp size={14} /></button>
+                        <button type="button" onClick={() => moveFile(index, 'down')} disabled={index === files.length - 1} className="p-1.5 rounded-md hover:bg-stone-200 text-stone-500 disabled:opacity-30" title="Move file down"><ArrowDown size={14} /></button>
+                      </>
+                    )}
+                    <button type="button" onClick={() => removeFile(index)} className="p-1.5 rounded-md hover:bg-red-50 text-stone-400 hover:text-red-600" title="Remove file"><X size={14} /></button>
+                  </div>
+                </li>
+              ))}
             </ul>
           )}
         </div>
