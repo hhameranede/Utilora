@@ -19,6 +19,8 @@ export const TemplateCImageWorkspace: React.FC<TemplateCImageWorkspaceProps> = (
   defaultFormat = 'webp',
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
+  const previewImageRef = useRef<HTMLImageElement>(null);
+  const cropDragRef = useRef<{ pointerId: number; startX: number; startY: number } | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [sourceUrl, setSourceUrl] = useState('');
   const [resultUrl, setResultUrl] = useState('');
@@ -77,6 +79,7 @@ export const TemplateCImageWorkspace: React.FC<TemplateCImageWorkspaceProps> = (
       return '';
     });
     setMetadata(null);
+    cropDragRef.current = null;
     setRotation(0);
     setFlipHorizontal(false);
     setFlipVertical(false);
@@ -106,6 +109,46 @@ export const TemplateCImageWorkspace: React.FC<TemplateCImageWorkspaceProps> = (
     const next = Math.max(1, Math.min(12000, value || 1));
     setHeight(next);
     if (lockRatio && metadata) setWidth(Math.max(1, Math.round(next * metadata.width / metadata.height)));
+  };
+
+  const getCropPoint = (clientX: number, clientY: number) => {
+    const image = previewImageRef.current;
+    if (!image || !metadata) return null;
+    const rect = image.getBoundingClientRect();
+    if (rect.width <= 0 || rect.height <= 0) return null;
+    return {
+      x: Math.min(metadata.width, Math.max(0, ((clientX - rect.left) / rect.width) * metadata.width)),
+      y: Math.min(metadata.height, Math.max(0, ((clientY - rect.top) / rect.height) * metadata.height)),
+    };
+  };
+
+  const handleCropPointerDown = (event: React.PointerEvent<HTMLImageElement>) => {
+    if (!isCrop || !metadata) return;
+    const point = getCropPoint(event.clientX, event.clientY);
+    if (!point) return;
+    cropDragRef.current = { pointerId: event.pointerId, startX: point.x, startY: point.y };
+    event.currentTarget.setPointerCapture(event.pointerId);
+    setCropX(Math.min(metadata.width - 1, Math.floor(point.x)));
+    setCropY(Math.min(metadata.height - 1, Math.floor(point.y)));
+    setCropWidth(1);
+    setCropHeight(1);
+  };
+
+  const handleCropPointerMove = (event: React.PointerEvent<HTMLImageElement>) => {
+    const drag = cropDragRef.current;
+    if (!drag || drag.pointerId !== event.pointerId || !metadata) return;
+    const point = getCropPoint(event.clientX, event.clientY);
+    if (!point) return;
+    const left = Math.min(drag.startX, point.x);
+    const top = Math.min(drag.startY, point.y);
+    setCropX(Math.min(metadata.width - 1, Math.floor(left)));
+    setCropY(Math.min(metadata.height - 1, Math.floor(top)));
+    setCropWidth(Math.max(1, Math.round(Math.abs(point.x - drag.startX))));
+    setCropHeight(Math.max(1, Math.round(Math.abs(point.y - drag.startY))));
+  };
+
+  const handleCropPointerEnd = (event: React.PointerEvent<HTMLImageElement>) => {
+    if (cropDragRef.current?.pointerId === event.pointerId) cropDragRef.current = null;
   };
 
   const processImage = async () => {
@@ -169,10 +212,32 @@ export const TemplateCImageWorkspace: React.FC<TemplateCImageWorkspaceProps> = (
         </button>
 
         <div className="rounded-2xl border border-stone-200 bg-stone-50 min-h-[260px] p-4 flex items-center justify-center">
-          {resultUrl ? (
-            <img src={resultUrl} alt="Processed result preview" className="max-w-full max-h-[480px] object-contain rounded-lg" />
-          ) : sourceUrl ? (
-            <img src={sourceUrl} alt="Original image preview" className="max-w-full max-h-[480px] object-contain rounded-lg" />
+          {(isCrop ? (resultUrl || sourceUrl) : (resultUrl || sourceUrl)) ? (
+            <div className="relative inline-block max-w-full">
+              <img
+                ref={previewImageRef}
+                src={resultUrl || sourceUrl}
+                alt={resultUrl ? "Processed result preview" : "Original image preview"}
+                className={`max-w-full max-h-[480px] object-contain rounded-lg ${isCrop && !resultUrl ? 'touch-none cursor-crosshair select-none' : ''}`}
+                draggable={false}
+                onPointerDown={isCrop && !resultUrl ? handleCropPointerDown : undefined}
+                onPointerMove={isCrop && !resultUrl ? handleCropPointerMove : undefined}
+                onPointerUp={isCrop && !resultUrl ? handleCropPointerEnd : undefined}
+                onPointerCancel={isCrop && !resultUrl ? handleCropPointerEnd : undefined}
+              />
+              {isCrop && !resultUrl && metadata && (
+                <div
+                  aria-label="Selected crop area"
+                  className="absolute pointer-events-none border-2 border-orange-500 bg-orange-300/10 rounded-sm"
+                  style={{
+                    left: `${(cropX / metadata.width) * 100}%`,
+                    top: `${(cropY / metadata.height) * 100}%`,
+                    width: `${(Math.min(cropWidth, metadata.width - cropX) / metadata.width) * 100}%`,
+                    height: `${(Math.min(cropHeight, metadata.height - cropY) / metadata.height) * 100}%`,
+                  }}
+                />
+              )}
+            </div>
           ) : (
             <div className="text-center text-stone-400">
               <ImageIcon size={36} className="mx-auto mb-2 opacity-60" />
@@ -249,7 +314,7 @@ export const TemplateCImageWorkspace: React.FC<TemplateCImageWorkspaceProps> = (
 
           {isCrop && (
             <div className="space-y-3">
-              <p className="text-xs text-stone-600">Set the crop rectangle in original image pixels.</p>
+              <p className="text-xs text-stone-600">Drag across the image preview to select an area, or enter exact pixel values below. Touch dragging is supported.</p>
               <div className="grid grid-cols-2 gap-3">
                 <NumberField label="X" value={cropX} onChange={setCropX} />
                 <NumberField label="Y" value={cropY} onChange={setCropY} />
