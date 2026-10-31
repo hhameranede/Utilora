@@ -148,7 +148,8 @@ export async function renderPdfToImages(
   ]);
   pdfjs.GlobalWorkerOptions.workerSrc = pdfWorker.default;
   const bytes = new Uint8Array(await file.arrayBuffer());
-  const pdfDocument = await pdfjs.getDocument({ data: bytes }).promise;
+  const loadingTask = pdfjs.getDocument({ data: bytes });
+  const pdfDocument = await loadingTask.promise;
   if (pdfDocument.numPages > MAX_PDF_PAGES) throw new Error('This PDF exceeds the 250-page safety limit.');
   const pages = selectedPages?.length ? [...new Set(selectedPages)] : Array.from({ length: pdfDocument.numPages }, (_, index) => index + 1);
   if (pages.length > 40) throw new Error('Export is limited to 40 pages at a time to protect device memory.');
