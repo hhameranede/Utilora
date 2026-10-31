@@ -97,8 +97,8 @@ export const ImageRotatorAdapter: ToolAdapter<ImageRotatorInput, ImageRotatorOpt
   async execute(input, options = { degrees: 90 }) {
     const started = performance.now();
     try {
-      const result = await transformBrowserImage(input.file, { format: 'png', rotation: options.degrees });
-      return { success: true, data: { blob: result.blob, orientation: `${options.degrees}° clockwise` }, durationMs: performance.now() - started };
+      const result = await transformBrowserImage(input.file, { format: 'png', rotation: options.degrees, flipHorizontal: options.flipHorizontal, flipVertical: options.flipVertical });
+      return { success: true, data: { blob: result.blob, orientation: `${options.degrees}° clockwise${options.flipHorizontal ? ', flipped horizontally' : ''}${options.flipVertical ? ', flipped vertically' : ''}` }, durationMs: performance.now() - started };
     } catch (error) { return failure<ImageRotatorOutput>(error); }
   },
 };
