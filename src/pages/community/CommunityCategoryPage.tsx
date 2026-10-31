@@ -5,6 +5,7 @@ import { Breadcrumbs } from '../../components/common/Breadcrumbs';
 import { Head } from '../../seo/Head';
 import { Link } from '../../router';
 import { MessageCircle, Eye, ArrowRight } from 'lucide-react';
+import { NotFoundPage } from '../NotFoundPage';
 
 interface CommunityCategoryPageProps {
   categorySlug: string;
@@ -13,7 +14,8 @@ interface CommunityCategoryPageProps {
 export const CommunityCategoryPage: React.FC<CommunityCategoryPageProps> = ({ categorySlug }) => {
   const { locale, t } = useI18n();
 
-  const category = FORUM_CATEGORIES.find((c) => c.slug === categorySlug) || FORUM_CATEGORIES[0];
+  const category = FORUM_CATEGORIES.find((c) => c.slug === categorySlug);
+  if (!category) return <NotFoundPage />;
   const topics = SAMPLE_TOPICS.filter((t) => t.categorySlug === categorySlug);
   const title = category.title[locale] || category.title.en;
 
@@ -25,7 +27,7 @@ export const CommunityCategoryPage: React.FC<CommunityCategoryPageProps> = ({ ca
         locale={locale}
         routeType="community-category"
         slug={categorySlug}
-        isIndexable={true}
+        isIndexable={false}
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
