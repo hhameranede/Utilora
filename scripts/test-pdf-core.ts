@@ -38,6 +38,11 @@ async function main() {
   assert.equal(burst.length, 3);
   assert.deepEqual(burst.map((item) => item.pageCount), [1, 1, 1]);
 
+  await assert.rejects(
+    rotatePdfFile(first, 45 as unknown as 90, [0]),
+    /Rotation must be 90, 180, or 270/,
+  );
+
   const rotated = await rotatePdfFile(first, 90, [0]);
   assert.equal(rotated.rotatedPageCount, 1);
   const rotatedDoc = await PDFDocument.load(await rotated.blob.arrayBuffer());
@@ -45,6 +50,11 @@ async function main() {
 
   const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/pL8AAAAASUVORK5CYII=', 'base64');
   const pngFile = new File([png.buffer.slice(png.byteOffset, png.byteOffset + png.byteLength)], 'pixel.png', { type: 'image/png' });
+  await assert.rejects(
+    imagesToPdf([pngFile], 'a4', Number.NaN),
+    /margin must be a finite number/,
+  );
+
   const converted = await imagesToPdf([pngFile], 'a4', 10);
   assert.equal(converted.pageCount, 1);
   const convertedDoc = await PDFDocument.load(await converted.blob.arrayBuffer());
