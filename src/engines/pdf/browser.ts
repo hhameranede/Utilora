@@ -76,7 +76,7 @@ export async function splitPdfFile(file: File, ranges: string, burst = false): P
       const [page] = await part.copyPages(source, [pageIndex]);
       part.addPage(page);
       const bytes = await part.save();
-      results.push({ filename: `${file.name.replace(/\.pdf$/i, '')}-page-${pageIndex + 1}.pdf`, blob: new Blob([bytes], { type: 'application/pdf' }), pageCount: 1 });
+      results.push({ filename: `${file.name.replace(/\.pdf$/i, '')}-page-${pageIndex + 1}.pdf`, blob: bytesToPdfBlob(bytes), pageCount: 1 });
     }
     return results;
   }
@@ -84,7 +84,7 @@ export async function splitPdfFile(file: File, ranges: string, burst = false): P
   const pages = await part.copyPages(source, indices);
   pages.forEach((page) => part.addPage(page));
   const bytes = await part.save();
-  return [{ filename: `${file.name.replace(/\.pdf$/i, '')}-extracted.pdf`, blob: new Blob([bytes], { type: 'application/pdf' }), pageCount: pages.length }];
+  return [{ filename: `${file.name.replace(/\.pdf$/i, '')}-extracted.pdf`, blob: bytesToPdfBlob(bytes), pageCount: pages.length }];
 }
 
 export async function rotatePdfFile(file: File, rotation: 90 | 180 | 270, targetPages: number[] | 'all'): Promise<{ blob: Blob; rotatedPageCount: number }> {
@@ -98,7 +98,7 @@ export async function rotatePdfFile(file: File, rotation: 90 | 180 | 270, target
     page.setRotation(degrees((page.getRotation().angle + rotation) % 360));
   });
   const bytes = await pdf.save();
-  return { blob: new Blob([bytes], { type: 'application/pdf' }), rotatedPageCount: targets.length };
+  return { blob: bytesToPdfBlob(bytes), rotatedPageCount: targets.length };
 }
 
 export async function imagesToPdf(files: File[], pageSize: 'fit' | 'a4' | 'letter' = 'fit', marginMm = 10): Promise<{ blob: Blob; pageCount: number }> {
@@ -127,7 +127,7 @@ export async function imagesToPdf(files: File[], pageSize: 'fit' | 'a4' | 'lette
     page.drawImage(image, { x: (pageWidth - width) / 2, y: (pageHeight - height) / 2, width, height });
   }
   const bytes = await pdf.save();
-  return { blob: new Blob([bytes], { type: 'application/pdf' }), pageCount: files.length };
+  return { blob: bytesToPdfBlob(bytes), pageCount: files.length };
 }
 
 export async function countPdfPages(file: File): Promise<{ pageCount: number; title: string; size: number; hasFormFields: boolean }> {
