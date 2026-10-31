@@ -12,7 +12,8 @@
     "test:core": "tsx scripts/test-local-core.ts",
     "seo:generate": "tsx scripts/generate-seo-files.ts",
     "prerender": "tsx scripts/prerender-routes.tsx",
-    "test:pdf": "tsx scripts/test-pdf-core.ts"
+    "test:pdf": "tsx scripts/test-pdf-core.ts",
+    "test:image": "tsx scripts/test-image-core.ts"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",
