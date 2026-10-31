@@ -146,7 +146,7 @@ export async function renderPdfToImages(
   const outputs: Array<{ filename: string; blob: Blob; pageNumber: number }> = [];
   try {
     for (const pageNumber of pages) {
-      if (!Number.isInteger(pageNumber) || pageNumber < 1 || pageNumber > document.numPages) throw new Error(`Page ${pageNumber} is outside this PDF.`);
+      if (!Number.isInteger(pageNumber) || pageNumber < 1 || pageNumber > pdfDocument.numPages) throw new Error(`Page ${pageNumber} is outside this PDF.`);
       const page = await pdfDocument.getPage(pageNumber);
       const viewport = page.getViewport({ scale: dpi / 72 });
       if (viewport.width * viewport.height > 45_000_000) throw new Error(`Page ${pageNumber} is too large at ${dpi} DPI. Try 150 DPI.`);
