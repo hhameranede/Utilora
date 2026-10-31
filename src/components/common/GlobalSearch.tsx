@@ -10,10 +10,11 @@ import { Icon } from './Icon';
 
 interface GlobalSearchProps {
   isOpen: boolean;
+  onOpen: () => void;
   onClose: () => void;
 }
 
-export const GlobalSearch: React.FC<GlobalSearchProps> = ({ isOpen, onClose }) => {
+export const GlobalSearch: React.FC<GlobalSearchProps> = ({ isOpen, onOpen, onClose }) => {
   const { locale, t } = useI18n();
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
@@ -31,9 +32,10 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({ isOpen, onClose }) =
   // Global hotkey Ctrl+K / Cmd+K
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
         if (isOpen) onClose();
+        else onOpen();
       }
       if (e.key === 'Escape' && isOpen) {
         onClose();
@@ -41,7 +43,7 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({ isOpen, onClose }) =
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, onClose]);
+  }, [isOpen, onOpen, onClose]);
 
   // Filtered results
   const searchResults = useMemo(() => {
