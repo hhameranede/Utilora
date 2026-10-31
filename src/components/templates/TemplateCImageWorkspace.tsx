@@ -30,6 +30,8 @@ export const TemplateCImageWorkspace: React.FC<TemplateCImageWorkspaceProps> = (
   const [height, setHeight] = useState(0);
   const [lockRatio, setLockRatio] = useState(true);
   const [rotation, setRotation] = useState<0 | 90 | 180 | 270>(0);
+  const [flipHorizontal, setFlipHorizontal] = useState(false);
+  const [flipVertical, setFlipVertical] = useState(false);
   const [cropX, setCropX] = useState(0);
   const [cropY, setCropY] = useState(0);
   const [cropWidth, setCropWidth] = useState(0);
@@ -74,6 +76,8 @@ export const TemplateCImageWorkspace: React.FC<TemplateCImageWorkspaceProps> = (
     });
     setMetadata(null);
     setRotation(0);
+    setFlipHorizontal(false);
+    setFlipVertical(false);
     try {
       const details = await readBrowserImageMetadata(selected);
       setMetadata(details);
@@ -120,7 +124,7 @@ export const TemplateCImageWorkspace: React.FC<TemplateCImageWorkspaceProps> = (
       const options = isCrop
         ? { format: 'png' as const, crop: { x: cropX, y: cropY, width: cropWidth, height: cropHeight } }
         : isRotate
-          ? { format: 'png' as const, rotation }
+          ? { format: 'png' as const, rotation, flipHorizontal, flipVertical }
           : isResize
             ? { format: 'png' as const, width, height }
             : { format: isCompress ? 'webp' as const : format, quality };
@@ -243,6 +247,8 @@ export const TemplateCImageWorkspace: React.FC<TemplateCImageWorkspaceProps> = (
             <div className="space-y-2">
               <Field label="Rotation"><div className="grid grid-cols-4 gap-2">{([0, 90, 180, 270] as const).map((angle) => <button type="button" key={angle} onClick={() => setRotation(angle)} className={`py-2 rounded-lg border text-xs font-semibold ${rotation === angle ? 'border-orange-400 bg-orange-50 text-orange-700' : 'border-stone-200 text-stone-600'}`}>{angle}°</button>)}</div></Field>
               <button type="button" onClick={() => setRotation((value) => ((value + 90) % 360) as 0 | 90 | 180 | 270)} className="w-full py-2 rounded-lg bg-stone-100 text-xs font-semibold text-stone-700 flex items-center justify-center gap-2"><RotateCw size={14} /> Rotate 90° clockwise</button>
+              <label className="flex items-center justify-between gap-3 p-3 rounded-lg bg-stone-50 border border-stone-200 text-xs text-stone-700"><span>Flip horizontally</span><input type="checkbox" checked={flipHorizontal} onChange={(event) => setFlipHorizontal(event.target.checked)} /></label>
+              <label className="flex items-center justify-between gap-3 p-3 rounded-lg bg-stone-50 border border-stone-200 text-xs text-stone-700"><span>Flip vertically</span><input type="checkbox" checked={flipVertical} onChange={(event) => setFlipVertical(event.target.checked)} /></label>
             </div>
           )}
 
