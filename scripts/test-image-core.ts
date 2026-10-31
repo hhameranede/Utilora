@@ -254,4 +254,39 @@ await run('reads pixel metadata, aspect ratio, transparency, and honest EXIF lim
   }
 });
 
+await run('rejects non-finite dimensions and quality and unsupported runtime rotations', async () => {
+  const invalidDimensions = installBrowserMocks();
+  try {
+    await assert.rejects(
+      transformBrowserImage(makeImageFile(), { width: Number.NaN }),
+      /finite positive numbers/,
+    );
+    assert.equal(invalidDimensions.bitmaps[0].closed, true);
+  } finally {
+    invalidDimensions.restore();
+  }
+
+  const invalidQuality = installBrowserMocks();
+  try {
+    await assert.rejects(
+      transformBrowserImage(makeImageFile(), { quality: Number.NaN }),
+      /quality must be a finite number/,
+    );
+    assert.equal(invalidQuality.bitmaps[0].closed, true);
+  } finally {
+    invalidQuality.restore();
+  }
+
+  const invalidRotation = installBrowserMocks();
+  try {
+    await assert.rejects(
+      transformBrowserImage(makeImageFile(), { rotation: 45 as 90 }),
+      /Rotation must be 0, 90, 180, or 270/,
+    );
+    assert.equal(invalidRotation.bitmaps[0].closed, true);
+  } finally {
+    invalidRotation.restore();
+  }
+});
+
 process.stdout.write('All image engine smoke tests passed.\n');
