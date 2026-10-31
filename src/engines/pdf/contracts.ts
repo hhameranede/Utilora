@@ -58,7 +58,7 @@ export const JpgToPdfAdapter: ToolAdapter<JpgToPdfInput, JpgToPdfOptions, JpgToP
   async execute(input, options = { pageSize: 'fit', orientation: 'auto', marginMm: 10 }) {
     const started = performance.now();
     try {
-      const result = await imagesToPdf(input.files, options.pageSize, options.marginMm);
+      const result = await imagesToPdf(input.files, options.pageSize, options.marginMm, options.orientation);
       return { success: true, data: result, durationMs: performance.now() - started };
     } catch (error) { return failure<JpgToPdfOutput>(error); }
   },
