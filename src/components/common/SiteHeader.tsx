@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { useI18n } from '../../i18n';
 import { useRouter, Link } from '../../router';
-import { Search, Menu, X, ChevronDown, Layers, Sparkles, ShieldCheck } from 'lucide-react';
+import { Search, Menu, X, ChevronDown } from 'lucide-react';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { GlobalSearch } from './GlobalSearch';
+import { BrandLogo } from './BrandLogo';
 import { CATEGORIES_LIST } from '../../registry/categories.registry';
 import { Icon } from './Icon';
 
@@ -24,17 +25,7 @@ export const SiteHeader: React.FC = () => {
               routeType="home"
               className="flex items-center gap-2.5 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 rounded-lg"
             >
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center text-white font-bold text-sm tracking-tighter shadow-sm shadow-orange-500/20 group-hover:scale-105 transition-transform">
-                U
-              </div>
-              <div className="flex flex-col">
-                <span className="text-base font-bold tracking-wider text-stone-900 group-hover:text-orange-600 transition-colors">
-                  UTILORA
-                </span>
-                <span className="text-[10px] uppercase font-mono tracking-widest text-orange-600 -mt-1 hidden sm:block">
-                  Tools Platform
-                </span>
-              </div>
+              <BrandLogo />
             </Link>
 
             {/* Desktop Navigation Links */}
@@ -145,16 +136,6 @@ export const SiteHeader: React.FC = () => {
             {/* Language Selector */}
             <LanguageSwitcher variant="header" />
 
-            {/* Internal Template Gallery Lab Shortcut */}
-            <Link
-              to="/dev/templates"
-              className="hidden xl:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-medium text-stone-500 hover:text-orange-600 hover:bg-orange-50 border border-dashed border-stone-200 transition-colors"
-              title="Internal UI Template Gallery (Non-Public)"
-            >
-              <Sparkles size={12} className="text-orange-500" />
-              <span>{t('nav.devTemplates')}</span>
-            </Link>
-
             {/* Mobile Menu Toggle Button */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -169,7 +150,7 @@ export const SiteHeader: React.FC = () => {
       </header>
 
       {/* Global Search Dialog */}
-      <GlobalSearch isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
+      <GlobalSearch isOpen={isSearchOpen} onOpen={() => setIsSearchOpen(true)} onClose={() => setIsSearchOpen(false)} />
 
       {/* Mobile Drawer Menu */}
       {isMobileMenuOpen && (
@@ -249,13 +230,6 @@ export const SiteHeader: React.FC = () => {
                 className="block px-3 py-2 text-sm font-semibold text-stone-800 hover:text-orange-600"
               >
                 {t('nav.about')}
-              </Link>
-              <Link
-                to="/dev/templates"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="block px-3 py-2 text-xs font-mono text-orange-600 hover:underline"
-              >
-                ⚡ {t('nav.devTemplates')} (Internal Lab)
               </Link>
             </div>
 
