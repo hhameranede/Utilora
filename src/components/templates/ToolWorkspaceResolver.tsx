@@ -58,6 +58,7 @@ export const ToolWorkspaceResolver: React.FC<ToolWorkspaceResolverProps> = ({ to
       return (
         <TemplateETextEditor
           toolName={toolName}
+          toolSlug={tool.slug}
           showCaseOptions={tool.slug === 'case-converter'}
           showDedupeOptions={tool.slug === 'duplicate-lines-remover'}
           showSortOptions={tool.slug === 'sort-text-lines'}
@@ -68,10 +69,10 @@ export const ToolWorkspaceResolver: React.FC<ToolWorkspaceResolverProps> = ({ to
       return <TemplateFTwoPanelCompare toolName={toolName} />;
 
     case 'template-g-code-editor':
-      return <TemplateGCodeEditor toolName={toolName} />;
+      return <TemplateGCodeEditor toolName={toolName} toolSlug={tool.slug} />;
 
     case 'template-h-encoder-decoder':
-      return <TemplateHEncoderDecoder toolName={toolName} />;
+      return <TemplateHEncoderDecoder toolName={toolName} toolSlug={tool.slug} />;
 
     case 'template-i-generator':
       return (
