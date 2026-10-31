@@ -5,30 +5,30 @@
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   --font-arabic: 'Noto Sans Arabic', 'Plus Jakarta Sans', system-ui, sans-serif;
 
-  --color-orange-50: #fff7ed;
-  --color-orange-100: #ffedd5;
-  --color-orange-200: #fed7aa;
-  --color-orange-400: #fb923c;
-  --color-orange-500: #f97316;
-  --color-orange-600: #ea580c;
-  --color-orange-700: #c2410c;
-  --color-orange-800: #9a3412;
+  --color-orange-50: #fbf6e9;
+  --color-orange-100: #f5e8c5;
+  --color-orange-200: #ead39a;
+  --color-orange-400: #e8be5e;
+  --color-orange-500: #c99a37;
+  --color-orange-600: #a97d25;
+  --color-orange-700: #805c17;
+  --color-orange-800: #604510;
 
-  --color-brand-bg: #fafaf9;
-  --color-brand-surface: #ffffff;
-  --color-brand-surface-elevated: #fdfbf7;
-  --color-brand-border: #e7e5e4;
-  --color-brand-border-subtle: #f5f5f4;
+  --color-brand-bg: #0a1020;
+  --color-brand-surface: #111c31;
+  --color-brand-surface-elevated: #17243b;
+  --color-brand-border: #293852;
+  --color-brand-border-subtle: #1d2b43;
 }
 
 :root {
-  color-scheme: light;
+  color-scheme: dark;
 }
 
 html {
   font-family: var(--font-sans);
-  background-color: #fafaf9;
-  color: #1c1917;
+  background-color: #0a1020;
+  color: #f8fafc;
   scroll-behavior: smooth;
 }
 
@@ -42,12 +42,12 @@ html {
   height: 7px;
 }
 ::-webkit-scrollbar-track {
-  background: #fafaf9;
+  background: #0a1020;
 }
 ::-webkit-scrollbar-thumb {
-  background: #d6d3d1;
+  background: #8b7447;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #a8a29e;
+  background: #e8be5e;
 }
