@@ -9,7 +9,7 @@ function failure<T>(error: unknown) {
 }
 
 export interface ImageConverterInput { file: File; }
-export interface ImageConverterOptions { targetFormat: 'png' | 'jpg' | 'webp'; quality: number; preserveMetadata?: boolean; }
+export interface ImageConverterOptions { targetFormat: 'png' | 'jpg' | 'webp'; quality: number; }
 export interface ImageConverterOutput { blob: Blob; filename: string; originalSize: number; newSize: number; format: string; }
 
 export const ImageConverterAdapter: ToolAdapter<ImageConverterInput, ImageConverterOptions, ImageConverterOutput> = {
@@ -26,7 +26,7 @@ export const ImageConverterAdapter: ToolAdapter<ImageConverterInput, ImageConver
 };
 
 export interface ImageCompressorInput { file: File; }
-export interface ImageCompressorOptions { quality: number; maxDimension?: number; lossless?: boolean; }
+export interface ImageCompressorOptions { quality: number; maxDimension?: number; }
 export interface ImageCompressorOutput { blob: Blob; filename: string; originalSize: number; compressedSize: number; savingsPercent: number; }
 
 export const ImageCompressorAdapter: ToolAdapter<ImageCompressorInput, ImageCompressorOptions, ImageCompressorOutput> = {
@@ -53,7 +53,7 @@ export const ImageCompressorAdapter: ToolAdapter<ImageCompressorInput, ImageComp
 };
 
 export interface ImageResizerInput { file: File; }
-export interface ImageResizerOptions { mode: 'pixels' | 'percentage'; targetWidth?: number; targetHeight?: number; percentage?: number; maintainAspectRatio: boolean; resampleFilter?: 'bicubic' | 'bilinear' | 'lanczos'; }
+export interface ImageResizerOptions { mode: 'pixels' | 'percentage'; targetWidth?: number; targetHeight?: number; percentage?: number; maintainAspectRatio: boolean; }
 export interface ImageResizerOutput { blob: Blob; width: number; height: number; newSize: number; }
 
 export const ImageResizerAdapter: ToolAdapter<ImageResizerInput, ImageResizerOptions, ImageResizerOutput> = {
@@ -74,15 +74,18 @@ export const ImageResizerAdapter: ToolAdapter<ImageResizerInput, ImageResizerOpt
 };
 
 export interface ImageCropperInput { file: File; }
-export interface ImageCropperOptions { cropBox: { x: number; y: number; width: number; height: number }; aspectRatioPreset?: 'free' | '1:1' | '16:9' | '4:3' | 'circle'; }
+export interface ImageCropperOptions { cropBox?: { x: number; y: number; width: number; height: number }; }
 export interface ImageCropperOutput { blob: Blob; croppedWidth: number; croppedHeight: number; }
 
 export const ImageCropperAdapter: ToolAdapter<ImageCropperInput, ImageCropperOptions, ImageCropperOutput> = {
   id: 'image-cropper', name: 'Image Cropper Adapter', isConnected: true,
-  async execute(input, options = { cropBox: { x: 0, y: 0, width: 1, height: 1 } }) {
+  async execute(input, options) {
     const started = performance.now();
     try {
-      const result = await transformBrowserImage(input.file, { format: 'png', crop: options.cropBox });
+      const result = await transformBrowserImage(input.file, {
+        format: 'png',
+        ...(options?.cropBox ? { crop: options.cropBox } : {}),
+      });
       return { success: true, data: { blob: result.blob, croppedWidth: result.width, croppedHeight: result.height }, durationMs: performance.now() - started };
     } catch (error) { return failure<ImageCropperOutput>(error); }
   },
