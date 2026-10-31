@@ -180,12 +180,14 @@ await run('rejects malformed crop rectangles and still releases decoded bitmap r
     { x: 0, y: 0, width: 0, height: 1 },
     { x: 0, y: 0, width: Number.NaN, height: 1 },
     { x: 4, y: 0, width: 1, height: 1 },
+    { x: 3, y: 0, width: 2, height: 1 },
+    { x: 0, y: 1, width: 1, height: 2 },
   ]) {
     const mock = installBrowserMocks();
     try {
       await assert.rejects(
         transformBrowserImage(makeImageFile(), { crop }),
-        /Crop coordinates/,
+        /Crop rectangle/,
       );
       assert.equal(mock.bitmaps[0].closed, true);
     } finally {
