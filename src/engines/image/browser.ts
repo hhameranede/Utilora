@@ -50,13 +50,14 @@ export async function transformBrowserImage(file: File, options: BrowserImageOpt
     const crop = options.crop ?? { x: 0, y: 0, width: bitmap.width, height: bitmap.height };
     if (![crop.x, crop.y, crop.width, crop.height].every(Number.isFinite) ||
         crop.x < 0 || crop.y < 0 || crop.width < 1 || crop.height < 1 ||
-        crop.x >= bitmap.width || crop.y >= bitmap.height) {
-      throw new Error('Crop coordinates must start inside the image and use positive width and height.');
+        crop.x >= bitmap.width || crop.y >= bitmap.height ||
+        crop.x + crop.width > bitmap.width || crop.y + crop.height > bitmap.height) {
+      throw new Error('Crop rectangle must have positive dimensions and stay fully inside the image.');
     }
     const sx = Math.floor(crop.x);
     const sy = Math.floor(crop.y);
-    const sw = Math.max(1, Math.min(bitmap.width - sx, Math.floor(crop.width)));
-    const sh = Math.max(1, Math.min(bitmap.height - sy, Math.floor(crop.height)));
+    const sw = Math.max(1, Math.floor(crop.width));
+    const sh = Math.max(1, Math.floor(crop.height));
     const scale = Math.min(1, 12000 / Math.max(sw, sh));
     const requestedWidth = options.width ?? sw * scale;
     const requestedHeight = options.height ?? sh * scale;
