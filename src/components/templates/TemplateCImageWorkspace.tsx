@@ -183,7 +183,7 @@ export const TemplateCImageWorkspace: React.FC<TemplateCImageWorkspaceProps> = (
             <Metric label="Dimensions" value={`${metadata.width} × ${metadata.height}`} />
             <Metric label="File size" value={formatBytes(metadata.sizeBytes)} />
             <Metric label="Aspect ratio" value={metadata.aspectRatio} />
-            <Metric label="Transparency" value={metadata.hasTransparency ? 'Yes' : 'No'} />
+            <Metric label="Alpha sample" value={metadata.hasTransparency ? 'Yes' : 'No'} />
           </div>
         )}
         {metadata && isMetadata && (
