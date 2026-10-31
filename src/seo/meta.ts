@@ -33,8 +33,12 @@ export function generateHreflangLinks(routeType: RouteType, slug?: string): Arra
 export function applyDocumentMetadata(config: PageMetadataConfig) {
   if (typeof document === 'undefined') return;
 
-  // 1. Update Title
+  // 1. Update document language and title for localized routes
+  document.documentElement.lang = config.locale;
+  document.documentElement.dir = config.locale === 'ar' ? 'rtl' : 'ltr';
   document.title = config.title;
+
+  const siteOrigin = typeof window !== 'undefined' ? window.location.origin : undefined;
 
   // 2. Helper to set or create meta tag
   const setMeta = (nameAttr: 'name' | 'property', attrValue: string, content: string) => {
@@ -71,6 +75,10 @@ export function applyDocumentMetadata(config: PageMetadataConfig) {
   setMeta('property', 'og:description', config.description);
   setMeta('property', 'og:type', config.ogType || 'website');
   setMeta('property', 'og:site_name', 'UTILORA');
+  if (siteOrigin) {
+    setMeta('property', 'og:image', `${siteOrigin}/og-utilora.svg`);
+    setMeta('name', 'twitter:image', `${siteOrigin}/og-utilora.svg`);
+  }
   setMeta('name', 'twitter:card', 'summary_large_image');
   setMeta('name', 'twitter:title', config.title);
   setMeta('name', 'twitter:description', config.description);
@@ -105,7 +113,6 @@ export function applyDocumentMetadata(config: PageMetadataConfig) {
     document.head.appendChild(script);
   }
 
-  const siteOrigin = typeof window !== 'undefined' ? window.location.origin : undefined;
   let structuredData: Record<string, unknown> = {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
