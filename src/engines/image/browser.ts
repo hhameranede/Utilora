@@ -58,13 +58,26 @@ export async function transformBrowserImage(file: File, options: BrowserImageOpt
     const sw = Math.max(1, Math.min(bitmap.width - sx, Math.floor(crop.width)));
     const sh = Math.max(1, Math.min(bitmap.height - sy, Math.floor(crop.height)));
     const scale = Math.min(1, 12000 / Math.max(sw, sh));
-    const drawWidth = Math.max(1, Math.round(options.width ?? sw * scale));
-    const drawHeight = Math.max(1, Math.round(options.height ?? sh * scale));
+    const requestedWidth = options.width ?? sw * scale;
+    const requestedHeight = options.height ?? sh * scale;
+    if (!Number.isFinite(requestedWidth) || !Number.isFinite(requestedHeight) ||
+        requestedWidth <= 0 || requestedHeight <= 0) {
+      throw new Error('Output dimensions must be finite positive numbers.');
+    }
+    const drawWidth = Math.max(1, Math.round(requestedWidth));
+    const drawHeight = Math.max(1, Math.round(requestedHeight));
     if (drawWidth > 12000 || drawHeight > 12000 || drawWidth * drawHeight > 80_000_000) {
       throw new Error('The requested output dimensions are too large for a safe browser canvas.');
     }
 
-    const rotation = ((options.rotation ?? 0) % 360 + 360) % 360;
+    const rotation = options.rotation ?? 0;
+    if (![0, 90, 180, 270].includes(rotation)) {
+      throw new Error('Rotation must be 0, 90, 180, or 270 degrees.');
+    }
+    const quality = options.quality ?? 85;
+    if (!Number.isFinite(quality)) {
+      throw new Error('Image quality must be a finite number.');
+    }
     const swapsSides = rotation === 90 || rotation === 270;
     const canvas = document.createElement('canvas');
     canvas.width = swapsSides ? drawHeight : drawWidth;
@@ -85,7 +98,7 @@ export async function transformBrowserImage(file: File, options: BrowserImageOpt
 
     const format = options.format ?? 'webp';
     const mime = format === 'jpeg' ? 'image/jpeg' : `image/${format}`;
-    const blob = await canvasToBlob(canvas, mime, Math.max(0.1, Math.min(1, (options.quality ?? 85) / 100)));
+    const blob = await canvasToBlob(canvas, mime, Math.max(0.1, Math.min(1, quality / 100)));
     return {
       blob,
       width: canvas.width,
