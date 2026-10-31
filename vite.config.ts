@@ -1,7 +1,7 @@
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
-import {defineConfig} from 'vite';
+import { defineConfig } from 'vite';
 
 export default defineConfig(() => {
   const siteOriginMetadata = {
@@ -10,7 +10,7 @@ export default defineConfig(() => {
       const configuredSiteUrl = process.env.SITE_URL?.trim();
       if (!configuredSiteUrl) {
         return html.replace(
-          /\s*<meta (?:property="og:image(?::(?:width|height))?"|name="twitter:image")[^>]*\\/>\s*/g,
+          /\s*<meta (?:property="og:image(?::(?:width|height))?"|name="twitter:image")[^>]*\/>\s*/g,
           '',
         );
       }
