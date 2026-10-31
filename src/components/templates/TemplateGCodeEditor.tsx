@@ -12,7 +12,7 @@ interface TemplateGCodeEditorProps {
 
 export const TemplateGCodeEditor: React.FC<TemplateGCodeEditorProps> = ({
   toolName,
-  toolSlug = 'json-validator',
+  toolSlug = 'json-formatter',
   defaultPayload = `{\n  "service": "UTILORA",\n  "version": "2.4.0",\n  "status": "operational",\n  "capabilities": [\n    "in_browser_processing",\n    "zero_cloud_storage",\n    "local_privacy"\n  ]\n}`,
   actionLabel = 'Format & Prettify JSON',
 }) => {
@@ -27,12 +27,12 @@ export const TemplateGCodeEditor: React.FC<TemplateGCodeEditorProps> = ({
 
   const handleProcess = () => {
     try {
-      const mode = toolSlug === 'json-minifier' ? 'minify' : 'validate';
+      const mode = toolSlug === 'json-minifier' ? 'minify' : toolSlug === 'json-validator' ? 'validate' : 'format';
       const result = processJson(code, mode, indentSize);
-      if (mode === 'minify') {
+      if (mode === 'minify' || mode === 'format') {
         const saved = new TextEncoder().encode(code).length - new TextEncoder().encode(result.output).length;
         setCode(result.output);
-        setResultMessage(`JSON minified successfully. ${saved} bytes saved.`);
+        setResultMessage(mode === 'minify' ? `JSON minified successfully. ${saved} bytes saved.` : 'JSON formatted successfully.');
       } else {
         setResultMessage('Valid JSON. No syntax errors were found.');
       }
@@ -139,7 +139,7 @@ export const TemplateGCodeEditor: React.FC<TemplateGCodeEditorProps> = ({
         </div>
         <div className="w-full sm:w-auto">
           <button type="button" onClick={handleProcess} className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-stone-900 hover:bg-stone-800 text-white text-xs font-semibold shadow-sm transition-colors">
-            {toolSlug === 'json-minifier' ? 'Minify JSON' : actionLabel || 'Validate JSON'}
+            {toolSlug === 'json-minifier' ? 'Minify JSON' : toolSlug === 'json-validator' ? 'Validate JSON' : 'Format JSON'}
           </button>
         </div>
       </div>
