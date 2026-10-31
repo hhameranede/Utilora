@@ -61,7 +61,8 @@ export const ToolWorkspaceResolver: React.FC<ToolWorkspaceResolverProps> = ({ to
       return (
         <TemplateCImageWorkspace
           toolName={toolName}
-          defaultFormat={tool.slug === 'image-converter' ? 'webp' : 'jpg'}
+          toolSlug={tool.slug}
+          defaultFormat={tool.slug === 'image-converter' ? 'webp' : 'jpeg'}
           showCropperGrid={tool.slug === 'image-cropper'}
         />
       );
