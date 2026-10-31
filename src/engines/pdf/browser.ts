@@ -117,7 +117,7 @@ export async function imagesToPdf(files: File[], pageSize: 'fit' | 'a4' | 'lette
     if (pageSize === 'a4') { pageWidth = 595.28; pageHeight = 841.89; }
     if (pageSize === 'letter') { pageWidth = 612; pageHeight = 792; }
     const landscape = orientation === 'landscape' || (orientation === 'auto' && imageDims.width > imageDims.height);
-    if (pageSize !== 'fit' && landscape) [pageWidth, pageHeight] = [pageHeight, pageWidth];
+    if (landscape !== (pageWidth > pageHeight)) [pageWidth, pageHeight] = [pageHeight, pageWidth];
     const availableWidth = Math.max(1, pageWidth - margin * 2);
     const availableHeight = Math.max(1, pageHeight - margin * 2);
     const scale = Math.min(availableWidth / imageDims.width, availableHeight / imageDims.height, 1);
