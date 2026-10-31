@@ -139,18 +139,18 @@ export async function renderPdfToImages(
   const pdfjs = await import('pdfjs-dist');
   pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString();
   const bytes = new Uint8Array(await file.arrayBuffer());
-  const document = await pdfjs.getDocument({ data: bytes }).promise;
-  if (document.numPages > MAX_PDF_PAGES) throw new Error('This PDF exceeds the 250-page safety limit.');
-  const pages = selectedPages?.length ? [...new Set(selectedPages)] : Array.from({ length: document.numPages }, (_, index) => index + 1);
+  const pdfDocument = await pdfjs.getDocument({ data: bytes }).promise;
+  if (pdfDocument.numPages > MAX_PDF_PAGES) throw new Error('This PDF exceeds the 250-page safety limit.');
+  const pages = selectedPages?.length ? [...new Set(selectedPages)] : Array.from({ length: pdfDocument.numPages }, (_, index) => index + 1);
   if (pages.length > 40) throw new Error('Export is limited to 40 pages at a time to protect device memory.');
   const outputs: Array<{ filename: string; blob: Blob; pageNumber: number }> = [];
   try {
     for (const pageNumber of pages) {
       if (!Number.isInteger(pageNumber) || pageNumber < 1 || pageNumber > document.numPages) throw new Error(`Page ${pageNumber} is outside this PDF.`);
-      const page = await document.getPage(pageNumber);
+      const page = await pdfDocument.getPage(pageNumber);
       const viewport = page.getViewport({ scale: dpi / 72 });
       if (viewport.width * viewport.height > 45_000_000) throw new Error(`Page ${pageNumber} is too large at ${dpi} DPI. Try 150 DPI.`);
-      const canvas = document.createElement('canvas');
+      const canvas = globalThis.document.createElement('canvas');
       canvas.width = Math.ceil(viewport.width);
       canvas.height = Math.ceil(viewport.height);
       const context = canvas.getContext('2d');
@@ -165,6 +165,6 @@ export async function renderPdfToImages(
     }
     return outputs;
   } finally {
-    await document.destroy();
+    await pdfDocument.destroy();
   }
 }
