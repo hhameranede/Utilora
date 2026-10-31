@@ -358,6 +358,18 @@ await run('executes all six image tool adapters and returns truthful output meta
     cropperMock.restore();
   }
 
+  const defaultCropperMock = installBrowserMocks();
+  try {
+    const fullImage = await ImageCropperAdapter.execute({ file });
+    assert.equal(fullImage.success, true);
+    assert.ok(fullImage.data);
+    assert.equal(fullImage.data.croppedWidth, 4);
+    assert.equal(fullImage.data.croppedHeight, 2);
+    assert.equal(defaultCropperMock.bitmaps[0].closed, true);
+  } finally {
+    defaultCropperMock.restore();
+  }
+
   const rotatorMock = installBrowserMocks();
   try {
     const rotated = await ImageRotatorAdapter.execute({ file }, { degrees: 90, flipHorizontal: true });
