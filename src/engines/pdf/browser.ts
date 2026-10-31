@@ -3,6 +3,12 @@ import { PDFDocument, degrees } from 'pdf-lib';
 const MAX_PDF_SIZE = 100 * 1024 * 1024;
 const MAX_PDF_PAGES = 250;
 
+function bytesToPdfBlob(bytes: Uint8Array): Blob {
+  const buffer = new ArrayBuffer(bytes.byteLength);
+  new Uint8Array(buffer).set(bytes);
+  return new Blob([buffer], { type: 'application/pdf' });
+}
+
 function validatePdfFiles(files: File[]): void {
   if (!files.length) throw new Error('Select at least one PDF file.');
   for (const file of files) {
@@ -38,7 +44,7 @@ export async function mergePdfFiles(files: File[]): Promise<{ blob: Blob; pageCo
     if (totalPages > MAX_PDF_PAGES) throw new Error('The merged document would exceed 250 pages.');
   }
   const bytes = await output.save();
-  return { blob: new Blob([bytes], { type: 'application/pdf' }), pageCount: totalPages, size: bytes.length };
+  return { blob: bytesToPdfBlob(bytes), pageCount: totalPages, size: bytes.length };
 }
 
 function parsePageRanges(input: string, totalPages: number): number[] {
@@ -155,7 +161,7 @@ export async function renderPdfToImages(
       canvas.height = Math.ceil(viewport.height);
       const context = canvas.getContext('2d');
       if (!context) throw new Error('Canvas rendering is unavailable in this browser.');
-      await page.render({ canvasContext: context, viewport }).promise;
+      await page.render({ canvas, canvasContext: context, viewport }).promise;
       const mime = format === 'png' ? 'image/png' : 'image/jpeg';
       const blob = await new Promise<Blob>((resolve, reject) => canvas.toBlob((result) => result ? resolve(result) : reject(new Error('Unable to export rendered PDF page.')), mime, 0.92));
       outputs.push({ filename: `${file.name.replace(/\.pdf$/i, '')}-page-${pageNumber}.${format}`, blob, pageNumber });
@@ -165,6 +171,6 @@ export async function renderPdfToImages(
     }
     return outputs;
   } finally {
-    await pdfDocument.destroy();
+    pdfDocument.cleanup();
   }
 }
