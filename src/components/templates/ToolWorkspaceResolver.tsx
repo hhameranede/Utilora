@@ -1,4 +1,5 @@
 import React from 'react';
+import { TemplatePdfTools } from './TemplatePdfTools';
 import { ToolDefinition } from '../../registry/tool-types';
 import { TemplateASingleFile } from './TemplateASingleFile';
 import { TemplateBMultiFile } from './TemplateBMultiFile';
@@ -23,6 +24,20 @@ interface ToolWorkspaceResolverProps {
 
 export const ToolWorkspaceResolver: React.FC<ToolWorkspaceResolverProps> = ({ tool }) => {
   const toolName = tool.localizedName.en;
+
+  if (tool.category === 'image') {
+    return (
+      <TemplateCImageWorkspace
+        toolName={toolName}
+        toolSlug={tool.slug}
+        defaultFormat={tool.slug === 'image-converter' ? 'webp' : 'jpeg'}
+      />
+    );
+  }
+
+  if (tool.category === 'pdf') {
+    return <TemplatePdfTools toolName={toolName} toolSlug={tool.slug} />;
+  }
 
   switch (tool.template) {
     case 'template-a-single-file':
