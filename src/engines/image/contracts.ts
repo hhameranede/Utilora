@@ -106,7 +106,7 @@ export const ImageRotatorAdapter: ToolAdapter<ImageRotatorInput, ImageRotatorOpt
 export interface ImageMetadataViewerInput { file: File; }
 export interface ImageMetadataViewerOutput {
   dimensions: { width: number; height: number };
-  colorSpace: string;
+  mimeType: string;
   hasAlpha: boolean;
   exifTags?: { cameraMake?: string; cameraModel?: string; focalLength?: string; aperture?: string; iso?: number; shutterSpeed?: string; dateTaken?: string; gpsCoordinates?: { lat: number; lng: number } };
 }
@@ -117,7 +117,7 @@ export const ImageMetadataViewerAdapter: ToolAdapter<ImageMetadataViewerInput, R
     const started = performance.now();
     try {
       const metadata = await readBrowserImageMetadata(input.file);
-      return { success: true, data: { dimensions: { width: metadata.width, height: metadata.height }, colorSpace: metadata.mimeType, hasAlpha: metadata.hasTransparency }, durationMs: performance.now() - started };
+      return { success: true, data: { dimensions: { width: metadata.width, height: metadata.height }, mimeType: metadata.mimeType, hasAlpha: metadata.hasTransparency }, durationMs: performance.now() - started };
     } catch (error) { return failure<ImageMetadataViewerOutput>(error); }
   },
 };
