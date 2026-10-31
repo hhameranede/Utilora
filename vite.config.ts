@@ -10,7 +10,7 @@ export default defineConfig(() => {
       const configuredSiteUrl = process.env.SITE_URL?.trim();
       if (!configuredSiteUrl) {
         return html.replace(
-          /\\s*<meta (?:property="og:image(?::(?:width|height))?"|name="twitter:image")[^>]*\\/>\\s*/g,
+          /\s*<meta (?:property="og:image(?::(?:width|height))?"|name="twitter:image")[^>]*\\/>\s*/g,
           '',
         );
       }
