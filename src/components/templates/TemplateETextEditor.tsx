@@ -56,7 +56,7 @@ export const TemplateETextEditor: React.FC<TemplateETextEditorProps> = ({
       } else if (toolSlug === 'sort-text-lines') {
         setText(sortTextLines(text, sortMode));
         setResultMessage('Lines sorted successfully.');
-      } else if (toolSlug === 'character-counter') {
+      } else if (toolSlug === 'character-counter' || toolSlug === 'word-counter') {
         setResultMessage('Character statistics are live and update as you type.');
       }
       setResultError(false);
@@ -222,10 +222,10 @@ export const TemplateETextEditor: React.FC<TemplateETextEditorProps> = ({
         {/* Footer Bar */}
         <div className="p-4 bg-stone-50/60 border-t border-stone-100 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="text-xs text-stone-600">
-            Client-side text analytics active. All character parsing occurs in your browser.
+            Live text analysis runs locally in your browser as you type.
           </div>
           <div className="w-full sm:w-auto flex flex-col items-end gap-2">
-            {toolSlug !== 'character-counter' && (
+            {toolSlug !== 'character-counter' && toolSlug !== 'word-counter' && (
               <button type="button" onClick={handleProcess} className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-stone-900 hover:bg-stone-800 text-white text-xs font-semibold shadow-sm transition-colors">
                 {actionLabel}
               </button>
