@@ -88,6 +88,7 @@ export async function splitPdfFile(file: File, ranges: string, burst = false): P
 }
 
 export async function rotatePdfFile(file: File, rotation: 90 | 180 | 270, targetPages: number[] | 'all'): Promise<{ blob: Blob; rotatedPageCount: number }> {
+  if (![90, 180, 270].includes(rotation)) throw new Error('Rotation must be 90, 180, or 270 degrees.');
   const pdf = await loadPdf(file);
   const pages = pdf.getPages();
   const targets = targetPages === 'all' ? pages.map((_, index) => index) : [...new Set(targetPages)];
@@ -104,6 +105,7 @@ export async function rotatePdfFile(file: File, rotation: 90 | 180 | 270, target
 export async function imagesToPdf(files: File[], pageSize: 'fit' | 'a4' | 'letter' = 'fit', marginMm = 10, orientation: 'auto' | 'portrait' | 'landscape' = 'auto'): Promise<{ blob: Blob; pageCount: number }> {
   if (!files.length) throw new Error('Choose at least one JPG or PNG image.');
   if (files.length > 100) throw new Error('Choose no more than 100 images at a time.');
+  if (!Number.isFinite(marginMm)) throw new Error('Image-to-PDF margin must be a finite number.');
   const pdf = await PDFDocument.create();
   const margin = Math.max(0, Math.min(30, marginMm)) * 72 / 25.4;
   for (const file of files) {
@@ -149,12 +151,13 @@ export async function renderPdfToImages(
   pdfjs.GlobalWorkerOptions.workerSrc = pdfWorker.default;
   const bytes = new Uint8Array(await file.arrayBuffer());
   const loadingTask = pdfjs.getDocument({ data: bytes });
-  const pdfDocument = await loadingTask.promise;
-  if (pdfDocument.numPages > MAX_PDF_PAGES) throw new Error('This PDF exceeds the 250-page safety limit.');
-  const pages = selectedPages?.length ? [...new Set(selectedPages)] : Array.from({ length: pdfDocument.numPages }, (_, index) => index + 1);
-  if (pages.length > 40) throw new Error('Export is limited to 40 pages at a time to protect device memory.');
+  let pdfDocument: Awaited<typeof loadingTask.promise> | undefined;
   const outputs: Array<{ filename: string; blob: Blob; pageNumber: number }> = [];
   try {
+    pdfDocument = await loadingTask.promise;
+    if (pdfDocument.numPages > MAX_PDF_PAGES) throw new Error('This PDF exceeds the 250-page safety limit.');
+    const pages = selectedPages?.length ? [...new Set(selectedPages)] : Array.from({ length: pdfDocument.numPages }, (_, index) => index + 1);
+    if (pages.length > 40) throw new Error('Export is limited to 40 pages at a time to protect device memory.');
     for (const pageNumber of pages) {
       if (!Number.isInteger(pageNumber) || pageNumber < 1 || pageNumber > pdfDocument.numPages) throw new Error(`Page ${pageNumber} is outside this PDF.`);
       const page = await pdfDocument.getPage(pageNumber);
@@ -175,6 +178,10 @@ export async function renderPdfToImages(
     }
     return outputs;
   } finally {
-    pdfDocument.cleanup();
+    try {
+      pdfDocument?.cleanup();
+    } finally {
+      await loadingTask.destroy();
+    }
   }
 }
