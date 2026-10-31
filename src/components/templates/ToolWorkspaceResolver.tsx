@@ -59,6 +59,7 @@ export const ToolWorkspaceResolver: React.FC<ToolWorkspaceResolverProps> = ({ to
         <TemplateETextEditor
           toolName={toolName}
           toolSlug={tool.slug}
+          defaultText=""
           showCaseOptions={tool.slug === 'case-converter'}
           showDedupeOptions={tool.slug === 'duplicate-lines-remover'}
           showSortOptions={tool.slug === 'sort-text-lines'}
