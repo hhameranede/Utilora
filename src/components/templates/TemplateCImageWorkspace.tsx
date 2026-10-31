@@ -29,6 +29,8 @@ export const TemplateCImageWorkspace: React.FC<TemplateCImageWorkspaceProps> = (
   const [width, setWidth] = useState(0);
   const [height, setHeight] = useState(0);
   const [lockRatio, setLockRatio] = useState(true);
+  const [resizeMode, setResizeMode] = useState<'pixels' | 'percentage'>('pixels');
+  const [percentage, setPercentage] = useState(100);
   const [rotation, setRotation] = useState<0 | 90 | 180 | 270>(0);
   const [flipHorizontal, setFlipHorizontal] = useState(false);
   const [flipVertical, setFlipVertical] = useState(false);
@@ -83,6 +85,7 @@ export const TemplateCImageWorkspace: React.FC<TemplateCImageWorkspaceProps> = (
       setMetadata(details);
       setWidth(details.width);
       setHeight(details.height);
+      setPercentage(100);
       setCropX(0);
       setCropY(0);
       setCropWidth(details.width);
@@ -126,7 +129,7 @@ export const TemplateCImageWorkspace: React.FC<TemplateCImageWorkspaceProps> = (
         : isRotate
           ? { format: 'png' as const, rotation, flipHorizontal, flipVertical }
           : isResize
-            ? { format: 'png' as const, width, height }
+            ? { format: 'png' as const, width: resizeMode === 'percentage' ? Math.round(metadata.width * percentage / 100) : width, height: resizeMode === 'percentage' ? Math.round(metadata.height * percentage / 100) : height }
             : { format: isCompress ? 'webp' as const : format, quality };
 
       const output = await transformBrowserImage(file, options);
@@ -221,11 +224,25 @@ export const TemplateCImageWorkspace: React.FC<TemplateCImageWorkspaceProps> = (
 
           {isResize && (
             <>
-              <div className="flex justify-between items-center"><span className="text-xs font-semibold text-stone-700">Keep aspect ratio</span><button type="button" onClick={() => setLockRatio(!lockRatio)} className="flex items-center gap-1 text-xs text-orange-700">{lockRatio ? <Lock size={14} /> : <Unlock size={14} />}{lockRatio ? 'Locked' : 'Unlocked'}</button></div>
-              <div className="grid grid-cols-2 gap-3">
-                <NumberField label="Width (px)" value={width} onChange={updateWidth} />
-                <NumberField label="Height (px)" value={height} onChange={updateHeight} />
+              <div className="grid grid-cols-2 gap-2 p-1 bg-stone-100 rounded-xl">
+                <button type="button" onClick={() => setResizeMode('pixels')} className={`py-2 rounded-lg text-xs font-semibold ${resizeMode === 'pixels' ? 'bg-white text-orange-700 shadow-xs' : 'text-stone-500'}`}>Exact pixels</button>
+                <button type="button" onClick={() => setResizeMode('percentage')} className={`py-2 rounded-lg text-xs font-semibold ${resizeMode === 'percentage' ? 'bg-white text-orange-700 shadow-xs' : 'text-stone-500'}`}>Percentage</button>
               </div>
+              {resizeMode === 'percentage' ? (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between"><span className="text-xs font-semibold text-stone-700">Scale</span><strong className="text-xs text-orange-700">{percentage}%</strong></div>
+                  <input type="range" min="10" max="200" step="5" value={percentage} onChange={(event) => setPercentage(Number(event.target.value))} className="w-full accent-orange-600" />
+                  {metadata && <p className="text-[11px] text-stone-500">Output: {Math.round(metadata.width * percentage / 100)} × {Math.round(metadata.height * percentage / 100)}px</p>}
+                </div>
+              ) : (
+                <>
+                  <div className="flex justify-between items-center"><span className="text-xs font-semibold text-stone-700">Keep aspect ratio</span><button type="button" onClick={() => setLockRatio(!lockRatio)} className="flex items-center gap-1 text-xs text-orange-700">{lockRatio ? <Lock size={14} /> : <Unlock size={14} />}{lockRatio ? 'Locked' : 'Unlocked'}</button></div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <NumberField label="Width (px)" value={width} onChange={updateWidth} />
+                    <NumberField label="Height (px)" value={height} onChange={updateHeight} />
+                  </div>
+                </>
+              )}
               {metadata && <p className="text-[11px] text-stone-500">Original: {metadata.width} × {metadata.height}px. Maximum output dimension: 12,000px.</p>}
             </>
           )}
