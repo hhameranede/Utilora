@@ -35,9 +35,10 @@ This checklist records repository implementation separately from production depl
 - [x] Client-side SEO metadata handles titles, descriptions, canonical URLs, hreflang links, robots directives, and JSON-LD.
 - [x] Preview tool and sample content routes carry `noindex` directives in prerendered HTML.
 - [x] Internal template gallery exists at non-public `/dev/templates` route with state toggles.
-- [x] Future engine interfaces exist in `src/engines/` with typed inputs, outputs, progress, and cancellation.
-- [x] No actual tool processing has been implemented.
-- [x] No fake processing success messages exist.
+- [x] Engine interfaces exist in `src/engines/` with typed inputs, outputs, progress, and cancellation; local browser implementations are connected for 13 tools.
+- [x] 13 tools have browser-local processing implementations (text and developer utilities); 23 other tool workspaces remain preview-only.
+- [x] The 13 connected tools execute locally; other templates retain preview/disabled states instead of claiming completed processing.
+- [ ] New local-core smoke tests and CI type/build checks must pass before this branch is considered ready.
 - [x] No database has been added.
 - [x] No external advertising scripts have been added (AdSlot/AffiliateSlot hidden by default).
 - [x] README and architecture documentation exist in `docs/`.
