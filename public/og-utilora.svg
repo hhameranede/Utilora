@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#080f20"/><stop offset="1" stop-color="#172640"/></linearGradient></defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <circle cx="1050" cy="70" r="260" fill="none" stroke="#34435d" stroke-width="2"/>
+  <circle cx="1050" cy="70" r="190" fill="none" stroke="#263752" stroke-width="2"/>
+  <rect x="526" y="100" width="148" height="148" rx="38" fill="#0a162c" stroke="#455775" stroke-width="3"/>
+  <path d="M570 140v38c0 23 13 38 30 38s30-15 30-38v-38" fill="none" stroke="#e8be5e" stroke-width="15" stroke-linecap="square"/>
+  <path d="M650 112l7 19 19 7-19 7-7 19-7-19-19-7 19-7z" fill="#ffe4a3"/>
+  <text x="600" y="355" fill="#f8fafc" font-family="Arial,sans-serif" font-size="76" font-weight="800" letter-spacing="12" text-anchor="middle">UTILORA</text>
+  <text x="600" y="420" fill="#e8be5e" font-family="Arial,sans-serif" font-size="28" font-weight="700" letter-spacing="4" text-anchor="middle">EVERY DIGITAL TASK. ONE PLACE.</text>
+  <text x="600" y="480" fill="#bac6d8" font-family="Arial,sans-serif" font-size="22" text-anchor="middle">Free online tools for your digital workflow</text>
+</svg>
