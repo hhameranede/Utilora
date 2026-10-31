@@ -1,5 +1,13 @@
 import assert from 'node:assert/strict';
 import { readBrowserImageMetadata, transformBrowserImage } from '../src/engines/image/browser';
+import {
+  ImageConverterAdapter,
+  ImageCompressorAdapter,
+  ImageResizerAdapter,
+  ImageCropperAdapter,
+  ImageRotatorAdapter,
+  ImageMetadataViewerAdapter,
+} from '../src/engines/image/contracts';
 
 type HarnessOptions = {
   width?: number;
@@ -286,6 +294,92 @@ await run('rejects non-finite dimensions and quality and unsupported runtime rot
     assert.equal(invalidRotation.bitmaps[0].closed, true);
   } finally {
     invalidRotation.restore();
+  }
+});
+
+await run('executes all six image tool adapters and returns truthful output metadata', async () => {
+  const file = makeImageFile();
+
+  const converterMock = installBrowserMocks();
+  try {
+    const converted = await ImageConverterAdapter.execute({ file }, { targetFormat: 'jpg', quality: 80 });
+    assert.equal(converted.success, true);
+    assert.ok(converted.data);
+    assert.equal(converted.data.filename, 'sample.jpg');
+    assert.equal(converted.data.format, 'jpeg');
+    assert.equal(converted.data.blob.type, 'image/jpeg');
+  } finally {
+    converterMock.restore();
+  }
+
+  const compressorMock = installBrowserMocks();
+  try {
+    const compressed = await ImageCompressorAdapter.execute({ file }, { quality: 70, maxDimension: 2 });
+    assert.equal(compressed.success, true);
+    assert.ok(compressed.data);
+    assert.equal(compressed.data.filename, 'sample.webp');
+    assert.equal(compressed.data.compressedSize, compressed.data.blob.size);
+    assert.equal(compressorMock.canvases[0].width, 2);
+    assert.equal(compressorMock.canvases[0].height, 1);
+    assert.equal(compressorMock.bitmaps.every((bitmap) => bitmap.closed), true);
+  } finally {
+    compressorMock.restore();
+  }
+
+  const resizerMock = installBrowserMocks();
+  try {
+    const resized = await ImageResizerAdapter.execute(
+      { file },
+      { mode: 'percentage', percentage: 50, maintainAspectRatio: true },
+    );
+    assert.equal(resized.success, true);
+    assert.ok(resized.data);
+    assert.equal(resized.data.width, 2);
+    assert.equal(resized.data.height, 1);
+    assert.equal(resizedMock.canvases[0].width, 2);
+    assert.equal(resizedMock.canvases[0].height, 1);
+    assert.equal(resizedMock.bitmaps.every((bitmap) => bitmap.closed), true);
+  } finally {
+    resizerMock.restore();
+  }
+
+  const cropperMock = installBrowserMocks();
+  try {
+    const cropped = await ImageCropperAdapter.execute(
+      { file },
+      { cropBox: { x: 1, y: 0, width: 2, height: 2 } },
+    );
+    assert.equal(cropped.success, true);
+    assert.ok(cropped.data);
+    assert.equal(cropped.data.croppedWidth, 2);
+    assert.equal(cropped.data.croppedHeight, 2);
+    assert.equal(cropperMock.bitmaps[0].closed, true);
+  } finally {
+    cropperMock.restore();
+  }
+
+  const rotatorMock = installBrowserMocks();
+  try {
+    const rotated = await ImageRotatorAdapter.execute({ file }, { degrees: 90, flipHorizontal: true });
+    assert.equal(rotated.success, true);
+    assert.ok(rotated.data);
+    assert.equal(rotated.data.orientation, '90° clockwise, flipped horizontally');
+    assert.equal(rotatorMock.canvases[0].width, 2);
+    assert.equal(rotatorMock.canvases[0].height, 4);
+  } finally {
+    rotatorMock.restore();
+  }
+
+  const metadataMock = installBrowserMocks({ width: 4, height: 2, alpha: 120 });
+  try {
+    const metadata = await ImageMetadataViewerAdapter.execute({ file });
+    assert.equal(metadata.success, true);
+    assert.ok(metadata.data);
+    assert.deepEqual(metadata.data.dimensions, { width: 4, height: 2 });
+    assert.equal(metadata.data.mimeType, 'image/png');
+    assert.equal(metadata.data.hasAlpha, true);
+  } finally {
+    metadataMock.restore();
   }
 });
 
