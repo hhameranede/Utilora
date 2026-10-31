@@ -9,6 +9,7 @@
     "preview": "vite preview",
     "clean": "rm -rf dist server.js",
     "lint": "tsc --noEmit",
+    "test:core": "tsx scripts/test-local-core.ts",
     "seo:generate": "tsx scripts/generate-seo-files.ts",
     "prerender": "tsx scripts/prerender-routes.tsx"
   },
