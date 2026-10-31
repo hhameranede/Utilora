@@ -212,13 +212,13 @@ export const TemplateCImageWorkspace: React.FC<TemplateCImageWorkspaceProps> = (
         </button>
 
         <div className="rounded-2xl border border-stone-200 bg-stone-50 min-h-[260px] p-4 flex items-center justify-center">
-          {(isCrop ? (resultUrl || sourceUrl) : (resultUrl || sourceUrl)) ? (
+          {(resultUrl || sourceUrl) ? (
             <div className="relative inline-block max-w-full">
               <img
                 ref={previewImageRef}
                 src={resultUrl || sourceUrl}
                 alt={resultUrl ? "Processed result preview" : "Original image preview"}
-                className={`max-w-full max-h-[480px] object-contain rounded-lg ${isCrop && !resultUrl ? 'touch-none cursor-crosshair select-none' : ''}`}
+                className={`block max-w-full max-h-[480px] object-contain rounded-lg ${isCrop && !resultUrl ? 'touch-none cursor-crosshair select-none' : ''}`}
                 draggable={false}
                 onPointerDown={isCrop && !resultUrl ? handleCropPointerDown : undefined}
                 onPointerMove={isCrop && !resultUrl ? handleCropPointerMove : undefined}
