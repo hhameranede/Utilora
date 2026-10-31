@@ -20,7 +20,7 @@ This repository contains the **complete frontend foundation, UI system, reusable
 
 ## 2. Technology Stack
 
-- **Framework:** React 19 + TypeScript (Strict mode)
+- **Framework:** React 19 + TypeScript
 - **Bundler:** Vite 8 + Tailwind CSS v4
 - **Icons:** Lucide React
 - **Design Direction:** Deep black (`#0A0B0E`), charcoal surfaces (`#12141C`, `#171A26`), restrained metallic gold accents (`#F3C64F`), white and soft gray typography. Anti-AI slop, zero-pill metadata discipline.
@@ -40,9 +40,28 @@ npm run dev
 The application runs on `http://localhost:3000`.
 
 ### Production Build
+Set the real production origin before building so the sitemap, robots sitemap reference, and social preview image use the correct domain:
+
 ```bash
+SITE_URL=https://your-real-domain.example npm run build
+```
+
+On PowerShell:
+```powershell
+$env:SITE_URL = "https://your-real-domain.example"
 npm run build
 ```
+
+`SITE_URL` must be an origin only (scheme + hostname, no path). When it is not configured, the build still runs, but sitemap generation is skipped and the generated robots.txt omits its sitemap reference. Replace the example domain with the verified production domain.
+
+### SEO file generation
+```bash
+SITE_URL=https://your-real-domain.example npm run seo:generate
+```
+
+This writes `public/sitemap.xml` and `public/robots.txt`. The sitemap contains localized home, tool-directory, category, and legal routes; unfinished individual tool pages and sample article/community routes remain excluded.
+
+**SEO limitation:** the current app is still a client-rendered Vite SPA. The `Head` component updates metadata after JavaScript runs, so this sitemap and metadata work do not replace prerendering/SSR. Do not treat page-level metadata as fully crawler-ready until route HTML is prerendered or rendered at the edge.
 
 ### Run Unit Tests
 ```bash
