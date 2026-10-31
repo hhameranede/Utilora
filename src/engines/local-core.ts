@@ -87,7 +87,7 @@ export type SortMode = 'alphabetical-asc' | 'alphabetical-desc' | 'numeric' | 'l
 export function sortTextLines(text: string, mode: SortMode, ignoreCase = true): string {
   const lines = text.split(/\r?\n/u);
   if (mode === 'reverse') return lines.reverse().join('\n');
-  if (mode === 'length') return [...lines].sort((a, b) => a.length - b.length || a.localeCompare(b));
+  if (mode === 'length') return [...lines].sort((a, b) => a.length - b.length || a.localeCompare(b)).join('\\n');
   if (mode === 'numeric') {
     return [...lines].sort((a, b) => {
       const left = Number(a.trim());
