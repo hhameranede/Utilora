@@ -88,7 +88,7 @@ export const PdfPageCounterAdapter: ToolAdapter<PdfPageCounterInput, Record<stri
       const result = await countPdfPages(input.file);
       const header = new TextDecoder().decode((await input.file.slice(0, 16).arrayBuffer()));
       const version = header.match(/%PDF-(\d\.\d)/)?.[1] ?? 'unknown';
-      return { success: true, data: { pageCount: result.pageCount, pdfVersion: version, hasFormFields: false, isEncrypted: false }, durationMs: performance.now() - started };
+      return { success: true, data: { pageCount: result.pageCount, pdfVersion: version, hasFormFields: result.hasFormFields, isEncrypted: false }, durationMs: performance.now() - started };
     } catch (error) { return failure<PdfPageCounterOutput>(error); }
   },
 };
