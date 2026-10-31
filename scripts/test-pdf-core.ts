@@ -50,7 +50,17 @@ async function main() {
   const convertedDoc = await PDFDocument.load(await converted.blob.arrayBuffer());
   assert.equal(convertedDoc.getPageCount(), 1);
 
-  console.log('PDF engine smoke tests passed: page count, merge, range split, burst split, rotate, JPG/PNG-to-PDF.');
+  const portrait = await imagesToPdf([pngFile], 'a4', 10, 'portrait');
+  const portraitDoc = await PDFDocument.load(await portrait.blob.arrayBuffer());
+  const portraitSize = portraitDoc.getPage(0).getSize();
+  assert.ok(portraitSize.height > portraitSize.width);
+
+  const landscape = await imagesToPdf([pngFile], 'a4', 10, 'landscape');
+  const landscapeDoc = await PDFDocument.load(await landscape.blob.arrayBuffer());
+  const landscapeSize = landscapeDoc.getPage(0).getSize();
+  assert.ok(landscapeSize.width > landscapeSize.height);
+
+  console.log('PDF engine smoke tests passed: page count, merge, range split, burst split, rotate, image-to-PDF, portrait and landscape orientation.');
 }
 
 main().catch((error) => {
