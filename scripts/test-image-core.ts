@@ -104,7 +104,9 @@ function installBrowserMocks(options: HarnessOptions = {}) {
 }
 
 function makeImageFile(type = 'image/png'): File {
-  return new File([new Uint8Array([1, 2, 3, 4])], 'sample.png', {
+  const bytes = new ArrayBuffer(4);
+  new Uint8Array(bytes).set([1, 2, 3, 4]);
+  return new File([bytes], 'sample.png', {
     type,
     lastModified: 1_700_000_000_000,
   });
@@ -288,7 +290,7 @@ await run('rejects non-finite dimensions and quality and unsupported runtime rot
   const invalidRotation = installBrowserMocks();
   try {
     await assert.rejects(
-      transformBrowserImage(makeImageFile(), { rotation: 45 as 90 }),
+      transformBrowserImage(makeImageFile(), { rotation: 45 as unknown as 90 }),
       /Rotation must be 0, 90, 180, or 270/,
     );
     assert.equal(invalidRotation.bitmaps[0].closed, true);
