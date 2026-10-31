@@ -1,6 +1,6 @@
 # Implementation Status Checklist
 
-This checklist records repository implementation separately from production deployment and browser QA. On 2026-10-31, GitHub Actions run #20 passed the clean-URL prerender checks. The functional-core branch now passes TypeScript, local engine smoke tests, Vite build, prerender, and generated SEO checks. Cloudflare Pages project `utilora` is connected to this repository; its first preview deployment from `fix/seo-branding-hardening-2026-10-31` completed successfully and uploaded 537 files after prerendering 528 localized routes. Production deployments from `main` remain disabled. Direct browser/HTTP checks of deployed routes are still pending because the current execution environment could not resolve the preview hostname.
+This checklist records repository implementation separately from production deployment and browser QA. On 2026-10-31, GitHub Actions run #20 passed the clean-URL prerender checks. The functional-core branch now passes TypeScript, text/developer engine smoke tests, PDF engine smoke tests, Vite build, prerender, and generated SEO checks. Cloudflare Pages project `utilora` is connected to this repository; its first preview deployment from `fix/seo-branding-hardening-2026-10-31` completed successfully and uploaded 537 files after prerendering 528 localized routes. Production deployments from `main` remain disabled. Direct browser/HTTP checks of deployed routes are still pending because the current execution environment could not resolve the preview hostname.
 
 ## Verification status
 - [x] TypeScript check and Vite production build passed in GitHub Actions run #18.
@@ -35,10 +35,12 @@ This checklist records repository implementation separately from production depl
 - [x] Client-side SEO metadata handles titles, descriptions, canonical URLs, hreflang links, robots directives, and JSON-LD.
 - [x] Preview tool and sample content routes carry `noindex` directives in prerendered HTML.
 - [x] Internal template gallery exists at non-public `/dev/templates` route with state toggles.
-- [x] Engine interfaces exist in `src/engines/` with typed inputs, outputs, progress, and cancellation; local browser implementations are connected for 13 tools.
-- [x] 13 tools have browser-local processing implementations (text and developer utilities); 23 other tool workspaces remain preview-only.
-- [x] The 13 connected tools execute locally; other templates retain preview/disabled states instead of claiming completed processing.
-- [x] Local-core smoke tests and CI type/build checks pass on the current functional-core branch.
+- [x] Engine interfaces and browser-local implementations are connected for 25 tools across image, PDF, text, and developer categories.
+- [x] Image tools: conversion, compression, resizing, crop, rotation, and basic pixel/file metadata inspection (EXIF camera/GPS extraction is not included).
+- [x] PDF tools: merge, range/burst split, rotate, JPG/PNG to PDF, PDF to JPG/PNG, and page/form-field inspection.
+- [x] Text and developer tools: all 13 utilities run in the browser using native browser APIs.
+- [x] The 25 connected tools execute locally; the remaining 11 website/domain and video workspaces remain preview-only instead of claiming completed processing.
+- [x] CI smoke tests cover text/developer core helpers and PDF merge, range split, burst split, rotate, image-to-PDF, and page count.
 - [x] No database has been added.
 - [x] No external advertising scripts have been added (AdSlot/AffiliateSlot hidden by default).
 - [x] README and architecture documentation exist in `docs/`.
