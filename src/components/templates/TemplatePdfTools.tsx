@@ -71,7 +71,7 @@ export const TemplatePdfTools: React.FC<TemplatePdfToolsProps> = ({ toolName, to
       } else if (toolSlug === 'rotate-pdf') {
         const pages = targetPages.trim().toLowerCase() === 'all'
           ? 'all'
-          : targetPages.split(',').map((part) => Number(part.trim()));
+          : targetPages.split(',').map((part) => Number(part.trim()) - 1);
         const result = await rotatePdfFile(files[0], rotation, pages);
         setOutputs([{ name: files[0].name.replace(/\.pdf$/i, '') + '-rotated.pdf', blob: result.blob, note: `${result.rotatedPageCount} page(s) rotated` }]);
         setMessage('PDF page rotation saved.');
