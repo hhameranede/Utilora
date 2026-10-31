@@ -130,9 +130,9 @@ export async function imagesToPdf(files: File[], pageSize: 'fit' | 'a4' | 'lette
   return { blob: new Blob([bytes], { type: 'application/pdf' }), pageCount: files.length };
 }
 
-export async function countPdfPages(file: File): Promise<{ pageCount: number; title: string; size: number }> {
+export async function countPdfPages(file: File): Promise<{ pageCount: number; title: string; size: number; hasFormFields: boolean }> {
   const pdf = await loadPdf(file);
-  return { pageCount: pdf.getPageCount(), title: pdf.getTitle() || file.name, size: file.size };
+  return { pageCount: pdf.getPageCount(), title: pdf.getTitle() || file.name, size: file.size, hasFormFields: pdf.getForm().getFields().length > 0 };
 }
 
 export async function renderPdfToImages(
