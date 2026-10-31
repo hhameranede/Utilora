@@ -6,6 +6,7 @@ import { Head } from '../../seo/Head';
 import { Link } from '../../router';
 import { RelatedTools } from '../../components/common/RelatedTools';
 import { RelatedArticles } from '../../components/common/RelatedArticles';
+import { NotFoundPage } from '../NotFoundPage';
 import {
   Calendar,
   Clock,
@@ -29,7 +30,8 @@ export const ArticleDetailPage: React.FC<ArticleDetailPageProps> = ({ articleSlu
   const { locale, t } = useI18n();
   const [copiedShare, setCopiedShare] = useState(false);
 
-  const article = SAMPLE_ARTICLES.find((a) => a.slug === articleSlug) || SAMPLE_ARTICLES[0];
+  const article = SAMPLE_ARTICLES.find((a) => a.slug === articleSlug);
+  if (!article) return <NotFoundPage />;
   const title = article.title[locale] || article.title.en;
   const excerpt = article.excerpt[locale] || article.excerpt.en;
 
@@ -52,7 +54,7 @@ export const ArticleDetailPage: React.FC<ArticleDetailPageProps> = ({ articleSlu
         ogType="article"
         publishedTime={article.publishedAt}
         author={article.author}
-        isIndexable={true}
+        isIndexable={false}
         schemaType="Article"
       />
 
