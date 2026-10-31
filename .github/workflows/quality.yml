@@ -36,6 +36,9 @@ jobs:
       - name: Test local PDF engines
         run: npm run test:pdf
 
+      - name: Test local image engines
+        run: npm run test:image
+
       - name: Build and generate SEO files
         run: npm run build
         env:
