@@ -7,6 +7,8 @@ export interface BrowserImageOptions {
   height?: number;
   crop?: { x: number; y: number; width: number; height: number };
   rotation?: 0 | 90 | 180 | 270;
+  flipHorizontal?: boolean;
+  flipVertical?: boolean;
 }
 
 export interface BrowserImageResult {
@@ -72,6 +74,7 @@ export async function transformBrowserImage(file: File, options: BrowserImageOpt
     context.imageSmoothingEnabled = true;
     context.imageSmoothingQuality = 'high';
     context.translate(canvas.width / 2, canvas.height / 2);
+    context.scale(options.flipHorizontal ? -1 : 1, options.flipVertical ? -1 : 1);
     context.rotate((rotation * Math.PI) / 180);
     context.drawImage(bitmap, sx, sy, sw, sh, -drawWidth / 2, -drawHeight / 2, drawWidth, drawHeight);
 
