@@ -25,7 +25,7 @@ export const CommunityIndexPage: React.FC = () => {
         description="Collaborate with developers and creators. Discuss in-browser WASM engines, suggest utility features, and share workflows."
         locale={locale}
         routeType="community-index"
-        isIndexable={true}
+        isIndexable={false}
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
