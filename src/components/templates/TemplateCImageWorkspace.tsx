@@ -21,6 +21,7 @@ export const TemplateCImageWorkspace: React.FC<TemplateCImageWorkspaceProps> = (
   const inputRef = useRef<HTMLInputElement>(null);
   const previewImageRef = useRef<HTMLImageElement>(null);
   const cropDragRef = useRef<{ pointerId: number; startX: number; startY: number } | null>(null);
+  const fileRevisionRef = useRef(0);
   const [file, setFile] = useState<File | null>(null);
   const [sourceUrl, setSourceUrl] = useState('');
   const [resultUrl, setResultUrl] = useState('');
@@ -57,6 +58,8 @@ export const TemplateCImageWorkspace: React.FC<TemplateCImageWorkspaceProps> = (
 
   const handleFile = async (selected?: File) => {
     if (!selected) return;
+    const fileRevision = ++fileRevisionRef.current;
+    setBusy(false);
     setError('');
     setMessage('');
     if (!selected.type.startsWith('image/')) {
@@ -85,6 +88,7 @@ export const TemplateCImageWorkspace: React.FC<TemplateCImageWorkspaceProps> = (
     setFlipVertical(false);
     try {
       const details = await readBrowserImageMetadata(selected);
+      if (fileRevision !== fileRevisionRef.current) return;
       setMetadata(details);
       setWidth(details.width);
       setHeight(details.height);
@@ -95,7 +99,9 @@ export const TemplateCImageWorkspace: React.FC<TemplateCImageWorkspaceProps> = (
       setCropHeight(details.height);
       if (isMetadata) setMessage('Image properties loaded. EXIF camera and GPS tags are not read by this tool.');
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : 'Unable to read this image.');
+      if (fileRevision === fileRevisionRef.current) {
+        setError(cause instanceof Error ? cause.message : 'Unable to read this image.');
+      }
     }
   };
 
@@ -156,12 +162,14 @@ export const TemplateCImageWorkspace: React.FC<TemplateCImageWorkspaceProps> = (
       setError('Choose an image first.');
       return;
     }
+    const fileRevision = fileRevisionRef.current;
     setBusy(true);
     setError('');
     setMessage('');
     try {
       if (isMetadata) {
         const data = await readBrowserImageMetadata(file);
+        if (fileRevision !== fileRevisionRef.current) return;
         setMetadata(data);
         setMessage('Image properties inspected successfully.');
         return;
@@ -176,6 +184,7 @@ export const TemplateCImageWorkspace: React.FC<TemplateCImageWorkspaceProps> = (
             : { format: isCompress ? 'webp' as const : format, quality };
 
       const output = await transformBrowserImage(file, options);
+      if (fileRevision !== fileRevisionRef.current) return;
       const extension = isCompress ? 'webp' : isCrop || isRotate || isResize ? 'png' : format === 'jpeg' ? 'jpg' : format;
       const outputName = file.name.replace(/\.[^.]+$/, '') + '-' + toolSlug + '.' + extension;
       const nextUrl = URL.createObjectURL(output.blob);
@@ -187,9 +196,11 @@ export const TemplateCImageWorkspace: React.FC<TemplateCImageWorkspaceProps> = (
       const savings = Math.round((1 - output.blob.size / Math.max(1, file.size)) * 100);
       setMessage(`Done: ${output.width} × ${output.height}px · ${formatBytes(output.blob.size)}${isCompress ? ` · ${savings}% size change` : ''}`);
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : 'Image processing failed.');
+      if (fileRevision === fileRevisionRef.current) {
+        setError(cause instanceof Error ? cause.message : 'Image processing failed.');
+      }
     } finally {
-      setBusy(false);
+      if (fileRevision === fileRevisionRef.current) setBusy(false);
     }
   };
 
