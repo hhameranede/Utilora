@@ -6,7 +6,7 @@ type ImageFormat = 'webp' | 'jpeg' | 'png';
 
 interface TemplateCImageWorkspaceProps {
   toolName: string;
-  toolSlug: string;
+  toolSlug?: string;
   defaultFormat?: ImageFormat;
   showQuality?: boolean;
   showDimensions?: boolean;
@@ -15,7 +15,7 @@ interface TemplateCImageWorkspaceProps {
 
 export const TemplateCImageWorkspace: React.FC<TemplateCImageWorkspaceProps> = ({
   toolName,
-  toolSlug,
+  toolSlug = 'image-cropper',
   defaultFormat = 'webp',
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
