@@ -53,3 +53,10 @@ The five website/domain tools (domain age, RDAP, DNS, website status, HTTP heade
 - Network tools must defend against private IPs, redirects to internal targets, DNS rebinding, and abuse.
 - Long-running operations must support cancellation or clear timeouts.
 - Unsupported browsers must receive an honest compatibility message, not a fake output.
+
+## Automated smoke-test coverage
+
+- `scripts/test-local-core.ts` exercises the text and developer helper functions, including Unicode text, JSON, Base64, URL encoding, UUID generation, and SHA-256.
+- `scripts/test-pdf-core.ts` covers page counting, ordered merge, range and burst splitting, selected-page rotation, and image-to-PDF orientation.
+- `scripts/test-image-core.ts` uses deterministic browser API mocks to test Canvas transforms, crop validation, resizing, rotation/flips, MIME export failures, resource cleanup, pixel metadata, and all six image adapter result contracts.
+- These are engine-level smoke tests. They do **not** replace browser-based UI, touch interaction, real-device compatibility, or visual regression testing; those remain separate QA tasks.
