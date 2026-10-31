@@ -5,6 +5,7 @@ import { Breadcrumbs } from '../../components/common/Breadcrumbs';
 import { Head } from '../../seo/Head';
 import { Link } from '../../router';
 import { ArrowRight } from 'lucide-react';
+import { NotFoundPage } from '../NotFoundPage';
 
 interface ArticleCategoryPageProps {
   categorySlug: string;
@@ -14,6 +15,7 @@ export const ArticleCategoryPage: React.FC<ArticleCategoryPageProps> = ({ catego
   const { locale, t } = useI18n();
 
   const articles = SAMPLE_ARTICLES.filter((a) => a.category === categorySlug);
+  if (articles.length === 0) return <NotFoundPage />;
   const categoryTitle = categorySlug.charAt(0).toUpperCase() + categorySlug.slice(1);
 
   return (
@@ -24,7 +26,7 @@ export const ArticleCategoryPage: React.FC<ArticleCategoryPageProps> = ({ catego
         locale={locale}
         routeType="article-category"
         slug={categorySlug}
-        isIndexable={true}
+        isIndexable={false}
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
