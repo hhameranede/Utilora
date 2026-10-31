@@ -33,8 +33,8 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
         ar: `هل ${toolName} آمن للاستخدام مع المستندات الحساسة؟`,
       },
       answer: {
-        en: `Yes. In UTILORA's architecture, data processing takes place directly in your local browser sandbox without intermediate server persistence.`,
-        ar: `نعم. تضمن معمارية يوتيلورا أن تتم المعالجة في بيئة المتصفح المحلية لديك دون تخزينها على خوادم وسيطة.`,
+        en: tool.status === 'functional' ? `Yes. This tool processes its input locally in your browser without uploading it to an intermediate server.` : `This workspace is currently a visual preview. It does not process files yet.`,
+        ar: tool.status === 'functional' ? `نعم. تعالج هذه الأداة مدخلاتها محليًا داخل متصفحك دون رفعها إلى خادم وسيط.` : `مساحة العمل هذه معاينة للواجهة حاليًا، ولم تُفعّل المعالجة فيها بعد.`,
       },
     },
     {
@@ -87,7 +87,7 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
               <div className="flex items-center gap-2 text-xs text-stone-400">
                 <span>{categoryTitle}</span>
                 <span aria-hidden="true" className="text-stone-300">·</span>
-                <span className="text-orange-600 font-mono font-medium">UI Ready</span>
+                <span className="text-orange-600 font-mono font-medium">{tool.status === "functional" ? "Functional" : "Preview only"}</span>
               </div>
               <h1 className="text-2xl sm:text-4xl font-extrabold text-stone-900 mt-1">
                 {toolName}
@@ -100,14 +100,15 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
           </p>
         </div>
 
-        {/* Engine Disconnected Notice Banner */}
-        <div className="p-4 rounded-2xl bg-orange-50/80 border border-orange-200/90 flex items-center gap-3 text-xs text-orange-900 shadow-xs">
-          <Info size={16} className="text-orange-600 shrink-0" />
-          <div className="flex-1">
-            <span className="font-semibold text-stone-900">Interactive UI Preview: </span>
-            {t('common.previewNotice')}
+        {tool.status !== 'functional' && (
+          <div className="p-4 rounded-2xl bg-orange-50/80 border border-orange-200/90 flex items-center gap-3 text-xs text-orange-900 shadow-xs">
+            <Info size={16} className="text-orange-600 shrink-0" />
+            <div className="flex-1">
+              <span className="font-semibold text-stone-900">Preview only: </span>
+              {t('common.previewNotice')}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Main Specialized Tool Workspace */}
         <section className="pt-2">
@@ -141,7 +142,7 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
                 <span className="text-xs font-mono font-bold text-orange-600">STEP 03</span>
                 <h4 className="text-sm font-semibold text-stone-900">Save Local Output</h4>
                 <p className="text-xs text-stone-600 leading-relaxed">
-                  Once connected to Phase 2 engine, export your finished file directly to your disk.
+                  {tool.status === 'functional' ? 'Download or copy your result directly from this browser.' : 'This workspace is not active yet; processing will be enabled in a later release.'}
                 </p>
               </div>
             </div>
