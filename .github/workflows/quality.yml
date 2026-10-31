@@ -43,3 +43,10 @@ jobs:
           grep -q 'hreflang="ar"' public/sitemap.xml
           grep -q 'hreflang="bn"' public/sitemap.xml
           ! grep -q "/tools/json-formatter" public/sitemap.xml
+          test -s dist/ar/index.html
+          test -s dist/en/tools/index.html
+          test -s dist/en/tools/image-converter/index.html
+          grep -q 'dir="rtl"' dist/ar/index.html
+          grep -q 'canonical" href="https://utilora.invalid/ar"' dist/ar/index.html
+          grep -q 'noindex, nofollow' dist/en/tools/image-converter/index.html
+          grep -q 'id="root"><' dist/en/index.html
