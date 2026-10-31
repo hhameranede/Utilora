@@ -11,13 +11,12 @@ interface RouterContextType {
 
 const RouterContext = createContext<RouterContextType | null>(null);
 
-export const RouterProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const RouterProvider: React.FC<{ children: ReactNode; initialPath?: string }> = ({ children, initialPath }) => {
   const { locale, setLocale } = useI18n();
 
   const [currentPath, setCurrentPath] = useState<string>(() => {
-    if (typeof window !== 'undefined') {
-      return window.location.pathname || '/';
-    }
+    if (initialPath) return initialPath;
+    if (typeof window !== 'undefined') return window.location.pathname || '/';
     return '/';
   });
 
