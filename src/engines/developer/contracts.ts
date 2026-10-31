@@ -88,16 +88,17 @@ export const Base64Adapter: ToolAdapter<Base64Input, Base64Options, Base64Output
   async execute(input, options = {}) {
     const started = performance.now();
     try {
-      const result = input.mode === 'encode'
-        ? encodeBase64Utf8(input.text)
-        : decodeBase64Utf8(input.text);
-      const formatted = options.urlSafe && input.mode === 'encode'
-        ? result.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '')
-        : result;
-      const normalized = options.urlSafe && input.mode === 'decode'
-        ? input.text.replace(/-/g, '+').replace(/_/g, '/').padEnd(Math.ceil(input.text.length / 4) * 4, '=')
-        : formatted;
-      return { success: true, data: { result: normalized }, durationMs: performance.now() - started };
+      let result: string;
+      if (input.mode === 'encode') {
+        result = encodeBase64Utf8(input.text);
+        if (options.urlSafe) result = result.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
+      } else {
+        const normalizedInput = options.urlSafe
+          ? input.text.replace(/-/g, '+').replace(/_/g, '/').padEnd(Math.ceil(input.text.length / 4) * 4, '=')
+          : input.text;
+        result = decodeBase64Utf8(normalizedInput);
+      }
+      return { success: true, data: { result }, durationMs: performance.now() - started };
     } catch (error) { return failure<Base64Output>(error); }
   },
 };
