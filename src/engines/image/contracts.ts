@@ -34,7 +34,13 @@ export const ImageCompressorAdapter: ToolAdapter<ImageCompressorInput, ImageComp
   async execute(input, options = { quality: 75 }) {
     const started = performance.now();
     try {
-      const result = await transformBrowserImage(input.file, { format: 'webp', quality: options.quality, width: options.maxDimension && input.file.size ? undefined : undefined });
+      const bitmap = await createImageBitmap(input.file);
+      const limit = Math.max(1, Math.min(12000, options.maxDimension ?? 12000));
+      const scale = Math.min(1, limit / Math.max(bitmap.width, bitmap.height));
+      const width = Math.max(1, Math.round(bitmap.width * scale));
+      const height = Math.max(1, Math.round(bitmap.height * scale));
+      bitmap.close();
+      const result = await transformBrowserImage(input.file, { format: 'webp', quality: options.quality, width, height });
       return { success: true, data: {
         blob: result.blob,
         filename: input.file.name.replace(/\.[^.]+$/, '') + '.webp',
@@ -52,7 +58,7 @@ export interface ImageResizerOutput { blob: Blob; width: number; height: number;
 
 export const ImageResizerAdapter: ToolAdapter<ImageResizerInput, ImageResizerOptions, ImageResizerOutput> = {
   id: 'image-resizer', name: 'Image Resizer Adapter', isConnected: true,
-  async execute(input, options) {
+  async execute(input, options = { mode: 'pixels', maintainAspectRatio: true }) {
     const started = performance.now();
     try {
       const bitmap = await createImageBitmap(input.file);
@@ -73,7 +79,7 @@ export interface ImageCropperOutput { blob: Blob; croppedWidth: number; croppedH
 
 export const ImageCropperAdapter: ToolAdapter<ImageCropperInput, ImageCropperOptions, ImageCropperOutput> = {
   id: 'image-cropper', name: 'Image Cropper Adapter', isConnected: true,
-  async execute(input, options) {
+  async execute(input, options = { cropBox: { x: 0, y: 0, width: 1, height: 1 } }) {
     const started = performance.now();
     try {
       const result = await transformBrowserImage(input.file, { format: 'png', crop: options.cropBox });
@@ -88,7 +94,7 @@ export interface ImageRotatorOutput { blob: Blob; orientation: string; }
 
 export const ImageRotatorAdapter: ToolAdapter<ImageRotatorInput, ImageRotatorOptions, ImageRotatorOutput> = {
   id: 'image-rotator', name: 'Image Rotator Adapter', isConnected: true,
-  async execute(input, options) {
+  async execute(input, options = { degrees: 90 }) {
     const started = performance.now();
     try {
       const result = await transformBrowserImage(input.file, { format: 'png', rotation: options.degrees });
