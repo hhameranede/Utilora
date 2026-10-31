@@ -17,21 +17,31 @@ The modules below execute on the client and do not upload input text to a server
 | Base64 encoder/decoder | UTF-8 safe `TextEncoder` / `TextDecoder` |
 | URL encoder/decoder | Browser URI encoding APIs |
 | UUID generator | Web Crypto random values, UUID v4 and v7 |
-| Hash generator | Web Crypto SHA-256, SHA-384, SHA-512 (SHA-1 can be requested through the adapter but is not recommended for security) |
+| Hash generator | Web Crypto SHA-1, SHA-256, SHA-384, SHA-512 (SHA-1 is legacy and not recommended for security) |
 
 MD5 is not exposed by the current browser-native hash workspace. It requires a separate implementation and should not be presented as a secure cryptographic digest.
 
+| Tools | Implementation |
+| :--- | :--- |
+| Image converter and compressor | Canvas image decode/re-encode with WebP, JPEG, and PNG output; quality and size metrics |
+| Image resizer | Canvas resampling with pixel dimensions and aspect-ratio locking |
+| Image cropper and rotator | Source-pixel crop rectangle and 90°/180°/270° canvas rotation |
+| Image metadata viewer | Pixel dimensions, MIME type, file size, aspect ratio, and sampled transparency; EXIF camera/GPS tags are not extracted |
+| PDF merge, split, and rotate | `pdf-lib` in the local browser; supports ordered merge, page ranges/burst split, and selected-page rotation |
+| JPG/PNG to PDF | `pdf-lib` image embedding with fit/A4/Letter pages, margins, and orientation controls |
+| PDF to JPG/PNG | Mozilla PDF.js renderer with DPI controls and a per-batch page limit |
+| PDF page counter | PDF page count, PDF header version, and AcroForm field presence |
+
 ## Still preview-only
 
-Image manipulation, PDF handling, video processing, downloading, RDAP, DNS, HTTP status, and header inspection are not yet connected to complete production engines. Their interfaces may exist, but they must remain marked as previews until their processing paths, validation, error handling, and output downloads are implemented and tested.
+The five website/domain tools (domain age, RDAP, DNS, website status, HTTP headers) and six video tools remain preview-only. Their interfaces must stay marked as previews until their processing paths, input validation, safety controls, error handling, and downloadable outputs are implemented and tested.
 
 ## Engine architecture for remaining tools
 
 | Domain | Planned technology | Execution model |
 | :--- | :--- | :--- |
-| Image compression/conversion | Browser Canvas APIs and dedicated codecs | Web Worker where practical |
-| Image resize/crop/rotate | Canvas / OffscreenCanvas | Main thread or Worker |
-| PDF manipulation | `pdf-lib` + PDF.js | In-memory Worker |
+| Image conversion/compression/resize/crop/rotate | Browser Canvas APIs | Main thread currently; large inputs need performance profiling |
+| PDF manipulation/rendering | `pdf-lib` + PDF.js | In-memory browser processing; PDF.js worker for rendering |
 | Network and diagnostics | Cloudflare Worker with strict URL validation, SSRF protection and rate limiting | Edge API |
 | Video processing | WebCodecs / Mediabunny with optional ffmpeg.wasm fallback | Worker where supported |
 
