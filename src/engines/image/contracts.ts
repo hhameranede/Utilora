@@ -1,174 +1,117 @@
-import { ToolAdapter, EngineExecutionResult } from '../types';
+import { ToolAdapter } from '../types';
+import { readBrowserImageMetadata, transformBrowserImage } from './browser';
 
-// ==========================================
-// 1. Image Converter
-// ==========================================
-export interface ImageConverterInput {
-  file: File;
+function failure<T>(error: unknown) {
+  return {
+    success: false,
+    error: { code: 'IMAGE_PROCESSING_ERROR', message: error instanceof Error ? error.message : 'Unable to process this image.' },
+  } as const;
 }
-export interface ImageConverterOptions {
-  targetFormat: 'png' | 'jpg' | 'webp' | 'avif';
-  quality: number; // 1 - 100
-  preserveMetadata?: boolean;
-}
-export interface ImageConverterOutput {
-  blob: Blob;
-  filename: string;
-  originalSize: number;
-  newSize: number;
-  format: string;
-}
+
+export interface ImageConverterInput { file: File; }
+export interface ImageConverterOptions { targetFormat: 'png' | 'jpg' | 'webp' | 'avif'; quality: number; preserveMetadata?: boolean; }
+export interface ImageConverterOutput { blob: Blob; filename: string; originalSize: number; newSize: number; format: string; }
 
 export const ImageConverterAdapter: ToolAdapter<ImageConverterInput, ImageConverterOptions, ImageConverterOutput> = {
-  id: 'image-converter',
-  name: 'PNG/JPG/WebP Converter Adapter',
-  isConnected: false,
-  async execute() {
-    // TODO: Connect WebAssembly / Canvas / OffscreenCanvas engine in Phase 2
-    throw new Error('Engine not connected. UTILORA is currently in UI Preview Mode.');
+  id: 'image-converter', name: 'PNG/JPG/WebP Converter Adapter', isConnected: true,
+  async execute(input, options = { targetFormat: 'webp', quality: 85 }) {
+    const started = performance.now();
+    try {
+      const targetFormat = options.targetFormat === 'jpg' ? 'jpeg' : options.targetFormat === 'avif' ? 'webp' : options.targetFormat;
+      const result = await transformBrowserImage(input.file, { format: targetFormat, quality: options.quality });
+      const extension = targetFormat === 'jpeg' ? 'jpg' : targetFormat;
+      return { success: true, data: { blob: result.blob, filename: input.file.name.replace(/\.[^.]+$/, '') + '.' + extension, originalSize: input.file.size, newSize: result.blob.size, format: targetFormat }, durationMs: performance.now() - started };
+    } catch (error) { return failure<ImageConverterOutput>(error); }
   },
 };
 
-// ==========================================
-// 2. Image Compressor
-// ==========================================
-export interface ImageCompressorInput {
-  file: File;
-}
-export interface ImageCompressorOptions {
-  quality: number; // 1 - 100
-  maxDimension?: number;
-  lossless?: boolean;
-}
-export interface ImageCompressorOutput {
-  blob: Blob;
-  filename: string;
-  originalSize: number;
-  compressedSize: number;
-  savingsPercent: number;
-}
+export interface ImageCompressorInput { file: File; }
+export interface ImageCompressorOptions { quality: number; maxDimension?: number; lossless?: boolean; }
+export interface ImageCompressorOutput { blob: Blob; filename: string; originalSize: number; compressedSize: number; savingsPercent: number; }
 
 export const ImageCompressorAdapter: ToolAdapter<ImageCompressorInput, ImageCompressorOptions, ImageCompressorOutput> = {
-  id: 'image-compressor',
-  name: 'Image Compressor Adapter',
-  isConnected: false,
-  async execute() {
-    // TODO: Connect mozjpeg/oxipng/libwebp WASM in Phase 2
-    throw new Error('Engine not connected. UTILORA is currently in UI Preview Mode.');
+  id: 'image-compressor', name: 'Image Compressor Adapter', isConnected: true,
+  async execute(input, options = { quality: 75 }) {
+    const started = performance.now();
+    try {
+      const result = await transformBrowserImage(input.file, { format: 'webp', quality: options.quality, width: options.maxDimension && input.file.size ? undefined : undefined });
+      return { success: true, data: {
+        blob: result.blob,
+        filename: input.file.name.replace(/\.[^.]+$/, '') + '.webp',
+        originalSize: input.file.size,
+        compressedSize: result.blob.size,
+        savingsPercent: Math.round((1 - result.blob.size / Math.max(1, input.file.size)) * 100),
+      }, durationMs: performance.now() - started };
+    } catch (error) { return failure<ImageCompressorOutput>(error); }
   },
 };
 
-// ==========================================
-// 3. Image Resizer
-// ==========================================
-export interface ImageResizerInput {
-  file: File;
-}
-export interface ImageResizerOptions {
-  mode: 'pixels' | 'percentage';
-  targetWidth?: number;
-  targetHeight?: number;
-  percentage?: number;
-  maintainAspectRatio: boolean;
-  resampleFilter?: 'bicubic' | 'bilinear' | 'lanczos';
-}
-export interface ImageResizerOutput {
-  blob: Blob;
-  width: number;
-  height: number;
-  newSize: number;
-}
+export interface ImageResizerInput { file: File; }
+export interface ImageResizerOptions { mode: 'pixels' | 'percentage'; targetWidth?: number; targetHeight?: number; percentage?: number; maintainAspectRatio: boolean; resampleFilter?: 'bicubic' | 'bilinear' | 'lanczos'; }
+export interface ImageResizerOutput { blob: Blob; width: number; height: number; newSize: number; }
 
 export const ImageResizerAdapter: ToolAdapter<ImageResizerInput, ImageResizerOptions, ImageResizerOutput> = {
-  id: 'image-resizer',
-  name: 'Image Resizer Adapter',
-  isConnected: false,
-  async execute() {
-    // TODO: Connect Pica or WebGL Lanczos shader resizer in Phase 2
-    throw new Error('Engine not connected.');
+  id: 'image-resizer', name: 'Image Resizer Adapter', isConnected: true,
+  async execute(input, options) {
+    const started = performance.now();
+    try {
+      const bitmap = await createImageBitmap(input.file);
+      const sourceWidth = bitmap.width;
+      const sourceHeight = bitmap.height;
+      bitmap.close();
+      const width = options.mode === 'percentage' ? Math.round(sourceWidth * (options.percentage ?? 100) / 100) : (options.targetWidth ?? sourceWidth);
+      const height = options.maintainAspectRatio ? Math.round(width * sourceHeight / sourceWidth) : (options.mode === 'percentage' ? Math.round(sourceHeight * (options.percentage ?? 100) / 100) : (options.targetHeight ?? sourceHeight));
+      const result = await transformBrowserImage(input.file, { format: 'png', width, height });
+      return { success: true, data: { blob: result.blob, width: result.width, height: result.height, newSize: result.blob.size }, durationMs: performance.now() - started };
+    } catch (error) { return failure<ImageResizerOutput>(error); }
   },
 };
 
-// ==========================================
-// 4. Image Cropper
-// ==========================================
-export interface ImageCropperInput {
-  file: File;
-}
-export interface ImageCropperOptions {
-  cropBox: { x: number; y: number; width: number; height: number };
-  aspectRatioPreset?: 'free' | '1:1' | '16:9' | '4:3' | 'circle';
-}
-export interface ImageCropperOutput {
-  blob: Blob;
-  croppedWidth: number;
-  croppedHeight: number;
-}
+export interface ImageCropperInput { file: File; }
+export interface ImageCropperOptions { cropBox: { x: number; y: number; width: number; height: number }; aspectRatioPreset?: 'free' | '1:1' | '16:9' | '4:3' | 'circle'; }
+export interface ImageCropperOutput { blob: Blob; croppedWidth: number; croppedHeight: number; }
 
 export const ImageCropperAdapter: ToolAdapter<ImageCropperInput, ImageCropperOptions, ImageCropperOutput> = {
-  id: 'image-cropper',
-  name: 'Image Cropper Adapter',
-  isConnected: false,
-  async execute() {
-    // TODO: Connect client canvas cropper in Phase 2
-    throw new Error('Engine not connected.');
+  id: 'image-cropper', name: 'Image Cropper Adapter', isConnected: true,
+  async execute(input, options) {
+    const started = performance.now();
+    try {
+      const result = await transformBrowserImage(input.file, { format: 'png', crop: options.cropBox });
+      return { success: true, data: { blob: result.blob, croppedWidth: result.width, croppedHeight: result.height }, durationMs: performance.now() - started };
+    } catch (error) { return failure<ImageCropperOutput>(error); }
   },
 };
 
-// ==========================================
-// 5. Image Rotator
-// ==========================================
-export interface ImageRotatorInput {
-  file: File;
-}
-export interface ImageRotatorOptions {
-  degrees: 90 | 180 | 270;
-  flipHorizontal?: boolean;
-  flipVertical?: boolean;
-}
-export interface ImageRotatorOutput {
-  blob: Blob;
-  orientation: string;
-}
+export interface ImageRotatorInput { file: File; }
+export interface ImageRotatorOptions { degrees: 90 | 180 | 270; flipHorizontal?: boolean; flipVertical?: boolean; }
+export interface ImageRotatorOutput { blob: Blob; orientation: string; }
 
 export const ImageRotatorAdapter: ToolAdapter<ImageRotatorInput, ImageRotatorOptions, ImageRotatorOutput> = {
-  id: 'image-rotator',
-  name: 'Image Rotator Adapter',
-  isConnected: false,
-  async execute() {
-    // TODO: Connect lossless JPEG transform / canvas rotation in Phase 2
-    throw new Error('Engine not connected.');
+  id: 'image-rotator', name: 'Image Rotator Adapter', isConnected: true,
+  async execute(input, options) {
+    const started = performance.now();
+    try {
+      const result = await transformBrowserImage(input.file, { format: 'png', rotation: options.degrees });
+      return { success: true, data: { blob: result.blob, orientation: `${options.degrees}° clockwise` }, durationMs: performance.now() - started };
+    } catch (error) { return failure<ImageRotatorOutput>(error); }
   },
 };
 
-// ==========================================
-// 6. Image Metadata Viewer (EXIF)
-// ==========================================
-export interface ImageMetadataViewerInput {
-  file: File;
-}
+export interface ImageMetadataViewerInput { file: File; }
 export interface ImageMetadataViewerOutput {
   dimensions: { width: number; height: number };
   colorSpace: string;
   hasAlpha: boolean;
-  exifTags?: {
-    cameraMake?: string;
-    cameraModel?: string;
-    focalLength?: string;
-    aperture?: string;
-    iso?: number;
-    shutterSpeed?: string;
-    dateTaken?: string;
-    gpsCoordinates?: { lat: number; lng: number };
-  };
+  exifTags?: { cameraMake?: string; cameraModel?: string; focalLength?: string; aperture?: string; iso?: number; shutterSpeed?: string; dateTaken?: string; gpsCoordinates?: { lat: number; lng: number } };
 }
 
 export const ImageMetadataViewerAdapter: ToolAdapter<ImageMetadataViewerInput, Record<string, never>, ImageMetadataViewerOutput> = {
-  id: 'image-metadata-viewer',
-  name: 'Image Metadata Viewer Adapter',
-  isConnected: false,
-  async execute() {
-    // TODO: Connect exifr / exiv2 WebAssembly in Phase 2
-    throw new Error('Engine not connected.');
+  id: 'image-metadata-viewer', name: 'Image Metadata Viewer Adapter', isConnected: true,
+  async execute(input) {
+    const started = performance.now();
+    try {
+      const metadata = await readBrowserImageMetadata(input.file);
+      return { success: true, data: { dimensions: { width: metadata.width, height: metadata.height }, colorSpace: metadata.mimeType, hasAlpha: metadata.hasTransparency }, durationMs: performance.now() - started };
+    } catch (error) { return failure<ImageMetadataViewerOutput>(error); }
   },
 };
