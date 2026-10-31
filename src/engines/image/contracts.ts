@@ -9,7 +9,7 @@ function failure<T>(error: unknown) {
 }
 
 export interface ImageConverterInput { file: File; }
-export interface ImageConverterOptions { targetFormat: 'png' | 'jpg' | 'webp' | 'avif'; quality: number; preserveMetadata?: boolean; }
+export interface ImageConverterOptions { targetFormat: 'png' | 'jpg' | 'webp'; quality: number; preserveMetadata?: boolean; }
 export interface ImageConverterOutput { blob: Blob; filename: string; originalSize: number; newSize: number; format: string; }
 
 export const ImageConverterAdapter: ToolAdapter<ImageConverterInput, ImageConverterOptions, ImageConverterOutput> = {
@@ -17,7 +17,7 @@ export const ImageConverterAdapter: ToolAdapter<ImageConverterInput, ImageConver
   async execute(input, options = { targetFormat: 'webp', quality: 85 }) {
     const started = performance.now();
     try {
-      const targetFormat = options.targetFormat === 'jpg' ? 'jpeg' : options.targetFormat === 'avif' ? 'webp' : options.targetFormat;
+      const targetFormat = options.targetFormat === 'jpg' ? 'jpeg' : options.targetFormat;
       const result = await transformBrowserImage(input.file, { format: targetFormat, quality: options.quality });
       const extension = targetFormat === 'jpeg' ? 'jpg' : targetFormat;
       return { success: true, data: { blob: result.blob, filename: input.file.name.replace(/\.[^.]+$/, '') + '.' + extension, originalSize: input.file.size, newSize: result.blob.size, format: targetFormat }, durationMs: performance.now() - started };
