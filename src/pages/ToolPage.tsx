@@ -110,9 +110,9 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
         </div>
 
         {/* Main Specialized Tool Workspace */}
-        <main className="pt-2">
+        <section className="pt-2">
           <ToolWorkspaceResolver tool={tool} />
-        </main>
+        </section>
 
         {/* Specifications & Instructions Section */}
         <section className="p-8 sm:p-10 rounded-3xl bg-white border border-stone-200/90 shadow-xs space-y-8">
