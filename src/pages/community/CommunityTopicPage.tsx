@@ -4,6 +4,7 @@ import { SAMPLE_TOPICS, FORUM_CATEGORIES } from '../../data/community.data';
 import { Breadcrumbs } from '../../components/common/Breadcrumbs';
 import { Head } from '../../seo/Head';
 import { Link } from '../../router';
+import { NotFoundPage } from '../NotFoundPage';
 import {
   MessageSquare,
   CheckCircle,
@@ -23,7 +24,8 @@ interface CommunityTopicPageProps {
 export const CommunityTopicPage: React.FC<CommunityTopicPageProps> = ({ topicSlug }) => {
   const { locale, t } = useI18n();
 
-  const topic = SAMPLE_TOPICS.find((t) => t.slug === topicSlug) || SAMPLE_TOPICS[0];
+  const topic = SAMPLE_TOPICS.find((t) => t.slug === topicSlug);
+  if (!topic) return <NotFoundPage />;
   const category = FORUM_CATEGORIES.find((c) => c.slug === topic.categorySlug);
   const title = topic.title[locale] || topic.title.en;
 
