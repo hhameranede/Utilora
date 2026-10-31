@@ -52,3 +52,15 @@ Each route is emitted as `dist/<route>.html`. Cloudflare Pages maps an extension
 For a Cloudflare Pages deployment, use `npm run build` as the build command, `dist` as the output directory, and set `SITE_URL` to the verified production origin in the production build environment. The root `/` remains the Vite root document; SEO-critical localized routes are prerendered.
 
 **Deployment verification remains pending:** the connected Cloudflare account currently has no UTILORA Pages project, so direct HTTP route status, canonical redirects, and production HTML source have not yet been checked against a live deployment. Do not treat CI output validation as proof of a deployed site.
+
+## Cloudflare Pages preview environment
+
+The repository is connected to the Cloudflare Pages project `utilora`.
+- Build command: `npm run build`
+- Output directory: `dist`
+- Node.js build version: `22`
+- Project hostname: `https://utilora-cn6.pages.dev`
+- `SITE_URL` is configured to that Pages hostname for preview and production builds until a verified custom domain is attached.
+- The `main` branch is designated as production, but production deployments are disabled. Only `fix/seo-branding-hardening-2026-10-31` is allowed to create preview deployments.
+
+The Pages project has been provisioned; confirm the first preview build and inspect its deployed HTML/HTTP responses before enabling production deployments or attaching a custom domain.
