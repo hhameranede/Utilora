@@ -1,11 +1,114 @@
-<div align="center">
+# UTILORA — Global Digital Tools Platform
 
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+> **Official Slogan:** Every Digital Task. One Place.
 
-  <h1>Built with AI Studio</h2>
+UTILORA is a premium, free online digital tools platform engineered to unify high-frequency utilities across **Images, Documents (PDF), Text, Code, Websites & Domains, and Video** into one fast, elegant, and confidential experience.
 
-  <p>The fastest path from prompt to production with Gemini.</p>
+---
 
-  <a href="https://aistudio.google.com/apps">Start building</a>
+## 1. Project Scope & Architecture Phase
 
-</div>
+This repository contains the **complete frontend foundation, UI system, reusable workspace templates, internationalization, routing, and future engine integration contracts**.
+
+### Scope Invariants & Anti-Deception Guardrails
+- **Frontend & Product Shell Only:** The visual interfaces, responsive layouts, client validation forms, and 16 specialized templates are fully realized and runnable.
+- **Engines Pending Phase 2:** Heavy processing engines (WASM-based image encoders, PDF page manipulation, video transcoders, live DoH/RDAP network workers) are intentionally scheduled for Phase 2.
+- **No Mock or Fake Execution:** Processing buttons remain visibly disabled with clear preview notices (`"Engine Integration Preview"`). The application never fabricates successful file conversions or pretend downloads.
+- **Privacy First:** Designed for in-browser, client-side processing without uploading user files to central servers.
+
+---
+
+## 2. Technology Stack
+
+- **Framework:** React 19 + TypeScript (Strict mode)
+- **Bundler:** Vite 8 + Tailwind CSS v4
+- **Icons:** Lucide React
+- **Design Direction:** Deep black (`#0A0B0E`), charcoal surfaces (`#12141C`, `#171A26`), restrained metallic gold accents (`#F3C64F`), white and soft gray typography. Anti-AI slop, zero-pill metadata discipline.
+- **Routing:** Path-based client router with direct link, browser back/forward, and locale persistence (`/:lang/...`).
+- **Internationalization (i18n):** 8 fully translated languages (English, Arabic RTL, French, Spanish, Portuguese, Hindi, Chinese, Bengali).
+- **SEO & Search:** Centralized dynamic metadata, hreflang links for all 8 languages, JSON-LD structured schemas, and controlled `noindex, nofollow` exclusion for unfinished preview tools.
+
+---
+
+## 3. Getting Started
+
+### Development Server
+```bash
+npm install
+npm run dev
+```
+The application runs on `http://localhost:3000`.
+
+### Production Build
+```bash
+npm run build
+```
+
+### Run Unit Tests
+```bash
+npx --yes tsx --test src/tests/registry.test.ts
+```
+
+---
+
+## 4. The Six Main Categories & 36 Registered Tools
+
+| Category | Slug | Planned Tools Count | Key Slug Examples |
+| :--- | :--- | :--- | :--- |
+| **Image Tools** | `image` | 6 tools | `image-converter`, `image-compressor`, `image-resizer`, `image-cropper`, `image-rotator`, `image-metadata-viewer` |
+| **PDF Tools** | `pdf` | 6 tools | `merge-pdf`, `split-pdf`, `rotate-pdf`, `jpg-to-pdf`, `pdf-to-jpg`, `pdf-page-counter` |
+| **Text Tools** | `text` | 6 tools | `word-counter`, `character-counter`, `case-converter`, `duplicate-lines-remover`, `sort-text-lines`, `text-diff-checker` |
+| **Developer Tools** | `developer` | 7 tools | `json-formatter`, `json-validator`, `json-minifier`, `base64-encoder-decoder`, `url-encoder-decoder`, `uuid-generator`, `hash-generator` |
+| **Website & Domain** | `website-domain` | 5 tools | `domain-age-checker`, `rdap-lookup`, `dns-lookup`, `website-status-checker`, `http-headers-checker` |
+| **Video Tools** | `video` | 6 tools | `video-compressor`, `video-to-audio`, `video-metadata-viewer`, `video-downloader`, `video-trimmer`, `thumbnail-extractor` |
+
+**Total: Exactly 36 Tools registered across 6 categories.**
+
+---
+
+## 5. Reusable Workspace Templates (A through P)
+
+All 36 tools are built upon 16 specialized, reusable workspace templates located in `src/components/templates/`:
+
+1. **Template A (Single File):** Dropzone, file info, format restrictions, disabled action. (`pdf-page-counter`, `video-downloader`)
+2. **Template B (Multi-File):** Multi-file queue, drag-reorder, item removal, batch merge. (`merge-pdf`, `jpg-to-pdf`)
+3. **Template C (Image Workspace):** Interactive canvas, before/after compare, quality & dimensions sidebar. (`image-converter`, `image-compressor`, `image-resizer`, `image-cropper`, `image-rotator`)
+4. **Template D (PDF Workspace):** Document page thumbnails grid, rotation, page extraction. (`split-pdf`, `rotate-pdf`, `pdf-to-jpg`)
+5. **Template E (Text Editor):** Live word/char/sentence analytics strip, case options, line sorters. (`word-counter`, `character-counter`, `case-converter`, `duplicate-lines-remover`, `sort-text-lines`)
+6. **Template F (Two-Panel Compare):** Side-by-side desktop / stacked mobile diff viewer. (`text-diff-checker`)
+7. **Template G (Code Editor):** Syntax styling, line number gutter, indent spacing. (`json-formatter`, `json-validator`, `json-minifier`)
+8. **Template H (Encoder/Decoder):** Dual panels, encode/decode tabs, swap direction. (`base64-encoder-decoder`, `url-encoder-decoder`)
+9. **Template I (Generator Workspace):** Entropic quantity controls, UUID v4/v7 toggles, copy-all. (`uuid-generator`, `hash-generator`)
+10. **Template J (Domain Lookup):** Domain input, RDAP registration records, nameservers. (`domain-age-checker`, `rdap-lookup`)
+11. **Template K (DNS Lookup):** Record type filtering (A, AAAA, MX, CNAME, TXT, NS, SOA). (`dns-lookup`)
+12. **Template L (Website Diagnostics):** Latency probe, HTTP response status, headers table. (`website-status-checker`, `http-headers-checker`)
+13. **Template M (Video Editor):** Video frame preview, timeline visual scrubber, start/end markers, CRF slider. (`video-compressor`, `video-trimmer`)
+14. **Template N (Media Converter):** Audio demuxing, format selector (MP3, WAV, AAC), bitrate picker. (`video-to-audio`)
+15. **Template O (Media Metadata):** Deep EXIF camera tags and MP4 atom container parameters. (`image-metadata-viewer`, `video-metadata-viewer`)
+16. **Template P (Thumbnail Extractor):** Filmstrip scrubber, frame timestamp selection, format export. (`thumbnail-extractor`)
+
+---
+
+## 6. Internal Template Lab (Non-Public)
+
+To inspect any of the 16 templates with real-time state toggles (Interactive, Empty, Loading, Error, Mobile view), visit:
+```
+/dev/templates
+```
+*(This route is excluded from public navigation, excluded from sitemaps, and marked with noindex).*
+
+---
+
+## 7. Documentation Index
+
+Comprehensive guides for development and extension:
+- `docs/ARCHITECTURE.md` — System architecture and client routing
+- `docs/DESIGN_SYSTEM.md` — Visual tokens, zero-pill rules, and typography
+- `docs/TOOL_REGISTRY.md` — Central registry schema and validation
+- `docs/ADDING_A_TOOL.md` — Step-by-step guide to add Tool #37
+- `docs/ADDING_AN_ARTICLE.md` — Content schema and authoring guides
+- `docs/ADDING_A_FORUM_SECTION.md` — Community forum expansion
+- `docs/ENGINE_INTEGRATION.md` — Phase 2 adapter contracts and WASM binding
+- `docs/LOCALIZATION.md` — 8-language translations and Arabic RTL handling
+- `docs/SEO.md` — Meta tags, structured JSON-LD, and noindex rules
+- `docs/IMPLEMENTATION_STATUS.md` — Verified feature checklist

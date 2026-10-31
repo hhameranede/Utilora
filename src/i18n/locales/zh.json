@@ -1,0 +1,81 @@
+{
+  "brand": { "name": "UTILORA", "slogan": "每一个数字任务。尽在一处。" },
+  "nav": {
+    "tools": "工具箱", "categories": "分类导航", "articles": "技术指南", "community": "开发者社区",
+    "about": "关于平台", "contact": "联系我们", "search": "搜索 36 款在线工具...", "searchShort": "搜索",
+    "devTemplates": "模板工坊", "allTools": "全部工具", "switchLanguage": "切换语言"
+  },
+  "hero": {
+    "badge": "全球免费数字化工具平台",
+    "title": "每一个数字任务。尽在一处。",
+    "subtitle": "为图像、文档、文本、代码、网站和视频打造的强劲、纯净且永久免费的在线实用工具箱。",
+    "searchPlaceholder": "输入工具名称、格式或关键词（例如：压缩、JSON、PDF）...",
+    "privacyBadge": "隐私优先架构 · 浏览器本地极速运算 · 无需注册账号",
+    "browseCategories": "浏览六大分类", "explorePopular": "热门工具推荐",
+    "statsTools": "36 款规划工具", "statsCategories": "6 大核心分类", "statsGlobal": "8 种国际语言"
+  },
+  "common": {
+    "openTool": "进入工具", "learnMore": "了解详情", "back": "返回", "backToHome": "返回首页",
+    "backToCategory": "返回分类", "categories": "分类", "filter": "筛选", "all": "全部",
+    "clear": "清空", "copy": "复制", "copied": "已复制到剪贴板", "cancel": "取消", "close": "关闭",
+    "download": "下载结果", "process": "开始执行",
+    "previewNotice": "UI 预览状态：真实处理引擎计划于第二阶段接入。执行操作保持禁用状态以确保反馈真实准确。",
+    "engineDisconnected": "等待接入处理引擎", "uiReady": "UI 交互就绪",
+    "noResults": "未找到匹配的工具或内容", "tryAnother": "尝试调整关键词或浏览下方推荐分类。",
+    "howToUse": "如何使用本工具", "faq": "常见问题解答", "relatedTools": "相关推荐工具",
+    "relatedArticles": "相关技术指南", "privacyStatement": "隐私与本地执行保障",
+    "privacyStatementDesc": "采用零云端留存、客户端本地优先架构。接入引擎后，您的文件与数据将全程在浏览器本地处理，绝不上传。",
+    "supportedFormats": "支持格式与规格限制", "sampleData": "界面演示数据", "demoOnly": "视觉预览模式",
+    "pageNotFound": "页面未找到", "pageNotFoundDesc": "您访问的工具或页面不存在或已被移除。", "returnHome": "返回首页"
+  },
+  "home": {
+    "categoriesHeading": "按工具分类探索", "categoriesSub": "精心归纳整理的六大核心数字化处理工具集。",
+    "popularHeading": "高频热门工具", "popularSub": "专为高效、精准与极速输出而设计的高使用率工具。",
+    "featuredHeading": "精选工作台", "featuredSub": "针对专业复杂处理流程打造的沉浸式工作环境。",
+    "howItWorksHeading": "UTILORA 如何运作", "howItWorksSub": "极简、高效且尊重用户隐私的数字化工具新标准。",
+    "step1Title": "1. 快速选定工具", "step1Desc": "通过直观分类、全局快捷搜索或直达链接即刻定位目标工具。",
+    "step2Title": "2. 在专属工作区完成配置", "step2Desc": "针对图像对比、文档编排、代码校验等不同场景量身定制的交互面板。",
+    "step3Title": "3. 本地运算极速响应", "step3Desc": "无需冗余服务端中转，保护数据私密性并提供极致响应速度。",
+    "trustHeading": "建立在信任与现代标准之上", "trustDesc": "我们坚信数字工具应当纯粹：无骚扰广告、免强制注册、深度保护用户隐私。",
+    "articlesPreviewHeading": "精选技术博文与指南", "articlesPreviewSub": "深入探讨压缩算法、PDF 规范及现代前端工程标准。",
+    "communityPreviewHeading": "社区与技术生态", "communityPreviewSub": "参与功能建议、探讨开发工作流并与全球用户共同交流。"
+  },
+  "templates": {
+    "dropzonePrompt": "将文件拖放到此处，或点击浏览上传", "dropzoneMultiPrompt": "拖入多个文件进行批量操作",
+    "supports": "支持格式", "maxSize": "单文件限制", "selectedFile": "已选文件", "fileDetails": "文件详情",
+    "removeFile": "移除文件", "clearAll": "清空列表", "totalFiles": "文件总数",
+    "reorderTip": "拖拽卡片或点击箭头可调整处理次序", "dimensions": "尺寸规格", "fileSize": "文件体积",
+    "format": "目标格式", "quality": "质量压缩比", "aspectRatio": "画面比例", "targetFormat": "输出格式",
+    "estimatedOutput": "预估结果（占位演示）", "original": "原图", "preview": "处理预览", "statistics": "文本指标统计",
+    "words": "词数", "characters": "字符数", "lines": "总行数", "readingTime": "阅读耗时", "speakingTime": "朗读耗时",
+    "inputLabel": "输入数据", "outputLabel": "输出结果", "compareA": "原始文本 (A)", "compareB": "对比文本 (B)",
+    "codeLanguage": "语法高亮", "indentSize": "缩进空格", "domainInput": "输入域名（例如：example.com）",
+    "urlInput": "输入网址 URL（例如：https://example.com）", "lookupAction": "发起查询", "diagnosticsAction": "开始诊断",
+    "registrationDate": "注册时间", "expirationDate": "到期时间", "registrar": "注册服务商",
+    "nameservers": "权威域名服务器", "dnsRecordType": "解析类型", "statusIndicator": "服务状态",
+    "responseCode": "响应状态码", "responseTime": "响应延迟", "headersTable": "HTTP 响应标头明细",
+    "timelineScrubber": "时间轴拖动", "trimStart": "截取起始点", "trimEnd": "截取结束点", "captureFrame": "截取当前帧画面"
+  },
+  "articles": {
+    "title": "技术文章与官方指南", "subtitle": "通俗易懂且严谨精准的数字媒体、网络协议与现代标准深度解析。",
+    "searchPlaceholder": "搜索文章与教程...", "featuredArticle": "焦点技术指南", "latestArticles": "最新发布",
+    "readTime": "分钟阅读", "tableOfContents": "文章目录导航", "author": "UTILORA 编研团队", "publishedOn": "发布时间",
+    "relatedTools": "本教程提及的工具", "categories": "文章分类", "allGuides": "全部指南",
+    "tutorials": "实战教程", "tips": "实用技巧", "comparisons": "技术对比", "explanations": "深度解析",
+    "newsletterTitle": "订阅动态", "newsletterDesc": "每季度精选发布新工具特性、压缩基准测试与网页技术动态。（预览）",
+    "newsletterPlaceholder": "输入您的工作邮箱", "subscribe": "免费订阅"
+  },
+  "community": {
+    "title": "开发者社区与功能探讨", "subtitle": "共同参与工具功能建议、交流日常工作流并分享开发经验。",
+    "searchPlaceholder": "搜索社区议题...", "newDiscussion": "发起新讨论（预览模式已禁用）",
+    "categories": "板块分类", "recentDiscussions": "最新讨论", "popularTopics": "高赞热门",
+    "replies": "回复数", "views": "浏览量", "lastActive": "最后活跃", "guidelines": "社区公约",
+    "guidelinesDesc": "保持友善与尊重，鼓励建设性的技术探讨，杜绝垃圾营销内容。", "replyPlaceholder": "登录后参与讨论（视觉预览）",
+    "replySubmit": "发布回帖", "joinNotice": "账号系统与实时社区互动将在下一开发阶段正式上线。"
+  },
+  "footer": {
+    "rights": "保留所有权利。", "privacy": "隐私政策", "terms": "服务条款",
+    "copyright": "版权与 DMCA", "acceptableUse": "合理使用规范", "about": "关于平台",
+    "contact": "联系与技术支持", "cookieNotice": "零广告追踪 Cookie。极速、纯粹、尊重用户。"
+  }
+}

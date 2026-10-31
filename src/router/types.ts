@@ -1,0 +1,32 @@
+import { SupportedLocale } from '../i18n';
+
+export type RouteType =
+  | 'home'
+  | 'categories-index'
+  | 'category'
+  | 'tools-index'
+  | 'tool'
+  | 'articles-index'
+  | 'article-category'
+  | 'article-detail'
+  | 'community-index'
+  | 'community-category'
+  | 'community-topic'
+  | 'about'
+  | 'contact'
+  | 'privacy'
+  | 'terms'
+  | 'copyright'
+  | 'acceptable-use'
+  | 'dev-templates'
+  | 'not-found';
+
+export interface ParsedRoute {
+  type: RouteType;
+  locale: SupportedLocale;
+  categorySlug?: string;
+  toolSlug?: string;
+  articleSlug?: string;
+  topicSlug?: string;
+  rawPath: string;
+}

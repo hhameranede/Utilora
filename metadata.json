@@ -1,0 +1,6 @@
+{
+  "name": "UTILORA",
+  "description": "Every Digital Task. One Place. Global digital tools platform for images, documents, text, code, websites, and videos.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

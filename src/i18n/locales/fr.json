@@ -1,0 +1,80 @@
+{
+  "brand": { "name": "UTILORA", "slogan": "Chaque tâche numérique. Un seul endroit." },
+  "nav": {
+    "tools": "Outils", "categories": "Catégories", "articles": "Articles & Guides", "community": "Communauté",
+    "about": "À propos", "contact": "Contact", "search": "Rechercher parmi 36 outils...", "searchShort": "Recherche",
+    "devTemplates": "Lab Modèles", "allTools": "Tous les outils", "switchLanguage": "Changer de langue"
+  },
+  "hero": {
+    "badge": "Plateforme Mondiale d'Outils Numériques",
+    "title": "Chaque tâche numérique. Un seul endroit.",
+    "subtitle": "Utilitaires en ligne puissants, rapides et gratuits pour vos images, documents, textes, codes, sites web et vidéos.",
+    "searchPlaceholder": "Rechercher par nom d'outil, format ou tâche...",
+    "privacyBadge": "Architecture respectueuse de la vie privée · Traitement local dans le navigateur",
+    "browseCategories": "Explorer les catégories", "explorePopular": "Outils populaires",
+    "statsTools": "36 Outils Prévus", "statsCategories": "6 Catégories Clés", "statsGlobal": "8 Langues Mondiales"
+  },
+  "common": {
+    "openTool": "Ouvrir l'outil", "learnMore": "En savoir plus", "back": "Retour", "backToHome": "Retour à l'accueil",
+    "backToCategory": "Retour à la catégorie", "categories": "Catégories", "filter": "Filtrer", "all": "Tous",
+    "clear": "Effacer", "copy": "Copier", "copied": "Copié dans le presse-papier", "cancel": "Annuler", "close": "Fermer",
+    "download": "Télécharger le résultat", "process": "Exécuter l'action",
+    "previewNotice": "Aperçu de l'interface : intégration du moteur prévue en Phase 2. Les boutons d'exécution sont désactivés.",
+    "engineDisconnected": "Connexion du moteur en attente", "uiReady": "Interface prête",
+    "noResults": "Aucun outil ne correspond à votre recherche", "tryAnother": "Essayez d'autres mots-clés ou parcourez les catégories.",
+    "howToUse": "Comment utiliser cet outil", "faq": "Foire aux questions", "relatedTools": "Outils associés",
+    "relatedArticles": "Guides associés", "privacyStatement": "Garantie de confidentialité",
+    "privacyStatementDesc": "Conçu avec une architecture locale sans stockage serveur. Vos fichiers restent sur votre machine.",
+    "supportedFormats": "Formats pris en charge", "sampleData": "Données d'exemple", "demoOnly": "Mode Aperçu",
+    "pageNotFound": "Page introuvable", "pageNotFoundDesc": "L'outil ou la page demandée n'existe pas.", "returnHome": "Retour à l'accueil"
+  },
+  "home": {
+    "categoriesHeading": "Explorer par catégorie", "categoriesSub": "36 utilitaires répartis en six catégories spécialisées.",
+    "popularHeading": "Outils les plus populaires", "popularSub": "Des solutions optimisées pour la rapidité et la clarté.",
+    "featuredHeading": "Espaces de travail en vedette", "featuredSub": "Environnements dédiés aux traitements complexes.",
+    "howItWorksHeading": "Comment fonctionne UTILORA", "howItWorksSub": "Une approche respectueuse et moderne des outils web.",
+    "step1Title": "1. Choisissez votre outil", "step1Desc": "Accédez rapidement à n'importe quel outil par recherche ou catégorie.",
+    "step2Title": "2. Configurez votre espace", "step2Desc": "Interagissez avec des interfaces optimisées pour chaque type de média.",
+    "step3Title": "3. Traitement local sans intermédiaire", "step3Desc": "Conçu pour s'exécuter dans le navigateur sans transfert serveur.",
+    "trustHeading": "Fondé sur la confiance", "trustDesc": "Des outils numériques gratuits, rapides, sans compte et sans publicité.",
+    "articlesPreviewHeading": "Derniers guides & analyses", "articlesPreviewSub": "Articles techniques sur la compression et les standards du web.",
+    "communityPreviewHeading": "Communauté", "communityPreviewSub": "Partagez vos retours et suggérez de nouveaux outils."
+  },
+  "templates": {
+    "dropzonePrompt": "Glissez-déposez votre fichier ici, ou parcourez", "dropzoneMultiPrompt": "Glissez-déposez plusieurs fichiers ici",
+    "supports": "Formats acceptés", "maxSize": "Taille max", "selectedFile": "Fichier sélectionné", "fileDetails": "Détails du fichier",
+    "removeFile": "Supprimer le fichier", "clearAll": "Tout effacer", "totalFiles": "Total des fichiers",
+    "reorderTip": "Déplacez les cartes pour réorganiser l'ordre", "dimensions": "Dimensions", "fileSize": "Taille",
+    "format": "Format", "quality": "Niveau de qualité", "aspectRatio": "Format d'image", "targetFormat": "Format cible",
+    "estimatedOutput": "Résultat estimé (Aperçu)", "original": "Original", "preview": "Aperçu", "statistics": "Statistiques du texte",
+    "words": "Mots", "characters": "Caractères", "lines": "Lignes", "readingTime": "Temps de lecture", "speakingTime": "Temps de parole",
+    "inputLabel": "Entrée", "outputLabel": "Sortie traitée", "compareA": "Document Original (A)", "compareB": "Document Modifié (B)",
+    "codeLanguage": "Langage", "indentSize": "Indentation", "domainInput": "Entrez le nom de domaine", "urlInput": "Entrez l'URL du site",
+    "lookupAction": "Lancer la recherche", "diagnosticsAction": "Analyser l'URL", "registrationDate": "Date d'enregistrement",
+    "expirationDate": "Date d'expiration", "registrar": "Bureau d'enregistrement", "nameservers": "Serveurs DNS",
+    "dnsRecordType": "Type d'enregistrement", "statusIndicator": "État du serveur", "responseCode": "Code réponse",
+    "responseTime": "Temps de réponse", "headersTable": "En-têtes de réponse HTTP", "timelineScrubber": "Parcourir la vidéo",
+    "trimStart": "Début", "trimEnd": "Fin", "captureFrame": "Capturer l'image actuelle"
+  },
+  "articles": {
+    "title": "Articles & Guides Techniques", "subtitle": "Explications précises sur les formats de fichiers et les standards web.",
+    "searchPlaceholder": "Rechercher un article...", "featuredArticle": "Article à la une", "latestArticles": "Dernières publications",
+    "readTime": "min de lecture", "tableOfContents": "Sommaire", "author": "Équipe de rédaction", "publishedOn": "Publié le",
+    "relatedTools": "Outils mentionnés", "categories": "Catégories", "allGuides": "Tous les guides", "tutorials": "Tutoriels",
+    "tips": "Astuces", "comparisons": "Comparaisons", "explanations": "Analyses", "newsletterTitle": "Restez informé",
+    "newsletterDesc": "Rapport trimestriel des nouveautés. (Aperçu)", "newsletterPlaceholder": "Votre adresse e-mail", "subscribe": "S'abonner"
+  },
+  "community": {
+    "title": "Communauté & Échanges", "subtitle": "Participez aux discussions techniques et suggestions d'outils.",
+    "searchPlaceholder": "Rechercher dans la communauté...", "newDiscussion": "Nouvelle discussion (Désactivé en aperçu)",
+    "categories": "Catégories du forum", "recentDiscussions": "Discussions récentes", "popularTopics": "Sujets populaires",
+    "replies": "Réponses", "views": "Vues", "lastActive": "Dernière activité", "guidelines": "Règles de la communauté",
+    "guidelinesDesc": "Soyez respectueux et partagez des retours constructifs.", "replyPlaceholder": "Connectez-vous pour répondre (Aperçu)",
+    "replySubmit": "Envoyer la réponse", "joinNotice": "La création de compte sera activée lors de la prochaine phase."
+  },
+  "footer": {
+    "rights": "Tous droits réservés.", "privacy": "Politique de confidentialité", "terms": "Conditions d'utilisation",
+    "copyright": "Droits d'auteur / DMCA", "acceptableUse": "Usage acceptable", "about": "À propos d'UTILORA",
+    "contact": "Contact", "cookieNotice": "Aucun cookie de pistage. Conception rapide et respectueuse."
+  }
+}
