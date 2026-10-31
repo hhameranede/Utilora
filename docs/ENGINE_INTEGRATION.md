@@ -57,6 +57,6 @@ The five website/domain tools (domain age, RDAP, DNS, website status, HTTP heade
 ## Automated smoke-test coverage
 
 - `scripts/test-local-core.ts` exercises the text and developer helper functions, including Unicode text, JSON, Base64, URL encoding, UUID generation, and SHA-256.
-- `scripts/test-pdf-core.ts` covers page counting, ordered merge, range and burst splitting, selected-page rotation, and image-to-PDF orientation.
+- `scripts/test-pdf-core.ts` covers page counting, ordered merge, range and burst splitting, selected-page rotation, image-to-PDF orientation, and rejection of invalid rotation/margin values. PDF.js page rendering still needs browser-level execution coverage.
 - `scripts/test-image-core.ts` uses deterministic browser API mocks to test Canvas transforms, crop validation, resizing, rotation/flips, MIME export failures, resource cleanup, pixel metadata, and all six image adapter result contracts.
 - These are engine-level smoke tests. They do **not** replace browser-based UI, touch interaction, real-device compatibility, or visual regression testing; those remain separate QA tasks.
