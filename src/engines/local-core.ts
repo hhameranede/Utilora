@@ -206,7 +206,7 @@ export function generateUuid(version: 'v4' | 'v7'): string {
   return [hex.slice(0, 8), hex.slice(8, 12), hex.slice(12, 16), hex.slice(16, 20), hex.slice(20)].join('-');
 }
 
-export async function generateDigest(value: string, algorithm: 'SHA-256' | 'SHA-384' | 'SHA-512'): Promise<string> {
+export async function generateDigest(value: string, algorithm: 'SHA-1' | 'SHA-256' | 'SHA-384' | 'SHA-512'): Promise<string> {
   if (!globalThis.crypto?.subtle) throw new Error('Secure Web Crypto is unavailable in this browser. Open UTILORA over HTTPS and try again.');
   const digest = await crypto.subtle.digest(algorithm, new TextEncoder().encode(value));
   return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, '0')).join('');
