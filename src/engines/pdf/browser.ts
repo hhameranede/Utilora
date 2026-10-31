@@ -1,4 +1,5 @@
 import { PDFDocument, degrees } from 'pdf-lib';
+import pdfWorkerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 
 const MAX_PDF_SIZE = 100 * 1024 * 1024;
 const MAX_PDF_PAGES = 250;
@@ -143,7 +144,7 @@ export async function renderPdfToImages(
 ): Promise<Array<{ filename: string; blob: Blob; pageNumber: number }>> {
   validatePdfFiles([file]);
   const pdfjs = await import('pdfjs-dist');
-  pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString();
+  pdfjs.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
   const bytes = new Uint8Array(await file.arrayBuffer());
   const pdfDocument = await pdfjs.getDocument({ data: bytes }).promise;
   if (pdfDocument.numPages > MAX_PDF_PAGES) throw new Error('This PDF exceeds the 250-page safety limit.');
