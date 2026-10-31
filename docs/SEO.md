@@ -63,4 +63,6 @@ The repository is connected to the Cloudflare Pages project `utilora`.
 - `SITE_URL` is configured to that Pages hostname for preview and production builds until a verified custom domain is attached.
 - The `main` branch is designated as production, but production deployments are disabled. Only `fix/seo-branding-hardening-2026-10-31` is allowed to create preview deployments.
 
-The Pages project has been provisioned; confirm the first preview build and inspect its deployed HTML/HTTP responses before enabling production deployments or attaching a custom domain.
+The first Cloudflare Pages preview deployment completed successfully from `fix/seo-branding-hardening-2026-10-31`. Cloudflare build logs confirm that the production build generated 528 localized route documents using `https://utilora-cn6.pages.dev`, and the deployment uploaded 537 files successfully. The preview URL is public and Cloudflare Pages adds `X-Robots-Tag: noindex` to preview deployments by default. Production deployments remain disabled.
+
+Live HTTP verification of `/ar`, `/en/tools`, and an unknown route is still pending: external HTTP probing from the current execution environment could not resolve the preview hostname. Verify these paths in a normal browser before enabling production deployments or attaching a custom domain.

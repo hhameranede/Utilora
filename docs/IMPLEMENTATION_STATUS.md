@@ -1,13 +1,15 @@
 # Implementation Status Checklist
 
-This checklist records repository implementation separately from production deployment and browser QA. On 2026-10-31, GitHub Actions run #18 completed successfully for the SEO/branding branch, including TypeScript, Vite build, prerendering of 528 localized routes, and generated-HTML assertions. The connected Cloudflare account currently has no UTILORA Pages project, so live route serving is not yet verified.
+This checklist records repository implementation separately from production deployment and browser QA. On 2026-10-31, GitHub Actions run #19 passed the clean-URL prerender checks, and run #20 passed on the Pages-connected branch head. Cloudflare Pages project `utilora` is connected to this repository; its first preview deployment from `fix/seo-branding-hardening-2026-10-31` completed successfully and uploaded 537 files after prerendering 528 localized routes. Production deployments from `main` remain disabled. Direct browser/HTTP checks of deployed routes are still pending because the current execution environment could not resolve the preview hostname.
 
 ## Verification status
 - [x] TypeScript check and Vite production build passed in GitHub Actions run #18.
 - [x] Sitemap/robots output generated and validated in that build.
 - [x] Static HTML prerendering generated 528 localized routes; CI checks sample route bodies, canonical URLs, RTL direction, preview noindex, and 404 output.
 - [ ] Responsive visual QA completed on mobile and desktop.
-- [ ] Cloudflare Pages live-route verification pending; no UTILORA Pages project is present in the connected Cloudflare account.
+- [x] Cloudflare Pages project connected; preview build and asset deployment succeeded (537 files uploaded).
+- [ ] Direct HTTP/browser verification of localized routes, canonical tags, and 404 status still pending.
+- [x] Production deployment from `main` explicitly disabled pending approval.
 
 
 
