@@ -1,11 +1,19 @@
 # Implementation Status Checklist
 
-All items from Section 24 of the Master Brief have been systematically built and verified:
+This checklist records repository implementation, not a claim that production deployment or every browser workflow has been independently verified. The current branch has not yet produced a successful CI build in this session.
 
-- [x] Application starts and compiles cleanly (`compile_applet`).
-- [x] React 19 and TypeScript structure is clean and strictly typed.
-- [x] Design system exists with deep black, charcoal, and restrained metallic gold palette.
-- [x] Premium responsive visual identity is applied (mobile-first reflow).
+## Verification status
+- [ ] TypeScript check and production build confirmed by GitHub Actions (workflow added; no run result received yet).
+- [ ] Sitemap/robots output validated in a completed production build.
+- [ ] Responsive visual QA completed on mobile and desktop.
+- [ ] Route-level HTML prerendering / SSR / edge rendering implemented and verified (still outstanding).
+
+
+
+- [ ] Application startup and production compilation successfully re-verified.
+- [x] React 19 and TypeScript project structure exists; TypeScript strict mode is not enabled yet.
+- [~] Brand tokens use navy and gold; full visual consistency across all component surfaces remains to be audited.
+- [ ] Premium responsive visual identity requires visual QA at mobile and desktop breakpoints.
 - [x] Home page is complete with Hero, 6 categories, popular tools, featured workspaces, how it works, trust, articles, and community sections.
 - [x] Six category pages exist (`image`, `pdf`, `text`, `developer`, `website-domain`, `video`).
 - [x] All 36 tool definitions exist in `src/registry/tools.registry.ts`.
@@ -18,11 +26,11 @@ All items from Section 24 of the Master Brief have been systematically built and
 - [x] Community landing page exists (`/:lang/community`).
 - [x] Community category templates exist (`/:lang/community/category/:slug`).
 - [x] Discussion detail templates exist (`/:lang/community/topic/:slug`) with thread preview and solution badges.
-- [x] Global Search UI exists with `Ctrl+K` / `Cmd+K` hotkey, searching local registry, categories, articles, and topics.
+- [x] Global Search UI exists; `Ctrl+K` / `Cmd+K` now toggles the search dialog.
 - [x] Eight localization dictionaries exist (`en`, `ar`, `fr`, `es`, `pt`, `hi`, `zh`, `bn`).
-- [x] Arabic RTL works with `dir="rtl"` and appropriate typographic hierarchy.
-- [x] SEO metadata architecture exists with dynamic titles, descriptions, hreflang links, and JSON-LD schemas.
-- [x] Noindex behavior for unfinished tool pages and dev templates is enforced.
+- [x] Route metadata updates the document language and sets Arabic routes to `dir="rtl"`; visual RTL QA remains pending.
+- [x] Client-side SEO metadata handles titles, descriptions, canonical URLs, hreflang links, robots directives, and JSON-LD.
+- [x] Preview tool and sample content routes request `noindex` through client-side metadata; verify after prerendering is added.
 - [x] Internal template gallery exists at non-public `/dev/templates` route with state toggles.
 - [x] Future engine interfaces exist in `src/engines/` with typed inputs, outputs, progress, and cancellation.
 - [x] No actual tool processing has been implemented.
@@ -30,3 +38,9 @@ All items from Section 24 of the Master Brief have been systematically built and
 - [x] No database has been added.
 - [x] No external advertising scripts have been added (AdSlot/AffiliateSlot hidden by default).
 - [x] README and architecture documentation exist in `docs/`.
+
+- [x] Production sitemap generator includes only localized home, tools-directory, category, and legal routes.
+- [x] Build-time SEO script generates robots.txt and generates sitemap.xml only when a verified SITE_URL is supplied.
+- [x] Header/footer use a shared UTILORA brand mark and internal template links are removed from public navigation.
+- [x] Browser tab icon assets include SVG and a 96×96 PNG.
+- [ ] Static prerendering / SSR / edge HTML output is not implemented; route-specific metadata is applied after JavaScript runs.
