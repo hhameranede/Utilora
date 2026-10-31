@@ -77,16 +77,9 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({
   initialLocale = 'en',
   onLocaleChange,
 }) => {
-  const [locale, setLocaleState] = useState<SupportedLocale>(() => {
-    // Check localStorage if available, or use initialLocale
-    if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem('utilora_locale') as SupportedLocale;
-      if (stored && DICTIONARIES[stored]) {
-        return stored;
-      }
-    }
-    return initialLocale;
-  });
+  // The locale in the URL is authoritative so server-rendered HTML and
+  // client hydration always start with the same language.
+  const [locale, setLocaleState] = useState<SupportedLocale>(initialLocale);
 
   const currentLanguage = useMemo(() => {
     return SUPPORTED_LANGUAGES.find((lang) => lang.code === locale) || SUPPORTED_LANGUAGES[0];
