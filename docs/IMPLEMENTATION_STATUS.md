@@ -1,12 +1,13 @@
 # Implementation Status Checklist
 
-This checklist records repository implementation, not a claim that production deployment or every browser workflow has been independently verified. The current branch has not yet produced a successful CI build in this session.
+This checklist records repository implementation separately from production deployment and browser QA. On 2026-10-31, GitHub Actions run #18 completed successfully for the SEO/branding branch, including TypeScript, Vite build, prerendering of 528 localized routes, and generated-HTML assertions. The connected Cloudflare account currently has no UTILORA Pages project, so live route serving is not yet verified.
 
 ## Verification status
-- [ ] TypeScript check and production build confirmed by GitHub Actions (workflow added; no run result received yet).
-- [ ] Sitemap/robots output validated in a completed production build.
+- [x] TypeScript check and Vite production build passed in GitHub Actions run #18.
+- [x] Sitemap/robots output generated and validated in that build.
+- [x] Static HTML prerendering generated 528 localized routes; CI checks sample route bodies, canonical URLs, RTL direction, preview noindex, and 404 output.
 - [ ] Responsive visual QA completed on mobile and desktop.
-- [ ] Route-level HTML prerendering / SSR / edge rendering implemented and verified (still outstanding).
+- [ ] Cloudflare Pages live-route verification pending; no UTILORA Pages project is present in the connected Cloudflare account.
 
 
 
@@ -30,7 +31,7 @@ This checklist records repository implementation, not a claim that production de
 - [x] Eight localization dictionaries exist (`en`, `ar`, `fr`, `es`, `pt`, `hi`, `zh`, `bn`).
 - [x] Route metadata updates the document language and sets Arabic routes to `dir="rtl"`; visual RTL QA remains pending.
 - [x] Client-side SEO metadata handles titles, descriptions, canonical URLs, hreflang links, robots directives, and JSON-LD.
-- [x] Preview tool and sample content routes request `noindex` through client-side metadata; verify after prerendering is added.
+- [x] Preview tool and sample content routes carry `noindex` directives in prerendered HTML.
 - [x] Internal template gallery exists at non-public `/dev/templates` route with state toggles.
 - [x] Future engine interfaces exist in `src/engines/` with typed inputs, outputs, progress, and cancellation.
 - [x] No actual tool processing has been implemented.
@@ -43,4 +44,4 @@ This checklist records repository implementation, not a claim that production de
 - [x] Build-time SEO script generates robots.txt and generates sitemap.xml only when a verified SITE_URL is supplied.
 - [x] Header/footer use a shared UTILORA brand mark and internal template links are removed from public navigation.
 - [x] Browser tab icon assets include SVG and a 96×96 PNG.
-- [ ] Static prerendering / SSR / edge HTML output is not implemented; route-specific metadata is applied after JavaScript runs.
+- [x] Static route prerendering emits one extensionless-URL HTML file per localized route and a top-level `404.html`; Cloudflare Pages HTTP behavior is pending live deployment verification.

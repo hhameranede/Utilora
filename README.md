@@ -61,7 +61,7 @@ SITE_URL=https://your-real-domain.example npm run seo:generate
 
 This writes `public/sitemap.xml` and `public/robots.txt`. The sitemap contains localized home, tool-directory, category, and legal routes; unfinished individual tool pages and sample article/community routes remain excluded.
 
-**SEO limitation:** the current app is still a client-rendered Vite SPA. The `Head` component updates metadata after JavaScript runs, so this sitemap and metadata work do not replace prerendering/SSR. Do not treat page-level metadata as fully crawler-ready until route HTML is prerendered or rendered at the edge.
+**Static route rendering:** `npm run build` prerenders the 528 localized routes into HTML files in `dist`, including page content and route-specific metadata before JavaScript runs. Each localized route is emitted once as `dist/<route>.html`; Cloudflare Pages serves that file at its extensionless URL (for example, `/en/tools`). We intentionally do not also emit `<route>/index.html`, because that would create a second trailing-slash URL for the same content. The build also creates a top-level `404.html`, so Cloudflare Pages returns a real 404 for unknown routes instead of falling back to the SPA shell. The root `/` still uses the Vite root document; the localized pages are the prerendered SEO routes.
 
 ### Run Unit Tests
 ```bash

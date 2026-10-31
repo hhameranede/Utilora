@@ -43,10 +43,15 @@ jobs:
           grep -q 'hreflang="ar"' public/sitemap.xml
           grep -q 'hreflang="bn"' public/sitemap.xml
           ! grep -q "/tools/json-formatter" public/sitemap.xml
-          test -s dist/ar/index.html
-          test -s dist/en/tools/index.html
-          test -s dist/en/tools/image-converter/index.html
-          grep -q 'dir="rtl"' dist/ar/index.html
-          grep -q 'canonical" href="https://utilora.invalid/ar"' dist/ar/index.html
-          grep -q 'noindex, nofollow' dist/en/tools/image-converter/index.html
-          grep -q 'id="root"><' dist/en/index.html
+          test -s dist/ar.html
+          test -s dist/en/tools.html
+          test -s dist/en/tools/image-converter.html
+          test -s dist/404.html
+          test ! -e dist/ar/index.html
+          test ! -e dist/en/tools/index.html
+          grep -q 'dir="rtl"' dist/ar.html
+          grep -q 'canonical" href="https://utilora.invalid/ar"' dist/ar.html
+          grep -q 'noindex, nofollow' dist/en/tools/image-converter.html
+          grep -q 'noindex, nofollow' dist/404.html
+          grep -q 'Page not found' dist/404.html
+          grep -q 'id="root"><' dist/en.html

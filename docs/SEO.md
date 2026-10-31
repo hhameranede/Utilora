@@ -43,8 +43,12 @@ When `SITE_URL` is omitted, the build does not guess a domain: stale sitemap out
 
 The document `lang` is updated for each locale, and Arabic routes set `dir="rtl"`. Canonical URLs and JSON-LD use the active browser origin; they do not assume a hard-coded production domain.
 
-## Important prerendering limitation
+## Static route HTML and Cloudflare Pages
 
-The app is currently a client-rendered Vite SPA. Route-specific metadata is applied after JavaScript executes. A generated sitemap does not make the initial HTML contain each route's title, description, canonical, robots directive, or page content.
+The production build runs `scripts/prerender-routes.tsx` after Vite and renders each localized route into its own initial HTML document. The generated file includes the route's rendered body, title, description, canonical URL, hreflang alternates, robots directive, and JSON-LD before client JavaScript runs.
 
-Before relying on organic indexing for route-level pages, implement and verify static prerendering, SSR, or edge HTML rendering for the intended public routes. Validate the resulting HTML source and HTTP status codes, not only the browser DOM after React loads.
+Each route is emitted as `dist/<route>.html`. Cloudflare Pages maps an extensionless request such as `/en/tools` to `dist/en/tools.html`. Do not emit both `dist/en/tools.html` and `dist/en/tools/index.html`: Pages maps those to different extensionless and trailing-slash URLs, which would expose duplicate copies while the canonical tag points to only one. The build creates a top-level `dist/404.html`; Cloudflare Pages uses that file for unmatched requests and does not apply its automatic SPA fallback when a top-level 404 page exists.
+
+For a Cloudflare Pages deployment, use `npm run build` as the build command, `dist` as the output directory, and set `SITE_URL` to the verified production origin in the production build environment. The root `/` remains the Vite root document; SEO-critical localized routes are prerendered.
+
+**Deployment verification remains pending:** the connected Cloudflare account currently has no UTILORA Pages project, so direct HTTP route status, canonical redirects, and production HTML source have not yet been checked against a live deployment. Do not treat CI output validation as proof of a deployed site.

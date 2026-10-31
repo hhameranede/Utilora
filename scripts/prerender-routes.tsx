@@ -154,16 +154,12 @@ async function main() {
       const html = injectMetadata(template, meta, origin)
         .replace('<div id="root"></div>', '<div id="root">' + body + '</div>');
       const cleanPath = route.path.replace(/^\/+|\/+$/g, '');
-      const parts = cleanPath ? cleanPath.split('/') : [];
-      const indexFile = resolve(dist, ...parts, 'index.html');
+      // Cloudflare Pages maps /route to dist/route.html. Do not also emit
+      // dist/route/index.html: that creates a second URL (/route/) for the
+      // same page and conflicts with the no-trailing-slash canonical URL.
       const cleanUrlFile = resolve(dist, (cleanPath || 'index') + '.html');
-
-      await mkdir(dirname(indexFile), { recursive: true });
-      await writeFile(indexFile, html, 'utf8');
-      if (cleanUrlFile !== indexFile) {
-        await mkdir(dirname(cleanUrlFile), { recursive: true });
-        await writeFile(cleanUrlFile, html, 'utf8');
-      }
+      await mkdir(dirname(cleanUrlFile), { recursive: true });
+      await writeFile(cleanUrlFile, html, 'utf8');
     }
 
     const notFound = template
