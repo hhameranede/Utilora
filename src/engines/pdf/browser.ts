@@ -101,7 +101,7 @@ export async function rotatePdfFile(file: File, rotation: 90 | 180 | 270, target
   return { blob: bytesToPdfBlob(bytes), rotatedPageCount: targets.length };
 }
 
-export async function imagesToPdf(files: File[], pageSize: 'fit' | 'a4' | 'letter' = 'fit', marginMm = 10): Promise<{ blob: Blob; pageCount: number }> {
+export async function imagesToPdf(files: File[], pageSize: 'fit' | 'a4' | 'letter' = 'fit', marginMm = 10, orientation: 'auto' | 'portrait' | 'landscape' = 'auto'): Promise<{ blob: Blob; pageCount: number }> {
   if (!files.length) throw new Error('Choose at least one JPG or PNG image.');
   if (files.length > 100) throw new Error('Choose no more than 100 images at a time.');
   const pdf = await PDFDocument.create();
@@ -116,7 +116,7 @@ export async function imagesToPdf(files: File[], pageSize: 'fit' | 'a4' | 'lette
     let pageHeight = imageDims.height + margin * 2;
     if (pageSize === 'a4') { pageWidth = 595.28; pageHeight = 841.89; }
     if (pageSize === 'letter') { pageWidth = 612; pageHeight = 792; }
-    const landscape = imageDims.width > imageDims.height;
+    const landscape = orientation === 'landscape' || (orientation === 'auto' && imageDims.width > imageDims.height);
     if (pageSize !== 'fit' && landscape) [pageWidth, pageHeight] = [pageHeight, pageWidth];
     const availableWidth = Math.max(1, pageWidth - margin * 2);
     const availableHeight = Math.max(1, pageHeight - margin * 2);
