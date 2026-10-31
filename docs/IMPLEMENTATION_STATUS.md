@@ -40,7 +40,8 @@ This checklist records repository implementation separately from production depl
 - [x] PDF tools: merge, range/burst split, rotate, JPG/PNG to PDF, PDF to JPG/PNG, and page/form-field inspection.
 - [x] Text and developer tools: all 13 utilities run in the browser using native browser APIs.
 - [x] The 25 connected tools execute locally; the remaining 11 website/domain and video workspaces remain preview-only instead of claiming completed processing.
-- [x] CI smoke tests cover text/developer core helpers and PDF merge, range split, burst split, rotate, image-to-PDF, and page count.
+- [x] The CI workflow is configured to run text/developer, PDF, and image-engine smoke-test commands; image coverage now includes all six image adapters and common invalid-input/resource-cleanup paths.
+- [ ] PDF.js rendered-page execution and all 25 tool workspaces still need browser-based integration/E2E coverage.
 - [x] No database has been added.
 - [x] No external advertising scripts have been added (AdSlot/AffiliateSlot hidden by default).
 - [x] README and architecture documentation exist in `docs/`.
