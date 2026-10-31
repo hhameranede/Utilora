@@ -6,6 +6,7 @@
 import React from 'react';
 import { I18nProvider } from './i18n';
 import { RouterProvider, useRouter } from './router';
+import { parseRoute } from './router/matcher';
 import { SiteHeader } from './components/common/SiteHeader';
 import { SiteFooter } from './components/common/SiteFooter';
 
@@ -85,10 +86,18 @@ const AppContent: React.FC = () => {
   );
 };
 
-export default function App() {
+export interface AppProps {
+  /** Initial URL path, supplied by the prerenderer and otherwise read from the browser. */
+  initialPath?: string;
+}
+
+export default function App({ initialPath }: AppProps = {}) {
+  const resolvedPath = initialPath ?? (typeof window !== 'undefined' ? window.location.pathname : '/');
+  const initialLocale = parseRoute(resolvedPath).locale;
+
   return (
-    <I18nProvider>
-      <RouterProvider>
+    <I18nProvider initialLocale={initialLocale}>
+      <RouterProvider initialPath={resolvedPath}>
         <AppContent />
       </RouterProvider>
     </I18nProvider>
