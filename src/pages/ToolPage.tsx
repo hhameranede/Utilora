@@ -165,7 +165,7 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
         <div className="mt-6 grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
           <div className="max-w-3xl">
             <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-orange-100 bg-white text-orange-600 shadow-sm">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-orange-100 bg-white text-orange-700 shadow-sm">
                 <Icon name={tool.icon} size={25} />
               </div>
               <div className="min-w-0">
@@ -192,13 +192,13 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
 
             <div className="mt-6 flex flex-wrap gap-2">
               <span className="inline-flex items-center gap-2 rounded-full border border-stone-200 bg-white px-3 py-2 text-xs font-medium text-stone-700">
-                <CheckCircle2 size={14} className="text-orange-600" />
+                <CheckCircle2 size={14} className="text-orange-700" />
                 {isFunctional
                   ? t('product.free')
                   : t('product.freePreview')}
               </span>
               <span className="inline-flex items-center gap-2 rounded-full border border-stone-200 bg-white px-3 py-2 text-xs font-medium text-stone-700">
-                <ShieldCheck size={14} className="text-orange-600" />
+                <ShieldCheck size={14} className="text-orange-700" />
                 {!isFunctional
                   ? t('product.previewOnly')
                   : isNetworkLookup
@@ -206,7 +206,7 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
                     : t('product.browserProcessing')}
               </span>
               <span className="inline-flex items-center gap-2 rounded-full border border-stone-200 bg-white px-3 py-2 text-xs font-medium text-stone-700">
-                <Sparkles size={14} className="text-orange-600" />
+                <Sparkles size={14} className="text-orange-700" />
                 {isFunctional
                   ? t('product.noInstall')
                   : t('product.notAvailable')}
@@ -243,7 +243,7 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
 
       {!isFunctional && (
         <div className="flex items-start gap-3 rounded-2xl border border-orange-200 bg-orange-50/80 p-4 text-sm text-orange-950">
-          <Info size={18} className="mt-0.5 shrink-0 text-orange-600" />
+          <Info size={18} className="mt-0.5 shrink-0 text-orange-700" />
           <div>
             <p className="font-semibold">{t('product.previewNotWorking')}</p>
             <p className="mt-1 leading-6">{previewText}</p>
