@@ -9,7 +9,7 @@ interface LanguageSwitcherProps {
 }
 
 export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ variant = 'header', className = '' }) => {
-  const { languages, currentLanguage } = useI18n();
+  const { languages, currentLanguage, t } = useI18n();
   const { switchLocaleInPath } = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -36,7 +36,7 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ variant = 'h
       <div className={`flex flex-wrap items-center gap-3 text-xs ${className}`}>
         <span className="text-stone-400 flex items-center gap-1.5">
           <Globe size={13} className="text-orange-500" />
-          <span>Language:</span>
+          <span>{t('nav.switchLanguage')}</span>
         </span>
         <div className="flex flex-wrap gap-2">
           {languages.map((lang) => (
@@ -63,6 +63,7 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ variant = 'h
       <button
         onClick={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}
+        aria-label={t("nav.switchLanguage")}
         aria-haspopup="listbox"
         className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl border border-stone-200 bg-stone-50 hover:bg-stone-100 hover:border-stone-300 text-xs font-medium text-stone-700 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
       >
@@ -74,7 +75,7 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ variant = 'h
       {isOpen && (
         <div
           role="listbox"
-          className="absolute right-0 mt-1.5 w-44 rounded-xl bg-white border border-stone-200 shadow-xl shadow-stone-200/50 py-1.5 z-50"
+          className="absolute end-0 mt-1.5 w-44 rounded-xl bg-white border border-stone-200 shadow-xl shadow-stone-200/50 py-1.5 z-50"
         >
           {languages.map((lang) => {
             const isSelected = lang.code === currentLanguage.code;
@@ -84,7 +85,7 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ variant = 'h
                 role="option"
                 aria-selected={isSelected}
                 onClick={() => handleSelect(lang.code)}
-                className={`w-full flex items-center justify-between px-3 py-1.5 text-xs text-left transition-colors ${
+                className={`w-full flex items-center justify-between px-3 py-1.5 text-xs text-start transition-colors ${
                   isSelected
                     ? 'text-orange-700 bg-orange-50 font-semibold'
                     : 'text-stone-700 hover:bg-stone-50 hover:text-stone-900'
