@@ -63,22 +63,12 @@ export interface VideoMetadataViewerOutput {
   durationSeconds: number;
   dimensions: { width: number; height: number };
   aspectRatio: string;
-  frameRate: number;
-  videoCodec: string;
-  audioCodec?: string;
-  bitrateKbps: number;
+  frameRate: number | null;
+  videoCodec: string | null;
+  audioCodec?: string | null;
+  bitrateKbps: number | null;
   container: string;
 }
-
-export const VideoMetadataViewerAdapter: ToolAdapter<VideoMetadataViewerInput, Record<string, never>, VideoMetadataViewerOutput> = {
-  id: 'video-metadata-viewer',
-  name: 'Video Metadata Viewer Adapter',
-  isConnected: false,
-  async execute() {
-    // TODO: Connect MP4Box.js / MediaStreamTrack demuxer in Phase 2
-    throw new Error('Engine not connected.');
-  },
-};
 
 // ==========================================
 // 34. Video Downloader (Permitted Streams & Direct Files)
