@@ -14,7 +14,7 @@ test('global search exposes dialog semantics, traps focus, and restores its trig
 
   await input.fill('json');
   const options = dialog.getByRole('option');
-  await expect(options).toHaveCount(3);
+  await expect(options).toHaveCount(4);
 
   await page.keyboard.press('Shift+Tab');
   await expect(options.last()).toBeFocused();
@@ -32,7 +32,7 @@ test('global search keyboard selection opens the selected tool', async ({ page }
   await page.getByRole('button', { name: 'Search', exact: true }).click();
   const input = page.getByRole('dialog').getByRole('textbox', { name: 'Search' });
   await input.fill('json');
-  await expect(page.getByRole('option')).toHaveCount(3);
+  await expect(page.getByRole('option')).toHaveCount(4);
 
   await input.press('ArrowDown');
   await input.press('Enter');
