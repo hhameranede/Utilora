@@ -2,18 +2,18 @@
 
 ## 1. Color Palette
 
-UTILORA uses a dark minimal aesthetic tailored for high-frequency digital tools:
+UTILORA uses a light, minimal aesthetic tailored for high-frequency digital tools:
 
 | Token Name | Hex Code | Purpose |
 | :--- | :--- | :--- |
-| **Brand Background** | `#0A0B0E` | Main page background |
-| **Brand Surface** | `#12141C` | Cards, panels, workspace frames |
-| **Brand Surface Elevated** | `#171A26` | Toolbars, inputs, dropdown menus |
-| **Brand Border Subtle** | `#232738` / `zinc-800` | Hairline dividers, card outlines |
-| **Metallic Gold Accent** | `#F3C64F` / `#D4AF37` | Highlights, active tabs, brand emblem |
-| **Typography Primary** | `#F4F4F5` / `zinc-100` | High-contrast headers and values |
-| **Typography Muted** | `#A1A1AA` / `zinc-400` | Secondary copy, instructions, labels |
-| **Typography Subtle** | `#71717A` / `zinc-500` | Meta dates, footnotes, constraints |
+| **Brand Background** | `#FAFAF9` | Main page background |
+| **Brand Surface** | `#FFFFFF` | Cards, panels, workspace frames |
+| **Brand Surface Elevated** | `#F5F5F4` | Toolbars, inputs, dropdown menus |
+| **Brand Border** | `#E7E5E4` / `stone-200` | Hairline dividers and card outlines |
+| **Orange Accent** | `#F97316` / `orange-500` | Primary actions, active states, brand emblem |
+| **Typography Primary** | `#1C1917` / `stone-900` | High-contrast headings and values |
+| **Typography Muted** | `#57534E` / `stone-600` | Secondary copy, instructions, labels |
+| **Typography Subtle** | `#78716C` / `stone-500` | Meta dates, footnotes, constraints |
 
 *Anti-Slop Ban: Neon greens, electric purples, candy gradients, and heavy glassmorphism are explicitly prohibited.*
 
