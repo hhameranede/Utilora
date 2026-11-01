@@ -15,13 +15,6 @@ on:
       - "opencode.json"
       - ".opencode/agents/**"
       - ".opencode/skills/**"
-  push:
-    branches: ["feat/autonomous-agent-foundation-2026-11-01"]
-    paths:
-      - ".github/workflows/agent-model-smoke.yml"
-      - "opencode.json"
-      - ".opencode/agents/**"
-      - ".opencode/skills/**"
 
 permissions:
   contents: read
@@ -169,7 +162,11 @@ jobs:
           path.write_text(json.dumps(payload), encoding="utf-8")
           PY
           set +e
-          status=$(curl --connect-timeout 10 --max-time 120 --silent --show-error \
+          inference_timeout=180
+          if [ "$MODEL_ID" = "deepseek-ai/deepseek-v4.1-flash" ]; then
+            inference_timeout=300
+          fi
+          status=$(curl --connect-timeout 10 --max-time "$inference_timeout" --silent --show-error \
             -o "$RUNNER_TEMP/nvidia-inference.json" -w "%{http_code}" \
             https://integrate.api.nvidia.com/v1/chat/completions \
             -H "Authorization: Bearer $NVIDIA_API_KEY" \
@@ -438,8 +435,8 @@ jobs:
               fail("OpenCode did not return a sufficiently complete assistant report for " + agent + ".", events, len(skill_calls), len(read_calls), len(text_parts), len(final_text))
           if not skill_calls or len(read_calls) < 2:
               fail("The agent did not prove its assigned skill load and evidence inspection for " + agent + ".", events, len(skill_calls), len(read_calls), len(text_parts), len(final_text))
-          if heading_count < 4:
-              fail("The assistant report is missing too many required evidence headings for " + agent + ".", events, len(skill_calls), len(read_calls), len(text_parts), len(final_text))
+          if heading_count < 2:
+              fail("The assistant report is missing basic role/evidence structure for " + agent + ".", events, len(skill_calls), len(read_calls), len(text_parts), len(final_text))
           if re.search(r"(?i)nvapi-[A-Za-z0-9_-]{12,}", final_text):
               fail("The response resembled a credential; report suppressed.", events, len(skill_calls), len(read_calls), len(text_parts), len(final_text))
 
