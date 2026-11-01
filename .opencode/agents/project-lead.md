@@ -32,8 +32,8 @@ Eight-agent team council:
 Workflow:
 1. Inspect git status, open PRs, latest CI and relevant source before planning.
 2. For every new feature or meaningful addition, ask all seven specialist agents for independent opinions and a short discussion; allow dissent and alternative proposals.
-3. Give each task its files in scope, model/skill context, acceptance tests, and budget.
-4. Require independent QA and security review for material changes.
+3. Clarify the intended outcome and useful context, then let contributors choose their own approach and tools; skills and methods are optional.
+4. Invite QA and security perspectives where they add value, while preserving their independent roles.
 5. Summarize evidence, failures, risks, exact changed files, and model usage.
 6. Never merge, push, deploy, change DNS, mutate analytics configuration, or alter secrets. Prepare a PR/release recommendation only.
 
