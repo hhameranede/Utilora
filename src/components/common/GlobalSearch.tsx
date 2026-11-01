@@ -6,6 +6,7 @@ import { TOOLS_LIST } from '../../registry/tools.registry';
 import { CATEGORIES_LIST } from '../../registry/categories.registry';
 import { SAMPLE_ARTICLES } from '../../data/articles.data';
 import { Icon } from './Icon';
+import { matchesSearch } from '../../utils/search';
 
 interface GlobalSearchProps {
   isOpen: boolean;
@@ -66,25 +67,17 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({ isOpen, onOpen, onCl
       };
     }
 
-    const matchedTools = TOOLS_LIST.filter((tool) => {
-      const name = (tool.localizedName[locale] || tool.localizedName.en).toLowerCase();
-      const desc = (tool.localizedDescription[locale] || tool.localizedDescription.en).toLowerCase();
-      const slug = tool.slug.toLowerCase();
-      const formats = (tool.acceptedFormats || []).join(' ').toLowerCase();
-      return name.includes(q) || desc.includes(q) || slug.includes(q) || formats.includes(q);
-    });
+    const matchedTools = TOOLS_LIST.filter((tool) => matchesSearch(
+      q,
+      tool.localizedName,
+      tool.localizedDescription,
+      tool.slug,
+      tool.acceptedFormats,
+    ));
 
-    const matchedCategories = CATEGORIES_LIST.filter((cat) => {
-      const title = (cat.localizedTitle[locale] || cat.localizedTitle.en).toLowerCase();
-      const desc = (cat.localizedDescription[locale] || cat.localizedDescription.en).toLowerCase();
-      return title.includes(q) || desc.includes(q);
-    });
+    const matchedCategories = CATEGORIES_LIST.filter((cat) => matchesSearch(q, cat.localizedTitle, cat.localizedDescription, cat.localizedLongDescription, cat.slug));
 
-    const matchedArticles = SAMPLE_ARTICLES.filter((art) => {
-      const title = (art.title[locale] || art.title.en).toLowerCase();
-      const tags = art.tags.join(' ').toLowerCase();
-      return title.includes(q) || tags.includes(q);
-    });
+    const matchedArticles = SAMPLE_ARTICLES.filter((art) => matchesSearch(q, art.title, art.tags, art.excerpt));
 
     return {
       tools: matchedTools,
@@ -189,7 +182,7 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({ isOpen, onOpen, onCl
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center pt-16 sm:pt-24 px-4 bg-stone-900/40 backdrop-blur-sm transition-opacity"
+      className="fixed inset-0 z-50 flex items-start justify-center pt-16 sm:pt-24 px-4 bg-stone-900/40 transition-opacity"
       onClick={onClose}
     >
       <div
@@ -261,7 +254,7 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({ isOpen, onOpen, onCl
                       tabIndex={-1}
                       onClick={item.action}
                       onMouseEnter={() => setSelectedIndex(index)}
-                      className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-left transition-all ${
+                      className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-start transition-all ${
                         isSelected
                           ? 'bg-orange-50 text-stone-900 border border-orange-200'
                           : 'text-stone-700 hover:bg-stone-50 border border-transparent'
@@ -289,7 +282,7 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({ isOpen, onOpen, onCl
                           )}
                         </div>
                       </div>
-                      <div className="shrink-0 flex items-center pl-3">
+                      <div className="shrink-0 flex items-center ps-3">
                         {isSelected ? (
                           <CornerDownLeft size={14} className="text-orange-600" />
                         ) : (
@@ -308,11 +301,11 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({ isOpen, onOpen, onCl
         <div className="px-4 py-2.5 bg-stone-50 border-t border-stone-200 flex items-center justify-between text-[11px] text-stone-400">
           <div className="flex items-center gap-3">
             <span>
-              Navigate <kbd className="px-1 py-0.5 bg-white border border-stone-200 rounded text-stone-600">↑</kbd>{' '}
+              {t('search.navigate')} <kbd className="px-1 py-0.5 bg-white border border-stone-200 rounded text-stone-600">↑</kbd>{' '}
               <kbd className="px-1 py-0.5 bg-white border border-stone-200 rounded text-stone-600">↓</kbd>
             </span>
             <span>
-              Select <kbd className="px-1 py-0.5 bg-white border border-stone-200 rounded text-stone-600">↵</kbd>
+              {t('search.select')} <kbd className="px-1 py-0.5 bg-white border border-stone-200 rounded text-stone-600">↵</kbd>
             </span>
           </div>
           <span>36 Tools · 8 Languages</span>
