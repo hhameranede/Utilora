@@ -269,9 +269,9 @@ export function getToolExperience(slug: string): ToolExperience | undefined {
   return TOOL_EXPERIENCE_REGISTRY[slug];
 }
 
-export function localizedExperience<T extends { en: string; ar: string }>(
+export function localizedExperience<T extends { en: unknown; ar: unknown }>(
   value: T,
   locale: SupportedLocale,
-): string {
+): T['en'] | T['ar'] {
   return locale === 'ar' ? value.ar : value.en;
 }
