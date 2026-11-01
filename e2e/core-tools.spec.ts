@@ -6,6 +6,23 @@ const onePixelPng = Buffer.from(
   'base64',
 );
 
+async function makePng(page: import('@playwright/test').Page, width = 8, height = 4): Promise<Buffer> {
+  const bytes = await page.evaluate(async ({ width, height }) => {
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const context = canvas.getContext('2d');
+    if (!context) throw new Error('Canvas is unavailable for the PNG fixture.');
+    context.fillStyle = '#f59e0b';
+    context.fillRect(0, 0, width, height);
+    const blob = await new Promise<Blob>((resolve, reject) => {
+      canvas.toBlob((value) => value ? resolve(value) : reject(new Error('PNG fixture export failed.')), 'image/png');
+    });
+    return Array.from(new Uint8Array(await blob.arrayBuffer()));
+  }, { width, height });
+  return Buffer.from(bytes);
+}
+
 async function makePdf(name: string): Promise<{ name: string; mimeType: string; buffer: Buffer }> {
   const pdf = await PDFDocument.create();
   const page = pdf.addPage([300, 400]);
@@ -23,7 +40,7 @@ test('image converter accepts a local image and exposes an actual downloadable r
   await page.locator('input[type="file"]').setInputFiles({
     name: 'pixel.png',
     mimeType: 'image/png',
-    buffer: onePixelPng,
+    buffer: await makePng(page, 4, 2),
   });
 
   const sourcePreview = page.getByAltText('Original image preview');
@@ -38,7 +55,13 @@ test('image converter accepts a local image and exposes an actual downloadable r
   const statusText = (await page.getByRole('status').allTextContents()).join(' ');
   const errorText = (await page.getByRole('alert').allTextContents()).join(' ');
   expect(statusText, `Image conversion did not complete. Status: ${statusText}. Error: ${errorText}`).toContain('Done:');
-  await expect(page.getByRole('button', { name: /Download pixel-image-converter/ })).toBeVisible();
+  const downloadButton = page.getByRole('button', { name: /Download pixel-image-converter/ });
+  await expect(downloadButton).toBeVisible();
+  const downloadPromise = page.waitForEvent('download');
+  await downloadButton.click();
+  const download = await downloadPromise;
+  expect(download.suggestedFilename()).toBe('pixel-image-converter.webp');
+  expect(await download.failure()).toBeNull();
 });
 
 test('PDF merge orders files and creates a real PDF output', async ({ page }) => {
@@ -52,6 +75,11 @@ test('PDF merge orders files and creates a real PDF output', async ({ page }) =>
   await page.getByRole('button', { name: 'Merge PDFs' }).click();
   await expect(page.getByText('merged-document.pdf')).toBeVisible();
   await expect(page.getByText('2 pages', { exact: false })).toBeVisible();
+  const pdfDownloadPromise = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Download merged-document.pdf' }).click();
+  const pdfDownload = await pdfDownloadPromise;
+  expect(pdfDownload.suggestedFilename()).toBe('merged-document.pdf');
+  expect(await pdfDownload.failure()).toBeNull();
 });
 
 test('JSON formatter formats valid input and reports invalid JSON without false success', async ({ page }) => {
@@ -77,6 +105,37 @@ test('text case converter transforms punctuation-separated words', async ({ page
   await page.getByRole('button', { name: 'Title Case' }).click();
   await page.getByRole('button', { name: 'Transform Text' }).click();
   await expect(editor).toHaveValue('Hello-World / Utilora');
+});
+
+test('image cropper maps pointer dragging to source pixel coordinates', async ({ page }) => {
+  await page.goto('/en/tools/image-cropper');
+  await page.locator('input[type="file"]').setInputFiles({
+    name: 'crop-source.png',
+    mimeType: 'image/png',
+    buffer: await makePng(page, 8, 4),
+  });
+
+  const preview = page.getByAltText('Original image preview');
+  await expect(preview).toBeVisible();
+  const processButton = page.getByRole('button', { name: 'Process image' });
+  await expect(processButton).toBeEnabled();
+
+  const bounds = await preview.boundingBox();
+  expect(bounds).not.toBeNull();
+  if (!bounds) throw new Error('Image preview has no measurable bounds.');
+
+  await page.mouse.move(bounds.x + bounds.width * 0.25, bounds.y + bounds.height * 0.25);
+  await page.mouse.down();
+  await page.mouse.move(bounds.x + bounds.width * 0.75, bounds.y + bounds.height * 0.75, { steps: 5 });
+  await page.mouse.up();
+
+  await expect(page.getByLabel('X')).toHaveValue('2');
+  await expect(page.getByLabel('Y')).toHaveValue('1');
+  await expect(page.getByLabel('Width')).toHaveValue('4');
+  await expect(page.getByLabel('Height')).toHaveValue('2');
+
+  await processButton.click();
+  await expect(page.getByRole('status')).toContainText('Done: 4 × 2px');
 });
 
 test('Arabic tool page stays within a mobile viewport and keeps RTL direction', async ({ page }) => {
