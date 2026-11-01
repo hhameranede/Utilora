@@ -74,3 +74,15 @@ jobs:
 
       - name: Run browser end-to-end tests
         run: npm run e2e
+
+      - name: Upload Playwright failure artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-failure-artifacts
+          path: |
+            test-results/
+            playwright-report/
+          if-no-files-found: ignore
+          retention-days: 7
+
