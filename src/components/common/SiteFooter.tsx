@@ -51,7 +51,7 @@ export const SiteFooter: React.FC = () => {
           {/* Categories 4-6 */}
           <div>
             <h4 className="text-xs font-semibold text-stone-900 uppercase tracking-wider mb-3">
-              {t('nav.categories')}
+              {t('footer.moreCategories')}
             </h4>
             <ul className="space-y-2 text-xs">
               {CATEGORIES_LIST.slice(3, 6).map((cat) => (
@@ -71,7 +71,7 @@ export const SiteFooter: React.FC = () => {
           {/* Resources & Content */}
           <div>
             <h4 className="text-xs font-semibold text-stone-900 uppercase tracking-wider mb-3">
-              Platform
+              {t('footer.platform')}
             </h4>
             <ul className="space-y-2 text-xs">
               <li>
@@ -90,7 +90,7 @@ export const SiteFooter: React.FC = () => {
           {/* Legal & Compliance */}
           <div>
             <h4 className="text-xs font-semibold text-stone-900 uppercase tracking-wider mb-3">
-              Legal
+              {t('footer.legal')}
             </h4>
             <ul className="space-y-2 text-xs">
               <li>
