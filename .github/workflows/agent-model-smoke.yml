@@ -136,7 +136,7 @@ jobs:
               sys.exit(1)
           agent_file = pathlib.Path(os.environ["TARGET_DIR"], ".opencode", "agents", os.environ["AGENT_NAME"] + ".md")
           frontmatter = agent_file.read_text(encoding="utf-8").split("---", 2)[1]
-          match = re.search(r"^model:\\s*(\\S+)\\s*$", frontmatter, re.MULTILINE)
+          match = re.search(r"^model:\s*(\S+)\s*$", frontmatter, re.MULTILINE)
           expected = os.environ["MODEL_ROUTE"]
           if not match or match.group(1) != expected:
               print("::error::The agent frontmatter does not match the assigned NVIDIA route.")
