@@ -182,10 +182,12 @@
   },
   "category": {
     "featuredWorkspace": "বিশেষ ওয়ার্কস্পেস",
-    "allTools": "এর সব টুল",
+    "allTools": "সকল টুল",
     "chooseWorkspace": "ওয়ার্কস্পেস খুলতে নিচের একটি টুল বেছে নিন।",
     "searchPlaceholder": "এই বিভাগের টুল ফিল্টার করুন...",
-    "relatedCategories": "সম্পর্কিত বিভাগ"
+    "relatedCategories": "সম্পর্কিত বিভাগ",
+    "toolsInSuite": "এই বিভাগের টুল",
+    "functionalCount": "ব্যবহারের জন্য প্রস্তুত"
   },
   "search": {
     "navigate": "নেভিগেট",
