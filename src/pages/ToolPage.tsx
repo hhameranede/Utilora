@@ -159,7 +159,7 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
           <span className="rounded-full border border-orange-200 bg-orange-50 px-3 py-1 text-orange-700">UTILORA</span>
           <span>{categoryTitle}</span>
           <span aria-hidden="true">/</span>
-          <span>{categoryTitle}</span>
+          <span>{toolName}</span>
         </div>
 
         <div className="mt-6 grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
