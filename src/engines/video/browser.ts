@@ -89,6 +89,78 @@ async function loadVideo(file: File): Promise<LoadedVideo> {
   };
 }
 
+async function readFiniteDuration(video: HTMLVideoElement): Promise<number> {
+  if (Number.isFinite(video.duration) && video.duration > 0) return video.duration;
+
+  if (video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) {
+    await waitForFrameData(video);
+    if (Number.isFinite(video.duration) && video.duration > 0) return video.duration;
+  }
+
+  const getSeekableEnd = () => {
+    try {
+      const ranges = video.seekable;
+      if (!ranges.length) return null;
+      const end = ranges.end(ranges.length - 1);
+      return Number.isFinite(end) && end > 0 ? end : null;
+    } catch {
+      return null;
+    }
+  };
+
+  const seekableEnd = getSeekableEnd();
+  if (seekableEnd !== null) return seekableEnd;
+
+  // MediaRecorder-generated WebM files can expose duration === Infinity.
+  // Seeking beyond the final packet makes Chromium resolve the actual duration.
+  return new Promise<number>((resolve, reject) => {
+    let settled = false;
+    const timeout = window.setTimeout(() => {
+      finish(new Error('The video duration is not available in this browser.'));
+    }, 5_000);
+
+    const cleanup = () => {
+      window.clearTimeout(timeout);
+      video.removeEventListener('durationchange', inspect);
+      video.removeEventListener('timeupdate', inspect);
+      video.removeEventListener('seeked', inspect);
+      video.removeEventListener('progress', inspect);
+      video.removeEventListener('error', onError);
+    };
+
+    const finish = (value: number | Error) => {
+      if (settled) return;
+      settled = true;
+      cleanup();
+      if (value instanceof Error) reject(value);
+      else resolve(value);
+    };
+
+    const inspect = () => {
+      if (Number.isFinite(video.duration) && video.duration > 0) {
+        finish(video.duration);
+        return;
+      }
+      const end = getSeekableEnd();
+      if (end !== null) finish(end);
+    };
+    const onError = () => finish(new Error('The browser could not determine the video duration.'));
+
+    video.addEventListener('durationchange', inspect);
+    video.addEventListener('timeupdate', inspect);
+    video.addEventListener('seeked', inspect);
+    video.addEventListener('progress', inspect);
+    video.addEventListener('error', onError, { once: true });
+
+    try {
+      video.currentTime = Number.MAX_SAFE_INTEGER;
+      inspect();
+    } catch {
+      finish(new Error('This browser cannot resolve the duration of this video file.'));
+    }
+  });
+}
+
 function greatestCommonDivisor(a: number, b: number): number {
   let x = Math.round(a);
   let y = Math.round(b);
@@ -116,7 +188,7 @@ export async function inspectVideoMetadata(file: File): Promise<VideoMetadataVie
     const { video } = loaded;
     const width = video.videoWidth;
     const height = video.videoHeight;
-    const durationSeconds = video.duration;
+    const durationSeconds = await readFiniteDuration(video);
 
     if (!width || !height || !Number.isFinite(durationSeconds) || durationSeconds <= 0) {
       throw new Error('The browser could not read valid video dimensions or duration.');
@@ -225,7 +297,7 @@ export async function extractVideoThumbnail(
   const loaded = await loadVideo(file);
   try {
     const { video } = loaded;
-    const duration = video.duration;
+    const duration = await readFiniteDuration(video);
     const width = video.videoWidth;
     const height = video.videoHeight;
     if (!width || !height || !Number.isFinite(duration) || duration <= 0) {
