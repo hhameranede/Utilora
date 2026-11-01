@@ -44,6 +44,15 @@ function canvasToBlob(canvas: HTMLCanvasElement, mime: string, quality: number):
   });
 }
 
+export async function getBrowserImageDimensions(file: File): Promise<{ width: number; height: number }> {
+  const bitmap = await decodeImage(file);
+  try {
+    return { width: bitmap.width, height: bitmap.height };
+  } finally {
+    bitmap.close();
+  }
+}
+
 export async function transformBrowserImage(file: File, options: BrowserImageOptions = {}): Promise<BrowserImageResult> {
   const bitmap = await decodeImage(file);
   try {
