@@ -264,7 +264,7 @@ export const ToolGuidePage: React.FC<ToolGuidePageProps> = ({ toolSlug }) => {
 
         {tool.status !== 'functional' && (
           <div className="flex items-start gap-3 rounded-2xl border border-orange-200 bg-orange-50/70 p-4 text-xs leading-relaxed text-stone-700">
-            <ShieldCheck size={17} className="mt-0.5 shrink-0 text-orange-600" />
+            <ShieldCheck size={17} className="mt-0.5 shrink-0 text-orange-700" />
             <span>{t('guide.previewNotice')}</span>
           </div>
         )}
@@ -272,7 +272,7 @@ export const ToolGuidePage: React.FC<ToolGuidePageProps> = ({ toolSlug }) => {
         <section className="overflow-hidden rounded-3xl border border-stone-200 bg-white shadow-xs">
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-stone-200 bg-stone-50 px-4 py-3 sm:px-6">
             <div className="flex items-center gap-2 text-xs font-semibold text-stone-800">
-              <Camera size={15} className="text-orange-600" />
+              <Camera size={15} className="text-orange-700" />
               {t('guide.screenshotTitle')}
             </div>
             <span className="text-xs text-stone-500">{t('guide.screenshotCaption')}</span>
