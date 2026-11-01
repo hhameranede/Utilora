@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Download, FileVideo, Image as ImageIcon, ShieldCheck } from 'lucide-react';
-import { ThumbnailExtractorAdapter } from '../../engines/video/browser';
+import { readFiniteDuration, ThumbnailExtractorAdapter } from '../../engines/video/browser';
 import type { ThumbnailExtractorOutput } from '../../engines/video/contracts';
 
 type ImageFormat = 'png' | 'jpg';
@@ -111,11 +111,15 @@ export const TemplatePThumbnailExtractor: React.FC<{ toolName: string }> = ({ to
                 controls
                 preload="metadata"
                 onLoadedMetadata={(event) => {
-                  const value = event.currentTarget.duration;
-                  if (Number.isFinite(value) && value > 0) {
-                    setDuration(value);
-                    setTimestamp(0);
-                  }
+                  const videoElement = event.currentTarget;
+                  void readFiniteDuration(videoElement)
+                    .then((value) => {
+                      setDuration(value);
+                      setTimestamp(0);
+                    })
+                    .catch((cause: unknown) => {
+                      setError(cause instanceof Error ? cause.message : 'The browser could not read the video duration.');
+                    });
                 }}
                 onError={() => setError('This browser cannot play the selected video. Try a browser-supported MP4 or WebM file.')}
                 className="w-full max-h-80 rounded-2xl bg-stone-950"
