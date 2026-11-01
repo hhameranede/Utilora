@@ -1,4 +1,5 @@
 import React from 'react';
+import { useI18n } from '../../i18n';
 import { LucideIcon, Inbox, AlertTriangle, Loader2 } from 'lucide-react';
 
 interface EmptyStateProps {
@@ -56,7 +57,7 @@ export const ErrorState: React.FC<{ title: string; message?: string; onRetry?: (
           onClick={onRetry}
           className="px-3 py-1.5 rounded-lg bg-stone-900 hover:bg-stone-800 text-xs font-medium text-white transition-colors"
         >
-          Try Again
+          {t('common.tryAgain')}
         </button>
       )}
     </div>
