@@ -182,10 +182,12 @@
   },
   "category": {
     "featuredWorkspace": "Espaço em destaque",
-    "allTools": "Todas as ferramentas de",
+    "allTools": "Todas as ferramentas",
     "chooseWorkspace": "Escolha uma ferramenta para abrir seu espaço de trabalho.",
     "searchPlaceholder": "Filtrar ferramentas desta categoria...",
-    "relatedCategories": "Categorias relacionadas"
+    "relatedCategories": "Categorias relacionadas",
+    "toolsInSuite": "ferramentas nesta categoria",
+    "functionalCount": "prontas para usar"
   },
   "search": {
     "navigate": "Navegar",
