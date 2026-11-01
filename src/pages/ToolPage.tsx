@@ -3,6 +3,7 @@ import { useI18n } from '../i18n';
 import { getToolBySlug } from '../registry/tools.registry';
 import { getCategoryById } from '../registry/categories.registry';
 import { Breadcrumbs } from '../components/common/Breadcrumbs';
+import { Link } from '../router';
 import { ToolWorkspaceResolver } from '../components/templates/ToolWorkspaceResolver';
 import { RelatedTools } from '../components/common/RelatedTools';
 import { RelatedArticles } from '../components/common/RelatedArticles';
@@ -154,31 +155,26 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
             <h2 className="text-lg font-bold text-stone-900 mb-2">
               {t('common.howToUse')}
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-              <div className="space-y-1.5">
-                <span className="text-xs font-mono font-bold text-orange-600">STEP 01</span>
-                <h4 className="text-sm font-semibold text-stone-900">Load Input</h4>
-                <p className="text-xs text-stone-600 leading-relaxed">
-                  Select, drop, or type your data directly into the active canvas workspace.
+            <Link
+              routeType="tool-guide"
+              slug={tool.slug}
+              className="group mt-5 flex flex-col gap-3 rounded-2xl border border-orange-200 bg-orange-50/60 p-5 transition-colors hover:border-orange-300 sm:flex-row sm:items-center sm:justify-between"
+            >
+              <div>
+                <h3 className="text-sm font-bold text-stone-900">
+                  {locale === 'ar' ? 'شاهد الدليل المرئي لهذه الأداة' : 'See the visual step-by-step guide'}
+                </h3>
+                <p className="mt-1 text-xs leading-relaxed text-stone-600">
+                  {locale === 'ar'
+                    ? 'لقطات من واجهة الأداة الفعلية مع أسهم توضّح أماكن الرفع والإعدادات والنتائج.'
+                    : 'Screenshots from the actual tool interface, annotated to show uploads, settings, and results.'}
                 </p>
               </div>
-
-              <div className="space-y-1.5">
-                <span className="text-xs font-mono font-bold text-orange-600">STEP 02</span>
-                <h4 className="text-sm font-semibold text-stone-900">Adjust Configuration</h4>
-                <p className="text-xs text-stone-600 leading-relaxed">
-                  Fine-tune sliders, quality presets, target formats, or parameter toggles.
-                </p>
-              </div>
-
-              <div className="space-y-1.5">
-                <span className="text-xs font-mono font-bold text-orange-600">STEP 03</span>
-                <h4 className="text-sm font-semibold text-stone-900">Save Local Output</h4>
-                <p className="text-xs text-stone-600 leading-relaxed">
-                  {tool.status === 'functional' ? (isNetworkLookup ? 'Review the live public lookup result here.' : 'Download or copy your result directly from this browser.') : 'This workspace is not active yet; processing will be enabled in a later release.'}
-                </p>
-              </div>
-            </div>
+              <span className="inline-flex shrink-0 items-center gap-2 text-xs font-semibold text-orange-700">
+                {locale === 'ar' ? 'افتح دليل الاستعمال' : 'Open usage guide'}
+                <span aria-hidden="true">→</span>
+              </span>
+            </Link>
           </div>
 
           {/* Supported Formats or Constraints */}

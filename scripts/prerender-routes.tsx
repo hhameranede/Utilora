@@ -7,7 +7,6 @@ import { SUPPORTED_LANGUAGES } from '../src/i18n';
 import { CATEGORIES_LIST } from '../src/registry/categories.registry';
 import { TOOLS_LIST } from '../src/registry/tools.registry';
 import { SAMPLE_ARTICLES } from '../src/data/articles.data';
-import { FORUM_CATEGORIES, SAMPLE_TOPICS } from '../src/data/community.data';
 import { buildRoutePath } from '../src/router/matcher';
 
 type Locale = (typeof SUPPORTED_LANGUAGES)[number]['code'];
@@ -98,15 +97,15 @@ function getRoutes(): RouteEntry[] {
     add(locale, 'tools-index');
     add(locale, 'categories-index');
     CATEGORIES_LIST.forEach((item) => add(locale, 'category', item.slug));
-    TOOLS_LIST.forEach((item) => add(locale, 'tool', item.slug));
+    TOOLS_LIST.forEach((item) => {
+      add(locale, 'tool', item.slug);
+      add(locale, 'tool-guide', item.slug);
+    });
     ['about', 'contact', 'privacy', 'terms', 'copyright', 'acceptable-use'].forEach((page) => add(locale, page));
 
     add(locale, 'articles-index');
     Array.from(new Set(SAMPLE_ARTICLES.map((item) => item.category))).forEach((category) => add(locale, 'article-category', category));
     SAMPLE_ARTICLES.forEach((item) => add(locale, 'article-detail', item.slug));
-    add(locale, 'community-index');
-    FORUM_CATEGORIES.forEach((item) => add(locale, 'community-category', item.slug));
-    SAMPLE_TOPICS.forEach((item) => add(locale, 'community-topic', item.slug));
   }
   return routes;
 }

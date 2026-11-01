@@ -109,7 +109,7 @@ export const ToolWorkspaceResolver: React.FC<ToolWorkspaceResolverProps> = ({ to
       return <TemplateLWebsiteDiagnostics toolName={toolName} toolSlug={tool.slug} />;
 
     case 'template-m-video-editor':
-      return <TemplateMVideoEditor toolName={toolName} />;
+      return <TemplateMVideoEditor toolName={toolName} toolSlug={tool.slug} />;
 
     case 'template-n-media-converter':
       return <TemplateNMediaConverter toolName={toolName} />;

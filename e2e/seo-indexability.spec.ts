@@ -8,12 +8,20 @@ test('functional tool pages are indexable while unfinished previews remain noind
   for (const locale of ['en', 'ar', 'fr', 'es', 'pt', 'hi', 'zh', 'bn']) {
     expect(sitemap).toContain('/' + locale + '/tools/json-formatter');
   }
-  expect(sitemap).not.toContain('/en/tools/video-compressor');
+  expect(sitemap).toContain('/en/tools/video-compressor');
+  expect(sitemap).toContain('/en/tools/video-compressor/how-to');
+  expect(sitemap).not.toContain('/en/tools/video-downloader/how-to');
 
   await page.goto('/en/tools/json-formatter');
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'index, follow');
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', /\/en\/tools\/json-formatter$/);
 
   await page.goto('/en/tools/video-compressor');
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'index, follow');
+
+  await page.goto('/en/tools/video-compressor/how-to');
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'index, follow');
+
+  await page.goto('/en/tools/video-downloader/how-to');
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex, nofollow');
 });

@@ -4,7 +4,7 @@ import { buildRoutePath } from '../router/matcher';
 import { TOOLS_LIST } from '../registry/tools.registry';
 
 type PublicRoute = 'home' | 'tools-index' | 'categories-index' | 'category' | 'tool' |
-  'about' | 'contact' | 'privacy' | 'terms' | 'copyright' | 'acceptable-use';
+  'tool-guide' | 'about' | 'contact' | 'privacy' | 'terms' | 'copyright' | 'acceptable-use';
 
 interface SitemapRoute {
   type: PublicRoute;
@@ -17,7 +17,10 @@ const PUBLIC_ROUTES: SitemapRoute[] = [
   { type: 'categories-index' },
   ...CATEGORIES_LIST.map((category) => ({ type: 'category' as const, slug: category.slug })),
   ...TOOLS_LIST.filter((tool) => tool.status === 'functional')
-    .map((tool) => ({ type: 'tool' as const, slug: tool.slug })),
+    .flatMap((tool) => [
+      { type: 'tool' as const, slug: tool.slug },
+      { type: 'tool-guide' as const, slug: tool.slug },
+    ]),
   { type: 'about' },
   { type: 'contact' },
   { type: 'privacy' },
@@ -38,7 +41,7 @@ function escapeXml(value: string): string {
 /**
  * Generates a sitemap for completed, indexable routes only.
  * Only tool workspaces whose processing engines are marked functional are included.
- * Preview-only tools, sample articles and sample community routes stay excluded.
+ * Preview-only tools and their guides stay excluded.
  */
 export function generateProductionSitemap(siteUrl: string): string {
   const parsedUrl = new URL(siteUrl);

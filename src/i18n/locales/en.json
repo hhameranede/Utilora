@@ -7,7 +7,6 @@
     "tools": "Tools",
     "categories": "Categories",
     "articles": "Articles & Guides",
-    "community": "Community",
     "about": "About",
     "contact": "Contact",
     "search": "Search 36 tools, guides, topics...",
@@ -155,23 +154,6 @@
     "newsletterDesc": "Quarterly roundups of new tools, compression benchmarks, and web specs. (Preview Only)",
     "newsletterPlaceholder": "Enter your work email",
     "subscribe": "Subscribe"
-  },
-  "community": {
-    "title": "Community & Developer Discussions",
-    "subtitle": "Collaborate on utility feature requests, discuss workflows, and share technical knowledge.",
-    "searchPlaceholder": "Search community topics...",
-    "newDiscussion": "Start Discussion (Disabled in Preview)",
-    "categories": "Discussion Categories",
-    "recentDiscussions": "Recent Discussions",
-    "popularTopics": "Popular Topics",
-    "replies": "Replies",
-    "views": "Views",
-    "lastActive": "Last Activity",
-    "guidelines": "Community Principles",
-    "guidelinesDesc": "Be respectful, keep technical feedback actionable, and refrain from spam.",
-    "replyPlaceholder": "Sign in to leave a response (Preview Mode)",
-    "replySubmit": "Post Reply",
-    "joinNotice": "Account creation and live commenting will activate in the next development cycle."
   },
   "footer": {
     "rights": "All rights reserved.",

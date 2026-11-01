@@ -1,9 +1,9 @@
 import { expect, test, type Page } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
 
-async function makeWebm(page: Page): Promise<Buffer> {
+async function makeWebm(page: Page, withAudio = false): Promise<Buffer> {
   const bytes = await page.evaluate(async () => {
-    const mimeType = 'video/webm;codecs=vp8';
+    const mimeType = withAudio ? 'video/webm;codecs=vp8,opus' : 'video/webm;codecs=vp8';
     if (!MediaRecorder.isTypeSupported(mimeType)) {
       throw new Error('Chromium does not support the WebM VP8 fixture required by this test.');
     }
@@ -26,7 +26,25 @@ async function makeWebm(page: Page): Promise<Buffer> {
     draw();
 
     const stream = canvas.captureStream(12);
-    const recorder = new MediaRecorder(stream, { mimeType });
+    let audioContext: AudioContext | null = null;
+    let oscillator: OscillatorNode | null = null;
+    let recorderStream = stream;
+    if (withAudio) {
+      audioContext = new AudioContext();
+      const destination = audioContext.createMediaStreamDestination();
+      oscillator = audioContext.createOscillator();
+      const gain = audioContext.createGain();
+      gain.gain.value = 0.025;
+      oscillator.frequency.value = 440;
+      oscillator.connect(gain);
+      gain.connect(destination);
+      oscillator.start();
+      recorderStream = new MediaStream([
+        ...stream.getVideoTracks(),
+        ...destination.stream.getAudioTracks(),
+      ]);
+    }
+    const recorder = new MediaRecorder(recorderStream, { mimeType });
     const chunks: BlobPart[] = [];
     recorder.addEventListener('dataavailable', (event) => {
       if (event.data.size > 0) chunks.push(event.data);
@@ -41,7 +59,9 @@ async function makeWebm(page: Page): Promise<Buffer> {
     window.clearInterval(interval);
     recorder.stop();
     await stopped;
-    stream.getTracks().forEach((track) => track.stop());
+    recorderStream.getTracks().forEach((track) => track.stop());
+    if (oscillator) oscillator.stop();
+    if (audioContext) await audioContext.close();
 
     const blob = new Blob(chunks, { type: mimeType });
     if (blob.size < 1000) throw new Error('The browser produced an empty WebM fixture.');
@@ -109,4 +129,77 @@ test('thumbnail extractor captures a selected frame and downloads a real JPEG', 
   const bytes = await readFile(path!);
   expect(bytes[0]).toBe(0xff);
   expect(bytes[1]).toBe(0xd8);
+});
+
+test('video compressor produces a downloadable WebM file from a real video fixture', async ({ page }) => {
+  await page.goto('/en/tools/video-compressor');
+  await page.getByLabel('Choose a video file').setInputFiles({
+    name: 'compress-fixture.webm',
+    mimeType: 'video/webm',
+    buffer: await makeWebm(page),
+  });
+
+  await page.getByLabel('Compression quality').selectOption('balanced');
+  await page.getByLabel('Output resolution').selectOption('original');
+  await page.getByRole('button', { name: 'Compress video' }).click();
+  await expect(page.getByRole('status')).toContainText('File ready', { timeout: 60_000 });
+
+  const downloadPromise = page.waitForEvent('download');
+  await page.getByRole('link', { name: 'Download video' }).click();
+  const download = await downloadPromise;
+  expect(download.suggestedFilename()).toBe('compress-fixture-compressed.webm');
+  expect(await download.failure()).toBeNull();
+  const path = await download.path();
+  expect(path).not.toBeNull();
+  const bytes = await readFile(path!);
+  expect(bytes.byteLength).toBeGreaterThan(1000);
+  expect(Array.from(bytes.slice(0, 4))).toEqual([0x1a, 0x45, 0xdf, 0xa3]);
+});
+
+test('video trimmer exports only the selected time range as a real WebM file', async ({ page }) => {
+  await page.goto('/en/tools/video-trimmer');
+  await page.getByLabel('Choose a video file').setInputFiles({
+    name: 'trim-fixture.webm',
+    mimeType: 'video/webm',
+    buffer: await makeWebm(page),
+  });
+
+  await expect(page.locator('#video-trim-end')).toHaveValue(/^[1-9]/, { timeout: 15_000 });
+  await page.locator('#video-trim-start').fill('0.10');
+  await page.locator('#video-trim-end').fill('0.80');
+  await page.getByRole('button', { name: 'Export selected clip' }).click();
+  await expect(page.getByRole('status')).toContainText('File ready', { timeout: 60_000 });
+
+  const downloadPromise = page.waitForEvent('download');
+  await page.getByRole('link', { name: 'Download video' }).click();
+  const download = await downloadPromise;
+  expect(download.suggestedFilename()).toBe('trim-fixture-trimmed.webm');
+  expect(await download.failure()).toBeNull();
+  const path = await download.path();
+  expect(path).not.toBeNull();
+  expect((await readFile(path!)).byteLength).toBeGreaterThan(1000);
+});
+
+test('video-to-audio extracts an audio track and exports a valid WAV file', async ({ page }) => {
+  await page.goto('/en/tools/video-to-audio');
+  await page.getByLabel('Choose a video file').setInputFiles({
+    name: 'audio-fixture.webm',
+    mimeType: 'video/webm',
+    buffer: await makeWebm(page, true),
+  });
+
+  await page.getByLabel('Audio format').selectOption('wav');
+  await page.getByRole('button', { name: 'Extract audio' }).click();
+  await expect(page.getByRole('status')).toContainText('File ready', { timeout: 60_000 });
+
+  const downloadPromise = page.waitForEvent('download');
+  await page.getByRole('link', { name: 'Download audio' }).click();
+  const download = await downloadPromise;
+  expect(download.suggestedFilename()).toBe('audio-fixture.wav');
+  expect(await download.failure()).toBeNull();
+  const path = await download.path();
+  expect(path).not.toBeNull();
+  const bytes = await readFile(path!);
+  expect(bytes.subarray(0, 4).toString('ascii')).toBe('RIFF');
+  expect(bytes.subarray(8, 12).toString('ascii')).toBe('WAVE');
 });

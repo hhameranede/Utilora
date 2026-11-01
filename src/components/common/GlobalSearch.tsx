@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Search, X, ArrowRight, CornerDownLeft, FileText, Layers, MessageSquare, Zap } from 'lucide-react';
+import { Search, X, ArrowRight, CornerDownLeft, FileText, Layers, Zap } from 'lucide-react';
 import { useI18n } from '../../i18n';
 import { useNavigate } from '../../router';
 import { TOOLS_LIST } from '../../registry/tools.registry';
 import { CATEGORIES_LIST } from '../../registry/categories.registry';
 import { SAMPLE_ARTICLES } from '../../data/articles.data';
-import { SAMPLE_TOPICS } from '../../data/community.data';
 import { Icon } from './Icon';
 
 interface GlobalSearchProps {
@@ -64,7 +63,6 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({ isOpen, onOpen, onCl
         tools: TOOLS_LIST.slice(0, 6),
         categories: CATEGORIES_LIST,
         articles: SAMPLE_ARTICLES.slice(0, 2),
-        topics: [],
       };
     }
 
@@ -88,23 +86,17 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({ isOpen, onOpen, onCl
       return title.includes(q) || tags.includes(q);
     });
 
-    const matchedTopics = SAMPLE_TOPICS.filter((top) => {
-      const title = (top.title[locale] || top.title.en).toLowerCase();
-      return title.includes(q);
-    });
-
     return {
       tools: matchedTools,
       categories: matchedCategories,
       articles: matchedArticles,
-      topics: matchedTopics,
     };
   }, [query, locale]);
 
   // Flatten for keyboard navigation
   const flatItems = useMemo(() => {
     const items: Array<{
-      type: 'tool' | 'category' | 'article' | 'topic';
+      type: 'tool' | 'category' | 'article';
       id: string;
       title: string;
       subtitle?: string;
@@ -149,20 +141,6 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({ isOpen, onOpen, onCl
         icon: 'BookOpen',
         action: () => {
           navigate({ type: 'article-detail', slug: art.slug, locale });
-          onClose();
-        },
-      });
-    });
-
-    searchResults.topics.forEach((top) => {
-      items.push({
-        type: 'topic',
-        id: `topic-${top.slug}`,
-        title: top.title[locale] || top.title.en,
-        subtitle: `${top.replyCount} replies`,
-        icon: 'MessageSquare',
-        action: () => {
-          navigate({ type: 'community-topic', slug: top.slug, locale });
           onClose();
         },
       });

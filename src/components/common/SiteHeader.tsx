@@ -33,7 +33,7 @@ export const SiteHeader: React.FC = () => {
               <Link
                 routeType="tools-index"
                 className={`transition-colors hover:text-orange-600 ${
-                  route.type === 'tools-index' || route.type === 'tool' ? 'text-orange-600 font-semibold' : ''
+                  route.type === 'tools-index' || route.type === 'tool' || route.type === 'tool-guide' ? 'text-orange-600 font-semibold' : ''
                 }`}
               >
                 {t('nav.tools')}
@@ -96,15 +96,6 @@ export const SiteHeader: React.FC = () => {
                 }`}
               >
                 {t('nav.articles')}
-              </Link>
-
-              <Link
-                routeType="community-index"
-                className={`transition-colors hover:text-orange-600 ${
-                  route.type.startsWith('community') ? 'text-orange-600 font-semibold' : ''
-                }`}
-              >
-                {t('nav.community')}
               </Link>
 
               <Link
@@ -220,13 +211,6 @@ export const SiteHeader: React.FC = () => {
                 className="block px-3 py-2 text-sm font-semibold text-stone-800 hover:text-orange-600"
               >
                 {t('nav.articles')}
-              </Link>
-              <Link
-                routeType="community-index"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="block px-3 py-2 text-sm font-semibold text-stone-800 hover:text-orange-600"
-              >
-                {t('nav.community')}
               </Link>
               <Link
                 routeType="about"

@@ -70,8 +70,7 @@ export const RouterProvider: React.FC<{ children: ReactNode; initialPath?: strin
       else if (parsedRoute.type === 'category') slug = parsedRoute.categorySlug;
       else if (parsedRoute.type === 'article-detail') slug = parsedRoute.articleSlug;
       else if (parsedRoute.type === 'article-category') slug = parsedRoute.categorySlug;
-      else if (parsedRoute.type === 'community-category') slug = parsedRoute.categorySlug;
-      else if (parsedRoute.type === 'community-topic') slug = parsedRoute.topicSlug;
+      else if (parsedRoute.type === 'tool-guide') slug = parsedRoute.toolSlug;
 
       const nextPath = buildRoutePath(newLocale, parsedRoute.type, slug);
       if (typeof window !== 'undefined') {

@@ -14,13 +14,11 @@ import { HomePage } from './pages/HomePage';
 import { CategoryPage } from './pages/CategoryPage';
 import { CategoriesIndexPage } from './pages/CategoriesIndexPage';
 import { ToolPage } from './pages/ToolPage';
+import { ToolGuidePage } from './pages/ToolGuidePage';
 import { ToolsIndexPage } from './pages/ToolsIndexPage';
 import { ArticlesIndexPage } from './pages/articles/ArticlesIndexPage';
 import { ArticleCategoryPage } from './pages/articles/ArticleCategoryPage';
 import { ArticleDetailPage } from './pages/articles/ArticleDetailPage';
-import { CommunityIndexPage } from './pages/community/CommunityIndexPage';
-import { CommunityCategoryPage } from './pages/community/CommunityCategoryPage';
-import { CommunityTopicPage } from './pages/community/CommunityTopicPage';
 import { AboutPage } from './pages/legal/AboutPage';
 import { ContactPage } from './pages/legal/ContactPage';
 import { PrivacyPage } from './pages/legal/PrivacyPage';
@@ -43,18 +41,14 @@ const AppContent: React.FC = () => {
         return <ToolsIndexPage />;
       case 'tool':
         return <ToolPage toolSlug={route.toolSlug!} />;
+      case 'tool-guide':
+        return <ToolGuidePage toolSlug={route.toolSlug!} />;
       case 'articles-index':
         return <ArticlesIndexPage />;
       case 'article-category':
         return <ArticleCategoryPage categorySlug={route.categorySlug!} />;
       case 'article-detail':
         return <ArticleDetailPage articleSlug={route.articleSlug!} />;
-      case 'community-index':
-        return <CommunityIndexPage />;
-      case 'community-category':
-        return <CommunityCategoryPage categorySlug={route.categorySlug!} />;
-      case 'community-topic':
-        return <CommunityTopicPage topicSlug={route.topicSlug!} />;
       case 'about':
         return <AboutPage />;
       case 'contact':

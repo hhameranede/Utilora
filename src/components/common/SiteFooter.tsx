@@ -84,11 +84,6 @@ export const SiteFooter: React.FC = () => {
                   {t('nav.articles')}
                 </Link>
               </li>
-              <li>
-                <Link routeType="community-index" className="hover:text-orange-600 transition-colors">
-                  {t('nav.community')}
-                </Link>
-              </li>
             </ul>
           </div>
 

@@ -32,7 +32,8 @@
     "pdfjs-dist": "^6.4.299",
     "mediabunny": "1.65.0",
     "@mediabunny/mp3-encoder": "1.62.1",
-    "@mediabunny/aac-encoder": "1.65.0"
+    "@mediabunny/aac-encoder": "1.65.0",
+    "html-to-image": "1.11.13"
   },
   "devDependencies": {
     "@playwright/test": "^1.56.1",
