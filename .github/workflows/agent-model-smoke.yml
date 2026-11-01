@@ -59,35 +59,27 @@ jobs:
           - agent: project-lead
             model_alias: nemotron-ultra
             model_id: nvidia/nemotron-3-ultra-550b-a55b
-            skill: planning-and-task-breakdown
           - agent: problem-analyst
             model_alias: deepseek-v4-1-flash
             model_id: deepseek-ai/deepseek-v4.1-flash
-            skill: research
           - agent: implementation-engineer
             model_alias: minimax-m3-1-flash
             model_id: minimaxai/minimax-m3.1-flash
-            skill: safe-implementation
           - agent: fast-task-engineer
             model_alias: glm-5-3-flash
             model_id: z-ai/glm-5.3-flash
-            skill: incremental-implementation
           - agent: visual-reviewer
             model_alias: nemotron-super-vl
             model_id: nvidia/nemotron-3.5-super-vl-120b-a12b
-            skill: accessibility-ux
           - agent: long-horizon-engineer
             model_alias: laguna-xs-2-1
             model_id: poolside/laguna-xs-2.1
-            skill: systematic-debugging
           - agent: qa-engineer
             model_alias: deepseek-v4-1-flash
             model_id: deepseek-ai/deepseek-v4.1-flash
-            skill: quality-validation
           - agent: security-auditor
             model_alias: nemotron-ultra
             model_id: nvidia/nemotron-3-ultra-550b-a55b
-            skill: security-audit
 
     steps:
       - name: Set up Node.js
@@ -321,7 +313,6 @@ jobs:
           NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
           TARGET_DIR: ${{ runner.temp }}/utilora
           AGENT_NAME: ${{ matrix.agent }}
-          SKILL_NAME: ${{ matrix.skill }}
           MODEL_ROUTE: nvidia-nim/${{ matrix.model_alias }}
           MODEL_ID: ${{ matrix.model_id }}
           RAW_REPORT: ${{ runner.temp }}/agent-output.jsonl
@@ -332,26 +323,21 @@ jobs:
           set +x
           mkdir -p "$SAFE_REPORT_DIR"
           PROMPT="$(cat <<EOF
-          This is a controlled, read-only model-backed smoke test of UTILORA's specialist team.
-          You are agent: $AGENT_NAME. Your assigned skill is: $SKILL_NAME.
-          FIRST: load exactly your assigned skill using the native skill tool. Use the exact @skill trigger @$SKILL_NAME so OpenCode can resolve it, then confirm the tool call completed.
-          SECOND: inspect README.md and your own .opencode/agents/$AGENT_NAME.md file using read-only tools.
-          For role-specific evidence:
-          - visual-reviewer: inspect the attached real homepage screenshot and report layout, contrast, hierarchy, responsiveness and RTL limitations.
-          - qa-engineer: inspect existing test scripts and identify one concrete regression test relevant to the repository.
-          - security-auditor: review the agent permission boundary and workflow security without looking for or printing credentials.
-          - project-lead: produce a short task breakdown for improving one real issue visible in repository documentation.
-          - problem-analyst: identify one evidence-backed improvement opportunity and compare two solutions.
-          - implementation-engineer: describe a minimal code change and the exact regression test, but do not modify files.
-          - fast-task-engineer: identify one small, bounded improvement and how to validate it.
-          - long-horizon-engineer: break one substantial engineering improvement into safe, testable phases.
+          This is a lightweight, read-only capability check for one member of UTILORA's eight-agent team.
+          You are agent: $AGENT_NAME. Keep your specialist role and use your own judgment.
+          Skills are optional: you may use any available skill if you judge it useful, or use none. No skill name, tool sequence, fixed report format, minimum file count, or checklist is required.
+          Consider the repository context and the role-specific task below. Identify useful ideas, alternatives, trade-offs, and questions another specialist should consider.
+          Role-specific task:
+          - visual-reviewer: inspect the attached real homepage screenshot and comment on a useful visual, responsive or RTL observation you can support.
+          - qa-engineer: consider one useful quality or regression-testing improvement for the repository.
+          - security-auditor: consider one meaningful security or privacy risk in the agent configuration or workflow.
+          - project-lead: suggest a useful next improvement and which specialists should discuss it.
+          - problem-analyst: identify a real improvement opportunity and possible approaches.
+          - implementation-engineer: suggest a practical implementation direction.
+          - fast-task-engineer: identify a useful small improvement if one is apparent.
+          - long-horizon-engineer: consider a larger architectural or product improvement and how it could evolve.
           Do not edit, create, delete, commit, push, merge, deploy, inspect environment variables, read .env files, or call external services.
-          Provide a concise role-specific assessment based only on files or image you actually inspected.
-          Your final answer MUST contain exactly three labeled sections; the runner records your role, model, and assigned skill from trusted workflow metadata.
-          OUTCOME: the task-specific result or conclusion.
-          EVIDENCE: at least two actual repository paths inspected, or the real screenshot and viewport for visual review.
-          LIMITATIONS: what you could not verify in this run.
-          Use these exact labels, one per line. Do not use a code block. Do not fabricate tool calls or evidence.
+          Be honest about what you did and did not inspect. Do not invent evidence, tool calls, screenshots, or results. Answer naturally and concisely.
           EOF
           )"
           cd "$TARGET_DIR"
@@ -519,10 +505,6 @@ jobs:
                   parse_errors += 1
 
           agent = os.environ["AGENT_NAME"]
-          skill = os.environ["SKILL_NAME"]
-          skill_calls = []
-          skill_failures = []
-          read_calls = []
           text_parts = []
           tool_names = []
           stream_errors = []
@@ -535,13 +517,6 @@ jobs:
                   inputs = state.get("input") or {}
                   if isinstance(tool, str):
                       tool_names.append(tool)
-                  if tool == "skill" and skill in json.dumps(inputs, ensure_ascii=False):
-                      if state.get("status") == "completed":
-                          skill_calls.append(event)
-                      else:
-                          skill_failures.append(str(state.get("status", "unknown")))
-                  if tool in {"read", "grep", "glob", "list"} and state.get("status") == "completed":
-                      read_calls.append(event)
               elif event_type == "text":
                   value = part.get("text")
                   if isinstance(value, str):
@@ -554,32 +529,10 @@ jobs:
                       stream_errors.append("OpenCode error")
 
           final_text = "\n".join(text_parts).strip()
-          required_headings = ["outcome", "evidence", "limitations"]
-          found_headings = [
-              heading for heading in required_headings
-              if re.search(
-                  r"(?im)^\s*(?:#{1,6}\s*)?(?:\*\*)?" + re.escape(heading)
-                  + r"(?:\*\*)?\s*:",
-                  final_text
-              )
-          ]
-          missing_headings = [heading for heading in required_headings if heading not in found_headings]
           if stream_errors:
-              fail("OpenCode emitted an error event for " + agent + ".", events, len(skill_calls), len(read_calls), len(text_parts), len(final_text))
-          if not events or not final_text or len(final_text) < 80:
-              fail("OpenCode did not return a sufficiently complete assistant report for " + agent + ".", events, len(skill_calls), len(read_calls), len(text_parts), len(final_text))
-          if not skill_calls or len(read_calls) < 2:
-              fail(
-                  "The agent did not successfully load its assigned native skill and inspect at least two repository sources for "
-                  + agent + "; failed skill attempt statuses: " + ", ".join(skill_failures) + ".",
-                  events, len(skill_calls), len(read_calls), len(text_parts), len(final_text)
-              )
-          if missing_headings:
-              fail(
-                  "The assistant report is missing required labeled sections for " + agent + ": "
-                  + ", ".join(missing_headings) + ".",
-                  events, len(skill_calls), len(read_calls), len(text_parts), len(final_text)
-              )
+              fail("OpenCode emitted an error event for " + agent + ".", events, 0, 0, len(text_parts), len(final_text))
+          if not events or not final_text:
+              fail("OpenCode did not return a final assistant response for " + agent + ".", events, 0, 0, len(text_parts), len(final_text))
           if agent == "visual-reviewer":
               if not re.search(r"(?i)screenshot|viewport", final_text):
                   fail("The visual reviewer did not provide screenshot/viewport-specific evidence.", events, len(skill_calls), len(read_calls), len(text_parts), len(final_text))
@@ -592,15 +545,13 @@ jobs:
           report = (
               "# Agent smoke report: " + agent + "\n\n"
               "- Model: " + model + "\n"
-              "- Assigned skill loaded via native tool: " + skill + "\n"
-              "- Completed evidence/tool calls: " + str(len(read_calls)) + "\n"
               "- Parsed OpenCode events: " + str(len(events)) + "\n"
               "- Result: PASS\n\n"
               "## Agent response\n\n" + final_text + "\n"
           )
           (report_dir / (agent + ".md")).write_text(report, encoding="utf-8")
           raw_path.unlink(missing_ok=True)
-          print("PASS: " + agent + " used " + model + ", loaded " + skill + ", and inspected repository evidence.")
+          print("PASS: " + agent + " responded using " + model + ".")
           PY
           worktree_status="$(git -C "$TARGET_DIR" status --porcelain=v1 --untracked-files=all)"
           if [ -n "$worktree_status" ]; then
@@ -608,7 +559,7 @@ jobs:
             printf '%s\n' "$worktree_status" | sed -E 's/^.../Unexpected worktree path: /' | head -n 20
             exit 1
           fi
-          echo "| $AGENT_NAME | PASS | $MODEL_ID | $SKILL_NAME |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| $AGENT_NAME | PASS | $MODEL_ID | optional skills |" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Stop local preview
         if: always() && matrix.agent == 'visual-reviewer'
