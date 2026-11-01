@@ -5,7 +5,7 @@ export const CATEGORIES_REGISTRY: Record<CategoryId, CategoryDefinition> = {
     id: 'image',
     slug: 'image',
     icon: 'Image',
-    accentColor: '#f3c64f',
+    accentColor: '#f97316',
     localizedTitle: {
       en: 'Image Tools',
       ar: 'أدوات الصور',
@@ -36,7 +36,7 @@ export const CATEGORIES_REGISTRY: Record<CategoryId, CategoryDefinition> = {
     id: 'pdf',
     slug: 'pdf',
     icon: 'FileText',
-    accentColor: '#f3c64f',
+    accentColor: '#f97316',
     localizedTitle: {
       en: 'PDF Tools',
       ar: 'أدوات PDF',
@@ -67,7 +67,7 @@ export const CATEGORIES_REGISTRY: Record<CategoryId, CategoryDefinition> = {
     id: 'text',
     slug: 'text',
     icon: 'Type',
-    accentColor: '#f3c64f',
+    accentColor: '#f97316',
     localizedTitle: {
       en: 'Text Tools',
       ar: 'أدوات النصوص',
@@ -98,7 +98,7 @@ export const CATEGORIES_REGISTRY: Record<CategoryId, CategoryDefinition> = {
     id: 'developer',
     slug: 'developer',
     icon: 'Code2',
-    accentColor: '#f3c64f',
+    accentColor: '#f97316',
     localizedTitle: {
       en: 'Developer Tools',
       ar: 'أدوات المطورين',
@@ -129,7 +129,7 @@ export const CATEGORIES_REGISTRY: Record<CategoryId, CategoryDefinition> = {
     id: 'website-domain',
     slug: 'website-domain',
     icon: 'Globe',
-    accentColor: '#f3c64f',
+    accentColor: '#f97316',
     localizedTitle: {
       en: 'Website & Domain Tools',
       ar: 'أدوات المواقع والنطاقات',
@@ -160,7 +160,7 @@ export const CATEGORIES_REGISTRY: Record<CategoryId, CategoryDefinition> = {
     id: 'video',
     slug: 'video',
     icon: 'Video',
-    accentColor: '#f3c64f',
+    accentColor: '#f97316',
     localizedTitle: {
       en: 'Video Tools',
       ar: 'أدوات الفيديو',
