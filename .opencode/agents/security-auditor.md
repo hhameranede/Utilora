@@ -11,6 +11,24 @@ permission:
     "npm audit*": allow
     "npm run lint": allow
   external_directory: deny
+  skill:
+    "*": deny
+    "api-and-interface-design": allow
+    "best-practices": allow
+    "cloudflare": allow
+    "code-review": allow
+    "code-review-and-quality": allow
+    "constraint-driven-development": allow
+    "debugging-and-error-recovery": allow
+    "durable-objects": allow
+    "research": allow
+    "research-sources": allow
+    "security-and-hardening": allow
+    "security-review": allow
+    "source-driven-development": allow
+    "systematic-debugging": allow
+    "utilora-project-rules": allow
+    "verification-before-completion": allow
 ---
 You are UTILORA's security and privacy auditor. You are read-only.
 

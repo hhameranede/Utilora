@@ -35,11 +35,16 @@ jobs:
       - name: Install dependencies
         run: npm install --no-audit --no-fund
 
+      - name: Install OpenCode CLI
+        run: npm install --global opencode-ai@1
+
       - name: Type check
         run: npm run lint
 
-      - name: Verify agent and MCP configuration
+      - name: Verify agent and MCP configuration and OpenCode discovery
         run: npm run test:agent-config
+        env:
+          OPENCODE_RUNTIME_TEST: '1'
 
       - name: Test standalone product content
         run: npm run test:products

@@ -1,0 +1,1191 @@
+{
+  "schema_version": 1,
+  "project": "UTILORA",
+  "external_skill_count": 100,
+  "internal_skill_count": 9,
+  "total_skill_count": 109,
+  "skills": [
+    {
+      "id": "ab-testing",
+      "source": "coreyhaines31/marketingskills",
+      "path": "skills/ab-testing/SKILL.md",
+      "revision": "88c79f6528a9347420e57ceb1fff9a60de651768",
+      "license": "MIT",
+      "assigned_agents": [
+        "analytics-reviewer"
+      ],
+      "upstream_url": "https://github.com/coreyhaines31/marketingskills/blob/88c79f6528a9347420e57ceb1fff9a60de651768/skills/ab-testing/SKILL.md"
+    },
+    {
+      "id": "accessibility",
+      "source": "addyosmani/web-quality-skills",
+      "path": "skills/accessibility/SKILL.md",
+      "revision": "afa8da942115f2961fdbfa80807ea0b232ff6c00",
+      "license": "MIT",
+      "assigned_agents": [
+        "qa-engineer",
+        "seo-auditor",
+        "ux-reviewer"
+      ],
+      "upstream_url": "https://github.com/addyosmani/web-quality-skills/blob/afa8da942115f2961fdbfa80807ea0b232ff6c00/skills/accessibility/SKILL.md"
+    },
+    {
+      "id": "agents-sdk",
+      "source": "cloudflare/skills",
+      "path": "skills/agents-sdk/SKILL.md",
+      "revision": "1a33048817d06df12882cb881dfc754e7039954a",
+      "license": "Apache-2.0",
+      "assigned_agents": [
+        "implementation-engineer"
+      ],
+      "upstream_url": "https://github.com/cloudflare/skills/blob/1a33048817d06df12882cb881dfc754e7039954a/skills/agents-sdk/SKILL.md"
+    },
+    {
+      "id": "ai-seo",
+      "source": "coreyhaines31/marketingskills",
+      "path": "skills/ai-seo/SKILL.md",
+      "revision": "88c79f6528a9347420e57ceb1fff9a60de651768",
+      "license": "MIT",
+      "assigned_agents": [
+        "seo-auditor"
+      ],
+      "upstream_url": "https://github.com/coreyhaines31/marketingskills/blob/88c79f6528a9347420e57ceb1fff9a60de651768/skills/ai-seo/SKILL.md"
+    },
+    {
+      "id": "analytics",
+      "source": "coreyhaines31/marketingskills",
+      "path": "skills/analytics/SKILL.md",
+      "revision": "88c79f6528a9347420e57ceb1fff9a60de651768",
+      "license": "MIT",
+      "assigned_agents": [
+        "seo-auditor",
+        "analytics-reviewer"
+      ],
+      "upstream_url": "https://github.com/coreyhaines31/marketingskills/blob/88c79f6528a9347420e57ceb1fff9a60de651768/skills/analytics/SKILL.md"
+    },
+    {
+      "id": "animate",
+      "source": "emilkowalski/skills",
+      "path": "skills/animate/SKILL.md",
+      "revision": "a81dbca07f2217b7103e510c0f13f8d5b017afc9",
+      "license": "MIT",
+      "assigned_agents": [
+        "implementation-engineer",
+        "ux-reviewer"
+      ],
+      "upstream_url": "https://github.com/emilkowalski/skills/blob/a81dbca07f2217b7103e510c0f13f8d5b017afc9/skills/animate/SKILL.md"
+    },
+    {
+      "id": "animation-performance",
+      "source": "emilkowalski/skills",
+      "path": "skills/animation-performance/SKILL.md",
+      "revision": "a81dbca07f2217b7103e510c0f13f8d5b017afc9",
+      "license": "MIT",
+      "assigned_agents": [
+        "qa-engineer",
+        "ux-reviewer"
+      ],
+      "upstream_url": "https://github.com/emilkowalski/skills/blob/a81dbca07f2217b7103e510c0f13f8d5b017afc9/skills/animation-performance/SKILL.md"
+    },
+    {
+      "id": "animation-vocabulary",
+      "source": "emilkowalski/skills",
+      "path": "skills/animation-vocabulary/SKILL.md",
+      "revision": "a81dbca07f2217b7103e510c0f13f8d5b017afc9",
+      "license": "MIT",
+      "assigned_agents": [
+        "ux-reviewer"
+      ],
+      "upstream_url": "https://github.com/emilkowalski/skills/blob/a81dbca07f2217b7103e510c0f13f8d5b017afc9/skills/animation-vocabulary/SKILL.md"
+    },
+    {
+      "id": "api-and-interface-design",
+      "source": "addyosmani/agent-skills",
+      "path": "skills/api-and-interface-design/SKILL.md",
+      "revision": "301b02b12bff98e4688e6984af6556802322bbde",
+      "license": "MIT",
+      "assigned_agents": [
+        "implementation-engineer",
+        "security-auditor"
+      ],
+      "upstream_url": "https://github.com/addyosmani/agent-skills/blob/301b02b12bff98e4688e6984af6556802322bbde/skills/api-and-interface-design/SKILL.md"
+    },
+    {
+      "id": "attribution",
+      "source": "coreyhaines31/marketingskills",
+      "path": "skills/attribution/SKILL.md",
+      "revision": "88c79f6528a9347420e57ceb1fff9a60de651768",
+      "license": "MIT",
+      "assigned_agents": [
+        "analytics-reviewer"
+      ],
+      "upstream_url": "https://github.com/coreyhaines31/marketingskills/blob/88c79f6528a9347420e57ceb1fff9a60de651768/skills/attribution/SKILL.md"
+    },
+    {
+      "id": "best-practices",
+      "source": "addyosmani/web-quality-skills",
+      "path": "skills/best-practices/SKILL.md",
+      "revision": "afa8da942115f2961fdbfa80807ea0b232ff6c00",
+      "license": "MIT",
+      "assigned_agents": [
+        "qa-engineer",
+        "security-auditor",
+        "ux-reviewer"
+      ],
+      "upstream_url": "https://github.com/addyosmani/web-quality-skills/blob/afa8da942115f2961fdbfa80807ea0b232ff6c00/skills/best-practices/SKILL.md"
+    },
+    {
+      "id": "brainstorming",
+      "source": "obra/superpowers",
+      "path": "skills/brainstorming/SKILL.md",
+      "revision": "2ce8aa15d05bd57213e6f746f953aafb7ded7a8b",
+      "license": "MIT",
+      "assigned_agents": [
+        "project-lead",
+        "implementation-engineer",
+        "ux-reviewer"
+      ],
+      "upstream_url": "https://github.com/obra/superpowers/blob/2ce8aa15d05bd57213e6f746f953aafb7ded7a8b/skills/brainstorming/SKILL.md"
+    },
+    {
+      "id": "browser-testing-with-devtools",
+      "source": "addyosmani/agent-skills",
+      "path": "skills/browser-testing-with-devtools/SKILL.md",
+      "revision": "301b02b12bff98e4688e6984af6556802322bbde",
+      "license": "MIT",
+      "assigned_agents": [
+        "qa-engineer"
+      ],
+      "upstream_url": "https://github.com/addyosmani/agent-skills/blob/301b02b12bff98e4688e6984af6556802322bbde/skills/browser-testing-with-devtools/SKILL.md"
+    },
+    {
+      "id": "cf-cli",
+      "source": "cloudflare/skills",
+      "path": "skills/cf-cli/SKILL.md",
+      "revision": "1a33048817d06df12882cb881dfc754e7039954a",
+      "license": "Apache-2.0",
+      "assigned_agents": [
+        "implementation-engineer",
+        "release-reviewer"
+      ],
+      "upstream_url": "https://github.com/cloudflare/skills/blob/1a33048817d06df12882cb881dfc754e7039954a/skills/cf-cli/SKILL.md"
+    },
+    {
+      "id": "ci-cd-and-automation",
+      "source": "addyosmani/agent-skills",
+      "path": "skills/ci-cd-and-automation/SKILL.md",
+      "revision": "301b02b12bff98e4688e6984af6556802322bbde",
+      "license": "MIT",
+      "assigned_agents": [
+        "release-reviewer"
+      ],
+      "upstream_url": "https://github.com/addyosmani/agent-skills/blob/301b02b12bff98e4688e6984af6556802322bbde/skills/ci-cd-and-automation/SKILL.md"
+    },
+    {
+      "id": "cloudflare",
+      "source": "cloudflare/skills",
+      "path": "skills/cloudflare/SKILL.md",
+      "revision": "1a33048817d06df12882cb881dfc754e7039954a",
+      "license": "Apache-2.0",
+      "assigned_agents": [
+        "implementation-engineer",
+        "security-auditor"
+      ],
+      "upstream_url": "https://github.com/cloudflare/skills/blob/1a33048817d06df12882cb881dfc754e7039954a/skills/cloudflare/SKILL.md"
+    },
+    {
+      "id": "code-review",
+      "source": "mattpocock/skills",
+      "path": "skills/engineering/code-review/SKILL.md",
+      "revision": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+      "license": "MIT",
+      "assigned_agents": [
+        "project-lead",
+        "implementation-engineer",
+        "qa-engineer",
+        "security-auditor",
+        "release-reviewer"
+      ],
+      "upstream_url": "https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/engineering/code-review/SKILL.md"
+    },
+    {
+      "id": "code-review-and-quality",
+      "source": "addyosmani/agent-skills",
+      "path": "skills/code-review-and-quality/SKILL.md",
+      "revision": "301b02b12bff98e4688e6984af6556802322bbde",
+      "license": "MIT",
+      "assigned_agents": [
+        "qa-engineer",
+        "security-auditor"
+      ],
+      "upstream_url": "https://github.com/addyosmani/agent-skills/blob/301b02b12bff98e4688e6984af6556802322bbde/skills/code-review-and-quality/SKILL.md"
+    },
+    {
+      "id": "code-simplification",
+      "source": "addyosmani/agent-skills",
+      "path": "skills/code-simplification/SKILL.md",
+      "revision": "301b02b12bff98e4688e6984af6556802322bbde",
+      "license": "MIT",
+      "assigned_agents": [
+        "implementation-engineer"
+      ],
+      "upstream_url": "https://github.com/addyosmani/agent-skills/blob/301b02b12bff98e4688e6984af6556802322bbde/skills/code-simplification/SKILL.md"
+    },
+    {
+      "id": "codebase-design",
+      "source": "mattpocock/skills",
+      "path": "skills/engineering/codebase-design/SKILL.md",
+      "revision": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+      "license": "MIT",
+      "assigned_agents": [
+        "project-lead",
+        "implementation-engineer",
+        "ux-reviewer"
+      ],
+      "upstream_url": "https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/engineering/codebase-design/SKILL.md"
+    },
+    {
+      "id": "competitor-profiling",
+      "source": "coreyhaines31/marketingskills",
+      "path": "skills/competitor-profiling/SKILL.md",
+      "revision": "88c79f6528a9347420e57ceb1fff9a60de651768",
+      "license": "MIT",
+      "assigned_agents": [
+        "project-lead",
+        "seo-auditor",
+        "analytics-reviewer"
+      ],
+      "upstream_url": "https://github.com/coreyhaines31/marketingskills/blob/88c79f6528a9347420e57ceb1fff9a60de651768/skills/competitor-profiling/SKILL.md"
+    },
+    {
+      "id": "competitors",
+      "source": "coreyhaines31/marketingskills",
+      "path": "skills/competitors/SKILL.md",
+      "revision": "88c79f6528a9347420e57ceb1fff9a60de651768",
+      "license": "MIT",
+      "assigned_agents": [
+        "seo-auditor"
+      ],
+      "upstream_url": "https://github.com/coreyhaines31/marketingskills/blob/88c79f6528a9347420e57ceb1fff9a60de651768/skills/competitors/SKILL.md"
+    },
+    {
+      "id": "constraint-driven-development",
+      "source": "addyosmani/agent-skills",
+      "path": "skills/constraint-driven-development/SKILL.md",
+      "revision": "301b02b12bff98e4688e6984af6556802322bbde",
+      "license": "MIT",
+      "assigned_agents": [
+        "implementation-engineer",
+        "security-auditor"
+      ],
+      "upstream_url": "https://github.com/addyosmani/agent-skills/blob/301b02b12bff98e4688e6984af6556802322bbde/skills/constraint-driven-development/SKILL.md"
+    },
+    {
+      "id": "content-strategy",
+      "source": "coreyhaines31/marketingskills",
+      "path": "skills/content-strategy/SKILL.md",
+      "revision": "88c79f6528a9347420e57ceb1fff9a60de651768",
+      "license": "MIT",
+      "assigned_agents": [
+        "seo-auditor",
+        "analytics-reviewer"
+      ],
+      "upstream_url": "https://github.com/coreyhaines31/marketingskills/blob/88c79f6528a9347420e57ceb1fff9a60de651768/skills/content-strategy/SKILL.md"
+    },
+    {
+      "id": "context-engineering",
+      "source": "addyosmani/agent-skills",
+      "path": "skills/context-engineering/SKILL.md",
+      "revision": "301b02b12bff98e4688e6984af6556802322bbde",
+      "license": "MIT",
+      "assigned_agents": [
+        "project-lead",
+        "implementation-engineer"
+      ],
+      "upstream_url": "https://github.com/addyosmani/agent-skills/blob/301b02b12bff98e4688e6984af6556802322bbde/skills/context-engineering/SKILL.md"
+    },
+    {
+      "id": "conversion-tracking",
+      "source": "coreyhaines31/marketingskills",
+      "path": "skills/conversion-tracking/SKILL.md",
+      "revision": "88c79f6528a9347420e57ceb1fff9a60de651768",
+      "license": "MIT",
+      "assigned_agents": [
+        "analytics-reviewer"
+      ],
+      "upstream_url": "https://github.com/coreyhaines31/marketingskills/blob/88c79f6528a9347420e57ceb1fff9a60de651768/skills/conversion-tracking/SKILL.md"
+    },
+    {
+      "id": "copy-editing",
+      "source": "coreyhaines31/marketingskills",
+      "path": "skills/copy-editing/SKILL.md",
+      "revision": "88c79f6528a9347420e57ceb1fff9a60de651768",
+      "license": "MIT",
+      "assigned_agents": [
+        "seo-auditor"
+      ],
+      "upstream_url": "https://github.com/coreyhaines31/marketingskills/blob/88c79f6528a9347420e57ceb1fff9a60de651768/skills/copy-editing/SKILL.md"
+    },
+    {
+      "id": "copywriting",
+      "source": "coreyhaines31/marketingskills",
+      "path": "skills/copywriting/SKILL.md",
+      "revision": "88c79f6528a9347420e57ceb1fff9a60de651768",
+      "license": "MIT",
+      "assigned_agents": [
+        "seo-auditor"
+      ],
+      "upstream_url": "https://github.com/coreyhaines31/marketingskills/blob/88c79f6528a9347420e57ceb1fff9a60de651768/skills/copywriting/SKILL.md"
+    },
+    {
+      "id": "core-web-vitals",
+      "source": "addyosmani/web-quality-skills",
+      "path": "skills/core-web-vitals/SKILL.md",
+      "revision": "afa8da942115f2961fdbfa80807ea0b232ff6c00",
+      "license": "MIT",
+      "assigned_agents": [
+        "qa-engineer",
+        "seo-auditor",
+        "ux-reviewer"
+      ],
+      "upstream_url": "https://github.com/addyosmani/web-quality-skills/blob/afa8da942115f2961fdbfa80807ea0b232ff6c00/skills/core-web-vitals/SKILL.md"
+    },
+    {
+      "id": "cro",
+      "source": "coreyhaines31/marketingskills",
+      "path": "skills/cro/SKILL.md",
+      "revision": "88c79f6528a9347420e57ceb1fff9a60de651768",
+      "license": "MIT",
+      "assigned_agents": [
+        "analytics-reviewer"
+      ],
+      "upstream_url": "https://github.com/coreyhaines31/marketingskills/blob/88c79f6528a9347420e57ceb1fff9a60de651768/skills/cro/SKILL.md"
+    },
+    {
+      "id": "customer-research",
+      "source": "coreyhaines31/marketingskills",
+      "path": "skills/customer-research/SKILL.md",
+      "revision": "88c79f6528a9347420e57ceb1fff9a60de651768",
+      "license": "MIT",
+      "assigned_agents": [
+        "project-lead",
+        "analytics-reviewer"
+      ],
+      "upstream_url": "https://github.com/coreyhaines31/marketingskills/blob/88c79f6528a9347420e57ceb1fff9a60de651768/skills/customer-research/SKILL.md"
+    },
+    {
+      "id": "debugging-and-error-recovery",
+      "source": "addyosmani/agent-skills",
+      "path": "skills/debugging-and-error-recovery/SKILL.md",
+      "revision": "301b02b12bff98e4688e6984af6556802322bbde",
+      "license": "MIT",
+      "assigned_agents": [
+        "implementation-engineer",
+        "qa-engineer",
+        "security-auditor"
+      ],
+      "upstream_url": "https://github.com/addyosmani/agent-skills/blob/301b02b12bff98e4688e6984af6556802322bbde/skills/debugging-and-error-recovery/SKILL.md"
+    },
+    {
+      "id": "deprecation-and-migration",
+      "source": "addyosmani/agent-skills",
+      "path": "skills/deprecation-and-migration/SKILL.md",
+      "revision": "301b02b12bff98e4688e6984af6556802322bbde",
+      "license": "MIT",
+      "assigned_agents": [
+        "implementation-engineer"
+      ],
+      "upstream_url": "https://github.com/addyosmani/agent-skills/blob/301b02b12bff98e4688e6984af6556802322bbde/skills/deprecation-and-migration/SKILL.md"
+    },
+    {
+      "id": "diagnosing-bugs",
+      "source": "mattpocock/skills",
+      "path": "skills/engineering/diagnosing-bugs/SKILL.md",
+      "revision": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+      "license": "MIT",
+      "assigned_agents": [
+        "implementation-engineer",
+        "qa-engineer",
+        "release-reviewer"
+      ],
+      "upstream_url": "https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/engineering/diagnosing-bugs/SKILL.md"
+    },
+    {
+      "id": "directory-submissions",
+      "source": "coreyhaines31/marketingskills",
+      "path": "skills/directory-submissions/SKILL.md",
+      "revision": "88c79f6528a9347420e57ceb1fff9a60de651768",
+      "license": "MIT",
+      "assigned_agents": [
+        "seo-auditor"
+      ],
+      "upstream_url": "https://github.com/coreyhaines31/marketingskills/blob/88c79f6528a9347420e57ceb1fff9a60de651768/skills/directory-submissions/SKILL.md"
+    },
+    {
+      "id": "dispatching-parallel-agents",
+      "source": "obra/superpowers",
+      "path": "skills/dispatching-parallel-agents/SKILL.md",
+      "revision": "2ce8aa15d05bd57213e6f746f953aafb7ded7a8b",
+      "license": "MIT",
+      "assigned_agents": [
+        "project-lead"
+      ],
+      "upstream_url": "https://github.com/obra/superpowers/blob/2ce8aa15d05bd57213e6f746f953aafb7ded7a8b/skills/dispatching-parallel-agents/SKILL.md"
+    },
+    {
+      "id": "documentation-and-adrs",
+      "source": "addyosmani/agent-skills",
+      "path": "skills/documentation-and-adrs/SKILL.md",
+      "revision": "301b02b12bff98e4688e6984af6556802322bbde",
+      "license": "MIT",
+      "assigned_agents": [
+        "project-lead"
+      ],
+      "upstream_url": "https://github.com/addyosmani/agent-skills/blob/301b02b12bff98e4688e6984af6556802322bbde/skills/documentation-and-adrs/SKILL.md"
+    },
+    {
+      "id": "domain-modeling",
+      "source": "mattpocock/skills",
+      "path": "skills/engineering/domain-modeling/SKILL.md",
+      "revision": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+      "license": "MIT",
+      "assigned_agents": [
+        "project-lead",
+        "implementation-engineer"
+      ],
+      "upstream_url": "https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/engineering/domain-modeling/SKILL.md"
+    },
+    {
+      "id": "doubt-driven-development",
+      "source": "addyosmani/agent-skills",
+      "path": "skills/doubt-driven-development/SKILL.md",
+      "revision": "301b02b12bff98e4688e6984af6556802322bbde",
+      "license": "MIT",
+      "assigned_agents": [
+        "project-lead"
+      ],
+      "upstream_url": "https://github.com/addyosmani/agent-skills/blob/301b02b12bff98e4688e6984af6556802322bbde/skills/doubt-driven-development/SKILL.md"
+    },
+    {
+      "id": "durable-objects",
+      "source": "cloudflare/skills",
+      "path": "skills/durable-objects/SKILL.md",
+      "revision": "1a33048817d06df12882cb881dfc754e7039954a",
+      "license": "Apache-2.0",
+      "assigned_agents": [
+        "implementation-engineer",
+        "security-auditor"
+      ],
+      "upstream_url": "https://github.com/cloudflare/skills/blob/1a33048817d06df12882cb881dfc754e7039954a/skills/durable-objects/SKILL.md"
+    },
+    {
+      "id": "emil-design-eng",
+      "source": "emilkowalski/skills",
+      "path": "skills/emil-design-eng/SKILL.md",
+      "revision": "a81dbca07f2217b7103e510c0f13f8d5b017afc9",
+      "license": "MIT",
+      "assigned_agents": [
+        "ux-reviewer"
+      ],
+      "upstream_url": "https://github.com/emilkowalski/skills/blob/a81dbca07f2217b7103e510c0f13f8d5b017afc9/skills/emil-design-eng/SKILL.md"
+    },
+    {
+      "id": "executing-plans",
+      "source": "obra/superpowers",
+      "path": "skills/executing-plans/SKILL.md",
+      "revision": "2ce8aa15d05bd57213e6f746f953aafb7ded7a8b",
+      "license": "MIT",
+      "assigned_agents": [
+        "project-lead",
+        "implementation-engineer"
+      ],
+      "upstream_url": "https://github.com/obra/superpowers/blob/2ce8aa15d05bd57213e6f746f953aafb7ded7a8b/skills/executing-plans/SKILL.md"
+    },
+    {
+      "id": "find-animation-opportunities",
+      "source": "emilkowalski/skills",
+      "path": "skills/find-animation-opportunities/SKILL.md",
+      "revision": "a81dbca07f2217b7103e510c0f13f8d5b017afc9",
+      "license": "MIT",
+      "assigned_agents": [
+        "ux-reviewer"
+      ],
+      "upstream_url": "https://github.com/emilkowalski/skills/blob/a81dbca07f2217b7103e510c0f13f8d5b017afc9/skills/find-animation-opportunities/SKILL.md"
+    },
+    {
+      "id": "finishing-a-development-branch",
+      "source": "obra/superpowers",
+      "path": "skills/finishing-a-development-branch/SKILL.md",
+      "revision": "2ce8aa15d05bd57213e6f746f953aafb7ded7a8b",
+      "license": "MIT",
+      "assigned_agents": [
+        "project-lead",
+        "release-reviewer"
+      ],
+      "upstream_url": "https://github.com/obra/superpowers/blob/2ce8aa15d05bd57213e6f746f953aafb7ded7a8b/skills/finishing-a-development-branch/SKILL.md"
+    },
+    {
+      "id": "free-tools",
+      "source": "coreyhaines31/marketingskills",
+      "path": "skills/free-tools/SKILL.md",
+      "revision": "88c79f6528a9347420e57ceb1fff9a60de651768",
+      "license": "MIT",
+      "assigned_agents": [
+        "seo-auditor"
+      ],
+      "upstream_url": "https://github.com/coreyhaines31/marketingskills/blob/88c79f6528a9347420e57ceb1fff9a60de651768/skills/free-tools/SKILL.md"
+    },
+    {
+      "id": "frontend-ui-engineering",
+      "source": "addyosmani/agent-skills",
+      "path": "skills/frontend-ui-engineering/SKILL.md",
+      "revision": "301b02b12bff98e4688e6984af6556802322bbde",
+      "license": "MIT",
+      "assigned_agents": [
+        "implementation-engineer",
+        "ux-reviewer"
+      ],
+      "upstream_url": "https://github.com/addyosmani/agent-skills/blob/301b02b12bff98e4688e6984af6556802322bbde/skills/frontend-ui-engineering/SKILL.md"
+    },
+    {
+      "id": "git-workflow-and-versioning",
+      "source": "addyosmani/agent-skills",
+      "path": "skills/git-workflow-and-versioning/SKILL.md",
+      "revision": "301b02b12bff98e4688e6984af6556802322bbde",
+      "license": "MIT",
+      "assigned_agents": [
+        "implementation-engineer",
+        "release-reviewer"
+      ],
+      "upstream_url": "https://github.com/addyosmani/agent-skills/blob/301b02b12bff98e4688e6984af6556802322bbde/skills/git-workflow-and-versioning/SKILL.md"
+    },
+    {
+      "id": "handoff",
+      "source": "mattpocock/skills",
+      "path": "skills/productivity/handoff/SKILL.md",
+      "revision": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+      "license": "MIT",
+      "assigned_agents": [
+        "project-lead"
+      ],
+      "upstream_url": "https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/productivity/handoff/SKILL.md"
+    },
+    {
+      "id": "implement",
+      "source": "mattpocock/skills",
+      "path": "skills/engineering/implement/SKILL.md",
+      "revision": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+      "license": "MIT",
+      "assigned_agents": [
+        "implementation-engineer"
+      ],
+      "upstream_url": "https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/engineering/implement/SKILL.md"
+    },
+    {
+      "id": "implement-spec",
+      "source": "mattpocock/skills",
+      "path": "skills/engineering/implement-spec/SKILL.md",
+      "revision": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+      "license": "MIT",
+      "assigned_agents": [
+        "implementation-engineer"
+      ],
+      "upstream_url": "https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/engineering/implement-spec/SKILL.md"
+    },
+    {
+      "id": "improve-animations",
+      "source": "emilkowalski/skills",
+      "path": "skills/improve-animations/SKILL.md",
+      "revision": "a81dbca07f2217b7103e510c0f13f8d5b017afc9",
+      "license": "MIT",
+      "assigned_agents": [
+        "ux-reviewer"
+      ],
+      "upstream_url": "https://github.com/emilkowalski/skills/blob/a81dbca07f2217b7103e510c0f13f8d5b017afc9/skills/improve-animations/SKILL.md"
+    },
+    {
+      "id": "improve-codebase-architecture",
+      "source": "mattpocock/skills",
+      "path": "skills/engineering/improve-codebase-architecture/SKILL.md",
+      "revision": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+      "license": "MIT",
+      "assigned_agents": [
+        "project-lead",
+        "implementation-engineer"
+      ],
+      "upstream_url": "https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/engineering/improve-codebase-architecture/SKILL.md"
+    },
+    {
+      "id": "incremental-implementation",
+      "source": "addyosmani/agent-skills",
+      "path": "skills/incremental-implementation/SKILL.md",
+      "revision": "301b02b12bff98e4688e6984af6556802322bbde",
+      "license": "MIT",
+      "assigned_agents": [
+        "implementation-engineer"
+      ],
+      "upstream_url": "https://github.com/addyosmani/agent-skills/blob/301b02b12bff98e4688e6984af6556802322bbde/skills/incremental-implementation/SKILL.md"
+    },
+    {
+      "id": "launch",
+      "source": "coreyhaines31/marketingskills",
+      "path": "skills/launch/SKILL.md",
+      "revision": "88c79f6528a9347420e57ceb1fff9a60de651768",
+      "license": "MIT",
+      "assigned_agents": [
+        "project-lead",
+        "release-reviewer"
+      ],
+      "upstream_url": "https://github.com/coreyhaines31/marketingskills/blob/88c79f6528a9347420e57ceb1fff9a60de651768/skills/launch/SKILL.md"
+    },
+    {
+      "id": "link-building",
+      "source": "coreyhaines31/marketingskills",
+      "path": "skills/link-building/SKILL.md",
+      "revision": "88c79f6528a9347420e57ceb1fff9a60de651768",
+      "license": "MIT",
+      "assigned_agents": [
+        "seo-auditor"
+      ],
+      "upstream_url": "https://github.com/coreyhaines31/marketingskills/blob/88c79f6528a9347420e57ceb1fff9a60de651768/skills/link-building/SKILL.md"
+    },
+    {
+      "id": "marketing-ideas",
+      "source": "coreyhaines31/marketingskills",
+      "path": "skills/marketing-ideas/SKILL.md",
+      "revision": "88c79f6528a9347420e57ceb1fff9a60de651768",
+      "license": "MIT",
+      "assigned_agents": [
+        "project-lead",
+        "seo-auditor",
+        "analytics-reviewer"
+      ],
+      "upstream_url": "https://github.com/coreyhaines31/marketingskills/blob/88c79f6528a9347420e57ceb1fff9a60de651768/skills/marketing-ideas/SKILL.md"
+    },
+    {
+      "id": "marketing-loops",
+      "source": "coreyhaines31/marketingskills",
+      "path": "skills/marketing-loops/SKILL.md",
+      "revision": "88c79f6528a9347420e57ceb1fff9a60de651768",
+      "license": "MIT",
+      "assigned_agents": [
+        "seo-auditor",
+        "analytics-reviewer",
+        "release-reviewer"
+      ],
+      "upstream_url": "https://github.com/coreyhaines31/marketingskills/blob/88c79f6528a9347420e57ceb1fff9a60de651768/skills/marketing-loops/SKILL.md"
+    },
+    {
+      "id": "marketing-plan",
+      "source": "coreyhaines31/marketingskills",
+      "path": "skills/marketing-plan/SKILL.md",
+      "revision": "88c79f6528a9347420e57ceb1fff9a60de651768",
+      "license": "MIT",
+      "assigned_agents": [
+        "project-lead",
+        "seo-auditor",
+        "analytics-reviewer"
+      ],
+      "upstream_url": "https://github.com/coreyhaines31/marketingskills/blob/88c79f6528a9347420e57ceb1fff9a60de651768/skills/marketing-plan/SKILL.md"
+    },
+    {
+      "id": "marketing-psychology",
+      "source": "coreyhaines31/marketingskills",
+      "path": "skills/marketing-psychology/SKILL.md",
+      "revision": "88c79f6528a9347420e57ceb1fff9a60de651768",
+      "license": "MIT",
+      "assigned_agents": [
+        "seo-auditor",
+        "analytics-reviewer"
+      ],
+      "upstream_url": "https://github.com/coreyhaines31/marketingskills/blob/88c79f6528a9347420e57ceb1fff9a60de651768/skills/marketing-psychology/SKILL.md"
+    },
+    {
+      "id": "observability-and-instrumentation",
+      "source": "addyosmani/agent-skills",
+      "path": "skills/observability-and-instrumentation/SKILL.md",
+      "revision": "301b02b12bff98e4688e6984af6556802322bbde",
+      "license": "MIT",
+      "assigned_agents": [
+        "release-reviewer"
+      ],
+      "upstream_url": "https://github.com/addyosmani/agent-skills/blob/301b02b12bff98e4688e6984af6556802322bbde/skills/observability-and-instrumentation/SKILL.md"
+    },
+    {
+      "id": "offers",
+      "source": "coreyhaines31/marketingskills",
+      "path": "skills/offers/SKILL.md",
+      "revision": "88c79f6528a9347420e57ceb1fff9a60de651768",
+      "license": "MIT",
+      "assigned_agents": [
+        "seo-auditor",
+        "analytics-reviewer"
+      ],
+      "upstream_url": "https://github.com/coreyhaines31/marketingskills/blob/88c79f6528a9347420e57ceb1fff9a60de651768/skills/offers/SKILL.md"
+    },
+    {
+      "id": "onboarding",
+      "source": "coreyhaines31/marketingskills",
+      "path": "skills/onboarding/SKILL.md",
+      "revision": "88c79f6528a9347420e57ceb1fff9a60de651768",
+      "license": "MIT",
+      "assigned_agents": [
+        "analytics-reviewer"
+      ],
+      "upstream_url": "https://github.com/coreyhaines31/marketingskills/blob/88c79f6528a9347420e57ceb1fff9a60de651768/skills/onboarding/SKILL.md"
+    },
+    {
+      "id": "performance",
+      "source": "addyosmani/web-quality-skills",
+      "path": "skills/performance/SKILL.md",
+      "revision": "afa8da942115f2961fdbfa80807ea0b232ff6c00",
+      "license": "MIT",
+      "assigned_agents": [
+        "qa-engineer",
+        "seo-auditor",
+        "ux-reviewer"
+      ],
+      "upstream_url": "https://github.com/addyosmani/web-quality-skills/blob/afa8da942115f2961fdbfa80807ea0b232ff6c00/skills/performance/SKILL.md"
+    },
+    {
+      "id": "performance-optimization",
+      "source": "addyosmani/agent-skills",
+      "path": "skills/performance-optimization/SKILL.md",
+      "revision": "301b02b12bff98e4688e6984af6556802322bbde",
+      "license": "MIT",
+      "assigned_agents": [
+        "implementation-engineer",
+        "release-reviewer"
+      ],
+      "upstream_url": "https://github.com/addyosmani/agent-skills/blob/301b02b12bff98e4688e6984af6556802322bbde/skills/performance-optimization/SKILL.md"
+    },
+    {
+      "id": "pick-ui-library",
+      "source": "emilkowalski/skills",
+      "path": "skills/pick-ui-library/SKILL.md",
+      "revision": "a81dbca07f2217b7103e510c0f13f8d5b017afc9",
+      "license": "MIT",
+      "assigned_agents": [
+        "implementation-engineer",
+        "ux-reviewer"
+      ],
+      "upstream_url": "https://github.com/emilkowalski/skills/blob/a81dbca07f2217b7103e510c0f13f8d5b017afc9/skills/pick-ui-library/SKILL.md"
+    },
+    {
+      "id": "planning-and-task-breakdown",
+      "source": "addyosmani/agent-skills",
+      "path": "skills/planning-and-task-breakdown/SKILL.md",
+      "revision": "301b02b12bff98e4688e6984af6556802322bbde",
+      "license": "MIT",
+      "assigned_agents": [
+        "project-lead"
+      ],
+      "upstream_url": "https://github.com/addyosmani/agent-skills/blob/301b02b12bff98e4688e6984af6556802322bbde/skills/planning-and-task-breakdown/SKILL.md"
+    },
+    {
+      "id": "pr",
+      "source": "mattpocock/skills",
+      "path": "skills/engineering/pr/SKILL.md",
+      "revision": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+      "license": "MIT",
+      "assigned_agents": [
+        "project-lead",
+        "release-reviewer"
+      ],
+      "upstream_url": "https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/engineering/pr/SKILL.md"
+    },
+    {
+      "id": "pricing",
+      "source": "coreyhaines31/marketingskills",
+      "path": "skills/pricing/SKILL.md",
+      "revision": "88c79f6528a9347420e57ceb1fff9a60de651768",
+      "license": "MIT",
+      "assigned_agents": [
+        "analytics-reviewer"
+      ],
+      "upstream_url": "https://github.com/coreyhaines31/marketingskills/blob/88c79f6528a9347420e57ceb1fff9a60de651768/skills/pricing/SKILL.md"
+    },
+    {
+      "id": "product-marketing",
+      "source": "coreyhaines31/marketingskills",
+      "path": "skills/product-marketing/SKILL.md",
+      "revision": "88c79f6528a9347420e57ceb1fff9a60de651768",
+      "license": "MIT",
+      "assigned_agents": [
+        "project-lead",
+        "seo-auditor",
+        "analytics-reviewer"
+      ],
+      "upstream_url": "https://github.com/coreyhaines31/marketingskills/blob/88c79f6528a9347420e57ceb1fff9a60de651768/skills/product-marketing/SKILL.md"
+    },
+    {
+      "id": "programmatic-seo",
+      "source": "coreyhaines31/marketingskills",
+      "path": "skills/programmatic-seo/SKILL.md",
+      "revision": "88c79f6528a9347420e57ceb1fff9a60de651768",
+      "license": "MIT",
+      "assigned_agents": [
+        "seo-auditor"
+      ],
+      "upstream_url": "https://github.com/coreyhaines31/marketingskills/blob/88c79f6528a9347420e57ceb1fff9a60de651768/skills/programmatic-seo/SKILL.md"
+    },
+    {
+      "id": "prototype",
+      "source": "emilkowalski/skills",
+      "path": "skills/prototype/SKILL.md",
+      "revision": "a81dbca07f2217b7103e510c0f13f8d5b017afc9",
+      "license": "MIT",
+      "assigned_agents": [
+        "ux-reviewer"
+      ],
+      "upstream_url": "https://github.com/emilkowalski/skills/blob/a81dbca07f2217b7103e510c0f13f8d5b017afc9/skills/prototype/SKILL.md"
+    },
+    {
+      "id": "receiving-code-review",
+      "source": "obra/superpowers",
+      "path": "skills/receiving-code-review/SKILL.md",
+      "revision": "2ce8aa15d05bd57213e6f746f953aafb7ded7a8b",
+      "license": "MIT",
+      "assigned_agents": [
+        "project-lead",
+        "release-reviewer"
+      ],
+      "upstream_url": "https://github.com/obra/superpowers/blob/2ce8aa15d05bd57213e6f746f953aafb7ded7a8b/skills/receiving-code-review/SKILL.md"
+    },
+    {
+      "id": "remove-animations",
+      "source": "emilkowalski/skills",
+      "path": "skills/remove-animations/SKILL.md",
+      "revision": "a81dbca07f2217b7103e510c0f13f8d5b017afc9",
+      "license": "MIT",
+      "assigned_agents": [
+        "ux-reviewer"
+      ],
+      "upstream_url": "https://github.com/emilkowalski/skills/blob/a81dbca07f2217b7103e510c0f13f8d5b017afc9/skills/remove-animations/SKILL.md"
+    },
+    {
+      "id": "requesting-code-review",
+      "source": "obra/superpowers",
+      "path": "skills/requesting-code-review/SKILL.md",
+      "revision": "2ce8aa15d05bd57213e6f746f953aafb7ded7a8b",
+      "license": "MIT",
+      "assigned_agents": [
+        "project-lead",
+        "release-reviewer"
+      ],
+      "upstream_url": "https://github.com/obra/superpowers/blob/2ce8aa15d05bd57213e6f746f953aafb7ded7a8b/skills/requesting-code-review/SKILL.md"
+    },
+    {
+      "id": "research",
+      "source": "mattpocock/skills",
+      "path": "skills/engineering/research/SKILL.md",
+      "revision": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+      "license": "MIT",
+      "assigned_agents": [
+        "project-lead",
+        "security-auditor",
+        "seo-auditor",
+        "analytics-reviewer",
+        "release-reviewer"
+      ],
+      "upstream_url": "https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/engineering/research/SKILL.md"
+    },
+    {
+      "id": "review-animations",
+      "source": "emilkowalski/skills",
+      "path": "skills/review-animations/SKILL.md",
+      "revision": "a81dbca07f2217b7103e510c0f13f8d5b017afc9",
+      "license": "MIT",
+      "assigned_agents": [
+        "qa-engineer",
+        "ux-reviewer"
+      ],
+      "upstream_url": "https://github.com/emilkowalski/skills/blob/a81dbca07f2217b7103e510c0f13f8d5b017afc9/skills/review-animations/SKILL.md"
+    },
+    {
+      "id": "schema",
+      "source": "coreyhaines31/marketingskills",
+      "path": "skills/schema/SKILL.md",
+      "revision": "88c79f6528a9347420e57ceb1fff9a60de651768",
+      "license": "MIT",
+      "assigned_agents": [
+        "seo-auditor"
+      ],
+      "upstream_url": "https://github.com/coreyhaines31/marketingskills/blob/88c79f6528a9347420e57ceb1fff9a60de651768/skills/schema/SKILL.md"
+    },
+    {
+      "id": "security-and-hardening",
+      "source": "addyosmani/agent-skills",
+      "path": "skills/security-and-hardening/SKILL.md",
+      "revision": "301b02b12bff98e4688e6984af6556802322bbde",
+      "license": "MIT",
+      "assigned_agents": [
+        "security-auditor"
+      ],
+      "upstream_url": "https://github.com/addyosmani/agent-skills/blob/301b02b12bff98e4688e6984af6556802322bbde/skills/security-and-hardening/SKILL.md"
+    },
+    {
+      "id": "seo",
+      "source": "addyosmani/web-quality-skills",
+      "path": "skills/seo/SKILL.md",
+      "revision": "afa8da942115f2961fdbfa80807ea0b232ff6c00",
+      "license": "MIT",
+      "assigned_agents": [
+        "seo-auditor"
+      ],
+      "upstream_url": "https://github.com/addyosmani/web-quality-skills/blob/afa8da942115f2961fdbfa80807ea0b232ff6c00/skills/seo/SKILL.md"
+    },
+    {
+      "id": "seo-audit",
+      "source": "coreyhaines31/marketingskills",
+      "path": "skills/seo-audit/SKILL.md",
+      "revision": "88c79f6528a9347420e57ceb1fff9a60de651768",
+      "license": "MIT",
+      "assigned_agents": [
+        "seo-auditor"
+      ],
+      "upstream_url": "https://github.com/coreyhaines31/marketingskills/blob/88c79f6528a9347420e57ceb1fff9a60de651768/skills/seo-audit/SKILL.md"
+    },
+    {
+      "id": "shipping-and-launch",
+      "source": "addyosmani/agent-skills",
+      "path": "skills/shipping-and-launch/SKILL.md",
+      "revision": "301b02b12bff98e4688e6984af6556802322bbde",
+      "license": "MIT",
+      "assigned_agents": [
+        "release-reviewer"
+      ],
+      "upstream_url": "https://github.com/addyosmani/agent-skills/blob/301b02b12bff98e4688e6984af6556802322bbde/skills/shipping-and-launch/SKILL.md"
+    },
+    {
+      "id": "signup",
+      "source": "coreyhaines31/marketingskills",
+      "path": "skills/signup/SKILL.md",
+      "revision": "88c79f6528a9347420e57ceb1fff9a60de651768",
+      "license": "MIT",
+      "assigned_agents": [
+        "qa-engineer",
+        "analytics-reviewer"
+      ],
+      "upstream_url": "https://github.com/coreyhaines31/marketingskills/blob/88c79f6528a9347420e57ceb1fff9a60de651768/skills/signup/SKILL.md"
+    },
+    {
+      "id": "site-architecture",
+      "source": "coreyhaines31/marketingskills",
+      "path": "skills/site-architecture/SKILL.md",
+      "revision": "88c79f6528a9347420e57ceb1fff9a60de651768",
+      "license": "MIT",
+      "assigned_agents": [
+        "seo-auditor"
+      ],
+      "upstream_url": "https://github.com/coreyhaines31/marketingskills/blob/88c79f6528a9347420e57ceb1fff9a60de651768/skills/site-architecture/SKILL.md"
+    },
+    {
+      "id": "source-driven-development",
+      "source": "addyosmani/agent-skills",
+      "path": "skills/source-driven-development/SKILL.md",
+      "revision": "301b02b12bff98e4688e6984af6556802322bbde",
+      "license": "MIT",
+      "assigned_agents": [
+        "project-lead",
+        "implementation-engineer",
+        "security-auditor"
+      ],
+      "upstream_url": "https://github.com/addyosmani/agent-skills/blob/301b02b12bff98e4688e6984af6556802322bbde/skills/source-driven-development/SKILL.md"
+    },
+    {
+      "id": "spec-driven-development",
+      "source": "addyosmani/agent-skills",
+      "path": "skills/spec-driven-development/SKILL.md",
+      "revision": "301b02b12bff98e4688e6984af6556802322bbde",
+      "license": "MIT",
+      "assigned_agents": [
+        "project-lead",
+        "implementation-engineer"
+      ],
+      "upstream_url": "https://github.com/addyosmani/agent-skills/blob/301b02b12bff98e4688e6984af6556802322bbde/skills/spec-driven-development/SKILL.md"
+    },
+    {
+      "id": "subagent-driven-development",
+      "source": "obra/superpowers",
+      "path": "skills/subagent-driven-development/SKILL.md",
+      "revision": "2ce8aa15d05bd57213e6f746f953aafb7ded7a8b",
+      "license": "MIT",
+      "assigned_agents": [
+        "project-lead",
+        "implementation-engineer"
+      ],
+      "upstream_url": "https://github.com/obra/superpowers/blob/2ce8aa15d05bd57213e6f746f953aafb7ded7a8b/skills/subagent-driven-development/SKILL.md"
+    },
+    {
+      "id": "systematic-debugging",
+      "source": "obra/superpowers",
+      "path": "skills/systematic-debugging/SKILL.md",
+      "revision": "2ce8aa15d05bd57213e6f746f953aafb7ded7a8b",
+      "license": "MIT",
+      "assigned_agents": [
+        "implementation-engineer",
+        "qa-engineer",
+        "security-auditor"
+      ],
+      "upstream_url": "https://github.com/obra/superpowers/blob/2ce8aa15d05bd57213e6f746f953aafb7ded7a8b/skills/systematic-debugging/SKILL.md"
+    },
+    {
+      "id": "tdd",
+      "source": "mattpocock/skills",
+      "path": "skills/engineering/tdd/SKILL.md",
+      "revision": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+      "license": "MIT",
+      "assigned_agents": [
+        "implementation-engineer",
+        "qa-engineer"
+      ],
+      "upstream_url": "https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/engineering/tdd/SKILL.md"
+    },
+    {
+      "id": "test-driven-development",
+      "source": "obra/superpowers",
+      "path": "skills/test-driven-development/SKILL.md",
+      "revision": "2ce8aa15d05bd57213e6f746f953aafb7ded7a8b",
+      "license": "MIT",
+      "assigned_agents": [
+        "implementation-engineer",
+        "qa-engineer"
+      ],
+      "upstream_url": "https://github.com/obra/superpowers/blob/2ce8aa15d05bd57213e6f746f953aafb7ded7a8b/skills/test-driven-development/SKILL.md"
+    },
+    {
+      "id": "to-spec",
+      "source": "mattpocock/skills",
+      "path": "skills/engineering/to-spec/SKILL.md",
+      "revision": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+      "license": "MIT",
+      "assigned_agents": [
+        "project-lead",
+        "seo-auditor"
+      ],
+      "upstream_url": "https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/engineering/to-spec/SKILL.md"
+    },
+    {
+      "id": "to-tickets",
+      "source": "mattpocock/skills",
+      "path": "skills/engineering/to-tickets/SKILL.md",
+      "revision": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+      "license": "MIT",
+      "assigned_agents": [
+        "project-lead"
+      ],
+      "upstream_url": "https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/engineering/to-tickets/SKILL.md"
+    },
+    {
+      "id": "triage",
+      "source": "mattpocock/skills",
+      "path": "skills/engineering/triage/SKILL.md",
+      "revision": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+      "license": "MIT",
+      "assigned_agents": [
+        "project-lead",
+        "qa-engineer"
+      ],
+      "upstream_url": "https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/engineering/triage/SKILL.md"
+    },
+    {
+      "id": "using-git-worktrees",
+      "source": "obra/superpowers",
+      "path": "skills/using-git-worktrees/SKILL.md",
+      "revision": "2ce8aa15d05bd57213e6f746f953aafb7ded7a8b",
+      "license": "MIT",
+      "assigned_agents": [
+        "implementation-engineer"
+      ],
+      "upstream_url": "https://github.com/obra/superpowers/blob/2ce8aa15d05bd57213e6f746f953aafb7ded7a8b/skills/using-git-worktrees/SKILL.md"
+    },
+    {
+      "id": "verification-before-completion",
+      "source": "obra/superpowers",
+      "path": "skills/verification-before-completion/SKILL.md",
+      "revision": "2ce8aa15d05bd57213e6f746f953aafb7ded7a8b",
+      "license": "MIT",
+      "assigned_agents": [
+        "project-lead",
+        "implementation-engineer",
+        "qa-engineer",
+        "security-auditor",
+        "release-reviewer"
+      ],
+      "upstream_url": "https://github.com/obra/superpowers/blob/2ce8aa15d05bd57213e6f746f953aafb7ded7a8b/skills/verification-before-completion/SKILL.md"
+    },
+    {
+      "id": "web-perf",
+      "source": "cloudflare/skills",
+      "path": "skills/web-perf/SKILL.md",
+      "revision": "1a33048817d06df12882cb881dfc754e7039954a",
+      "license": "Apache-2.0",
+      "assigned_agents": [
+        "implementation-engineer",
+        "qa-engineer",
+        "seo-auditor"
+      ],
+      "upstream_url": "https://github.com/cloudflare/skills/blob/1a33048817d06df12882cb881dfc754e7039954a/skills/web-perf/SKILL.md"
+    },
+    {
+      "id": "web-quality-audit",
+      "source": "addyosmani/web-quality-skills",
+      "path": "skills/web-quality-audit/SKILL.md",
+      "revision": "afa8da942115f2961fdbfa80807ea0b232ff6c00",
+      "license": "MIT",
+      "assigned_agents": [
+        "qa-engineer",
+        "seo-auditor",
+        "ux-reviewer"
+      ],
+      "upstream_url": "https://github.com/addyosmani/web-quality-skills/blob/afa8da942115f2961fdbfa80807ea0b232ff6c00/skills/web-quality-audit/SKILL.md"
+    },
+    {
+      "id": "workers-best-practices",
+      "source": "cloudflare/skills",
+      "path": "skills/workers-best-practices/SKILL.md",
+      "revision": "1a33048817d06df12882cb881dfc754e7039954a",
+      "license": "Apache-2.0",
+      "assigned_agents": [
+        "implementation-engineer",
+        "release-reviewer"
+      ],
+      "upstream_url": "https://github.com/cloudflare/skills/blob/1a33048817d06df12882cb881dfc754e7039954a/skills/workers-best-practices/SKILL.md"
+    },
+    {
+      "id": "workers-profiling",
+      "source": "cloudflare/skills",
+      "path": "skills/workers-profiling/SKILL.md",
+      "revision": "1a33048817d06df12882cb881dfc754e7039954a",
+      "license": "Apache-2.0",
+      "assigned_agents": [
+        "implementation-engineer"
+      ],
+      "upstream_url": "https://github.com/cloudflare/skills/blob/1a33048817d06df12882cb881dfc754e7039954a/skills/workers-profiling/SKILL.md"
+    },
+    {
+      "id": "wrangler",
+      "source": "cloudflare/skills",
+      "path": "skills/wrangler/SKILL.md",
+      "revision": "1a33048817d06df12882cb881dfc754e7039954a",
+      "license": "Apache-2.0",
+      "assigned_agents": [
+        "implementation-engineer",
+        "release-reviewer"
+      ],
+      "upstream_url": "https://github.com/cloudflare/skills/blob/1a33048817d06df12882cb881dfc754e7039954a/skills/wrangler/SKILL.md"
+    },
+    {
+      "id": "writing-plans",
+      "source": "obra/superpowers",
+      "path": "skills/writing-plans/SKILL.md",
+      "revision": "2ce8aa15d05bd57213e6f746f953aafb7ded7a8b",
+      "license": "MIT",
+      "assigned_agents": [
+        "project-lead"
+      ],
+      "upstream_url": "https://github.com/obra/superpowers/blob/2ce8aa15d05bd57213e6f746f953aafb7ded7a8b/skills/writing-plans/SKILL.md"
+    }
+  ]
+}

@@ -55,11 +55,16 @@ OpenCode lists project agents from `.opencode/agents/`. The project lead can del
 - `analytics-reviewer`
 - `release-reviewer`
 
-Skills are discovered on demand from `.opencode/skills/<name>/SKILL.md`.
+Skills are discovered on demand from `.opencode/skills/<name>/SKILL.md`. The repository contains **100 pinned external skills** plus **9 first-party UTILORA skills**; see `docs/agent-team/SKILLS-CATALOG.md` and `skills-catalog.json` for provenance, licences, and role assignments.
+
+Each specialist has a per-agent `permission.skill` allow-list. Skills not explicitly assigned to that role are hidden from it. The project lead has cross-functional planning and coordination skills. Skill instructions never grant additional shell, edit, MCP, GitHub, Cloudflare, or deployment permissions.
+
+Validate discovery with `opencode agent list` and `opencode debug skill`. CI runs these OpenCode CLI discovery checks in addition to the static catalogue and permission tests. This verifies that OpenCode can load the definitions; a real model-backed task for each agent still requires an authenticated provider/model.
 
 Useful commands:
 ```bash
 opencode agent list
+opencode debug skill
 opencode mcp list
 npm run test:agent-config
 npm run lint

@@ -5,6 +5,43 @@ permission:
   edit: deny
   bash: ask
   external_directory: deny
+  skill:
+    "*": deny
+    "brainstorming": allow
+    "code-review": allow
+    "codebase-design": allow
+    "competitor-profiling": allow
+    "context-engineering": allow
+    "customer-research": allow
+    "dispatching-parallel-agents": allow
+    "documentation-and-adrs": allow
+    "domain-modeling": allow
+    "doubt-driven-development": allow
+    "executing-plans": allow
+    "finishing-a-development-branch": allow
+    "handoff": allow
+    "improve-codebase-architecture": allow
+    "launch": allow
+    "marketing-ideas": allow
+    "marketing-plan": allow
+    "planning-and-task-breakdown": allow
+    "pr": allow
+    "product-marketing": allow
+    "receiving-code-review": allow
+    "release-safety": allow
+    "requesting-code-review": allow
+    "research": allow
+    "research-sources": allow
+    "safe-implementation": allow
+    "source-driven-development": allow
+    "spec-driven-development": allow
+    "subagent-driven-development": allow
+    "to-spec": allow
+    "to-tickets": allow
+    "triage": allow
+    "utilora-project-rules": allow
+    "verification-before-completion": allow
+    "writing-plans": allow
 ---
 You are the engineering lead for UTILORA.
 
