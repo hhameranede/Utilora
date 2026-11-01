@@ -68,3 +68,12 @@ The product-content test suite verifies:
 - The downloader remains explicitly preview-only.
 
 Visual and functional quality still requires the project CI suite, browser E2E tests, responsive viewport checks, and separate manual device checks. A successful build alone does not prove that a product is complete.
+
+## First implementation pass
+
+The first productization pass introduces the shared product-page shell in `src/pages/ToolPage.tsx` and a task-specific content record for every current tool in `src/registry/tool-experience.registry.ts`. It includes the hero, workspace entry point, highlights, three-step workflow, practical use case, privacy/connection panel, formats and limits, visual-guide link, task-specific default FAQs, and related-tool links.
+
+English and Arabic have unique product positioning, highlights, steps, and use cases for every registered tool. The other six locales use their existing localized tool names/descriptions and localized SEO-title fallback; the new detailed product-story fields currently fall back to English until reviewed translations are added. This is an explicit staged localization gap, not a claim of complete eight-language product copy.
+
+The new automated coverage test runs as `npm run test:products` and is part of the GitHub Actions quality workflow.
+
