@@ -1,0 +1,66 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "playwright": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@playwright/mcp@0.0.83",
+        "--headless",
+        "--isolated"
+      ],
+      "enabled": true,
+      "timeout": 60000
+    },
+    "context7": {
+      "type": "remote",
+      "url": "https://mcp.context7.com/mcp",
+      "enabled": true,
+      "timeout": 30000
+    },
+    "firecrawl": {
+      "type": "remote",
+      "url": "https://mcp.firecrawl.dev/v2/mcp",
+      "enabled": true,
+      "timeout": 60000
+    },
+    "cloudflare-docs": {
+      "type": "remote",
+      "url": "https://docs.mcp.cloudflare.com/mcp",
+      "enabled": true,
+      "timeout": 30000
+    },
+    "cloudflare-api": {
+      "type": "remote",
+      "url": "https://mcp.cloudflare.com/mcp",
+      "enabled": false,
+      "timeout": 60000
+    },
+    "posthog": {
+      "type": "remote",
+      "url": "https://mcp.posthog.com/mcp",
+      "enabled": false,
+      "timeout": 60000
+    }
+  },
+  "permission": {
+    "edit": "ask",
+    "bash": "ask",
+    "external_directory": "deny",
+    "read": {
+      "**/.env": "deny",
+      "**/.env.*": "deny",
+      ".env.example": "allow"
+    },
+    "skill": {
+      "*": "allow"
+    },
+    "playwright_*": "allow",
+    "context7_*": "allow",
+    "firecrawl_*": "allow",
+    "cloudflare-docs_*": "allow",
+    "cloudflare-api_*": "ask",
+    "posthog_*": "ask"
+  }
+}

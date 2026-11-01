@@ -38,6 +38,9 @@ jobs:
       - name: Type check
         run: npm run lint
 
+      - name: Verify agent and MCP configuration
+        run: npm run test:agent-config
+
       - name: Test standalone product content
         run: npm run test:products
 

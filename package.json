@@ -16,7 +16,8 @@
     "test:image": "tsx scripts/test-image-core.ts",
     "test:diagnostics": "tsx --test src/tests/diagnostics.test.ts",
     "e2e": "playwright test",
-    "test:products": "tsx --test src/tests/tool-experience.test.ts"
+    "test:products": "tsx --test src/tests/tool-experience.test.ts",
+    "test:agent-config": "tsx scripts/test-agent-config.ts"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",
