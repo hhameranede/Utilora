@@ -6,16 +6,15 @@ Only routes with complete, useful content should be listed in the production sit
 - Localized home pages for all eight supported locales.
 - Localized tools directory and categories index pages.
 - Localized category hub pages.
-- Localized detail pages for all tools whose registry status is `functional` (currently 32 tools across eight locales).
+- Localized detail pages and `/how-to` guides for all tools whose registry status is `functional` (currently 35 tools across eight locales).
 - Localized informational and legal pages.
 
 The following routes stay out of the sitemap until their content is production-ready:
-- Preview-only tool workspaces whose processing engines are not connected yet (currently four video tools). Functional tool detail pages are indexable and included in the sitemap.
+- The `video-downloader` preview workspace and its guide. The other 35 functional tool pages and their guides are indexable and included in the sitemap.
 - Sample articles and article categories.
-- Sample community categories and discussions.
 - The internal `/dev/templates` route.
 
-Article and community preview pages are marked `noindex, nofollow` by their page metadata. Unknown sample article/topic/category slugs render the not-found page rather than silently falling back to the first sample record.
+Sample article preview pages are marked `noindex, nofollow` by their page metadata. Community/forum pages and routes have been removed. Unknown sample article/topic/category slugs render the not-found page rather than silently falling back to the first sample record.
 
 ## Generate sitemap.xml and robots.txt
 
@@ -52,7 +51,7 @@ Each route is emitted as `dist/<route>.html`. Cloudflare Pages maps an extension
 
 For a Cloudflare Pages deployment, use `npm run build` as the build command, `dist` as the output directory, and set `SITE_URL` to the verified production origin in the production build environment. The root `/` remains the Vite root document; SEO-critical localized routes are prerendered.
 
-**Deployment verification remains pending:** the connected Cloudflare account currently has no UTILORA Pages project, so direct HTTP route status, canonical redirects, and production HTML source have not yet been checked against a live deployment. Do not treat CI output validation as proof of a deployed site.
+**Live deployment verification remains pending:** CI output validation is not proof that deployed route status, canonical redirects, or production HTML are correct. Verify these paths in a normal browser before enabling production deployments or attaching a custom domain.
 
 ## Cloudflare Pages preview environment
 
