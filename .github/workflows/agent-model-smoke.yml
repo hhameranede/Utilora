@@ -273,9 +273,9 @@ jobs:
           cd "$TARGET_DIR"
           set +e
           if [ "$AGENT_NAME" = "visual-reviewer" ]; then
-            opencode run --standalone --dir "$TARGET_DIR" --agent "$AGENT_NAME" --model "$MODEL_ROUTE" --file "$SCREENSHOT" --format json "$PROMPT" > "$RAW_REPORT" 2> "$RUNNER_TEMP/opencode-stderr.txt"
+            opencode run --dir "$TARGET_DIR" --agent "$AGENT_NAME" --model "$MODEL_ROUTE" --file "$SCREENSHOT" --format json "$PROMPT" > "$RAW_REPORT" 2> "$RUNNER_TEMP/opencode-stderr.txt"
           else
-            opencode run --standalone --dir "$TARGET_DIR" --agent "$AGENT_NAME" --model "$MODEL_ROUTE" --format json "$PROMPT" > "$RAW_REPORT" 2> "$RUNNER_TEMP/opencode-stderr.txt"
+            opencode run --dir "$TARGET_DIR" --agent "$AGENT_NAME" --model "$MODEL_ROUTE" --format json "$PROMPT" > "$RAW_REPORT" 2> "$RUNNER_TEMP/opencode-stderr.txt"
           fi
           opencode_status=$?
           set -e
