@@ -65,6 +65,6 @@ test('PDF workspace reports a damaged PDF and accepts a valid replacement', asyn
   });
   await page.getByPlaceholder('1-3, 5, 8-10').fill('1');
   await page.getByRole('button', { name: 'Extract selected pages' }).click();
-  await expect(page.getByText('valid-page-1.pdf')).toBeVisible();
+  await expect(page.getByText('valid-extracted.pdf')).toBeVisible();
   await expect(page.getByRole('alert')).toHaveCount(0);
 });
