@@ -34,7 +34,7 @@ export const FeaturedToolCard: React.FC<FeaturedToolCardProps> = ({ tool, classN
             <span aria-hidden="true" className="text-stone-300">·</span>
             <span className="flex items-center gap-1 text-orange-600 font-medium">
               <Sparkles size={12} />
-              <span>Featured</span>
+              <span>{t('common.featured')}</span>
             </span>
           </div>
         </div>
@@ -49,7 +49,7 @@ export const FeaturedToolCard: React.FC<FeaturedToolCardProps> = ({ tool, classN
 
         {tool.acceptedFormats && (
           <div className="text-xs text-stone-500 mb-6 flex items-center gap-2 flex-wrap">
-            <span className="text-stone-500 font-medium">Supported:</span>
+            <span className="text-stone-600 font-medium">{t('common.supported')}:</span>
             {tool.acceptedFormats.map((fmt) => (
               <span key={fmt} className="font-mono text-[11px] text-stone-600">
                 {fmt}
@@ -61,13 +61,13 @@ export const FeaturedToolCard: React.FC<FeaturedToolCardProps> = ({ tool, classN
 
       <div className="pt-5 border-t border-stone-100 flex items-center justify-between">
         <span className="text-xs text-stone-400 font-mono">
-          {tool.status === 'functional' ? 'Runs locally in your browser' : 'Preview only · engine not connected'}
+          {tool.status !== 'functional' ? t('common.previewOnly') : tool.category === 'website-domain' ? t('common.publicLookup') : t('common.runsLocally')}
         </span>
 
         <Link
           routeType="tool"
           slug={tool.slug}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-xs font-semibold shadow-xs shadow-orange-500/20 transition-all hover:scale-102"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-orange-700 hover:bg-orange-800 text-white text-sm font-semibold shadow-xs shadow-orange-500/20 transition-all hover:scale-102"
         >
           <span>{t('common.openTool')}</span>
           <ArrowRight size={14} className="group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5 transition-transform" />
