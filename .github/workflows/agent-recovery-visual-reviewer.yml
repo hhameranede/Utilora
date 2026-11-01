@@ -1,0 +1,33 @@
+name: UTILORA recovery · Visual Reviewer
+
+on:
+  workflow_dispatch:
+    inputs:
+      utilora_ref:
+        description: Optional immutable UTILORA commit to test; defaults to this workflow revision.
+        required: false
+        type: string
+        default: ""
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/agent-recovery-visual-reviewer.yml"
+      - ".github/workflows/_agent-recovery-reusable.yml"
+      - ".opencode/agents/visual-reviewer.md"
+      - ".opencode/skills/accessibility-ux/**"
+
+permissions:
+  contents: read
+
+jobs:
+  recovery:
+    uses: ./.github/workflows/_agent-recovery-reusable.yml
+    with:
+      utilora_ref: ${{ inputs.utilora_ref || github.sha }}
+      agent_name: "visual-reviewer"
+      model_alias: "nemotron-super-vl"
+      model_id: "nvidia/nemotron-3.5-super-vl-120b-a12b"
+      skill_name: "accessibility-ux"
+      diagnosis_focus: >-
+        The model catalogue, live inference, agent resolution, and real screenshot capture succeeded. The previous run completed two repository/evidence calls but recorded zero calls to the native skill tool. Explicitly load accessibility-ux via the native skill tool before examining the screenshot, then explain any remaining limitation.
+    secrets: inherit
