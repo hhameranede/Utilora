@@ -103,15 +103,38 @@ jobs:
           }
           pathlib.Path(os.environ["RUNNER_TEMP"], "request.json").write_text(json.dumps(payload))
           PY
-          set +e
-          status=$(curl --connect-timeout 10 --max-time 300 --silent --show-error \
-            -o "$RUNNER_TEMP/response.json" -w "%{http_code}" \
-            https://integrate.api.nvidia.com/v1/chat/completions \
-            -H "Authorization: Bearer $NVIDIA_API_KEY" \
-            -H "Content-Type: application/json" \
-            --data-binary @"$RUNNER_TEMP/request.json")
-          curl_exit=$?
-          set -e
+          attempt=1
+          max_attempts=4
+          status=""
+          curl_exit=0
+          while [ "$attempt" -le "$max_attempts" ]; do
+            set +e
+            status=$(curl --connect-timeout 10 --max-time 300 --silent --show-error \
+              -o "$RUNNER_TEMP/response.json" -w "%{http_code}" \
+              https://integrate.api.nvidia.com/v1/chat/completions \
+              -H "Authorization: Bearer $NVIDIA_API_KEY" \
+              -H "Content-Type: application/json" \
+              --data-binary @"$RUNNER_TEMP/request.json")
+            curl_exit=$?
+            set -e
+            if [ "$curl_exit" -eq 0 ] && [ "$status" = "200" ]; then
+              break
+            fi
+            case "$status" in
+              429|500|502|503|504) ;;
+              *)
+                if [ "$curl_exit" -eq 0 ]; then
+                  break
+                fi
+                ;;
+            esac
+            if [ "$attempt" -lt "$max_attempts" ]; then
+              delay=$((attempt * 20))
+              echo "NVIDIA endpoint is temporarily unavailable (HTTP $status, curl $curl_exit); retrying in ${delay}s ($attempt/$max_attempts)."
+              sleep "$delay"
+            fi
+            attempt=$((attempt + 1))
+          done
           export HTTP_STATUS="$status" CURL_EXIT="$curl_exit"
           python3 - <<'PY'
           import json, os, pathlib, sys
