@@ -115,6 +115,7 @@ export async function readFiniteDuration(video: HTMLVideoElement): Promise<numbe
   // Seeking beyond the final packet makes Chromium resolve the actual duration.
   return new Promise<number>((resolve, reject) => {
     let settled = false;
+    const initialTime = Number.isFinite(video.currentTime) ? video.currentTime : 0;
     const timeout = window.setTimeout(() => {
       finish(new Error('The video duration is not available in this browser.'));
     }, 5_000);
@@ -132,8 +133,18 @@ export async function readFiniteDuration(video: HTMLVideoElement): Promise<numbe
       if (settled) return;
       settled = true;
       cleanup();
-      if (value instanceof Error) reject(value);
-      else resolve(value);
+      if (value instanceof Error) {
+        reject(value);
+        return;
+      }
+      // The duration probe seeks to the end; restore the user's preview position.
+      try {
+        const restoreTime = Math.min(initialTime, value);
+        if (Math.abs(video.currentTime - restoreTime) > 0.01) video.currentTime = restoreTime;
+      } catch {
+        // The caller will perform an explicit seek before using a frame.
+      }
+      resolve(value);
     };
 
     const inspect = () => {
@@ -153,7 +164,7 @@ export async function readFiniteDuration(video: HTMLVideoElement): Promise<numbe
     video.addEventListener('error', onError, { once: true });
 
     try {
-      video.currentTime = Number.MAX_SAFE_INTEGER;
+      video.currentTime = 1e101;
       inspect();
     } catch {
       finish(new Error('This browser cannot resolve the duration of this video file.'));
@@ -306,7 +317,9 @@ export async function extractVideoThumbnail(
 
     const timestampSeconds = Math.min(options.timestampSeconds, Math.max(0, duration - 0.04));
     await waitForFrameData(video);
-    if (timestampSeconds > 0.02) await seekTo(video, timestampSeconds);
+    if (Math.abs(video.currentTime - timestampSeconds) > 0.02) {
+      await seekTo(video, timestampSeconds);
+    }
 
     const scale = Math.min(1, Math.sqrt(MAX_THUMBNAIL_PIXELS / (width * height)));
     const canvas = document.createElement('canvas');
