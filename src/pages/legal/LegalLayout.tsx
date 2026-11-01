@@ -35,7 +35,7 @@ export const LegalLayout: React.FC<LegalLayoutProps> = ({
         <Breadcrumbs items={[{ label: title }]} />
 
         <div className="space-y-3 pb-6 border-b border-stone-200">
-          <span className="text-xs font-mono uppercase tracking-widest text-orange-600 font-semibold">
+          <span className="text-xs font-mono uppercase tracking-widest text-orange-700 font-semibold">
             {t('legal.kicker')}
           </span>
           <h1 className="text-3xl sm:text-5xl font-extrabold text-stone-900">
@@ -46,7 +46,7 @@ export const LegalLayout: React.FC<LegalLayoutProps> = ({
               {subtitle}
             </p>
           )}
-          <div className="text-xs font-mono text-stone-400 pt-1">
+          <div className="text-xs font-mono text-stone-500 pt-1">
             {t('legal.lastUpdated')}: {lastUpdated || t('legal.updatedDate')} · {t('legal.effective')}
           </div>
         </div>
