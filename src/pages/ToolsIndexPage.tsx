@@ -6,7 +6,6 @@ import { ToolCard } from '../components/common/ToolCard';
 import { Breadcrumbs } from '../components/common/Breadcrumbs';
 import { Head } from '../seo/Head';
 import { Search, Filter } from 'lucide-react';
-import { CategoryId } from '../registry/tool-types';
 import { matchesSearch } from '../utils/search';
 
 export const ToolsIndexPage: React.FC = () => {
