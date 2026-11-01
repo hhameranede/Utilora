@@ -175,22 +175,20 @@ if (process.env.OPENCODE_RUNTIME_TEST === '1') {
 
     const allowedExternal = catalog.skills.filter((skill) => skill.assigned_agents.includes(agent)).map((skill) => skill.id);
     const allowedAll = [...new Set([...expectedInternalAssignments[agent], ...allowedExternal])];
-    const externalRules = resolved.permission.filter((rule) => rule.permission === 'external_directory' && rule.action === 'allow');
+    const skillRules = resolved.permission.filter((rule) => rule.permission === 'skill');
+    assert.ok(
+      skillRules.some((rule) => rule.pattern === '*' && rule.action === 'deny'),
+      'OpenCode must deny every unlisted skill for ' + agent,
+    );
     for (const name of allowedAll) {
-      const expectedPath = join(root, '.opencode', 'skills', name, '*');
-      assert.ok(
-        externalRules.some((rule) => rule.pattern === expectedPath),
-        'OpenCode did not grant ' + agent + ' access to assigned skill ' + name,
-      );
+      const exactAllow = skillRules.some((rule) => rule.pattern === name && rule.action === 'allow');
+      assert.ok(exactAllow, 'OpenCode did not allow assigned skill ' + name + ' for ' + agent);
     }
 
     const deniedExternal = catalog.skills.filter((skill) => !skill.assigned_agents.includes(agent)).map((skill) => skill.id);
     for (const name of deniedExternal) {
-      const deniedPath = join(root, '.opencode', 'skills', name, '*');
-      assert.ok(
-        !externalRules.some((rule) => rule.pattern === deniedPath),
-        'OpenCode granted ' + agent + ' access to unassigned skill ' + name,
-      );
+      const exactAllow = skillRules.some((rule) => rule.pattern === name && rule.action === 'allow');
+      assert.ok(!exactAllow, 'OpenCode explicitly allowed unassigned skill ' + name + ' for ' + agent);
     }
   }
 
