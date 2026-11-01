@@ -26,5 +26,5 @@ jobs:
       model_id: "nvidia/nemotron-3-ultra-550b-a55b"
       skill_name: "planning-and-task-breakdown"
       diagnosis_focus: >-
-        The previous full smoke run recorded a native call to the assigned planning-and-task-breakdown skill and two completed evidence calls, but the model emitted no usable final assistant text. Perform the same read-only checks, then return a complete concise report with all six exact labels. Do not stop after tool calls; always provide the final report.
+        The previous full smoke run recorded a native call to the assigned planning-and-task-breakdown skill and two completed evidence calls, but the model emitted no usable final assistant text. Perform the same read-only checks, then return a complete concise report with the three required report sections: OUTCOME, EVIDENCE, and LIMITATIONS. Do not stop after tool calls; always provide the final report.
     secrets: inherit

@@ -26,5 +26,5 @@ jobs:
       model_id: "poolside/laguna-xs-2.1"
       skill_name: "systematic-debugging"
       diagnosis_focus: >-
-        The previous full smoke run recorded a native systematic-debugging skill call and three completed evidence calls, but the 416-character assistant response omitted the required report labels. Return the full six-section report, a phased low-risk plan, and the strongest limitation grounded in inspected repository evidence.
+        The previous full smoke run recorded a native systematic-debugging skill call and three completed evidence calls, but the 416-character assistant response omitted the required report labels. Return the three required report sections: OUTCOME, EVIDENCE, and LIMITATIONS, a phased low-risk plan, and the strongest limitation grounded in inspected repository evidence.
     secrets: inherit

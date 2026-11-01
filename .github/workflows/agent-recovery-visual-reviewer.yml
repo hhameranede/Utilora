@@ -26,5 +26,5 @@ jobs:
       model_id: "nvidia/nemotron-3.5-super-vl-120b-a12b"
       skill_name: "accessibility-ux"
       diagnosis_focus: >-
-        The model catalogue, live inference, agent resolution, and real screenshot capture succeeded. The previous run completed two repository/evidence calls but recorded zero calls to the native skill tool. Explicitly load accessibility-ux via the native skill tool before examining the screenshot, then explain any remaining limitation.
+        The model catalogue, live inference, agent resolution, and real screenshot capture succeeded. The previous run completed two repository/evidence calls but recorded zero calls to the native skill tool. Explicitly load accessibility-ux via the native skill tool before examining the screenshot, then return OUTCOME, EVIDENCE, and LIMITATIONS with screenshot-specific evidence.
     secrets: inherit

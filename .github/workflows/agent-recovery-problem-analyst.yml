@@ -26,5 +26,5 @@ jobs:
       model_id: "deepseek-ai/deepseek-v4.1-flash"
       skill_name: "research"
       diagnosis_focus: >-
-        The previous full smoke run recorded a native research skill call and three completed evidence calls, but returned only a short 130-character response without the required role/evidence structure. Produce all six exact report sections, compare a bounded diagnosis with an alternative, and cite concrete repository paths inspected.
+        The previous full smoke run recorded a native research skill call and three completed evidence calls, but returned only a short 130-character response without the required role/evidence structure. Produce the three required report sections: OUTCOME, EVIDENCE, and LIMITATIONS, compare a bounded diagnosis with an alternative, and cite concrete repository paths inspected.
     secrets: inherit
