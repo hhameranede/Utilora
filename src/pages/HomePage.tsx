@@ -9,6 +9,7 @@ import { FeaturedToolCard } from '../components/common/FeaturedToolCard';
 import { Head } from '../seo/Head';
 import { Search, Shield, Zap, Sparkles, ArrowRight, CheckCircle2, Lock, Cpu, Globe } from 'lucide-react';
 import { SAMPLE_ARTICLES } from '../data/articles.data';
+import { matchesSearch } from '../utils/search';
 
 export const HomePage: React.FC = () => {
   const { locale, t } = useI18n();
@@ -18,12 +19,7 @@ export const HomePage: React.FC = () => {
   const featuredTools = getFeaturedTools().slice(0, 2);
 
   const filteredTools = searchQuery.trim()
-    ? TOOLS_LIST.filter((tool) => {
-        const name = (tool.localizedName[locale] || tool.localizedName.en).toLowerCase();
-        const desc = (tool.localizedDescription[locale] || tool.localizedDescription.en).toLowerCase();
-        const q = searchQuery.toLowerCase();
-        return name.includes(q) || desc.includes(q) || tool.slug.includes(q);
-      })
+    ? TOOLS_LIST.filter((tool) => matchesSearch(searchQuery, tool.localizedName, tool.localizedDescription, tool.slug, tool.acceptedFormats))
     : [];
 
   return (
@@ -37,7 +33,7 @@ export const HomePage: React.FC = () => {
         schemaType="WebSite"
       />
 
-      <div className="w-full space-y-24 sm:space-y-32">
+      <div className="w-full space-y-16 sm:space-y-20">
         {/* ========================================== */}
         {/* HERO SECTION                               */}
         {/* ========================================== */}
@@ -61,19 +57,19 @@ export const HomePage: React.FC = () => {
           {/* Hero Search Field */}
           <div className="max-w-2xl mx-auto relative mb-6">
             <div className="relative flex items-center">
-              <Search size={18} className="absolute left-4 text-orange-500 pointer-events-none" />
+              <Search size={18} className="absolute start-4 text-orange-500 pointer-events-none" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder={t('hero.searchPlaceholder')}
-                className="w-full pl-12 pr-4 py-4 rounded-2xl bg-white border border-stone-200 text-sm sm:text-base text-stone-900 placeholder-stone-400 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 shadow-lg shadow-stone-200/50 transition-all"
+                className="w-full ps-12 pe-4 py-4 rounded-2xl bg-white border border-stone-200 text-sm sm:text-base text-stone-900 placeholder-stone-400 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 shadow-lg shadow-stone-200/50 transition-all"
               />
             </div>
 
             {/* Quick Live Search Results Dropdown */}
             {searchQuery.trim() && (
-              <div className="absolute left-0 right-0 top-full mt-2 rounded-2xl bg-white border border-stone-200 p-2 shadow-2xl z-20 text-left max-h-80 overflow-y-auto">
+              <div className="absolute start-0 end-0 top-full mt-2 rounded-2xl bg-white border border-stone-200 p-2 shadow-2xl z-20 text-start max-h-80 overflow-y-auto">
                 {filteredTools.length === 0 ? (
                   <div className="p-4 text-xs text-stone-500 text-center">
                     {t('common.noResults')}
@@ -105,6 +101,15 @@ export const HomePage: React.FC = () => {
           <div className="flex items-center justify-center gap-2 text-xs text-stone-500">
             <Lock size={13} className="text-orange-500" />
             <span>{t('hero.privacyBadge')}</span>
+          </div>
+
+          <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
+            <Link routeType="tools-index" className="inline-flex items-center justify-center rounded-xl bg-orange-700 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-orange-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-700 focus-visible:ring-offset-2">
+              {t('nav.allTools')}
+            </Link>
+            <Link routeType="categories-index" className="inline-flex items-center justify-center rounded-xl border border-stone-300 bg-white px-5 py-3 text-sm font-semibold text-stone-700 transition hover:border-orange-400 hover:text-orange-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-700 focus-visible:ring-offset-2">
+              {t('hero.browseCategories')}
+            </Link>
           </div>
 
           {/* Platform Metrics (Clean unboxed statistics) */}
@@ -178,7 +183,7 @@ export const HomePage: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {popularTools.slice(0, 6).map((tool) => (
+            {popularTools.filter((tool) => !featuredTools.some((featured) => featured.id === tool.id)).slice(0, 6).map((tool) => (
               <ToolCard key={tool.id} tool={tool} />
             ))}
           </div>
@@ -266,7 +271,7 @@ export const HomePage: React.FC = () => {
             <div className="space-y-2 max-w-2xl">
               <div className="flex items-center gap-2 text-xs font-mono text-orange-600 uppercase tracking-wider font-semibold">
                 <Shield size={14} />
-                <span>Zero Server Storage Architecture</span>
+                <span>{t('home.privacyKicker')}</span>
               </div>
               <h3 className="text-xl sm:text-2xl font-bold text-stone-900">
                 {t('home.trustHeading')}
@@ -339,7 +344,7 @@ export const HomePage: React.FC = () => {
                 </div>
 
                 <div className="flex items-center justify-between text-xs font-medium text-stone-500 group-hover:text-orange-600 pt-4 border-t border-stone-100 mt-4">
-                  <span>Read Guide</span>
+                  <span>{t('common.readGuide')}</span>
                   <ArrowRight size={13} className="group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5 transition-transform" />
                 </div>
               </Link>
