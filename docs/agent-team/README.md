@@ -21,6 +21,23 @@ The repository configures one NVIDIA NIM provider with six model IDs using the `
 
 All eight agents are available as contributors. A model smoke result is diagnostic information only; it never blocks a role from participating in the team. The eight roles collaborate on new features and meaningful additions through the Project Lead's team council.
 
+## Official repository registration
+
+All eight are first-class UTILORA agents, not a shortlist or a temporary test group. Each role has a checked-in OpenCode definition under `.opencode/agents/`, a model mapping in `opencode.json`, and a role entry in the shared skill manifest. The Project Lead can convene all seven specialists regardless of any smoke-test outcome.
+
+| Agent ID | Registered definition | Default model |
+|---|---|---|
+| `project-lead` | `.opencode/agents/project-lead.md` | `nvidia/nemotron-3-ultra-550b-a55b` |
+| `problem-analyst` | `.opencode/agents/problem-analyst.md` | `deepseek-ai/deepseek-v4.1-flash` |
+| `implementation-engineer` | `.opencode/agents/implementation-engineer.md` | `minimaxai/minimax-m3.1-flash` |
+| `fast-task-engineer` | `.opencode/agents/fast-task-engineer.md` | `z-ai/glm-5.3-flash` |
+| `visual-reviewer` | `.opencode/agents/visual-reviewer.md` | `nvidia/nemotron-3.5-super-vl-120b-a12b` |
+| `long-horizon-engineer` | `.opencode/agents/long-horizon-engineer.md` | `poolside/laguna-xs-2.1` |
+| `qa-engineer` | `.opencode/agents/qa-engineer.md` | `deepseek-ai/deepseek-v4.1-flash` |
+| `security-auditor` | `.opencode/agents/security-auditor.md` | `nvidia/nemotron-3-ultra-550b-a55b` |
+
+The eight roles are registered together. Diagnostic response checks measure routing and completion quality; they are not admission, activation, or availability gates.
+
 SEO, analytics and release-review skills remain available in the shared library. No skill is assigned to a role; agents choose freely.
 
 ## Skill library
