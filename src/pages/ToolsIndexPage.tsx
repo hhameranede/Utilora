@@ -74,13 +74,13 @@ export const ToolsIndexPage: React.FC = () => {
 
           {/* Search Field */}
           <div className="relative w-full md:w-72">
-            <Search size={14} className="absolute start-3.5 top-1/2 -translate-y-1/2 text-orange-500" />
+            <Search size={14} className="absolute start-3.5 top-1/2 -translate-y-1/2 text-orange-600" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={t('tools.searchPlaceholder')}
-              className="w-full ps-9 pe-3 py-2 rounded-xl bg-white border border-stone-200 text-xs text-stone-900 placeholder-stone-400 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 shadow-xs transition-all"
+              className="w-full ps-9 pe-3 py-2 rounded-xl bg-white border border-stone-200 text-xs text-stone-900 placeholder-stone-500 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 shadow-xs transition-all"
             />
           </div>
         </div>
@@ -89,7 +89,7 @@ export const ToolsIndexPage: React.FC = () => {
 
         {/* Tool Cards Grid */}
         {filteredTools.length === 0 ? (
-          <div className="py-16 text-center text-stone-400 text-sm">
+          <div className="py-16 text-center text-stone-500 text-sm">
             {t('common.noResults')}
           </div>
         ) : (
