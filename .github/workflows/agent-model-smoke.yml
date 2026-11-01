@@ -15,19 +15,32 @@ on:
       - "opencode.json"
       - ".opencode/agents/**"
       - ".opencode/skills/**"
-  push:
-    branches: ["feat/autonomous-agent-foundation-2026-11-01"]
-    paths:
-      - ".github/workflows/agent-model-smoke.yml"
-      - "opencode.json"
-      - ".opencode/agents/**"
-      - ".opencode/skills/**"
 
 permissions:
   contents: read
 
 jobs:
+  credential-preflight:
+    name: Verify UTILORA API credential is configured
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Require the existing NVIDIA NIM key in UTILORA repository secrets
+        env:
+          NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+        run: |
+          set -euo pipefail
+          set +x
+          if [ -z "$NVIDIA_API_KEY" ]; then
+            echo "::error::UTILORA is missing the repository Actions secret NVIDIA_API_KEY."
+            echo "::error::Add the existing NVIDIA NIM credential under UTILORA > Settings > Secrets and variables > Actions."
+            echo "::error::Do not paste the key into source files, logs, issues, pull requests, or chat."
+            exit 1
+          fi
+          echo "UTILORA repository credential is present; the value remains masked."
+
   agent-smoke:
+    needs: credential-preflight
     name: "${{ matrix.agent }} · ${{ matrix.model_id }}"
     runs-on: ubuntu-latest
     timeout-minutes: 20
