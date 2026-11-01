@@ -343,7 +343,7 @@ await run('executes all six image tool adapters and returns truthful output meta
     assert.equal(resized.data.width, 2);
     assert.equal(resized.data.height, 1);
     assert.equal(resizerMock.canvases[0].width, 2);
-    assert.equal(resizedMock.canvases[0].height, 1);
+    assert.equal(resizerMock.canvases[0].height, 1);
     assert.equal(resizerMock.bitmaps.every((bitmap) => bitmap.closed), true);
   } finally {
     resizerMock.restore();
