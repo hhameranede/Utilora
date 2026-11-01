@@ -1,4 +1,5 @@
 import React from 'react';
+import { useI18n } from '../../i18n';
 import { TemplatePdfTools } from './TemplatePdfTools';
 import { ToolDefinition } from '../../registry/tool-types';
 import { TemplateASingleFile } from './TemplateASingleFile';
@@ -23,7 +24,8 @@ interface ToolWorkspaceResolverProps {
 }
 
 export const ToolWorkspaceResolver: React.FC<ToolWorkspaceResolverProps> = ({ tool }) => {
-  const toolName = tool.localizedName.en;
+  const { locale } = useI18n();
+  const toolName = tool.localizedName[locale] || tool.localizedName.en;
 
   if (tool.category === 'image') {
     return (

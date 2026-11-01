@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useI18n } from '../../i18n';
 import { ArrowDown, ArrowUp, Download, FileText, RefreshCw, Upload, AlertCircle, X } from 'lucide-react';
 import { countPdfPages, imagesToPdf, mergePdfFiles, renderPdfToImages, rotatePdfFile, splitPdfFile } from '../../engines/pdf/browser';
 
@@ -10,6 +11,7 @@ interface TemplatePdfToolsProps {
 interface OutputFile { name: string; blob: Blob; note: string; }
 
 export const TemplatePdfTools: React.FC<TemplatePdfToolsProps> = ({ toolName, toolSlug }) => {
+  const { t } = useI18n();
   const [files, setFiles] = useState<File[]>([]);
   const [outputs, setOutputs] = useState<OutputFile[]>([]);
   const [busy, setBusy] = useState(false);
@@ -63,11 +65,11 @@ export const TemplatePdfTools: React.FC<TemplatePdfToolsProps> = ({ toolName, to
 
   const runTool = async () => {
     if (!files.length) {
-      setError(isImages ? 'Choose at least one JPG or PNG image.' : 'Choose a PDF file first.');
+      setError(isImages ? t('pdfWorkspace.errorChooseImage') : t('pdfWorkspace.errorChoosePdf'));
       return;
     }
     if (!multiple && files.length > 1) {
-      setError('This tool accepts one file at a time.');
+      setError(t('pdfWorkspace.errorSingleFile'));
       return;
     }
     setBusy(true);
@@ -78,29 +80,29 @@ export const TemplatePdfTools: React.FC<TemplatePdfToolsProps> = ({ toolName, to
       if (toolSlug === 'merge-pdf') {
         const result = await mergePdfFiles(files);
         setOutputs([{ name: 'merged-document.pdf', blob: result.blob, note: `${result.pageCount} pages · ${formatBytes(result.size)}` }]);
-        setMessage('PDF files merged successfully.');
+        setMessage(t('pdfWorkspace.successMerged'));
       } else if (toolSlug === 'jpg-to-pdf') {
         const result = await imagesToPdf(files, pageSize, margin, orientation);
         setOutputs([{ name: 'images-to-pdf.pdf', blob: result.blob, note: `${result.pageCount} page(s)` }]);
-        setMessage('Images converted to PDF successfully.');
+        setMessage(t('pdfWorkspace.successImagesConverted'));
       } else if (toolSlug === 'split-pdf') {
         const result = await splitPdfFile(files[0], ranges, burst);
         setOutputs(result.map((item) => ({ name: item.filename, blob: item.blob, note: `${item.pageCount} page(s)` })));
-        setMessage(`Created ${result.length} PDF output file(s).`);
+        setMessage(t('pdfWorkspace.createdOutputFiles').replace('{count}', String(result.length)));
       } else if (toolSlug === 'rotate-pdf') {
         const pages = targetPages.trim().toLowerCase() === 'all'
           ? 'all'
           : targetPages.split(',').map((part) => Number(part.trim()) - 1);
         const result = await rotatePdfFile(files[0], rotation, pages);
         setOutputs([{ name: files[0].name.replace(/\.pdf$/i, '') + '-rotated.pdf', blob: result.blob, note: `${result.rotatedPageCount} page(s) rotated` }]);
-        setMessage('PDF page rotation saved.');
+        setMessage(t('pdfWorkspace.successRotationSaved'));
       } else if (toolSlug === 'pdf-to-jpg') {
         const result = await renderPdfToImages(files[0], dpi, imageFormat);
         setOutputs(result.map((item) => ({ name: item.filename, blob: item.blob, note: `Page ${item.pageNumber}` })));
-        setMessage(`Rendered ${result.length} page image(s).`);
+        setMessage(t('pdfWorkspace.renderedPageImages').replace('{count}', String(result.length)));
       } else if (toolSlug === 'pdf-page-counter') {
         const result = await countPdfPages(files[0]);
-        setMessage(`${result.title}: ${result.pageCount} page(s) · ${formatBytes(result.size)} · ${result.hasFormFields ? 'Contains fillable form fields' : 'No fillable form fields detected'}.`);
+        setMessage(`${result.title}: ${result.pageCount} ${result.pageCount === 1 ? t('pdfWorkspace.page') : t('pdfWorkspace.pages')} · ${formatBytes(result.size)} · ${result.hasFormFields ? t('pdfWorkspace.containsFormFields') : t('pdfWorkspace.noFillableForms')}.`);
       }
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'PDF processing failed.');
@@ -120,15 +122,15 @@ export const TemplatePdfTools: React.FC<TemplatePdfToolsProps> = ({ toolName, to
 
   const downloadAll = () => outputs.forEach((item) => downloadFile(item));
 
-  const inputLabel = isImages ? 'Choose JPG or PNG images' : multiple ? 'Choose PDF files to merge' : 'Choose a PDF file';
+  const inputLabel = isImages ? t('pdfWorkspace.chooseImages') : multiple ? t('pdfWorkspace.chooseMergeFiles') : t('pdfWorkspace.choosePdf');
   const actionLabel = {
-    'merge-pdf': 'Merge PDFs',
-    'split-pdf': burst ? 'Split every page' : 'Extract selected pages',
-    'rotate-pdf': 'Rotate pages',
-    'jpg-to-pdf': 'Create PDF',
-    'pdf-to-jpg': 'Convert pages to images',
-    'pdf-page-counter': 'Count PDF pages',
-  }[toolSlug] ?? 'Process PDF';
+    'merge-pdf': t('pdfWorkspace.mergeAction'),
+    'split-pdf': burst ? t('pdfWorkspace.splitAllAction') : t('pdfWorkspace.extractAction'),
+    'rotate-pdf': t('pdfWorkspace.rotateAction'),
+    'jpg-to-pdf': t('pdfWorkspace.createPdfAction'),
+    'pdf-to-jpg': t('pdfWorkspace.convertToImagesAction'),
+    'pdf-page-counter': t('pdfWorkspace.countPagesAction'),
+  }[toolSlug] ?? t('pdfWorkspace.processAction');
 
   return (
     <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-5">
@@ -137,12 +139,12 @@ export const TemplatePdfTools: React.FC<TemplatePdfToolsProps> = ({ toolName, to
           <input type="file" accept={accept} multiple={multiple} onChange={(event) => chooseFiles(event.target.files)} className="hidden" />
           <span className="mx-auto w-12 h-12 rounded-xl bg-orange-50 border border-orange-100 text-orange-600 flex items-center justify-center"><Upload size={22} /></span>
           <span className="block mt-3 text-sm font-semibold text-stone-900">{inputLabel}</span>
-          <span className="block mt-1 text-xs text-stone-500">{isImages ? 'JPG and PNG · Up to 100 images · Processed locally' : 'PDF · Up to 100 MB per file · Processed locally'}</span>
+          <span className="block mt-1 text-xs text-stone-500">{isImages ? t('pdfWorkspace.imageSummary') : t('pdfWorkspace.pdfSummary')}</span>
         </label>
 
         <div className="p-4 rounded-2xl bg-white border border-stone-200 shadow-xs space-y-3">
-          <div className="flex items-center justify-between gap-3"><h3 className="text-xs font-semibold text-stone-800">Selected files ({files.length})</h3><button type="button" onClick={() => { setFiles([]); setOutputs([]); setMessage(''); setError(''); }} className="text-[11px] text-stone-500 hover:text-red-600">Clear list</button></div>
-          {files.length === 0 ? <p className="text-xs text-stone-400 py-4 text-center">No files selected yet.</p> : (
+          <div className="flex items-center justify-between gap-3"><h3 className="text-xs font-semibold text-stone-800">{t('pdfWorkspace.selectedFiles')} ({files.length})</h3><button type="button" onClick={() => { setFiles([]); setOutputs([]); setMessage(''); setError(''); }} className="text-[11px] text-stone-500 hover:text-red-600">{t('pdfWorkspace.clearList')}</button></div>
+          {files.length === 0 ? <p className="text-xs text-stone-400 py-4 text-center">{t('pdfWorkspace.noFilesSelected')}</p> : (
             <ul className="space-y-2 max-h-72 overflow-y-auto">
               {files.map((file, index) => (
                 <li key={file.name + file.size + index} className="flex items-center justify-between gap-2 rounded-xl bg-stone-50 border border-stone-100 p-3">
@@ -153,11 +155,11 @@ export const TemplatePdfTools: React.FC<TemplatePdfToolsProps> = ({ toolName, to
                   <div className="flex items-center gap-1 shrink-0">
                     {multiple && (
                       <>
-                        <button type="button" onClick={() => moveFile(index, 'up')} disabled={index === 0} className="p-1.5 rounded-md hover:bg-stone-200 text-stone-500 disabled:opacity-30" title="Move file up"><ArrowUp size={14} /></button>
-                        <button type="button" onClick={() => moveFile(index, 'down')} disabled={index === files.length - 1} className="p-1.5 rounded-md hover:bg-stone-200 text-stone-500 disabled:opacity-30" title="Move file down"><ArrowDown size={14} /></button>
+                        <button type="button" onClick={() => moveFile(index, 'up')} disabled={index === 0} className="p-1.5 rounded-md hover:bg-stone-200 text-stone-500 disabled:opacity-30" title={t('pdfWorkspace.moveFileUp')}><ArrowUp size={14} /></button>
+                        <button type="button" onClick={() => moveFile(index, 'down')} disabled={index === files.length - 1} className="p-1.5 rounded-md hover:bg-stone-200 text-stone-500 disabled:opacity-30" title={t('pdfWorkspace.moveFileDown')}><ArrowDown size={14} /></button>
                       </>
                     )}
-                    <button type="button" onClick={() => removeFile(index)} className="p-1.5 rounded-md hover:bg-red-50 text-stone-400 hover:text-red-600" title="Remove file"><X size={14} /></button>
+                    <button type="button" onClick={() => removeFile(index)} className="p-1.5 rounded-md hover:bg-red-50 text-stone-400 hover:text-red-600" title={t('pdfWorkspace.removeFile')}><X size={14} /></button>
                   </div>
                 </li>
               ))}
@@ -167,15 +169,15 @@ export const TemplatePdfTools: React.FC<TemplatePdfToolsProps> = ({ toolName, to
 
         {outputs.length > 0 && (
           <div className="p-4 rounded-2xl bg-orange-50/60 border border-orange-200/80 space-y-3">
-            <div className="flex items-center justify-between gap-3"><h3 className="text-xs font-bold text-stone-900">Output files ({outputs.length})</h3>{outputs.length > 1 && <button type="button" onClick={downloadAll} className="text-xs font-semibold text-orange-800 underline">Download all</button>}</div>
-            {outputs.map((output) => <div key={output.name} className="flex items-center justify-between gap-3 bg-white border border-stone-200 rounded-xl p-3"><div className="min-w-0"><p className="text-xs font-semibold text-stone-900 truncate">{output.name}</p><p className="text-[11px] text-stone-500">{output.note} · {formatBytes(output.blob.size)}</p></div><button type="button" onClick={() => downloadFile(output)} className="shrink-0 p-2 rounded-lg bg-stone-900 text-white" aria-label={`Download ${output.name}`}><Download size={15} /></button></div>)}
+            <div className="flex items-center justify-between gap-3"><h3 className="text-xs font-bold text-stone-900">{t('pdfWorkspace.outputFiles')} ({outputs.length})</h3>{outputs.length > 1 && <button type="button" onClick={downloadAll} className="text-xs font-semibold text-orange-800 underline">{t('pdfWorkspace.downloadAll')}</button>}</div>
+            {outputs.map((output) => <div key={output.name} className="flex items-center justify-between gap-3 bg-white border border-stone-200 rounded-xl p-3"><div className="min-w-0"><p className="text-xs font-semibold text-stone-900 truncate">{output.name}</p><p className="text-[11px] text-stone-500">{output.note} · {formatBytes(output.blob.size)}</p></div><button type="button" onClick={() => downloadFile(output)} className="shrink-0 p-2 rounded-lg bg-stone-900 text-white" aria-label={`${t('pdfWorkspace.downloadFile')} ${output.name}`}><Download size={15} /></button></div>)}
           </div>
         )}
       </section>
 
       <aside className="lg:col-span-5 min-w-0">
         <div className="p-5 sm:p-6 rounded-2xl bg-white border border-stone-200 shadow-xs space-y-5">
-          <div className="flex items-center gap-2 pb-3 border-b border-stone-100"><FileText size={17} className="text-orange-600" /><h2 className="text-sm font-semibold text-stone-900">{toolName} settings</h2></div>
+          <div className="flex items-center gap-2 pb-3 border-b border-stone-100"><FileText size={17} className="text-orange-600" /><h2 className="text-sm font-semibold text-stone-900">{toolName} · {t('pdfWorkspace.settingsSuffix')}</h2></div>
 
           {isSplit && (
             <div className="space-y-3">
@@ -208,10 +210,10 @@ export const TemplatePdfTools: React.FC<TemplatePdfToolsProps> = ({ toolName, to
             </div>
           )}
 
-          <button type="button" onClick={runTool} disabled={!files.length || busy} className="w-full py-3 rounded-xl bg-stone-900 hover:bg-stone-800 disabled:opacity-40 text-white text-xs font-semibold flex items-center justify-center gap-2"><RefreshCw size={15} className={busy ? 'animate-spin' : ''} />{busy ? 'Processing…' : actionLabel}</button>
+          <button type="button" onClick={runTool} disabled={!files.length || busy} className="w-full py-3 rounded-xl bg-stone-900 hover:bg-stone-800 disabled:opacity-40 text-white text-xs font-semibold flex items-center justify-center gap-2"><RefreshCw size={15} className={busy ? 'animate-spin' : ''} />{busy ? t('pdfWorkspace.processing') : actionLabel}</button>
           {message && <p role="status" className="text-xs text-emerald-700">{message}</p>}
           {error && <p role="alert" className="text-xs text-red-600 flex items-start gap-1.5"><AlertCircle size={14} className="shrink-0 mt-0.5" />{error}</p>}
-          <p className="pt-3 border-t border-stone-100 text-[11px] leading-relaxed text-stone-500">PDF processing runs locally in your browser. Files are not uploaded. Large documents may use significant device memory.</p>
+          <p className="pt-3 border-t border-stone-100 text-[11px] leading-relaxed text-stone-500">{t('pdfWorkspace.privacyNotice')}</p>
         </div>
       </aside>
     </div>
