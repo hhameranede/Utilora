@@ -182,10 +182,12 @@
   },
   "category": {
     "featuredWorkspace": "مساحة عمل مميزة",
-    "allTools": "جميع أدوات",
+    "allTools": "جميع الأدوات",
     "chooseWorkspace": "اختر أداة لفتح مساحة العمل الخاصة بها.",
     "searchPlaceholder": "ابحث داخل هذه الفئة...",
-    "relatedCategories": "فئات ذات صلة"
+    "relatedCategories": "فئات ذات صلة",
+    "toolsInSuite": "أداة في هذه الفئة",
+    "functionalCount": "جاهزة للاستخدام"
   },
   "search": {
     "navigate": "التنقل",
