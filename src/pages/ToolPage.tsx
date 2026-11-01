@@ -40,8 +40,18 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
   const example = experience
     ? localizedExperience(experience.example, locale)
     : toolDesc;
-  const seoTitle = tool.seo.metaTitle[locale] || tool.seo.metaTitle.en || `${toolName} | UTILORA`;
-  const seoDescription = tool.seo.metaDescription[locale] || tool.seo.metaDescription.en || toolDesc;
+  const localizedTitleSuffix: Record<string, string> = {
+    en: 'Free Online Tool | UTILORA',
+    ar: 'أداة مجانية عبر الإنترنت | يوتيلورا',
+    fr: 'Outil en ligne gratuit | UTILORA',
+    es: 'Herramienta en línea gratuita | UTILORA',
+    pt: 'Ferramenta online gratuita | UTILORA',
+    hi: 'मुफ़्त ऑनलाइन टूल | UTILORA',
+    zh: '免费在线工具 | UTILORA',
+    bn: 'বিনামূল্যে অনলাইন টুল | UTILORA',
+  };
+  const seoTitle = tool.seo.metaTitle[locale] || `${toolName} — ${localizedTitleSuffix[locale] || localizedTitleSuffix.en}`;
+  const seoDescription = tool.seo.metaDescription[locale] || toolDesc;
   const localProcessingText = locale === 'ar'
     ? 'تتم معالجة الملفات أو النصوص محلياً داخل متصفحك، ولا تُرفع إلى خوادم UTILORA.'
     : 'Files and text are processed locally in your browser and are not uploaded to UTILORA servers.';
