@@ -182,10 +182,12 @@
   },
   "category": {
     "featuredWorkspace": "विशेष कार्यक्षेत्र",
-    "allTools": "के सभी टूल",
+    "allTools": "सभी टूल",
     "chooseWorkspace": "अपना कार्यक्षेत्र खोलने के लिए नीचे एक टूल चुनें।",
     "searchPlaceholder": "इस श्रेणी के टूल फ़िल्टर करें...",
-    "relatedCategories": "संबंधित श्रेणियाँ"
+    "relatedCategories": "संबंधित श्रेणियाँ",
+    "toolsInSuite": "इस श्रेणी के टूल",
+    "functionalCount": "उपयोग के लिए तैयार"
   },
   "search": {
     "navigate": "नेविगेट करें",
