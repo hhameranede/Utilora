@@ -148,6 +148,7 @@ test('image cropper maps mobile touch dragging to source pixel coordinates', asy
   const processButton = page.getByRole('button', { name: 'Process image' });
   await expect(processButton).toBeEnabled();
 
+  await preview.scrollIntoViewIfNeeded();
   const bounds = await preview.boundingBox();
   expect(bounds).not.toBeNull();
   if (!bounds) throw new Error('Image preview has no measurable bounds.');
