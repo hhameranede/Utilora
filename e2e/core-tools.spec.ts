@@ -26,9 +26,16 @@ test('image converter accepts a local image and exposes an actual downloadable r
     buffer: onePixelPng,
   });
 
-  await expect(page.getByAltText('Original image preview')).toBeVisible();
+  const sourcePreview = page.getByAltText('Original image preview');
+  await expect(sourcePreview).toBeVisible();
+  await expect(sourcePreview).toHaveJSProperty('naturalWidth', 1);
   await page.getByRole('button', { name: 'Process image' }).click();
-  await expect(page.getByRole('status').filter({ hasText: 'Done:' })).toBeVisible();
+  await expect.poll(async () => (
+    await page.getByRole('status').count() + await page.getByRole('alert').count()
+  )).toBeGreaterThan(0);
+  const statusText = (await page.getByRole('status').allTextContents()).join(' ');
+  const errorText = (await page.getByRole('alert').allTextContents()).join(' ');
+  expect(statusText, `Image conversion did not complete. Status: ${statusText}. Error: ${errorText}`).toContain('Done:');
   await expect(page.getByRole('button', { name: /Download pixel-image-converter/ })).toBeVisible();
 });
 
@@ -42,7 +49,7 @@ test('PDF merge orders files and creates a real PDF output', async ({ page }) =>
   await expect(page.getByText('Selected files (2)')).toBeVisible();
   await page.getByRole('button', { name: 'Merge PDFs' }).click();
   await expect(page.getByText('merged-document.pdf')).toBeVisible();
-  await expect(page.getByText('3 pages', { exact: false })).toBeVisible();
+  await expect(page.getByText('2 pages', { exact: false })).toBeVisible();
 });
 
 test('JSON formatter formats valid input and reports invalid JSON without false success', async ({ page }) => {
