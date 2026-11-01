@@ -100,13 +100,13 @@ export const ToolWorkspaceResolver: React.FC<ToolWorkspaceResolverProps> = ({ to
       );
 
     case 'template-j-domain-lookup':
-      return <TemplateJDomainLookup toolName={toolName} />;
+      return <TemplateJDomainLookup toolName={toolName} toolSlug={tool.slug} />;
 
     case 'template-k-dns-lookup':
       return <TemplateKDnsLookup toolName={toolName} />;
 
     case 'template-l-website-diagnostics':
-      return <TemplateLWebsiteDiagnostics toolName={toolName} />;
+      return <TemplateLWebsiteDiagnostics toolName={toolName} toolSlug={tool.slug} />;
 
     case 'template-m-video-editor':
       return <TemplateMVideoEditor toolName={toolName} />;

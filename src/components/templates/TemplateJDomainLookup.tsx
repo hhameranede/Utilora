@@ -1,97 +1,124 @@
 import React, { useState } from 'react';
-import { Globe, Search, Calendar, Shield, Server, ExternalLink, AlertCircle } from 'lucide-react';
-import { useI18n } from '../../i18n';
-import { DisabledAction } from '../common/DisabledAction';
+import { AlertCircle, CalendarDays, Globe2, LoaderCircle, RefreshCw, Server, ShieldCheck } from 'lucide-react';
+import { lookupDomainRdap, type RdapDomainResult } from '../../engines/diagnostics/browser';
 
 interface TemplateJDomainLookupProps {
   toolName: string;
+  toolSlug: string;
 }
 
-export const TemplateJDomainLookup: React.FC<TemplateJDomainLookupProps> = ({ toolName }) => {
-  const { t } = useI18n();
-  const [domain, setDomain] = useState<string>('example.com');
+export const TemplateJDomainLookup: React.FC<TemplateJDomainLookupProps> = ({ toolName, toolSlug }) => {
+  const isAgeChecker = toolSlug === 'domain-age-checker';
+  const [domain, setDomain] = useState('example.com');
+  const [result, setResult] = useState<RdapDomainResult | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+
+  const runLookup = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setBusy(true);
+    setError('');
+    setResult(null);
+    try {
+      setResult(await lookupDomainRdap(domain));
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'The registry lookup could not be completed.');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const formatDate = (value: string | null) => value
+    ? new Date(value).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })
+    : 'Not disclosed by registry';
+  const ageText = result?.ageDays === null || result?.ageDays === undefined
+    ? 'Not disclosed'
+    : (result.ageYears || 0) + ' years · ' + result.ageDays.toLocaleString() + ' days';
 
   return (
-    <div className="w-full space-y-6">
-      {/* Search Bar Input */}
-      <div className="p-5 sm:p-6 rounded-3xl bg-white border border-stone-200/90 shadow-xs space-y-3">
-        <label className="text-xs font-semibold text-stone-900 block">
-          Target Domain Name
-        </label>
+    <div className="w-full space-y-5">
+      <form onSubmit={runLookup} className="p-5 sm:p-6 rounded-2xl bg-white border border-stone-200 shadow-xs space-y-3">
+        <label htmlFor="rdap-domain" className="text-xs font-semibold text-stone-900 block">Domain name</label>
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
-            <Globe size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" />
+            <Globe2 size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" />
             <input
-              type="text"
+              id="rdap-domain"
               value={domain}
-              onChange={(e) => setDomain(e.target.value)}
-              placeholder="example.com or sub.domain.org"
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-xs sm:text-sm font-mono text-stone-900 placeholder-stone-400 focus:outline-none focus:border-orange-500 focus:bg-white transition-colors"
+              onChange={(event) => setDomain(event.target.value)}
+              placeholder="example.com"
+              autoComplete="url"
+              spellCheck={false}
+              className="w-full pl-10 pr-4 py-3 rounded-xl bg-stone-50 border border-stone-200 text-sm font-mono text-stone-900 focus:outline-none focus:border-amber-500"
             />
           </div>
-          <DisabledAction label="Query RDAP Registry" size="md" />
+          <button type="submit" disabled={busy || !domain.trim()} className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-stone-900 text-white text-xs font-semibold hover:bg-stone-800 disabled:opacity-50">
+            {busy ? <LoaderCircle size={15} className="animate-spin" /> : <RefreshCw size={15} />}
+            {busy ? 'Looking up…' : isAgeChecker ? 'Check domain age' : 'Query RDAP'}
+          </button>
         </div>
-        <p className="text-[11px] text-stone-500">
-          Enter an apex domain or subdomain without http:// or trailing slashes.
-        </p>
-      </div>
+        <p className="text-[11px] text-stone-500">Uses public RDAP registration data. Some registries redact dates or contact details.</p>
+      </form>
 
-      {/* Result Cards Workspace (Explicitly marked as Sample/Demo UI Data) */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between text-xs px-1">
-          <span className="font-semibold text-stone-900">Registration Records (Sample Data)</span>
-          <span className="text-[11px] font-mono text-orange-700 bg-orange-50 border border-orange-200 px-2 py-0.5 rounded font-medium">
-            Preview Schema
-          </span>
+      {error && <div role="alert" className="p-4 rounded-xl border border-red-200 bg-red-50 text-xs text-red-800 flex gap-2"><AlertCircle size={15} className="shrink-0 mt-0.5" />{error}</div>}
+
+      {result && (
+        <div className="space-y-4">
+          <div role="status" className="flex flex-wrap items-center justify-between gap-2 px-1 text-xs">
+            <span className="font-semibold text-stone-900">Live registry result for <span className="font-mono">{result.domain}</span></span>
+            <span className="text-stone-500">Source: RDAP</span>
+          </div>
+
+          {isAgeChecker ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
+              <Metric label="Registration date" value={formatDate(result.createdAt)} icon={<CalendarDays size={15} />} />
+              <Metric label="Domain age" value={ageText} icon={<RefreshCw size={15} />} />
+              <Metric label="Expiration date" value={formatDate(result.expiresAt)} icon={<CalendarDays size={15} />} />
+              <Metric label="Registrar" value={result.registrar || 'Not disclosed'} icon={<ShieldCheck size={15} />} />
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
+              <Metric label="Domain handle" value={result.handle || 'Not disclosed'} icon={<Globe2 size={15} />} />
+              <Metric label="Registrar" value={result.registrar || 'Not disclosed'} icon={<ShieldCheck size={15} />} />
+              <Metric label="Last updated" value={formatDate(result.updatedAt)} icon={<CalendarDays size={15} />} />
+            </div>
+          )}
+
+          {result.status.length > 0 && (
+            <section className="p-4 rounded-2xl bg-white border border-stone-200 shadow-xs space-y-2">
+              <h3 className="text-xs font-semibold text-stone-900">Registry status</h3>
+              <div className="flex flex-wrap gap-2">{result.status.map((item) => <span key={item} className="px-2.5 py-1 rounded-lg border border-stone-200 bg-stone-50 text-[11px] font-mono text-stone-700">{item}</span>)}</div>
+            </section>
+          )}
+
+          {result.nameservers.length > 0 && (
+            <section className="p-4 rounded-2xl bg-white border border-stone-200 shadow-xs space-y-3">
+              <h3 className="text-xs font-semibold text-stone-900 flex items-center gap-2"><Server size={15} className="text-amber-600" />Authoritative nameservers</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">{result.nameservers.map((server) => <div key={server} className="p-3 rounded-xl bg-stone-50 border border-stone-100 text-xs font-mono text-stone-700 break-all">{server}</div>)}</div>
+            </section>
+          )}
+
+          {!isAgeChecker && (
+            <section className="p-4 rounded-2xl bg-white border border-stone-200 shadow-xs space-y-3">
+              <h3 className="text-xs font-semibold text-stone-900">Registration events</h3>
+              {result.events.length === 0 ? <p className="text-xs text-stone-500">The registry did not publish event dates.</p> : (
+                <div className="divide-y divide-stone-100">
+                  {result.events.map((event, index) => <div key={event.eventAction + event.eventDate + index} className="py-2.5 flex flex-wrap items-center justify-between gap-2 text-xs"><span className="text-stone-600 capitalize">{event.eventAction}</span><span className="font-mono text-stone-900">{formatDate(event.eventDate)}</span></div>)}
+                </div>
+              )}
+            </section>
+          )}
+
+          <p className="text-[11px] text-stone-500">RDAP data depends on the domain registry and may omit privacy-protected or unavailable fields. UTILORA does not invent missing dates.</p>
         </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="p-4 rounded-2xl bg-white border border-stone-200/90 shadow-xs">
-            <div className="flex items-center gap-2 text-stone-500 text-xs mb-1.5">
-              <Calendar size={14} className="text-orange-600" />
-              <span>Created</span>
-            </div>
-            <div className="text-sm font-mono font-semibold text-stone-900">1995-08-14</div>
-            <div className="text-[11px] text-stone-500 mt-1">30+ Years Tenure</div>
-          </div>
-
-          <div className="p-4 rounded-2xl bg-white border border-stone-200/90 shadow-xs">
-            <div className="flex items-center gap-2 text-stone-500 text-xs mb-1.5">
-              <Calendar size={14} className="text-orange-600" />
-              <span>Expires</span>
-            </div>
-            <div className="text-sm font-mono font-semibold text-stone-900">2026-08-13</div>
-            <div className="text-[11px] text-stone-500 mt-1">Active Registration</div>
-          </div>
-
-          <div className="p-4 rounded-2xl bg-white border border-stone-200/90 shadow-xs">
-            <div className="flex items-center gap-2 text-stone-500 text-xs mb-1.5">
-              <Shield size={14} className="text-orange-600" />
-              <span>Registrar</span>
-            </div>
-            <div className="text-sm font-mono font-semibold text-stone-900 truncate">RESERVED-Internet Assigned Numbers Authority</div>
-            <div className="text-[11px] text-stone-500 mt-1">IANA ID: 376</div>
-          </div>
-
-          <div className="p-4 rounded-2xl bg-white border border-stone-200/90 shadow-xs">
-            <div className="flex items-center gap-2 text-stone-500 text-xs mb-1.5">
-              <Server size={14} className="text-orange-600" />
-              <span>Status</span>
-            </div>
-            <div className="text-sm font-mono font-semibold text-emerald-700">clientDeleteProhibited</div>
-            <div className="text-[11px] text-stone-500 mt-1">Locked Registry State</div>
-          </div>
-        </div>
-
-        {/* Nameservers List */}
-        <div className="p-5 rounded-2xl bg-white border border-stone-200/90 shadow-xs space-y-2">
-          <div className="text-xs font-semibold text-stone-900">Delegated Nameservers (Sample State)</div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-mono text-stone-700">
-            <div className="p-2.5 rounded-xl bg-stone-50 border border-stone-200">a.iana-servers.net</div>
-            <div className="p-2.5 rounded-xl bg-stone-50 border border-stone-200">b.iana-servers.net</div>
-          </div>
-        </div>
-      </div>
+      )}
     </div>
   );
 };
+
+const Metric: React.FC<{ label: string; value: string; icon: React.ReactNode }> = ({ label, value, icon }) => (
+  <div className="min-w-0 p-4 rounded-2xl bg-white border border-stone-200 shadow-xs">
+    <div className="flex items-center gap-2 text-stone-500 text-[11px] mb-2">{icon}<span>{label}</span></div>
+    <div className="text-sm font-semibold text-stone-900 break-words">{value}</div>
+  </div>
+);

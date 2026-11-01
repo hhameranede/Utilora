@@ -43,6 +43,9 @@ jobs:
       - name: Test local image engines
         run: npm run test:image
 
+      - name: Test public website and domain lookup engines
+        run: npm run test:diagnostics
+
       - name: Build and generate SEO files
         run: npm run build
         env:

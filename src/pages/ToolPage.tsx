@@ -24,6 +24,7 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
   const category = getCategoryById(tool.category);
   const toolName = tool.localizedName[locale] || tool.localizedName.en;
   const toolDesc = tool.localizedDescription[locale] || tool.localizedDescription.en;
+  const isNetworkLookup = tool.category === 'website-domain';
   const categoryTitle = category ? category.localizedTitle[locale] || category.localizedTitle.en : tool.category;
 
   const defaultFaqs = [
@@ -33,8 +34,8 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
         ar: `هل ${toolName} آمن للاستخدام مع المستندات الحساسة؟`,
       },
       answer: {
-        en: tool.status === 'functional' ? `Yes. This tool processes its input locally in your browser without uploading it to an intermediate server.` : `This workspace is currently a visual preview. It does not process files yet.`,
-        ar: tool.status === 'functional' ? `نعم. تعالج هذه الأداة مدخلاتها محليًا داخل متصفحك دون رفعها إلى خادم وسيط.` : `مساحة العمل هذه معاينة للواجهة حاليًا، ولم تُفعّل المعالجة فيها بعد.`,
+        en: tool.status === 'functional' ? (isNetworkLookup ? `This lookup sends only the domain or URL you enter to public DNS/RDAP services or directly to the target website. No files are uploaded.` : `Yes. This tool processes its input locally in your browser without uploading it to an intermediate server.`) : `This workspace is currently a visual preview. It does not process files yet.`,
+        ar: tool.status === 'functional' ? (isNetworkLookup ? `ترسل هذه الأداة النطاق أو الرابط الذي تدخله إلى خدمات DNS/RDAP العامة أو إلى الموقع المستهدف مباشرةً. لا تُرفع أي ملفات.` : `نعم. تعالج هذه الأداة مدخلاتها محليًا داخل متصفحك دون رفعها إلى خادم وسيط.`) : `مساحة العمل هذه معاينة للواجهة حاليًا، ولم تُفعّل المعالجة فيها بعد.`,
       },
     },
     {
@@ -142,7 +143,7 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
                 <span className="text-xs font-mono font-bold text-orange-600">STEP 03</span>
                 <h4 className="text-sm font-semibold text-stone-900">Save Local Output</h4>
                 <p className="text-xs text-stone-600 leading-relaxed">
-                  {tool.status === 'functional' ? 'Download or copy your result directly from this browser.' : 'This workspace is not active yet; processing will be enabled in a later release.'}
+                  {tool.status === 'functional' ? (isNetworkLookup ? 'Review the live public lookup result here.' : 'Download or copy your result directly from this browser.') : 'This workspace is not active yet; processing will be enabled in a later release.'}
                 </p>
               </div>
             </div>
@@ -177,7 +178,7 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
             <Lock size={16} className="text-orange-500 shrink-0 mt-0.5" />
             <div className="text-xs leading-relaxed text-stone-600">
               <span className="font-semibold text-stone-900">{t('common.privacyStatement')}: </span>
-              {t('common.privacyStatementDesc')}
+              {isNetworkLookup ? 'Network lookup: only the domain or URL you submit is sent to public DNS/RDAP services or the target website. No files or cookies are collected by UTILORA.' : t('common.privacyStatementDesc')}
             </div>
           </div>
         </section>

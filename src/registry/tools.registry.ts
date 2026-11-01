@@ -1113,7 +1113,7 @@ export const TOOLS_REGISTRY: Record<string, ToolDefinition> = {
     category: 'website-domain',
     icon: 'Calendar',
     template: 'template-j-domain-lookup',
-    status: 'ui-ready',
+    status: 'functional',
     engineContractRef: 'src/engines/diagnostics/contracts.ts#DomainAgeCheckerAdapter',
     isPopular: true,
     localizedName: {
@@ -1156,7 +1156,7 @@ export const TOOLS_REGISTRY: Record<string, ToolDefinition> = {
     category: 'website-domain',
     icon: 'Search',
     template: 'template-j-domain-lookup',
-    status: 'ui-ready',
+    status: 'functional',
     engineContractRef: 'src/engines/diagnostics/contracts.ts#RdapLookupAdapter',
     localizedName: {
       en: 'RDAP Lookup',
@@ -1198,7 +1198,7 @@ export const TOOLS_REGISTRY: Record<string, ToolDefinition> = {
     category: 'website-domain',
     icon: 'Network',
     template: 'template-k-dns-lookup',
-    status: 'ui-ready',
+    status: 'functional',
     engineContractRef: 'src/engines/diagnostics/contracts.ts#DnsLookupAdapter',
     isPopular: true,
     isFeatured: true,
@@ -1242,7 +1242,7 @@ export const TOOLS_REGISTRY: Record<string, ToolDefinition> = {
     category: 'website-domain',
     icon: 'Activity',
     template: 'template-l-website-diagnostics',
-    status: 'ui-ready',
+    status: 'functional',
     engineContractRef: 'src/engines/diagnostics/contracts.ts#WebsiteStatusCheckerAdapter',
     isPopular: true,
     localizedName: {
@@ -1285,7 +1285,7 @@ export const TOOLS_REGISTRY: Record<string, ToolDefinition> = {
     category: 'website-domain',
     icon: 'Sliders',
     template: 'template-l-website-diagnostics',
-    status: 'ui-ready',
+    status: 'functional',
     engineContractRef: 'src/engines/diagnostics/contracts.ts#HttpHeadersCheckerAdapter',
     localizedName: {
       en: 'HTTP Headers Checker',
