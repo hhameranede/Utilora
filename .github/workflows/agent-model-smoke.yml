@@ -389,6 +389,8 @@ jobs:
           secret = os.environ.get("NVIDIA_API_KEY", "")
           report_dir = pathlib.Path(os.environ["SAFE_REPORT_DIR"])
           report_dir.mkdir(parents=True, exist_ok=True)
+          tool_names = []
+          missing_headings = []
 
           def fail(message, events=None, skill_count=0, read_count=0, text_count=0, text_length=0):
               print("::error::" + message)
