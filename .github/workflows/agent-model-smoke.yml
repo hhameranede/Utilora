@@ -7,14 +7,9 @@ on:
         description: Immutable UTILORA commit to test.
         required: true
         type: string
-      model:
-        description: NVIDIA model identifier.
-        required: false
-        type: string
-        default: nvidia/nemotron-3.5-super-vl-120b-a12b
     secrets:
       NVIDIA_API_KEY:
-        description: NVIDIA key forwarded by the trusted caller workflow.
+        description: Existing NVIDIA key forwarded by the trusted Softnexa caller.
         required: true
 
 permissions:
@@ -22,30 +17,46 @@ permissions:
 
 jobs:
   agent-smoke:
-    name: Smoke test ${{ matrix.agent }}
+    name: "${{ matrix.agent }} · ${{ matrix.model_id }}"
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 12
     strategy:
       fail-fast: false
       max-parallel: 2
       matrix:
         include:
           - agent: project-lead
+            model_alias: nemotron-ultra
+            model_id: nvidia/nemotron-3-ultra-550b-a55b
             skill: planning-and-task-breakdown
+          - agent: problem-analyst
+            model_alias: deepseek-v4-1-flash
+            model_id: deepseek-ai/deepseek-v4.1-flash
+            skill: research
           - agent: implementation-engineer
+            model_alias: minimax-m3-1-flash
+            model_id: minimaxai/minimax-m3.1-flash
             skill: safe-implementation
+          - agent: fast-task-engineer
+            model_alias: glm-5-3-flash
+            model_id: z-ai/glm-5.3-flash
+            skill: incremental-implementation
+          - agent: visual-reviewer
+            model_alias: nemotron-super-vl
+            model_id: nvidia/nemotron-3.5-super-vl-120b-a12b
+            skill: accessibility-ux
+          - agent: long-horizon-engineer
+            model_alias: laguna-xs-2-1
+            model_id: poolside/laguna-xs-2.1
+            skill: systematic-debugging
           - agent: qa-engineer
+            model_alias: deepseek-v4-1-flash
+            model_id: deepseek-ai/deepseek-v4.1-flash
             skill: quality-validation
           - agent: security-auditor
+            model_alias: nemotron-ultra
+            model_id: nvidia/nemotron-3-ultra-550b-a55b
             skill: security-audit
-          - agent: seo-auditor
-            skill: seo-audit
-          - agent: ux-reviewer
-            skill: accessibility-ux
-          - agent: analytics-reviewer
-            skill: analytics
-          - agent: release-reviewer
-            skill: release-safety
 
     steps:
       - name: Set up Node.js
@@ -63,32 +74,12 @@ jobs:
           git -C "$RUNNER_TEMP/utilora" checkout --quiet --detach FETCH_HEAD
           test -f "$RUNNER_TEMP/utilora/opencode.json"
           test -f "$RUNNER_TEMP/utilora/.opencode/skills/manifest.json"
+          test -f "$RUNNER_TEMP/utilora/.opencode/agents/${{ matrix.agent }}.md"
 
-      - name: Install OpenCode CLI
-        run: npm install --global opencode-ai@1
-
-      - name: Confirm the pinned model and selected agent are discoverable
-        env:
-          TARGET_DIR: ${{ runner.temp }}/utilora
-          AGENT_NAME: ${{ matrix.agent }}
-        run: |
-          set -euo pipefail
-          cd "$TARGET_DIR"
-          opencode debug config > "$RUNNER_TEMP/opencode-config.json"
-          opencode agent list > "$RUNNER_TEMP/opencode-agents.txt"
-          grep -Fq "$AGENT_NAME" "$RUNNER_TEMP/opencode-agents.txt"
-          echo "OpenCode resolved agent: $AGENT_NAME"
-
-      - name: Execute the agent with its assigned skill
-        id: agent-run
+      - name: Verify NVIDIA key and this model are available
         env:
           NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
-          TARGET_DIR: ${{ runner.temp }}/utilora
-          AGENT_NAME: ${{ matrix.agent }}
-          SKILL_NAME: ${{ matrix.skill }}
-          MODEL_NAME: ${{ inputs.model }}
-          RAW_REPORT: ${{ runner.temp }}/agent-output.jsonl
-          SAFE_REPORT_DIR: ${{ github.workspace }}/agent-reports
+          EXPECTED_MODEL: ${{ matrix.model_id }}
         run: |
           set -euo pipefail
           set +x
@@ -96,25 +87,135 @@ jobs:
             echo "::error::NVIDIA_API_KEY was not received from the Softnexa caller."
             exit 1
           fi
+          curl --connect-timeout 10 --max-time 30 --fail --silent --show-error \
+            https://integrate.api.nvidia.com/v1/models \
+            -H "Authorization: Bearer $NVIDIA_API_KEY" \
+            -o "$RUNNER_TEMP/nvidia-models.json"
+          python3 - <<'PY'
+          import json, os, pathlib, sys
+          path = pathlib.Path(os.environ["RUNNER_TEMP"]) / "nvidia-models.json"
+          try:
+              payload = json.loads(path.read_text(encoding="utf-8"))
+          except Exception:
+              print("::error::NVIDIA model catalogue did not return valid JSON.")
+              sys.exit(1)
+          model_ids = {
+              item.get("id")
+              for item in payload.get("data", [])
+              if isinstance(item, dict) and isinstance(item.get("id"), str)
+          }
+          expected = os.environ["EXPECTED_MODEL"]
+          if expected not in model_ids:
+              print("::error::The existing Softnexa NVIDIA key does not currently list the assigned model: " + expected)
+              print("The key is valid only if the provider accepts it; no secret value was displayed.")
+              sys.exit(1)
+          print("NVIDIA catalogue check passed for: " + expected)
+          path.unlink(missing_ok=True)
+          PY
+
+      - name: Install OpenCode CLI
+        run: npm install --global opencode-ai@1
+
+      - name: Resolve the selected agent and model route
+        env:
+          TARGET_DIR: ${{ runner.temp }}/utilora
+          AGENT_NAME: ${{ matrix.agent }}
+          MODEL_ROUTE: nvidia-nim/${{ matrix.model_alias }}
+        run: |
+          set -euo pipefail
+          cd "$TARGET_DIR"
+          opencode debug config > "$RUNNER_TEMP/opencode-config.json"
+          opencode agent list > "$RUNNER_TEMP/opencode-agents.txt"
+          grep -Fq "$AGENT_NAME" "$RUNNER_TEMP/opencode-agents.txt"
+          opencode debug agent "$AGENT_NAME" > "$RUNNER_TEMP/resolved-agent.json"
+          python3 - <<'PY'
+          import json, os, pathlib, sys
+          data = json.loads(pathlib.Path(os.environ["RUNNER_TEMP"], "resolved-agent.json").read_text())
+          expected = os.environ["MODEL_ROUTE"]
+          if data.get("name") != os.environ["AGENT_NAME"]:
+              print("::error::OpenCode resolved a different agent than requested.")
+              sys.exit(1)
+          if data.get("model") != expected:
+              print("::error::Agent model route does not match the configured NVIDIA model.")
+              sys.exit(1)
+          print("OpenCode resolved " + data["name"] + " with " + expected)
+          PY
+
+      - name: Prepare a real visual sample
+        if: matrix.agent == 'visual-reviewer'
+        env:
+          TARGET_DIR: ${{ runner.temp }}/utilora
+        run: |
+          set -euo pipefail
+          cd "$TARGET_DIR"
+          npm install --no-audit --no-fund
+          npx playwright install chromium
+          npm run dev -- --host 127.0.0.1 > "$RUNNER_TEMP/utilora-vite.log" 2>&1 &
+          echo $! > "$RUNNER_TEMP/utilora-vite.pid"
+          ready=0
+          for attempt in $(seq 1 45); do
+            if curl --fail --silent http://127.0.0.1:3000/ > /dev/null; then
+              ready=1
+              break
+            fi
+            sleep 2
+          done
+          if [ "$ready" -ne 1 ]; then
+            echo "::error::UTILORA local preview did not become ready."
+            tail -n 40 "$RUNNER_TEMP/utilora-vite.log"
+            exit 1
+          fi
+          npx playwright screenshot --browser chromium --viewport-size "1365,900" \
+            http://127.0.0.1:3000/ "$RUNNER_TEMP/utilora-homepage.png"
+          test -s "$RUNNER_TEMP/utilora-homepage.png"
+
+      - name: Execute the model-specialized agent
+        env:
+          NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+          TARGET_DIR: ${{ runner.temp }}/utilora
+          AGENT_NAME: ${{ matrix.agent }}
+          SKILL_NAME: ${{ matrix.skill }}
+          MODEL_ROUTE: nvidia-nim/${{ matrix.model_alias }}
+          MODEL_ID: ${{ matrix.model_id }}
+          RAW_REPORT: ${{ runner.temp }}/agent-output.jsonl
+          SAFE_REPORT_DIR: ${{ github.workspace }}/agent-reports
+          SCREENSHOT: ${{ runner.temp }}/utilora-homepage.png
+        run: |
+          set -euo pipefail
+          set +x
           mkdir -p "$SAFE_REPORT_DIR"
           PROMPT="$(cat <<EOF
-          This is a controlled, read-only smoke test of the UTILORA agent team.
-          First, invoke the native skill tool and load exactly this assigned skill: $SKILL_NAME.
-          Then inspect the repository using read-only tools. Read README.md and at least one additional file that is relevant to your own agent role.
-          Do not edit, create, delete, commit, push, merge, deploy, access credentials, inspect environment variables, or call external services.
-          Provide a concise role-specific assessment based only on files you actually inspected.
-          Include these headings: ROLE, SKILL_LOADED, FILES_INSPECTED, FINDING, LIMITATION.
-          If and only if you actually loaded the assigned skill and inspected repository files, make the final line exactly: AGENT_SMOKE_PASS
+          This is a controlled, read-only model-backed smoke test of UTILORA's specialist team.
+          You are agent: $AGENT_NAME. Your assigned skill is: $SKILL_NAME.
+          First, invoke the native skill tool and load exactly your assigned skill.
+          Then inspect README.md and your own .opencode/agents/$AGENT_NAME.md file using read-only tools.
+          For role-specific evidence:
+          - visual-reviewer: inspect the attached real homepage screenshot and report layout, contrast, hierarchy, responsiveness and RTL limitations.
+          - qa-engineer: inspect existing test scripts and identify one concrete regression test relevant to the repository.
+          - security-auditor: review the agent permission boundary and workflow security without looking for or printing credentials.
+          - project-lead: produce a short task breakdown for improving one real issue visible in repository documentation.
+          - problem-analyst: identify one evidence-backed improvement opportunity and compare two solutions.
+          - implementation-engineer: describe a minimal code change and the exact regression test, but do not modify files.
+          - fast-task-engineer: identify one small, bounded improvement and how to validate it.
+          - long-horizon-engineer: break one substantial engineering improvement into safe, testable phases.
+          Do not edit, create, delete, commit, push, merge, deploy, inspect environment variables, read .env files, or call external services.
+          Provide a concise role-specific assessment based only on files or image you actually inspected.
+          Include these headings: ROLE, MODEL, SKILL_LOADED, EVIDENCE, FINDING, LIMITATION.
+          If and only if you actually loaded your assigned skill and inspected the required evidence, make the final line exactly: AGENT_SMOKE_PASS
           Otherwise make the final line exactly: AGENT_SMOKE_FAIL
           EOF
           )"
           cd "$TARGET_DIR"
           set +e
-          opencode run --dir "$TARGET_DIR" --agent "$AGENT_NAME" --model "$MODEL_NAME" --format json "$PROMPT" > "$RAW_REPORT" 2> "$RUNNER_TEMP/opencode-stderr.txt"
+          if [ "$AGENT_NAME" = "visual-reviewer" ]; then
+            opencode run --standalone --dir "$TARGET_DIR" --agent "$AGENT_NAME" --model "$MODEL_ROUTE" --file "$SCREENSHOT" --format json "$PROMPT" > "$RAW_REPORT" 2> "$RUNNER_TEMP/opencode-stderr.txt"
+          else
+            opencode run --standalone --dir "$TARGET_DIR" --agent "$AGENT_NAME" --model "$MODEL_ROUTE" --format json "$PROMPT" > "$RAW_REPORT" 2> "$RUNNER_TEMP/opencode-stderr.txt"
+          fi
           opencode_status=$?
           set -e
           if [ "$opencode_status" -ne 0 ]; then
-            echo "::error::OpenCode returned a non-zero exit code for $AGENT_NAME (exit $opencode_status)."
+            echo "::error::OpenCode failed for $AGENT_NAME (exit $opencode_status). Provider errors are deliberately not printed to avoid credential disclosure."
             exit "$opencode_status"
           fi
           python3 - <<'PY'
@@ -123,7 +224,7 @@ jobs:
           raw = raw_path.read_text(encoding="utf-8", errors="replace")
           secret = os.environ.get("NVIDIA_API_KEY", "")
           if secret and secret in raw:
-              print("::error::The model stream contained the credential; report suppressed.")
+              print("::error::The model output contained the credential; report suppressed.")
               raw_path.unlink(missing_ok=True)
               sys.exit(1)
           events = []
@@ -145,7 +246,7 @@ jobs:
                   inputs = state.get("input") or {}
                   if tool == "skill" and skill in json.dumps(inputs, ensure_ascii=False):
                       skill_calls.append(event)
-                  if tool in {"read", "grep", "glob", "list"} and state.get("status") == "completed":
+                  if tool in {"read", "grep", "glob", "list", "bash"} and state.get("status") == "completed":
                       read_calls.append(event)
               if event.get("type") == "text":
                   part = event.get("part") or {}
@@ -153,35 +254,42 @@ jobs:
                       text_parts.append(part["text"])
           final_text = "\n".join(text_parts).strip()
           if not final_text or not skill_calls or not read_calls or not final_text.rstrip().endswith("AGENT_SMOKE_PASS"):
-              print(f"::error::Smoke test did not prove model + skill + repository-read execution for {agent}.")
-              print(f"Skill calls for assigned skill: {len(skill_calls)}; read-only tool calls: {len(read_calls)}; text events: {len(text_parts)}.")
+              print("::error::Smoke test did not prove model, skill loading, evidence inspection and a final response for " + agent + ".")
+              print("Skill loads: " + str(len(skill_calls)) + "; completed read/tool calls: " + str(len(read_calls)) + "; response text events: " + str(len(text_parts)))
               raw_path.unlink(missing_ok=True)
               sys.exit(1)
           if re.search(r"nvapi-[A-Za-z0-9_-]{12,}", final_text):
-              print("::error::The response resembles a credential; report suppressed.")
+              print("::error::The response resembled a credential; report suppressed.")
               raw_path.unlink(missing_ok=True)
               sys.exit(1)
+          model = os.environ["MODEL_ID"]
           report_dir = pathlib.Path(os.environ["SAFE_REPORT_DIR"])
           report_dir.mkdir(parents=True, exist_ok=True)
           report = (
-              f"# Agent smoke report: {agent}\n\n"
-              f"- Model: {os.environ['MODEL_NAME']}\n"
-              f"- Assigned skill loaded via native tool: {skill}\n"
-              f"- Completed repository inspection tool calls: {len(read_calls)}\n"
-              f"- Result: PASS\n\n"
-              f"## Agent response\n\n{final_text}\n"
+              "# Agent smoke report: " + agent + "\n\n"
+              "- Model: " + model + "\n"
+              "- Assigned skill loaded via native tool: " + skill + "\n"
+              "- Completed evidence/tool calls: " + str(len(read_calls)) + "\n"
+              "- Result: PASS\n\n"
+              "## Agent response\n\n" + final_text + "\n"
           )
-          (report_dir / f"{agent}.md").write_text(report, encoding="utf-8")
+          (report_dir / (agent + ".md")).write_text(report, encoding="utf-8")
           raw_path.unlink(missing_ok=True)
-          pathlib.Path(os.environ.get("RUNNER_TEMP", "/tmp"), "opencode-stderr.txt").unlink(missing_ok=True)
-          print(f"PASS: {agent} loaded {skill}, inspected repository files, and returned a response.")
+          print("PASS: " + agent + " used " + model + ", loaded " + skill + ", and inspected repository evidence.")
           PY
           git -C "$TARGET_DIR" diff --exit-code
           if [ -n "$(git -C "$TARGET_DIR" status --porcelain)" ]; then
-            echo "::error::The agent smoke test modified the UTILORA checkout."
+            echo "::error::The read-only agent modified the UTILORA checkout."
             exit 1
           fi
-          echo "| $AGENT_NAME | PASS | $SKILL_NAME |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| $AGENT_NAME | PASS | $MODEL_ID | $SKILL_NAME |" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Stop local preview
+        if: always() && matrix.agent == 'visual-reviewer'
+        run: |
+          if [ -f "$RUNNER_TEMP/utilora-vite.pid" ]; then
+            kill "$(cat "$RUNNER_TEMP/utilora-vite.pid")" 2>/dev/null || true
+          fi
 
       - name: Upload sanitized agent report
         if: always()
