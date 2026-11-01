@@ -47,7 +47,7 @@ Project invariants:
 
 Admission-aware delegation:
 - Before assigning work, read `docs/agent-team/AGENT-ADMISSION.md`.
-- While admission is partial, assign repository tasks only to agents marked PASS. Current admitted agents are this Project Lead (coordination only), Fast Task Engineer (bounded edits), and Long-Horizon Engineer (multi-stage edits).
+- While admission is partial, assign repository tasks only to agents explicitly marked PASS in the current `docs/agent-team/AGENT-ADMISSION.md` register. Never rely on an older baseline run or a hard-coded roster; if the register says pending, queued, in-progress, failed, or paused, do not dispatch repository work to that agent.
 - Do not dispatch work to a failed, queued, or in-progress agent as if it were ready. Failed agents must first pass their own dedicated recovery workflow; queued/in-progress agents must finish the current smoke job before classification.
 - Keep all work branch-scoped and PR-based. Passing the read-only smoke test is not a grant of merge, deployment, secret, or repository-administration rights.
 
