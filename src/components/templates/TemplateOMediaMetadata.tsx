@@ -162,7 +162,7 @@ export const TemplateOMediaMetadata: React.FC<TemplateOMediaMetadataProps> = ({ 
         )}
 
         {error && <p role="alert" className="text-xs text-red-700 bg-red-50 border border-red-200 rounded-xl p-3">{error}</p>}
-        {notice && <p role="status" className="text-xs text-green-800 bg-orange-50 border border-orange-100 rounded-xl p-3">{notice}</p>}
+        {notice && <p role="status" className="text-xs text-stone-800 bg-orange-50 border border-orange-100 rounded-xl p-3">{notice}</p>}
       </section>
 
       {metadata && (
