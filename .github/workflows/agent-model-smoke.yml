@@ -141,8 +141,7 @@ jobs:
             --data-binary @"$RUNNER_TEMP/nvidia-request.json")
           curl_exit=$?
           set -e
-          echo "NIM_HTTP_STATUS=$status" >> "$GITHUB_ENV"
-          echo "NIM_CURL_EXIT=$curl_exit" >> "$GITHUB_ENV"
+          export NIM_HTTP_STATUS="$status" NIM_CURL_EXIT="$curl_exit"
           python3 - <<'PY'
           import json, os, pathlib, re, sys
           temp = pathlib.Path(os.environ["RUNNER_TEMP"])
@@ -160,7 +159,7 @@ jobs:
               secret = os.environ.get("NVIDIA_API_KEY", "")
               if secret:
                   detail = detail.replace(secret, "[REDACTED]")
-              detail = re.sub(r"(?i)(bearer\\s+)[^\\s,]+", r"\\1[REDACTED]", detail)
+              detail = re.sub(r"(?i)(bearer\s+)[^\s,]+", r"\1[REDACTED]", detail)
               print("::error::NVIDIA inference failed for " + os.environ["MODEL_ID"] + "; HTTP " + status + "; curl exit " + curl_exit)
               if detail:
                   print("Provider error: " + detail)
