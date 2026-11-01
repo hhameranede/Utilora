@@ -21,7 +21,7 @@ The repository configures one NVIDIA NIM provider with six model IDs using the `
 
 All eight agents are available as contributors. A model smoke result is diagnostic information only; it never blocks a role from participating in the team. The eight roles collaborate on new features and meaningful additions through the Project Lead's team council.
 
-SEO, analytics and release-review skills remain in the 50-skill library and are assigned to the Problem Analyst and other relevant agents; they are capabilities, not separate extra workers.
+SEO, analytics and release-review skills remain available in the shared library. No skill is assigned to a role; agents choose freely.
 
 ## Skill library
 
@@ -29,15 +29,15 @@ UTILORA uses exactly **50 reusable skills**: 9 first-party project skills and 41
 
 ## Shared NVIDIA model provider
 
-All six configured models use NVIDIA's OpenAI-compatible NIM endpoint `https://integrate.api.nvidia.com/v1` and one secret, `NVIDIA_API_KEY`. Model aliases and exact upstream IDs are defined in `opencode.json`. The model assignments are fixed in each agent's frontmatter and mirrored in the skill manifest.
+All six configured models use NVIDIA's OpenAI-compatible NIM endpoint `https://integrate.api.nvidia.com/v1` and one secret, `NVIDIA_API_KEY`. Model aliases and exact upstream IDs are defined in `opencode.json`. Each agent has a role-appropriate default model in its frontmatter.
 
-NVIDIA advertises free trial endpoints for these models, but quota, account entitlement, throttling and service availability can vary. The UTILORA-native smoke workflow first checks the live `/v1/models` catalogue and then performs one inference for each assigned model. Results—not the public catalogue alone—determine which models the configured credential can actually use. Do not assume that all eight roles imply eight different models: QA shares DeepSeek and Security shares Nemotron Ultra, but remain separate agents with independent instructions and permissions.
+NVIDIA advertises free trial endpoints for these models, but quota, account entitlement, throttling and service availability can vary. The optional, manually triggered UTILORA capability check runs a real response through each agent's configured model. Results—not the public catalogue alone—show which models the configured credential can actually use. Do not assume that all eight roles imply eight different models: QA shares DeepSeek and Security shares Nemotron Ultra, but remain separate agents with independent instructions and permissions.
 
 NVIDIA's trial terms may record prompts and outputs for service operation and improvement. Never send credentials, personal data, user uploads, or confidential production content through the trial endpoint.
 
 ## Team workflow
 
-For every new feature or meaningful addition, the Project Lead invites all seven specialists to discuss the proposal. Each contributes from its role, challenges assumptions, and offers alternatives. The team records agreement, dissent and trade-offs before implementation. No fixed skill, mandatory tool sequence, admission gate or rigid response template is required.
+For every new feature or meaningful addition, the Project Lead invites all seven specialists to discuss the proposal. Each contributes from their role, challenges assumptions, and offers alternatives. The team records agreement, dissent and trade-offs before implementation. No fixed skill, mandatory tool sequence, admission gate or rigid response template is required.
 
 ## Non-negotiable safety rules
 
