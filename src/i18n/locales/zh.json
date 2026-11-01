@@ -67,7 +67,8 @@
     "previewOnly": "仅供预览",
     "publicLookup": "公共网络查询",
     "runsLocally": "在浏览器中运行",
-    "readGuide": "阅读指南"
+    "readGuide": "阅读指南",
+    "tryAgain": "重试"
   },
   "home": {
     "categoriesHeading": "按工具分类探索",
@@ -160,7 +161,8 @@
     "newsletterTitle": "订阅动态",
     "newsletterDesc": "每季度精选发布新工具特性、压缩基准测试与网页技术动态。（预览）",
     "newsletterPlaceholder": "输入您的工作邮箱",
-    "subscribe": "免费订阅"
+    "subscribe": "免费订阅",
+    "readArticle": "阅读文章"
   },
   "footer": {
     "rights": "保留所有权利。",
@@ -263,5 +265,8 @@
     "external": "网站界面字体通过 Google Fonts 加载。因此，浏览器会向 Google 域名请求字体资源，Google 可能收到相关请求的技术信息。网络查询服务和目标网站也会收到完成查询所需的主机名或 URL。",
     "accountsTitle": "6. 账户和可选广告位",
     "accounts": "使用现有工具不需要用户账户。当前界面中预留的广告和联盟营销组件默认处于禁用状态。如果将来添加或启用可选第三方服务，应在使用前更新本政策。"
+  },
+  "categories": {
+    "description": "按类别浏览可用工具。每个类别将相关的浏览器工具集中在一起，方便查找。"
   }
 }
