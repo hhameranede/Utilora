@@ -114,7 +114,7 @@ function makeImageFile(type = 'image/png'): File {
 
 async function run(name: string, operation: () => void | Promise<void>) {
   await operation();
-  process.stdout.write(\`✓ \${name}\n\`);
+  process.stdout.write(`✓ ${name}\n`);
 }
 
 await run('transforms an image to WebP and preserves source dimensions by default', async () => {
