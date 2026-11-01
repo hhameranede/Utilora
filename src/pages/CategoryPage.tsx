@@ -12,6 +12,7 @@ import { Icon } from '../components/common/Icon';
 import { Head } from '../seo/Head';
 import { Search, Filter, ShieldCheck, ArrowRight } from 'lucide-react';
 import { Link } from '../router';
+import { matchesSearch } from '../utils/search';
 
 interface CategoryPageProps {
   categorySlug: string;
@@ -29,12 +30,8 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ categorySlug }) => {
   const relatedCategories = CATEGORIES_LIST.filter((c) => c.id !== category.id).slice(0, 3);
 
   const filteredTools = filterQuery.trim()
-    ? tools.filter((tool) => {
-        const name = (tool.localizedName[locale] || tool.localizedName.en).toLowerCase();
-        const desc = (tool.localizedDescription[locale] || tool.localizedDescription.en).toLowerCase();
-        return name.includes(filterQuery.toLowerCase()) || desc.includes(filterQuery.toLowerCase());
-      })
-    : tools;
+    ? tools.filter((tool) => matchesSearch(filterQuery, tool.localizedName, tool.localizedDescription, tool.slug, tool.acceptedFormats))
+    : tools.filter((tool) => tool.id !== featuredTool?.id);
 
   const title = category.localizedTitle[locale] || category.localizedTitle.en;
   const description = category.localizedDescription[locale] || category.localizedDescription.en;
@@ -107,10 +104,10 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ categorySlug }) => {
         </div>
 
         {/* Featured Tool Spotlight */}
-        {featuredTool && (
+        {featuredTool && !filterQuery.trim() && (
           <section className="space-y-4">
             <h2 className="text-sm font-semibold uppercase tracking-wider text-stone-500">
-              Featured Workspace
+              {t('category.featuredWorkspace')}
             </h2>
             <FeaturedToolCard tool={featuredTool} />
           </section>
@@ -121,28 +118,30 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ categorySlug }) => {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-stone-200">
             <div>
               <h2 className="text-xl font-bold text-stone-900">
-                All {title} ({tools.length})
+                {t('category.allTools')} {title} ({tools.length})
               </h2>
               <p className="text-xs text-stone-500 mt-0.5">
-                Select any workspace below to configure your files.
+                {t('category.chooseWorkspace')}
               </p>
             </div>
 
             {/* Quick in-category filter input */}
             <div className="relative w-full sm:w-64">
-              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-orange-500" />
+              <Search size={14} className="absolute start-3 top-1/2 -translate-y-1/2 text-orange-500" />
               <input
                 type="text"
                 value={filterQuery}
                 onChange={(e) => setFilterQuery(e.target.value)}
-                placeholder="Filter these tools..."
-                className="w-full pl-9 pr-3 py-2 rounded-xl bg-white border border-stone-200 text-xs text-stone-900 placeholder-stone-400 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 shadow-xs transition-all"
+                placeholder={t('category.searchPlaceholder')}
+                className="w-full ps-9 pe-3 py-2 rounded-xl bg-white border border-stone-200 text-xs text-stone-900 placeholder-stone-400 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 shadow-xs transition-all"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredTools.map((tool) => (
+            {filteredTools.length === 0 ? (
+              <p className="col-span-full rounded-2xl border border-dashed border-stone-300 bg-white px-4 py-10 text-center text-sm text-stone-600">{t('common.noResults')}</p>
+            ) : filteredTools.map((tool) => (
               <ToolCard key={tool.id} tool={tool} />
             ))}
           </div>
