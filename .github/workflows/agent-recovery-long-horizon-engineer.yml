@@ -8,13 +8,10 @@ on:
         required: false
         type: string
         default: ""
-  pull_request:
-    branches: [main]
-    paths:
-      - ".github/workflows/agent-recovery-long-horizon-engineer.yml"
-      - ".github/workflows/_agent-recovery-reusable.yml"
-      - ".opencode/agents/long-horizon-engineer.md"
-      - ".opencode/skills/systematic-debugging/**"
+
+concurrency:
+  group: utilora-recovery-long-horizon-engineer-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read

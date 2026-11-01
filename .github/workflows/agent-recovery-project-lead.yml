@@ -8,13 +8,10 @@ on:
         required: false
         type: string
         default: ""
-  pull_request:
-    branches: [main]
-    paths:
-      - ".github/workflows/agent-recovery-project-lead.yml"
-      - ".github/workflows/_agent-recovery-reusable.yml"
-      - ".opencode/agents/project-lead.md"
-      - ".opencode/skills/planning-and-task-breakdown/**"
+
+concurrency:
+  group: utilora-recovery-project-lead-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read

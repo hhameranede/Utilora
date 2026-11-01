@@ -32,6 +32,13 @@ Run [41356136034](https://github.com/hhameranede/Utilora/actions/runs/4135613603
 - Visual Reviewer acceptance now requires screenshot/viewport-specific evidence and rejects a report that says image input was unavailable.
 - The Visual Reviewer recovery workflow uses the same shared read-only recovery harness as the other roles.
 
+## Queue and run deduplication
+
+- The full eight-agent model smoke test remains automatic for relevant pull-request changes, with a workflow-level concurrency group that cancels older smoke attempts for the same PR when a newer commit arrives.
+- Individual recovery workflows are manual-dispatch only. Run them for a specific failed role when needed; they no longer launch five additional model runs on every PR synchronization.
+- Each recovery workflow has its own concurrency group so a newer manual recovery for the same role/ref supersedes an older one.
+- The full smoke matrix is the primary eight-agent admission gate; isolated recovery is targeted remediation, not a parallel second smoke suite.
+
 ## Per-agent recovery paths
 
 | Agent | Workflow |
