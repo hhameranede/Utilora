@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useI18n } from '../i18n';
 import { Link } from '../router';
-import { CATEGORIES_LIST } from '../registry/categories.registry';
+import { CATEGORIES_LIST, getCategoryById } from '../registry/categories.registry';
 import { getPopularTools, getFeaturedTools, TOOLS_LIST } from '../registry/tools.registry';
 import { CategoryCard } from '../components/common/CategoryCard';
 import { ToolCard } from '../components/common/ToolCard';
@@ -87,7 +87,7 @@ export const HomePage: React.FC = () => {
                           {tool.localizedName[locale] || tool.localizedName.en}
                         </span>
                         <span className="text-[11px] font-mono text-orange-600">
-                          {tool.category}
+                          {getCategoryById(tool.category)?.localizedTitle[locale] || tool.category}
                         </span>
                       </Link>
                     ))}
