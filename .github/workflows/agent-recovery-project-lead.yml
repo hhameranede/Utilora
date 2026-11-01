@@ -1,0 +1,33 @@
+name: UTILORA recovery · Project Lead
+
+on:
+  workflow_dispatch:
+    inputs:
+      utilora_ref:
+        description: Optional immutable UTILORA commit to test; defaults to this workflow revision.
+        required: false
+        type: string
+        default: ""
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/agent-recovery-project-lead.yml"
+      - ".github/workflows/_agent-recovery-reusable.yml"
+      - ".opencode/agents/project-lead.md"
+      - ".opencode/skills/planning-and-task-breakdown/**"
+
+permissions:
+  contents: read
+
+jobs:
+  recovery:
+    uses: ./.github/workflows/_agent-recovery-reusable.yml
+    with:
+      utilora_ref: ${{ inputs.utilora_ref || github.sha }}
+      agent_name: "project-lead"
+      model_alias: "nemotron-ultra"
+      model_id: "nvidia/nemotron-3-ultra-550b-a55b"
+      skill_name: "planning-and-task-breakdown"
+      diagnosis_focus: >-
+        The previous full smoke run recorded a native call to the assigned planning-and-task-breakdown skill and two completed evidence calls, but the model emitted no usable final assistant text. Perform the same read-only checks, then return a complete concise report with all six exact labels. Do not stop after tool calls; always provide the final report.
+    secrets: inherit
