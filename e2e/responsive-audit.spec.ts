@@ -14,8 +14,8 @@ const toolRoutes = [
   ['domain-age-checker', 'functional'], ['rdap-lookup', 'functional'], ['dns-lookup', 'functional'],
   ['website-status-checker', 'functional'], ['http-headers-checker', 'functional'],
   ['video-compressor', 'preview'], ['video-to-audio', 'preview'],
-  ['video-metadata-viewer', 'preview'], ['video-downloader', 'preview'],
-  ['video-trimmer', 'preview'], ['thumbnail-extractor', 'preview'],
+  ['video-metadata-viewer', 'functional'], ['video-downloader', 'preview'],
+  ['video-trimmer', 'preview'], ['thumbnail-extractor', 'functional'],
 ] as const;
 
 const viewports = [
