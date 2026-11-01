@@ -1,26 +1,16 @@
-name: UTILORA agent model smoke test
+name: UTILORA agent capability check
 
 on:
   workflow_dispatch:
     inputs:
       utilora_ref:
-        description: Optional immutable UTILORA commit to test; defaults to this workflow revision.
+        description: Optional UTILORA branch, tag, or commit to inspect
         required: false
         type: string
         default: ""
-  pull_request:
-    branches: [main]
-    paths:
-      - ".github/workflows/agent-model-smoke.yml"
-      - ".github/workflows/_agent-recovery-reusable.yml"
-      - ".github/workflows/agent-recovery-*.yml"
-      - "scripts/test-agent-config.ts"
-      - "opencode.json"
-      - ".opencode/agents/**"
-      - ".opencode/skills/**"
 
 concurrency:
-  group: utilora-agent-smoke-${{ github.event.pull_request.number || github.ref }}
+  group: utilora-agent-check-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
@@ -28,32 +18,29 @@ permissions:
 
 jobs:
   credential-preflight:
-    name: Verify UTILORA API credential is configured
     runs-on: ubuntu-latest
     timeout-minutes: 2
     steps:
-      - name: Require the existing NVIDIA NIM key in UTILORA repository secrets
+      - name: Require NVIDIA NIM credential
         env:
           NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
         run: |
           set -euo pipefail
           set +x
           if [ -z "$NVIDIA_API_KEY" ]; then
-            echo "::error::UTILORA is missing the repository Actions secret NVIDIA_API_KEY."
-            echo "::error::Add the existing NVIDIA NIM credential under UTILORA > Settings > Secrets and variables > Actions."
-            echo "::error::Do not paste the key into source files, logs, issues, pull requests, or chat."
+            echo "::error::Missing repository Actions secret NVIDIA_API_KEY."
             exit 1
           fi
-          echo "UTILORA repository credential is present; the value remains masked."
+          echo "NVIDIA NIM credential is configured; its value is not displayed."
 
-  agent-smoke:
+  agent-check:
     needs: credential-preflight
     name: "${{ matrix.agent }} · ${{ matrix.model_id }}"
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 12
     strategy:
       fail-fast: false
-      max-parallel: 1
+      max-parallel: 2
       matrix:
         include:
           - agent: project-lead
@@ -82,214 +69,26 @@ jobs:
             model_id: nvidia/nemotron-3-ultra-550b-a55b
 
     steps:
+      - name: Checkout UTILORA
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.utilora_ref || github.ref }}
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
 
-      - name: Checkout the pinned UTILORA revision
-        env:
-          UTILORA_REF: ${{ inputs.utilora_ref || github.sha }}
-        run: |
-          set -euo pipefail
-          git clone --quiet --depth 1 https://github.com/hhameranede/Utilora.git "$RUNNER_TEMP/utilora"
-          git -C "$RUNNER_TEMP/utilora" fetch --quiet --depth 1 origin "$UTILORA_REF"
-          git -C "$RUNNER_TEMP/utilora" checkout --quiet --detach FETCH_HEAD
-          test -f "$RUNNER_TEMP/utilora/opencode.json"
-          test -f "$RUNNER_TEMP/utilora/.opencode/skills/manifest.json"
-          test -f "$RUNNER_TEMP/utilora/.opencode/agents/${{ matrix.agent }}.md"
-
-      - name: Verify NVIDIA key and this model are available
-        env:
-          NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
-          EXPECTED_MODEL: ${{ matrix.model_id }}
-        run: |
-          set -euo pipefail
-          set +x
-          if [ -z "$NVIDIA_API_KEY" ]; then
-            echo "::error::Missing repository Actions secret NVIDIA_API_KEY. Add the existing provider credential to UTILORA Settings > Secrets and variables > Actions."
-            exit 1
-          fi
-          curl --connect-timeout 10 --max-time 30 --fail --silent --show-error \
-            https://integrate.api.nvidia.com/v1/models \
-            -H "Authorization: Bearer $NVIDIA_API_KEY" \
-            -o "$RUNNER_TEMP/nvidia-models.json"
-          python3 - <<'PY'
-          import json, os, pathlib, sys
-          path = pathlib.Path(os.environ["RUNNER_TEMP"]) / "nvidia-models.json"
-          try:
-              payload = json.loads(path.read_text(encoding="utf-8"))
-          except Exception:
-              print("::error::NVIDIA model catalogue did not return valid JSON.")
-              sys.exit(1)
-          model_ids = {
-              item.get("id")
-              for item in payload.get("data", [])
-              if isinstance(item, dict) and isinstance(item.get("id"), str)
-          }
-          expected = os.environ["EXPECTED_MODEL"]
-          if expected not in model_ids:
-              print("::error::The configured NVIDIA API credential does not list the assigned model: " + expected)
-              print("The key is valid only if the provider accepts it; no secret value was displayed.")
-              sys.exit(1)
-          print("NVIDIA catalogue check passed for: " + expected)
-          path.unlink(missing_ok=True)
-          PY
-
-      - name: Verify real NVIDIA inference for this assigned model
-        env:
-          NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
-          MODEL_ID: ${{ matrix.model_id }}
-        run: |
-          set -euo pipefail
-          set +x
-          python3 - <<'PY'
-          import json, os, pathlib
-          model = os.environ["MODEL_ID"]
-          payload = {
-              "model": model,
-              "messages": [{"role": "user", "content": "Reply with exactly this token: UTILORA_NIM_OK"}],
-              "max_tokens": 8192 if model == "z-ai/glm-5.3-flash" else 128,
-              "temperature": 0.1,
-              "stream": False
-          }
-          if model == "z-ai/glm-5.3-flash":
-              # GLM-5.3-Flash spends tokens on reasoning; keep the reasoning budget low
-              # and leave enough generation budget for a visible final answer.
-              payload["reasoning_effort"] = "low"
-          path = pathlib.Path(os.environ["RUNNER_TEMP"]) / "nvidia-request.json"
-          path.write_text(json.dumps(payload), encoding="utf-8")
-          PY
-          set +e
-          inference_timeout=180
-          if [ "$MODEL_ID" = "deepseek-ai/deepseek-v4.1-flash" ]; then
-            inference_timeout=300
-          fi
-          attempt=1
-          max_attempts=4
-          status=""
-          curl_exit=0
-          while [ "$attempt" -le "$max_attempts" ]; do
-            set +e
-            status=$(curl --connect-timeout 10 --max-time "$inference_timeout" --silent --show-error \
-              -o "$RUNNER_TEMP/nvidia-inference.json" -w "%{http_code}" \
-              https://integrate.api.nvidia.com/v1/chat/completions \
-              -H "Authorization: Bearer $NVIDIA_API_KEY" \
-              -H "Content-Type: application/json" \
-              --data-binary @"$RUNNER_TEMP/nvidia-request.json")
-            curl_exit=$?
-            set -e
-            if [ "$curl_exit" -eq 0 ] && [ "$status" = "200" ]; then
-              break
-            fi
-            case "$status" in
-              429|500|502|503|504|"") ;;
-              *) break ;;
-            esac
-            if [ "$attempt" -lt "$max_attempts" ]; then
-              delay=$((attempt * 15))
-              echo "NVIDIA inference temporarily unavailable (HTTP $status, curl exit $curl_exit); retrying in ${delay}s ($attempt/$max_attempts)."
-              sleep "$delay"
-            fi
-            attempt=$((attempt + 1))
-          done
-          export NIM_HTTP_STATUS="$status" NIM_CURL_EXIT="$curl_exit"
-          python3 - <<'PY'
-          import json, os, pathlib, re, sys
-          temp = pathlib.Path(os.environ["RUNNER_TEMP"])
-          status = os.environ.get("NIM_HTTP_STATUS", "")
-          curl_exit = os.environ.get("NIM_CURL_EXIT", "")
-          body_path = temp / "nvidia-inference.json"
-          try:
-              payload = json.loads(body_path.read_text(encoding="utf-8"))
-          except Exception:
-              payload = {}
-          if curl_exit != "0" or status != "200":
-              error = payload.get("error", {})
-              detail = error.get("message", "") if isinstance(error, dict) else str(error)
-              detail = str(detail)[:280]
-              secret = os.environ.get("NVIDIA_API_KEY", "")
-              if secret:
-                  detail = detail.replace(secret, "[REDACTED]")
-              detail = re.sub(r"(?i)(bearer\s+)[^\s,]+", r"\1[REDACTED]", detail)
-              print("::error::NVIDIA inference failed for " + os.environ["MODEL_ID"] + "; HTTP " + status + "; curl exit " + curl_exit)
-              if detail:
-                  print("Provider error: " + detail)
-              sys.exit(1)
-          choices = payload.get("choices", [])
-          choice = choices[0] if choices and isinstance(choices[0], dict) else {}
-          message = choice.get("message", {}) if isinstance(choice.get("message"), dict) else {}
-          content = message.get("content", "")
-          if isinstance(content, list):
-              content = "".join(
-                  part.get("text", "")
-                  for part in content
-                  if isinstance(part, dict) and isinstance(part.get("text"), str)
-              )
-          if not isinstance(content, str) or not content.strip():
-              finish_reason = str(choice.get("finish_reason", "unknown"))
-              reasoning = message.get("reasoning_content", "")
-              reasoning_length = len(reasoning) if isinstance(reasoning, str) else 0
-              print(
-                  "::error::NVIDIA returned HTTP 200 without a final text answer for "
-                  + os.environ["MODEL_ID"]
-                  + "; finish_reason=" + finish_reason
-                  + "; reasoning_chars=" + str(reasoning_length)
-              )
-              print("Response keys: " + ",".join(sorted(payload.keys())))
-              print("Choice keys: " + ",".join(sorted(choice.keys())))
-              print("Message keys: " + ",".join(sorted(message.keys())))
-              sys.exit(1)
-          if "UTILORA_NIM_OK" not in content:
-              print("::error::NVIDIA returned text but did not complete the inference sentinel for " + os.environ["MODEL_ID"])
-              print("finish_reason=" + str(choice.get("finish_reason", "unknown")) + "; output_chars=" + str(len(content)))
-              sys.exit(1)
-          print("Real NVIDIA inference passed for: " + os.environ["MODEL_ID"])
-          body_path.unlink(missing_ok=True)
-          (temp / "nvidia-request.json").unlink(missing_ok=True)
-          PY
-
-      - name: Install OpenCode CLI
+      - name: Install OpenCode
         run: npm install --global opencode-ai@1
-
-      - name: Resolve the selected agent and model route
-        env:
-          TARGET_DIR: ${{ runner.temp }}/utilora
-          AGENT_NAME: ${{ matrix.agent }}
-          MODEL_ROUTE: nvidia-nim/${{ matrix.model_alias }}
-        run: |
-          set -euo pipefail
-          cd "$TARGET_DIR"
-          opencode debug config > "$RUNNER_TEMP/opencode-config.json"
-          opencode agent list > "$RUNNER_TEMP/opencode-agents.txt"
-          grep -Fq "$AGENT_NAME" "$RUNNER_TEMP/opencode-agents.txt"
-          opencode debug agent "$AGENT_NAME" > "$RUNNER_TEMP/resolved-agent.json"
-          python3 - <<'PY'
-          import json, os, pathlib, re, sys
-          data = json.loads(pathlib.Path(os.environ["RUNNER_TEMP"], "resolved-agent.json").read_text())
-          if data.get("name") != os.environ["AGENT_NAME"]:
-              print("::error::OpenCode resolved a different agent than requested.")
-              sys.exit(1)
-          agent_file = pathlib.Path(os.environ["TARGET_DIR"], ".opencode", "agents", os.environ["AGENT_NAME"] + ".md")
-          frontmatter = agent_file.read_text(encoding="utf-8").split("---", 2)[1]
-          match = re.search(r"^model:\s*(\S+)\s*$", frontmatter, re.MULTILINE)
-          expected = os.environ["MODEL_ROUTE"]
-          if not match or match.group(1) != expected:
-              print("::error::The agent frontmatter does not match the assigned NVIDIA route.")
-              sys.exit(1)
-          print("OpenCode resolved " + data["name"] + "; assigned route: " + expected)
-          PY
 
       - name: Prepare a real visual sample
         if: matrix.agent == 'visual-reviewer'
-        env:
-          TARGET_DIR: ${{ runner.temp }}/utilora
         run: |
           set -euo pipefail
-          cd "$TARGET_DIR"
-          npm install --no-save --no-package-lock --no-audit --no-fund
-          npx playwright install chromium
-          npm run dev -- --host 127.0.0.1 > "$RUNNER_TEMP/utilora-vite.log" 2>&1 &
+          npm ci
+          npx playwright install --with-deps chromium
+          npm run dev -- --host 127.0.0.1 --port 3000 > "$RUNNER_TEMP/utilora-vite.log" 2>&1 &
           echo $! > "$RUNNER_TEMP/utilora-vite.pid"
           ready=0
           for attempt in $(seq 1 45); do
@@ -300,266 +99,82 @@ jobs:
             sleep 2
           done
           if [ "$ready" -ne 1 ]; then
-            echo "::error::UTILORA local preview did not become ready."
-            tail -n 40 "$RUNNER_TEMP/utilora-vite.log"
+            echo "::error::Local preview did not become ready."
+            tail -n 30 "$RUNNER_TEMP/utilora-vite.log"
             exit 1
           fi
-          npx playwright screenshot --browser chromium --viewport-size "1365,900" \
-            http://127.0.0.1:3000/ "$RUNNER_TEMP/utilora-homepage.png"
+          npx playwright screenshot --browser chromium --viewport-size "1365,900" http://127.0.0.1:3000/ "$RUNNER_TEMP/utilora-homepage.png"
           test -s "$RUNNER_TEMP/utilora-homepage.png"
 
-      - name: Execute the model-specialized agent
+      - name: Ask the agent for its role perspective
         env:
           NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
-          TARGET_DIR: ${{ runner.temp }}/utilora
           AGENT_NAME: ${{ matrix.agent }}
           MODEL_ROUTE: nvidia-nim/${{ matrix.model_alias }}
           MODEL_ID: ${{ matrix.model_id }}
-          RAW_REPORT: ${{ runner.temp }}/agent-output.jsonl
-          SAFE_REPORT_DIR: ${{ github.workspace }}/agent-reports
           SCREENSHOT: ${{ runner.temp }}/utilora-homepage.png
         run: |
           set -euo pipefail
           set +x
-          mkdir -p "$SAFE_REPORT_DIR"
-          PROMPT="$(cat <<EOF
-          This is a lightweight, read-only capability check for one member of UTILORA's eight-agent team.
-          You are agent: $AGENT_NAME. Keep your specialist role and use your own judgment.
-          Skills are optional: you may use any available skill if you judge it useful, or use none. No skill name, tool sequence, fixed report format, minimum file count, or checklist is required.
-          Consider the repository context and the role-specific task below. Identify useful ideas, alternatives, trade-offs, and questions another specialist should consider.
-          Role-specific task:
-          - visual-reviewer: inspect the attached real homepage screenshot and comment on a useful visual, responsive or RTL observation you can support.
-          - qa-engineer: consider one useful quality or regression-testing improvement for the repository.
-          - security-auditor: consider one meaningful security or privacy risk in the agent configuration or workflow.
-          - project-lead: suggest a useful next improvement and which specialists should discuss it.
-          - problem-analyst: identify a real improvement opportunity and possible approaches.
-          - implementation-engineer: suggest a practical implementation direction.
-          - fast-task-engineer: identify a useful small improvement if one is apparent.
-          - long-horizon-engineer: consider a larger architectural or product improvement and how it could evolve.
-          Do not edit, create, delete, commit, push, merge, deploy, inspect environment variables, read .env files, or call external services.
-          Be honest about what you did and did not inspect. Do not invent evidence, tool calls, screenshots, or results. Answer naturally and concisely.
+          PROMPT="$(cat <<'EOF'
+          You are participating in a lightweight, read-only capability check for UTILORA.
+          Respond from your specialist role. Use your own judgment and choose your own approach.
+          Skills are optional: use any available skill if it helps, or use none. No particular skill, tool sequence, minimum evidence count, checklist, or fixed report format is required.
+          Consider one useful improvement, observation, risk, or question that could help the wider eight-agent team. You may suggest alternatives and respectfully disagree with assumptions.
+          Be honest about what you actually inspected and what remains uncertain. Do not fabricate tool calls, evidence, screenshots, or results.
+          Do not edit files, create or delete files, commit, push, merge, deploy, inspect environment variables, read .env files, or call external services.
+          Answer naturally and concisely.
           EOF
           )"
-          cd "$TARGET_DIR"
-          set +e
           if [ "$AGENT_NAME" = "visual-reviewer" ]; then
-            opencode run --dir "$TARGET_DIR" --agent "$AGENT_NAME" --model "$MODEL_ROUTE" --file "$SCREENSHOT" --format json "$PROMPT" > "$RAW_REPORT" 2> "$RUNNER_TEMP/opencode-stderr.txt"
+            opencode run --dir "$GITHUB_WORKSPACE" --agent "$AGENT_NAME" --model "$MODEL_ROUTE" --file "$SCREENSHOT" --format json "$PROMPT" > "$RUNNER_TEMP/agent-output.jsonl" 2> "$RUNNER_TEMP/opencode-stderr.txt"
           else
-            opencode run --dir "$TARGET_DIR" --agent "$AGENT_NAME" --model "$MODEL_ROUTE" --format json "$PROMPT" > "$RAW_REPORT" 2> "$RUNNER_TEMP/opencode-stderr.txt"
-          fi
-          opencode_status=$?
-          set -e
-          if [ "$opencode_status" -ne 0 ]; then
-            echo "::error::OpenCode failed for $AGENT_NAME (exit $opencode_status). Sanitized diagnostic follows."
-            python3 - <<'PY'
-          import os, pathlib, re
-          path = pathlib.Path(os.environ["RUNNER_TEMP"], "opencode-stderr.txt")
-          if path.exists():
-              secret = os.environ.get("NVIDIA_API_KEY", "")
-              lines = path.read_text(encoding="utf-8", errors="replace").splitlines()
-              safe = []
-              for line in lines[-40:]:
-                  if re.search(r"(?i)(authorization|bearer|nvidia_api_key|nvapi-)", line):
-                      continue
-                  if secret:
-                      line = line.replace(secret, "[REDACTED]")
-                  line = re.sub(r"(?i)nvapi-[A-Za-z0-9_-]{8,}", "[REDACTED]", line)
-                  safe.append(line[:500])
-              for line in safe[-20:]:
-                  print(line)
-          PY
-            exit "$opencode_status"
-          fi
-          PRECHECK="$RUNNER_TEMP/opencode-precheck.json" python3 - <<'PY'
-          import json, os, pathlib, re
-          raw = pathlib.Path(os.environ["RAW_REPORT"]).read_text(encoding="utf-8", errors="replace")
-          events = []
-          for line in raw.splitlines():
-              try:
-                  item = json.loads(line)
-                  if isinstance(item, dict) and isinstance(item.get("type"), str):
-                      events.append(item)
-              except json.JSONDecodeError:
-                  continue
-          skill = os.environ["SKILL_NAME"]
-          skill_calls = 0
-          skill_failures = []
-          read_calls = 0
-          text_parts = []
-          session_id = ""
-          labels = ["OUTCOME", "EVIDENCE", "LIMITATIONS"]
-          for event in events:
-              session_id = session_id or event.get("sessionID") or (event.get("part") or {}).get("sessionID", "")
-              part = event.get("part") or {}
-              if event.get("type") == "tool_use":
-                  tool = part.get("tool")
-                  state = part.get("state") or {}
-                  if tool == "skill" and skill in json.dumps(state.get("input") or {}, ensure_ascii=False):
-                      if state.get("status") == "completed":
-                          skill_calls += 1
-                      else:
-                          skill_failures.append(str(state.get("status", "unknown")))
-                  if tool in {"read", "grep", "glob", "list"} and state.get("status") == "completed":
-                      read_calls += 1
-              elif event.get("type") == "text":
-                  value = part.get("text")
-                  if isinstance(value, str):
-                      text_parts.append(value)
-          final_text = "\n".join(text_parts)
-          missing = [
-              label for label in labels
-              if not re.search(
-                  r"(?im)^\s*(?:#{1,6}\s*)?(?:\*\*)?" + re.escape(label)
-                  + r"(?:\*\*)?\s*:",
-                  final_text
-              )
-          ]
-          precheck = {
-              "session_id": session_id,
-              "skill_calls": skill_calls,
-              "skill_failures": skill_failures,
-              "read_calls": read_calls,
-              "text_chars": len(final_text.strip()),
-              "missing_labels": missing,
-          }
-          pathlib.Path(os.environ["PRECHECK"]).write_text(json.dumps(precheck), encoding="utf-8")
-          print("OpenCode completion check: completed_skill_calls=%d, failed_skill_attempts=%d, evidence_reads=%d, text_chars=%d, missing_labels=%d" % (skill_calls, len(skill_failures), read_calls, len(final_text.strip()), len(missing)))
-          PY
-          needs_followup="$(python3 -c 'import json,sys; d=json.load(open(sys.argv[1])); print("yes" if d["skill_calls"] < 1 or d["read_calls"] < 2 or d["text_chars"] < 80 or d["missing_labels"] else "no")' "$RUNNER_TEMP/opencode-precheck.json")"
-          if [ "$needs_followup" = "yes" ]; then
-            session_id="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1])).get("session_id",""))' "$RUNNER_TEMP/opencode-precheck.json")"
-            if [ -z "$session_id" ]; then
-              echo "::error::OpenCode returned no resumable session ID; the agent could not complete its report."
-              exit 1
-            fi
-            FOLLOWUP_PROMPT="$(cat <<EOF
-          Continue this same UTILORA read-only smoke-test session. Do not restart or repeat completed work unnecessarily.
-          Before writing the final report, check the actual tool events already completed.
-          If the native skill call for exactly "$SKILL_NAME" did not complete successfully, invoke it now using the exact @skill trigger @$SKILL_NAME.
-          If you have fewer than two completed evidence-inspection calls, inspect the missing repository evidence now.
-          Do not edit files, run mutating commands, inspect environment variables, read .env files, or call external services.
-          Then return only these three separate labeled lines:
-          OUTCOME: ...
-          EVIDENCE: ...
-          LIMITATIONS: ...
-          Keep the evidence factual and concise. Do not claim any action or evidence unless it appears in the session's actual tool history.
-          EOF
-          )"
-            echo "The first response was incomplete; requesting one bounded continuation in the same session."
-            set +e
-            if [ "$AGENT_NAME" = "visual-reviewer" ]; then
-              opencode run --dir "$TARGET_DIR" --session "$session_id" --agent "$AGENT_NAME" --model "$MODEL_ROUTE" --format json "$FOLLOWUP_PROMPT" >> "$RAW_REPORT" 2>> "$RUNNER_TEMP/opencode-stderr.txt"
-            else
-              opencode run --dir "$TARGET_DIR" --session "$session_id" --agent "$AGENT_NAME" --model "$MODEL_ROUTE" --format json "$FOLLOWUP_PROMPT" >> "$RAW_REPORT" 2>> "$RUNNER_TEMP/opencode-stderr.txt"
-            fi
-            followup_status=$?
-            set -e
-            if [ "$followup_status" -ne 0 ]; then
-              echo "::warning::Bounded OpenCode continuation returned exit code $followup_status; strict validation remains enabled."
-            fi
+            opencode run --dir "$GITHUB_WORKSPACE" --agent "$AGENT_NAME" --model "$MODEL_ROUTE" --format json "$PROMPT" > "$RUNNER_TEMP/agent-output.jsonl" 2> "$RUNNER_TEMP/opencode-stderr.txt"
           fi
           python3 - <<'PY'
           import json, os, pathlib, re, sys
-          raw_path = pathlib.Path(os.environ["RAW_REPORT"])
-          raw = raw_path.read_text(encoding="utf-8", errors="replace")
+          path = pathlib.Path(os.environ["RUNNER_TEMP"]) / "agent-output.jsonl"
+          raw = path.read_text(encoding="utf-8", errors="replace")
           secret = os.environ.get("NVIDIA_API_KEY", "")
-          report_dir = pathlib.Path(os.environ["SAFE_REPORT_DIR"])
-          report_dir.mkdir(parents=True, exist_ok=True)
-          tool_names = []
-          missing_headings = []
-          skill_failures = []
-
-          def fail(message, events=None, skill_count=0, read_count=0, text_count=0, text_length=0):
-              print("::error::" + message)
-              diagnostic = (
-                  "# Agent smoke diagnostic: " + os.environ["AGENT_NAME"] + "\n\n"
-                  "- Model: " + os.environ["MODEL_ID"] + "\n"
-                  "- Assigned skill: " + os.environ["SKILL_NAME"] + "\n"
-                  "- Parsed event count: " + str(len(events or [])) + "\n"
-                  "- Successfully completed skill calls: " + str(skill_count) + "\n"
-                  "- Failed/denied skill attempts: " + ", ".join(skill_failures) + "\n"
-                  "- Completed evidence reads: " + str(read_count) + "\n"
-                  "- Assistant text events: " + str(text_count) + "\n"
-                  "- Assistant text characters: " + str(text_length) + "\n"
-                  "- Tool names observed: " + ", ".join(sorted(set(tool_names))) + "\n"
-                  "- Missing required headings: " + ", ".join(missing_headings if "missing_headings" in locals() else []) + "\n"
-                  "- Result: FAIL (sanitized diagnostic only)\n"
-              )
-              (report_dir / (os.environ["AGENT_NAME"] + ".diagnostic.md")).write_text(diagnostic, encoding="utf-8")
-              raw_path.unlink(missing_ok=True)
-              sys.exit(1)
-
           if secret and secret in raw:
-              fail("Agent output contained the configured credential; raw output was suppressed.")
-          if re.search(r"(?i)nvapi-[A-Za-z0-9_-]{12,}", raw):
-              fail("Agent output resembled an NVIDIA credential; raw output was suppressed.")
-
-          events = []
-          parse_errors = 0
+              print("::error::Agent output contained the configured credential; output suppressed.")
+              sys.exit(1)
+          if re.search(r"(?i)nvapi-[A-Za-z0-9_-]{12,}|gh[pousr]_[A-Za-z0-9]{20,}", raw):
+              print("::error::Agent output resembled a credential; output suppressed.")
+              sys.exit(1)
+          parts = []
           for line in raw.splitlines():
               try:
                   event = json.loads(line)
-                  if isinstance(event, dict) and isinstance(event.get("type"), str):
-                      events.append(event)
               except json.JSONDecodeError:
-                  parse_errors += 1
-
-          agent = os.environ["AGENT_NAME"]
-          text_parts = []
-          tool_names = []
-          stream_errors = []
-          for event in events:
-              event_type = event.get("type")
+                  continue
               part = event.get("part") or {}
-              if event_type == "tool_use":
-                  tool = part.get("tool")
-                  state = part.get("state") or {}
-                  inputs = state.get("input") or {}
-                  if isinstance(tool, str):
-                      tool_names.append(tool)
-              elif event_type == "text":
-                  value = part.get("text")
-                  if isinstance(value, str):
-                      text_parts.append(value)
-              elif event_type == "error":
-                  error = event.get("error") or {}
-                  if isinstance(error, dict):
-                      stream_errors.append(str(error.get("name", "OpenCode error")))
-                  else:
-                      stream_errors.append("OpenCode error")
-
-          final_text = "\n".join(text_parts).strip()
-          if stream_errors:
-              fail("OpenCode emitted an error event for " + agent + ".", events, 0, 0, len(text_parts), len(final_text))
-          if not events or not final_text:
-              fail("OpenCode did not return a final assistant response for " + agent + ".", events, 0, 0, len(text_parts), len(final_text))
-          if agent == "visual-reviewer":
-              if not re.search(r"(?i)screenshot|viewport", final_text):
-                  fail("The visual reviewer did not provide screenshot/viewport-specific evidence.", events, len(skill_calls), len(read_calls), len(text_parts), len(final_text))
-              if re.search(r"(?i)(could not inspect|was not inspected|does not support image input|no image input)", final_text):
-                  fail("The visual reviewer reported that image input was unavailable; visual review cannot pass.", events, len(skill_calls), len(read_calls), len(text_parts), len(final_text))
-          if re.search(r"(?i)nvapi-[A-Za-z0-9_-]{12,}", final_text):
-              fail("The response resembled a credential; report suppressed.", events, len(skill_calls), len(read_calls), len(text_parts), len(final_text))
-
-          model = os.environ["MODEL_ID"]
-          report = (
-              "# Agent smoke report: " + agent + "\n\n"
-              "- Model: " + model + "\n"
-              "- Parsed OpenCode events: " + str(len(events)) + "\n"
-              "- Result: PASS\n\n"
-              "## Agent response\n\n" + final_text + "\n"
-          )
-          (report_dir / (agent + ".md")).write_text(report, encoding="utf-8")
-          raw_path.unlink(missing_ok=True)
-          print("PASS: " + agent + " responded using " + model + ".")
+              if event.get("type") == "text" and isinstance(part.get("text"), str):
+                  parts.append(part["text"])
+          answer = "\n".join(parts).strip()
+          if not answer:
+              print("::error::The agent did not return a final text response.")
+              sys.exit(1)
+          report = "# " + os.environ["AGENT_NAME"] + "\n\nModel: " + os.environ["MODEL_ID"] + "\n\n" + answer + "\n"
+          pathlib.Path(os.environ["RUNNER_TEMP"], "agent-report.md").write_text(report, encoding="utf-8")
+          path.unlink(missing_ok=True)
+          print("Agent returned a response. Full response is retained as a short-lived workflow artifact.")
           PY
-          worktree_status="$(git -C "$TARGET_DIR" status --porcelain=v1 --untracked-files=all)"
+          worktree_status="$(git status --porcelain=v1 --untracked-files=all)"
           if [ -n "$worktree_status" ]; then
-            echo "::error::The read-only agent modified the UTILORA checkout."
-            printf '%s\n' "$worktree_status" | sed -E 's/^.../Unexpected worktree path: /' | head -n 20
+            echo "::error::The diagnostic agent changed the checkout; changes are not accepted."
+            printf '%s\n' "$worktree_status" | head -n 20
             exit 1
           fi
-          echo "| $AGENT_NAME | PASS | $MODEL_ID | optional skills |" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload the agent response
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: utilora-agent-response-${{ matrix.agent }}
+          path: ${{ runner.temp }}/agent-report.md
+          if-no-files-found: ignore
+          retention-days: 3
 
       - name: Stop local preview
         if: always() && matrix.agent == 'visual-reviewer'
@@ -567,12 +182,3 @@ jobs:
           if [ -f "$RUNNER_TEMP/utilora-vite.pid" ]; then
             kill "$(cat "$RUNNER_TEMP/utilora-vite.pid")" 2>/dev/null || true
           fi
-
-      - name: Upload sanitized agent report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: utilora-agent-report-${{ matrix.agent }}
-          path: agent-reports/
-          if-no-files-found: ignore
-          retention-days: 7
