@@ -42,7 +42,7 @@ export const HomePage: React.FC = () => {
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-orange-500/5 rounded-full blur-3xl pointer-events-none" />
 
           {/* Clean Unboxed Category Kicker */}
-          <div className="text-xs font-mono uppercase tracking-widest text-orange-600 mb-4 font-semibold">
+          <div className="text-xs font-mono uppercase tracking-widest text-orange-700 mb-4 font-semibold">
             {t('hero.badge')}
           </div>
 
@@ -57,13 +57,13 @@ export const HomePage: React.FC = () => {
           {/* Hero Search Field */}
           <div className="max-w-2xl mx-auto relative mb-6">
             <div className="relative flex items-center">
-              <Search size={18} className="absolute start-4 text-orange-500 pointer-events-none" />
+              <Search size={18} className="absolute start-4 text-orange-600 pointer-events-none" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder={t('hero.searchPlaceholder')}
-                className="w-full ps-12 pe-4 py-4 rounded-2xl bg-white border border-stone-200 text-sm sm:text-base text-stone-900 placeholder-stone-400 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 shadow-lg shadow-stone-200/50 transition-all"
+                className="w-full ps-12 pe-4 py-4 rounded-2xl bg-white border border-stone-200 text-sm sm:text-base text-stone-900 placeholder-stone-500 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 shadow-lg shadow-stone-200/50 transition-all"
               />
             </div>
 
@@ -86,7 +86,7 @@ export const HomePage: React.FC = () => {
                         <span className="font-semibold text-stone-800">
                           {tool.localizedName[locale] || tool.localizedName.en}
                         </span>
-                        <span className="text-[11px] font-mono text-orange-600">
+                        <span className="text-[11px] font-mono text-orange-700">
                           {getCategoryById(tool.category)?.localizedTitle[locale] || tool.category}
                         </span>
                       </Link>
@@ -119,7 +119,7 @@ export const HomePage: React.FC = () => {
               <div className="text-[11px] text-stone-500 mt-0.5">{t('hero.statsTools')}</div>
             </div>
             <div>
-              <div className="text-xl sm:text-2xl font-bold font-mono text-orange-600">6</div>
+              <div className="text-xl sm:text-2xl font-bold font-mono text-orange-700">6</div>
               <div className="text-[11px] text-stone-500 mt-0.5">{t('hero.statsCategories')}</div>
             </div>
             <div>
@@ -145,7 +145,7 @@ export const HomePage: React.FC = () => {
 
             <Link
               routeType="categories-index"
-              className="text-xs font-semibold text-orange-600 hover:text-orange-700 flex items-center gap-1 group"
+              className="text-xs font-semibold text-orange-700 hover:text-orange-700 flex items-center gap-1 group"
             >
               <span>{t('nav.categories')}</span>
               <ArrowRight size={13} className="group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5 transition-transform" />
@@ -175,7 +175,7 @@ export const HomePage: React.FC = () => {
 
             <Link
               routeType="tools-index"
-              className="text-xs font-semibold text-orange-600 hover:text-orange-700 flex items-center gap-1 group"
+              className="text-xs font-semibold text-orange-700 hover:text-orange-700 flex items-center gap-1 group"
             >
               <span>{t('nav.allTools')}</span>
               <ArrowRight size={13} className="group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5 transition-transform" />
@@ -225,7 +225,7 @@ export const HomePage: React.FC = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="space-y-3">
-                <div className="w-10 h-10 rounded-xl bg-orange-50 border border-orange-100 flex items-center justify-center text-orange-600 font-mono text-sm font-bold shadow-xs">
+                <div className="w-10 h-10 rounded-xl bg-orange-50 border border-orange-100 flex items-center justify-center text-orange-700 font-mono text-sm font-bold shadow-xs">
                   01
                 </div>
                 <h3 className="text-base font-semibold text-stone-900">
@@ -237,7 +237,7 @@ export const HomePage: React.FC = () => {
               </div>
 
               <div className="space-y-3">
-                <div className="w-10 h-10 rounded-xl bg-orange-50 border border-orange-100 flex items-center justify-center text-orange-600 font-mono text-sm font-bold shadow-xs">
+                <div className="w-10 h-10 rounded-xl bg-orange-50 border border-orange-100 flex items-center justify-center text-orange-700 font-mono text-sm font-bold shadow-xs">
                   02
                 </div>
                 <h3 className="text-base font-semibold text-stone-900">
@@ -249,7 +249,7 @@ export const HomePage: React.FC = () => {
               </div>
 
               <div className="space-y-3">
-                <div className="w-10 h-10 rounded-xl bg-orange-50 border border-orange-100 flex items-center justify-center text-orange-600 font-mono text-sm font-bold shadow-xs">
+                <div className="w-10 h-10 rounded-xl bg-orange-50 border border-orange-100 flex items-center justify-center text-orange-700 font-mono text-sm font-bold shadow-xs">
                   03
                 </div>
                 <h3 className="text-base font-semibold text-stone-900">
@@ -269,7 +269,7 @@ export const HomePage: React.FC = () => {
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="p-8 sm:p-10 rounded-3xl bg-gradient-to-r from-orange-50/60 via-white to-orange-50/40 border border-orange-200/80 flex flex-col md:flex-row items-center justify-between gap-8 shadow-xs">
             <div className="space-y-2 max-w-2xl">
-              <div className="flex items-center gap-2 text-xs font-mono text-orange-600 uppercase tracking-wider font-semibold">
+              <div className="flex items-center gap-2 text-xs font-mono text-orange-700 uppercase tracking-wider font-semibold">
                 <Shield size={14} />
                 <span>{t('home.privacyKicker')}</span>
               </div>
@@ -290,7 +290,7 @@ export const HomePage: React.FC = () => {
               </Link>
               <Link
                 routeType="about"
-                className="px-4 py-2.5 rounded-xl border border-stone-300 hover:border-orange-500 text-xs font-semibold text-stone-700 hover:text-orange-600 transition-colors text-center bg-white"
+                className="px-4 py-2.5 rounded-xl border border-stone-300 hover:border-orange-500 text-xs font-semibold text-stone-700 hover:text-orange-700 transition-colors text-center bg-white"
               >
                 {t('footer.about')}
               </Link>
@@ -314,7 +314,7 @@ export const HomePage: React.FC = () => {
 
             <Link
               routeType="articles-index"
-              className="text-xs font-semibold text-orange-600 hover:text-orange-700 flex items-center gap-1 group"
+              className="text-xs font-semibold text-orange-700 hover:text-orange-700 flex items-center gap-1 group"
             >
               <span>{t('articles.allGuides')}</span>
               <ArrowRight size={13} className="group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5 transition-transform" />
@@ -330,12 +330,12 @@ export const HomePage: React.FC = () => {
                 className="group p-6 rounded-2xl bg-white hover:bg-white border border-stone-200/90 hover:border-orange-300 transition-all flex flex-col justify-between shadow-xs hover:shadow-md hover:shadow-orange-500/5"
               >
                 <div>
-                  <div className="flex items-center gap-2 text-xs text-stone-400 mb-3">
+                  <div className="flex items-center gap-2 text-xs text-stone-500 mb-3">
                     <span className="capitalize">{art.category}</span>
                     <span aria-hidden="true" className="text-stone-300">·</span>
                     <span>{art.readingTimeMinutes} {t('articles.readTime')}</span>
                   </div>
-                  <h3 className="text-sm font-semibold text-stone-900 group-hover:text-orange-600 transition-colors line-clamp-2 mb-2">
+                  <h3 className="text-sm font-semibold text-stone-900 group-hover:text-orange-700 transition-colors line-clamp-2 mb-2">
                     {art.title[locale] || art.title.en}
                   </h3>
                   <p className="text-xs text-stone-600 line-clamp-2 leading-relaxed">
@@ -343,7 +343,7 @@ export const HomePage: React.FC = () => {
                   </p>
                 </div>
 
-                <div className="flex items-center justify-between text-xs font-medium text-stone-500 group-hover:text-orange-600 pt-4 border-t border-stone-100 mt-4">
+                <div className="flex items-center justify-between text-xs font-medium text-stone-500 group-hover:text-orange-700 pt-4 border-t border-stone-100 mt-4">
                   <span>{t('common.readGuide')}</span>
                   <ArrowRight size={13} className="group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5 transition-transform" />
                 </div>
