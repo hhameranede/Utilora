@@ -175,8 +175,8 @@ const licenseFiles: Record<string, string> = {
 for (const skill of manifest.skills) {
   assert.match(skill.name, /^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Invalid skill ID: ' + skill.name);
   assert.equal(skill.path, join('.opencode', 'skills', skill.name, 'SKILL.md'), 'Manifest path mismatch: ' + skill.name);
-  assert.ok(skill.suggestedFor.length > 0, 'Skill is not assigned: ' + skill.name);
-  assert.equal(new Set(skill.suggestedFor).size, skill.suggestedFor.length, 'Duplicate agent assignment: ' + skill.name);
+  assert.ok(Array.isArray(skill.suggestedFor), 'Skill recommendations must be an array: ' + skill.name);
+  assert.equal(new Set(skill.suggestedFor).size, skill.suggestedFor.length, 'Duplicate role suggestion: ' + skill.name);
 
   const skillPath = join(root, skill.path);
   const raw = readFileSync(skillPath, 'utf8');
@@ -203,7 +203,7 @@ for (const skill of manifest.skills) {
   }
 
   for (const agent of skill.suggestedFor) {
-    assert.ok(expectedAgents.includes(agent as (typeof expectedAgents)[number]), 'Unknown assigned agent: ' + agent);
+    assert.ok(expectedAgents.includes(agent as (typeof expectedAgents)[number]), 'Unknown suggested role: ' + agent);
     assert.ok(manifest.suggestionsByRole[agent]?.includes(skill.name), 'Reverse assignment missing: ' + skill.name);
   }
 }
@@ -225,11 +225,11 @@ for (const agentFile of agentFiles) {
 }
 
 for (const agent of expectedAgents) {
-  const assigned = manifest.skills.filter((skill) => skill.suggestedFor.includes(agent)).map((skill) => skill.name).sort();
+  const suggested = manifest.skills.filter((skill) => skill.suggestedFor.includes(agent)).map((skill) => skill.name).sort();
   assert.deepEqual(
     [...(manifest.suggestionsByRole[agent] ?? [])].sort(),
-    assigned,
-    'Manifest reverse index mismatch for ' + agent,
+    suggested,
+    'Manifest suggestion index mismatch for ' + agent,
   );
 }
 
