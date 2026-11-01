@@ -241,5 +241,27 @@
     "step1": "Ouvrez l’espace de travail et ajoutez vos données",
     "step2": "Choisissez les options adaptées à votre tâche",
     "step3": "Vérifiez le résultat puis enregistrez-le ou copiez-le"
+  },
+  "legal": {
+    "kicker": "Informations sur la plateforme",
+    "lastUpdated": "Dernière mise à jour",
+    "updatedDate": "Novembre 2026",
+    "effective": "Applicable dans le monde entier"
+  },
+  "privacy": {
+    "title": "Politique de confidentialité",
+    "subtitle": "Une explication claire des opérations effectuées dans votre navigateur, des données envoyées aux services publics et des informations techniques traitées par l’infrastructure.",
+    "processingTitle": "1. Traitement des fichiers et du texte",
+    "processing": "Les opérations sur les images, PDF, textes, outils de développement et médias pris en charge sont conçues pour s’exécuter dans votre navigateur. Les fichiers ou textes que vous sélectionnez sont traités sur votre appareil et leur contenu n’est pas envoyé aux serveurs applicatifs d’UTILORA.",
+    "networkTitle": "2. Recherches sur les sites et domaines",
+    "network": "Les outils de vérification des sites et domaines nécessitent un accès réseau. Lorsque vous lancez une recherche, le nom d’hôte ou l’URL saisi est transmis au service DNS ou RDAP public concerné, ou au site cible, afin d’obtenir les informations demandées. Ces services et sites externes peuvent traiter la requête selon leurs propres politiques de confidentialité.",
+    "infrastructureTitle": "3. Hébergement, diffusion et journaux techniques",
+    "infrastructure": "UTILORA est fourni par une infrastructure d’hébergement et de diffusion de contenu. Ces fournisseurs peuvent traiter des données techniques telles que l’adresse IP, l’agent utilisateur, le chemin demandé, les horodatages et les événements de sécurité pour la diffusion, le cache, la prévention des abus et la fiabilité. Leurs propres règles de confidentialité et de conservation s’appliquent.",
+    "preferencesTitle": "4. Préférences linguistiques et stockage local",
+    "preferences": "Lorsque vous changez la langue de l’interface, UTILORA enregistre votre choix dans le localStorage de votre navigateur afin de le mémoriser. Cette préférence reste dans ce navigateur jusqu’à la suppression des données du site.",
+    "externalTitle": "5. Ressources externes",
+    "external": "Le site charge les polices de l’interface depuis Google Fonts. Votre navigateur demande donc des ressources de police aux domaines de Google, qui peuvent recevoir des informations techniques sur ces requêtes. Les fournisseurs de recherches réseau et les sites cibles reçoivent également le nom d’hôte ou l’URL nécessaires.",
+    "accountsTitle": "6. Comptes et emplacements facultatifs",
+    "accounts": "Aucun compte utilisateur n’est nécessaire pour utiliser les outils disponibles. Les composants réservés à la publicité et à l’affiliation dans l’interface actuelle sont désactivés par défaut. Si des services tiers facultatifs sont ajoutés ou activés ultérieurement, cette politique devra être mise à jour avant leur utilisation."
   }
 }
