@@ -382,6 +382,8 @@ jobs:
           report_dir = pathlib.Path(os.environ["SAFE_REPORT_DIR"])
           report_dir.mkdir(parents=True, exist_ok=True)
 
+          skill_failures = []
+
           def fail(reason, events, skill_calls, read_calls, text_length, missing):
               diagnostic = (
                   "# Recovery diagnostic: " + os.environ["AGENT_NAME"] + "\n\n"
@@ -450,6 +452,11 @@ jobs:
               fail("The agent did not complete at least two repository evidence reads.", events, skill_calls, read_calls, len(final_text), missing)
           if len(final_text) < 180 or missing:
               fail("The recovery report is incomplete or missing required labeled sections.", events, skill_calls, read_calls, len(final_text), missing)
+          if os.environ["AGENT_NAME"] == "visual-reviewer":
+              if not re.search(r"(?i)screenshot|viewport", final_text):
+                  fail("The visual reviewer did not provide screenshot/viewport-specific evidence.", events, skill_calls, read_calls, len(final_text), missing)
+              if re.search(r"(?i)(could not inspect|was not inspected|does not support image input|no image input)", final_text):
+                  fail("The visual reviewer reported that image input was unavailable; visual review cannot pass.", events, skill_calls, read_calls, len(final_text), missing)
           if re.search(r"(?i)nvapi-[A-Za-z0-9_-]{12,}", final_text):
               fail("The final report resembled a credential; report suppressed.", events, skill_calls, read_calls, len(final_text), [])
           report = (
