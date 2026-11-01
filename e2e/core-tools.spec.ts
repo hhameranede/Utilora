@@ -133,7 +133,8 @@ test('text case converter transforms punctuation-separated words', async ({ page
   await expect(editor).toHaveValue('Hello-World / Utilora');
 });
 
-test('image cropper maps pointer dragging to source pixel coordinates', async ({ page }) => {
+test('image cropper maps mobile touch dragging to source pixel coordinates', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/en/tools/image-cropper');
   await page.locator('input[type="file"]').setInputFiles({
     name: 'crop-source.png',
@@ -151,10 +152,34 @@ test('image cropper maps pointer dragging to source pixel coordinates', async ({
   expect(bounds).not.toBeNull();
   if (!bounds) throw new Error('Image preview has no measurable bounds.');
 
-  await page.mouse.move(bounds.x + bounds.width * 0.25, bounds.y + bounds.height * 0.25);
-  await page.mouse.down();
-  await page.mouse.move(bounds.x + bounds.width * 0.75, bounds.y + bounds.height * 0.75, { steps: 5 });
-  await page.mouse.up();
+  const cdp = await page.context().newCDPSession(page);
+  try {
+    await cdp.send('Input.dispatchTouchEvent', {
+      type: 'touchStart',
+      touchPoints: [{
+        id: 1,
+        x: bounds.x + bounds.width * 0.25,
+        y: bounds.y + bounds.height * 0.25,
+        radiusX: 2,
+        radiusY: 2,
+        force: 1,
+      }],
+    });
+    await cdp.send('Input.dispatchTouchEvent', {
+      type: 'touchMove',
+      touchPoints: [{
+        id: 1,
+        x: bounds.x + bounds.width * 0.75,
+        y: bounds.y + bounds.height * 0.75,
+        radiusX: 2,
+        radiusY: 2,
+        force: 1,
+      }],
+    });
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+  } finally {
+    await cdp.detach();
+  }
 
   await expect(page.getByRole('spinbutton', { name: 'X' })).toHaveValue('200');
   await expect(page.getByRole('spinbutton', { name: 'Y' })).toHaveValue('100');
