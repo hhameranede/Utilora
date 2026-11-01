@@ -16,7 +16,7 @@ function collectSearchText(value: unknown, output: string[]): void {
 }
 
 export function normalizeSearchText(value: string): string {
-  return value.normalize("NFD").replace(/\\p{M}/gu, "").toLocaleLowerCase().replace(/[^\\p{L}\\p{N}]+/gu, " ").trim();
+  return value.normalize("NFD").replace(/\p{M}/gu, "").toLocaleLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();
 }
 
 export function matchesSearch(query: string, ...searchableValues: unknown[]): boolean {
