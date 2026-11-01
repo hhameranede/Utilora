@@ -25,5 +25,5 @@ export function matchesSearch(query: string, ...searchableValues: unknown[]): bo
   const searchableText: string[] = [];
   searchableValues.forEach((value) => collectSearchText(value, searchableText));
   const haystack = normalizeSearchText(searchableText.join(' '));
-  return normalizedQuery.split(/\\s+/).filter(Boolean).every((token) => haystack.includes(token));
+  return normalizedQuery.split(/\s+/).filter(Boolean).every((token) => haystack.includes(token));
 }
