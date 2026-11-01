@@ -67,7 +67,8 @@
     "previewOnly": "Solo vista previa",
     "publicLookup": "Consulta de red pública",
     "runsLocally": "Se ejecuta en tu navegador",
-    "readGuide": "Leer guía"
+    "readGuide": "Leer guía",
+    "tryAgain": "Intentar de nuevo"
   },
   "home": {
     "categoriesHeading": "Explorar por Categoría",
@@ -160,7 +161,8 @@
     "newsletterTitle": "Mantente al día",
     "newsletterDesc": "Resumen trimestral de novedades. (Solo vista previa)",
     "newsletterPlaceholder": "Ingresa tu correo",
-    "subscribe": "Suscribirse"
+    "subscribe": "Suscribirse",
+    "readArticle": "Leer artículo"
   },
   "footer": {
     "rights": "Todos los derechos reservados.",
@@ -263,5 +265,8 @@
     "external": "El sitio carga las fuentes de la interfaz desde Google Fonts. Por ello, tu navegador solicita recursos tipográficos a dominios de Google, que pueden recibir datos técnicos de esas solicitudes. Los proveedores de consultas de red y los sitios de destino también reciben el nombre de host o la URL necesarios.",
     "accountsTitle": "6. Cuentas y espacios opcionales",
     "accounts": "No necesitas una cuenta para utilizar las herramientas disponibles. Los componentes reservados para publicidad y afiliación de la interfaz actual están desactivados por defecto. Si se añaden o activan servicios de terceros en el futuro, esta política deberá actualizarse antes de utilizarlos."
+  },
+  "categories": {
+    "description": "Explora las herramientas disponibles por categoría. Cada grupo reúne utilidades relacionadas que funcionan en el navegador."
   }
 }
