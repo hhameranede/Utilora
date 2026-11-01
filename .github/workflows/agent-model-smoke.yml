@@ -1,0 +1,193 @@
+name: UTILORA agent model smoke test
+
+on:
+  workflow_call:
+    inputs:
+      utilora_ref:
+        description: Immutable UTILORA commit to test.
+        required: true
+        type: string
+      model:
+        description: NVIDIA model identifier.
+        required: false
+        type: string
+        default: nvidia/nemotron-3.5-super-vl-120b-a12b
+    secrets:
+      NVIDIA_API_KEY:
+        description: NVIDIA key forwarded by the trusted caller workflow.
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  agent-smoke:
+    name: Smoke test ${{ matrix.agent }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        include:
+          - agent: project-lead
+            skill: planning-and-task-breakdown
+          - agent: implementation-engineer
+            skill: safe-implementation
+          - agent: qa-engineer
+            skill: quality-validation
+          - agent: security-auditor
+            skill: security-audit
+          - agent: seo-auditor
+            skill: seo-audit
+          - agent: ux-reviewer
+            skill: accessibility-ux
+          - agent: analytics-reviewer
+            skill: analytics
+          - agent: release-reviewer
+            skill: release-safety
+
+    steps:
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Checkout the pinned UTILORA revision
+        env:
+          UTILORA_REF: ${{ inputs.utilora_ref }}
+        run: |
+          set -euo pipefail
+          git clone --quiet --depth 1 https://github.com/hhameranede/Utilora.git "$RUNNER_TEMP/utilora"
+          git -C "$RUNNER_TEMP/utilora" fetch --quiet --depth 1 origin "$UTILORA_REF"
+          git -C "$RUNNER_TEMP/utilora" checkout --quiet --detach FETCH_HEAD
+          test -f "$RUNNER_TEMP/utilora/opencode.json"
+          test -f "$RUNNER_TEMP/utilora/.opencode/skills/manifest.json"
+
+      - name: Install OpenCode CLI
+        run: npm install --global opencode-ai@1
+
+      - name: Confirm the pinned model and selected agent are discoverable
+        env:
+          TARGET_DIR: ${{ runner.temp }}/utilora
+          AGENT_NAME: ${{ matrix.agent }}
+        run: |
+          set -euo pipefail
+          cd "$TARGET_DIR"
+          opencode debug config > "$RUNNER_TEMP/opencode-config.json"
+          opencode agent list > "$RUNNER_TEMP/opencode-agents.txt"
+          grep -Fq "$AGENT_NAME" "$RUNNER_TEMP/opencode-agents.txt"
+          echo "OpenCode resolved agent: $AGENT_NAME"
+
+      - name: Execute the agent with its assigned skill
+        id: agent-run
+        env:
+          NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+          TARGET_DIR: ${{ runner.temp }}/utilora
+          AGENT_NAME: ${{ matrix.agent }}
+          SKILL_NAME: ${{ matrix.skill }}
+          MODEL_NAME: ${{ inputs.model }}
+          RAW_REPORT: ${{ runner.temp }}/agent-output.jsonl
+          SAFE_REPORT_DIR: ${{ github.workspace }}/agent-reports
+        run: |
+          set -euo pipefail
+          set +x
+          if [ -z "$NVIDIA_API_KEY" ]; then
+            echo "::error::NVIDIA_API_KEY was not received from the Softnexa caller."
+            exit 1
+          fi
+          mkdir -p "$SAFE_REPORT_DIR"
+          PROMPT="$(cat <<EOF
+          This is a controlled, read-only smoke test of the UTILORA agent team.
+          First, invoke the native skill tool and load exactly this assigned skill: $SKILL_NAME.
+          Then inspect the repository using read-only tools. Read README.md and at least one additional file that is relevant to your own agent role.
+          Do not edit, create, delete, commit, push, merge, deploy, access credentials, inspect environment variables, or call external services.
+          Provide a concise role-specific assessment based only on files you actually inspected.
+          Include these headings: ROLE, SKILL_LOADED, FILES_INSPECTED, FINDING, LIMITATION.
+          If and only if you actually loaded the assigned skill and inspected repository files, make the final line exactly: AGENT_SMOKE_PASS
+          Otherwise make the final line exactly: AGENT_SMOKE_FAIL
+          EOF
+          )"
+          cd "$TARGET_DIR"
+          set +e
+          opencode run --dir "$TARGET_DIR" --agent "$AGENT_NAME" --model "$MODEL_NAME" --format json "$PROMPT" > "$RAW_REPORT" 2> "$RUNNER_TEMP/opencode-stderr.txt"
+          opencode_status=$?
+          set -e
+          if [ "$opencode_status" -ne 0 ]; then
+            echo "::error::OpenCode returned a non-zero exit code for $AGENT_NAME (exit $opencode_status)."
+            exit "$opencode_status"
+          fi
+          python3 - <<'PY'
+          import json, os, pathlib, re, sys
+          raw_path = pathlib.Path(os.environ["RAW_REPORT"])
+          raw = raw_path.read_text(encoding="utf-8", errors="replace")
+          secret = os.environ.get("NVIDIA_API_KEY", "")
+          if secret and secret in raw:
+              print("::error::The model stream contained the credential; report suppressed.")
+              raw_path.unlink(missing_ok=True)
+              sys.exit(1)
+          events = []
+          for line in raw.splitlines():
+              try:
+                  events.append(json.loads(line))
+              except json.JSONDecodeError:
+                  continue
+          agent = os.environ["AGENT_NAME"]
+          skill = os.environ["SKILL_NAME"]
+          skill_calls = []
+          read_calls = []
+          text_parts = []
+          for event in events:
+              if event.get("type") == "tool_use":
+                  part = event.get("part") or {}
+                  tool = part.get("tool")
+                  state = part.get("state") or {}
+                  inputs = state.get("input") or {}
+                  if tool == "skill" and skill in json.dumps(inputs, ensure_ascii=False):
+                      skill_calls.append(event)
+                  if tool in {"read", "grep", "glob", "list"} and state.get("status") == "completed":
+                      read_calls.append(event)
+              if event.get("type") == "text":
+                  part = event.get("part") or {}
+                  if isinstance(part.get("text"), str):
+                      text_parts.append(part["text"])
+          final_text = "\n".join(text_parts).strip()
+          if not final_text or not skill_calls or not read_calls or not final_text.rstrip().endswith("AGENT_SMOKE_PASS"):
+              print(f"::error::Smoke test did not prove model + skill + repository-read execution for {agent}.")
+              print(f"Skill calls for assigned skill: {len(skill_calls)}; read-only tool calls: {len(read_calls)}; text events: {len(text_parts)}.")
+              raw_path.unlink(missing_ok=True)
+              sys.exit(1)
+          if re.search(r"nvapi-[A-Za-z0-9_-]{12,}", final_text):
+              print("::error::The response resembles a credential; report suppressed.")
+              raw_path.unlink(missing_ok=True)
+              sys.exit(1)
+          report_dir = pathlib.Path(os.environ["SAFE_REPORT_DIR"])
+          report_dir.mkdir(parents=True, exist_ok=True)
+          report = (
+              f"# Agent smoke report: {agent}\n\n"
+              f"- Model: {os.environ['MODEL_NAME']}\n"
+              f"- Assigned skill loaded via native tool: {skill}\n"
+              f"- Completed repository inspection tool calls: {len(read_calls)}\n"
+              f"- Result: PASS\n\n"
+              f"## Agent response\n\n{final_text}\n"
+          )
+          (report_dir / f"{agent}.md").write_text(report, encoding="utf-8")
+          raw_path.unlink(missing_ok=True)
+          pathlib.Path(os.environ.get("RUNNER_TEMP", "/tmp"), "opencode-stderr.txt").unlink(missing_ok=True)
+          print(f"PASS: {agent} loaded {skill}, inspected repository files, and returned a response.")
+          PY
+          git -C "$TARGET_DIR" diff --exit-code
+          if [ -n "$(git -C "$TARGET_DIR" status --porcelain)" ]; then
+            echo "::error::The agent smoke test modified the UTILORA checkout."
+            exit 1
+          fi
+          echo "| $AGENT_NAME | PASS | $SKILL_NAME |" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload sanitized agent report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: utilora-agent-report-${{ matrix.agent }}
+          path: agent-reports/
+          if-no-files-found: ignore
+          retention-days: 7
