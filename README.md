@@ -54,12 +54,15 @@ npm run build
 
 `SITE_URL` must be an origin only (scheme + hostname, no path). When it is not configured, the build still runs, but sitemap generation is skipped and the generated robots.txt omits its sitemap reference. Replace the example domain with the verified production domain.
 
+### Installable PWA and offline support
+UTILORA includes a web app manifest and a production-only service worker. The service worker uses network-first navigation with a bounded cache of recently visited pages, cache-first handling for versioned build assets, and an offline fallback page. It does not cache cross-origin requests, API calls, or non-GET requests. User files and tool outputs remain in browser memory and are never written to the service worker cache. See `docs/PWA.md` for the caching and privacy boundaries.
+
 ### SEO file generation
 ```bash
 SITE_URL=https://your-real-domain.example npm run seo:generate
 ```
 
-This writes `public/sitemap.xml` and `public/robots.txt`. The sitemap contains localized home, tool-directory, category, and legal routes; unfinished individual tool pages and sample article/community routes remain excluded.
+This writes `public/sitemap.xml` and `public/robots.txt`. The sitemap contains localized home, tool-directory, category, and legal routes, plus every functional tool detail page across all eight languages. Preview-only tools and sample article/community routes remain excluded.
 
 **Static route rendering:** `npm run build` prerenders the 528 localized routes into HTML files in `dist`, including page content and route-specific metadata before JavaScript runs. Each localized route is emitted once as `dist/<route>.html`; Cloudflare Pages serves that file at its extensionless URL (for example, `/en/tools`). We intentionally do not also emit `<route>/index.html`, because that would create a second trailing-slash URL for the same content. The build also creates a top-level `404.html`, so Cloudflare Pages returns a real 404 for unknown routes instead of falling back to the SPA shell. The root `/` still uses the Vite root document; the localized pages are the prerendered SEO routes.
 

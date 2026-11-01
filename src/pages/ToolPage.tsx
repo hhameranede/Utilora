@@ -90,8 +90,8 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
         locale={locale}
         routeType="tool"
         slug={tool.slug}
-        // Section 15: "all unfinished tool pages ... must initially be marked noindex and excluded from production sitemaps"
-        isIndexable={false}
+        // Functional tools are indexable; unfinished preview workspaces remain noindex.
+        isIndexable={tool.status === 'functional'}
         schemaType="SoftwareApplication"
         schemaData={{
           operatingSystem: 'All Modern Browsers',

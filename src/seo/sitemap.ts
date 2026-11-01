@@ -1,8 +1,9 @@
 import { SUPPORTED_LANGUAGES } from '../i18n';
 import { CATEGORIES_LIST } from '../registry/categories.registry';
 import { buildRoutePath } from '../router/matcher';
+import { TOOLS_LIST } from '../registry/tools.registry';
 
-type PublicRoute = 'home' | 'tools-index' | 'categories-index' | 'category' |
+type PublicRoute = 'home' | 'tools-index' | 'categories-index' | 'category' | 'tool' |
   'about' | 'contact' | 'privacy' | 'terms' | 'copyright' | 'acceptable-use';
 
 interface SitemapRoute {
@@ -15,6 +16,8 @@ const PUBLIC_ROUTES: SitemapRoute[] = [
   { type: 'tools-index' },
   { type: 'categories-index' },
   ...CATEGORIES_LIST.map((category) => ({ type: 'category' as const, slug: category.slug })),
+  ...TOOLS_LIST.filter((tool) => tool.status === 'functional')
+    .map((tool) => ({ type: 'tool' as const, slug: tool.slug })),
   { type: 'about' },
   { type: 'contact' },
   { type: 'privacy' },
@@ -34,8 +37,8 @@ function escapeXml(value: string): string {
 
 /**
  * Generates a sitemap for completed, indexable routes only.
- * Individual tool workspaces, sample articles and sample community routes
- * are intentionally excluded until their content and engines are production-ready.
+ * Only tool workspaces whose processing engines are marked functional are included.
+ * Preview-only tools, sample articles and sample community routes stay excluded.
  */
 export function generateProductionSitemap(siteUrl: string): string {
   const parsedUrl = new URL(siteUrl);

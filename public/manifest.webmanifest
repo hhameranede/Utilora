@@ -1,0 +1,29 @@
+{
+  "id": "/",
+  "name": "UTILORA — Every Digital Task. One Place.",
+  "short_name": "UTILORA",
+  "description": "Free online tools for images, documents, text, code, websites, and videos.",
+  "lang": "en",
+  "dir": "ltr",
+  "start_url": "/en",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "background_color": "#fafaf9",
+  "theme_color": "#fafaf9",
+  "categories": ["utilities", "productivity"],
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "/pwa-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    { "name": "All tools", "short_name": "Tools", "url": "/en/tools" },
+    { "name": "Image tools", "short_name": "Images", "url": "/en/categories/image" },
+    { "name": "PDF tools", "short_name": "PDF", "url": "/en/categories/pdf" }
+  ]
+}

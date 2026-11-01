@@ -49,7 +49,7 @@ This checklist records repository implementation separately from production depl
 - [x] No external advertising scripts have been added (AdSlot/AffiliateSlot hidden by default).
 - [x] README and architecture documentation exist in `docs/`.
 
-- [x] Production sitemap generator includes only localized home, tools-directory, category, and legal routes.
+- [x] Production sitemap includes localized home, tools-directory, category, and legal routes plus all 32 functional tool details across eight locales; four preview-only video pages remain noindex and excluded.
 - [x] Build-time SEO script generates robots.txt and generates sitemap.xml only when a verified SITE_URL is supplied.
 - [x] Header/footer use a shared UTILORA brand mark and internal template links are removed from public navigation.
 - [x] Browser tab icon assets include SVG and a 96×96 PNG.

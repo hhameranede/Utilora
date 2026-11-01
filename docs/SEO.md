@@ -6,10 +6,11 @@ Only routes with complete, useful content should be listed in the production sit
 - Localized home pages for all eight supported locales.
 - Localized tools directory and categories index pages.
 - Localized category hub pages.
+- Localized detail pages for all tools whose registry status is `functional` (currently 32 tools across eight locales).
 - Localized informational and legal pages.
 
 The following routes stay out of the sitemap until their content is production-ready:
-- Individual tool workspaces (the processing engines are not connected yet).
+- Preview-only tool workspaces whose processing engines are not connected yet (currently four video tools). Functional tool detail pages are indexable and included in the sitemap.
 - Sample articles and article categories.
 - Sample community categories and discussions.
 - The internal `/dev/templates` route.
