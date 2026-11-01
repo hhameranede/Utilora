@@ -3,7 +3,7 @@ import { ToolDefinition } from '../../registry/tool-types';
 import { useI18n } from '../../i18n';
 import { Link } from '../../router';
 import { Icon } from './Icon';
-import { ArrowUpRight, Lock, Sparkles } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 import { getCategoryById } from '../../registry/categories.registry';
 
 interface ToolCardProps {
@@ -35,7 +35,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, className = '', varian
             <h4 className="text-xs font-semibold text-stone-900 group-hover:text-orange-600 truncate">
               {name}
             </h4>
-            <span className="text-[11px] text-stone-400 truncate block">
+            <span className="text-xs text-stone-500 truncate block">
               {categoryTitle}
             </span>
           </div>
@@ -58,14 +58,14 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, className = '', varian
             <Icon name={tool.icon} size={19} />
           </div>
 
-          <div className="flex items-center gap-1.5 text-[11px] text-stone-400">
+          <div className="flex items-center gap-1.5 text-xs text-stone-500">
             <span className="font-medium text-stone-500 group-hover:text-orange-600 transition-colors">
               {categoryTitle}
             </span>
             {tool.isPopular && (
               <>
                 <span aria-hidden="true" className="text-stone-300">·</span>
-                <span className="text-orange-600 font-medium">Popular</span>
+                <span className="text-orange-700 font-semibold">{t('common.popular')}</span>
               </>
             )}
           </div>
@@ -77,17 +77,17 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, className = '', varian
         </h3>
 
         {/* Description */}
-        <p className="text-xs text-stone-600 line-clamp-2 leading-relaxed mb-4">
+        <p className="text-sm text-stone-600 line-clamp-2 leading-relaxed mb-4">
           {description}
         </p>
       </div>
 
       {/* Footer State: Formats or Engine preview reminder */}
-      <div className="pt-3 border-t border-stone-100 flex items-center justify-between text-[11px] text-stone-400">
+      <div className="pt-3 border-t border-stone-100 flex items-center justify-between text-xs text-stone-500">
         <span className="truncate">
-          {tool.acceptedFormats ? tool.acceptedFormats.slice(0, 3).join(', ') : 'In-browser tool'}
+          {tool.status !== 'functional' ? t('common.previewOnly') : tool.category === 'website-domain' ? t('common.publicLookup') : t('common.runsLocally')}
         </span>
-        <div className="flex items-center gap-1 text-orange-600 font-medium group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5 transition-transform">
+        <div className="flex items-center gap-1 text-orange-700 font-semibold group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5 transition-transform">
           <span>{t('common.openTool')}</span>
           <ArrowUpRight size={13} />
         </div>
