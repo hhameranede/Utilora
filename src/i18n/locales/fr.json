@@ -67,7 +67,8 @@
     "previewOnly": "Aperçu uniquement",
     "publicLookup": "Recherche réseau publique",
     "runsLocally": "S’exécute dans le navigateur",
-    "readGuide": "Lire le guide"
+    "readGuide": "Lire le guide",
+    "tryAgain": "Réessayer"
   },
   "home": {
     "categoriesHeading": "Explorer par catégorie",
@@ -160,7 +161,8 @@
     "newsletterTitle": "Restez informé",
     "newsletterDesc": "Rapport trimestriel des nouveautés. (Aperçu)",
     "newsletterPlaceholder": "Votre adresse e-mail",
-    "subscribe": "S'abonner"
+    "subscribe": "S'abonner",
+    "readArticle": "Lire l’article"
   },
   "footer": {
     "rights": "Tous droits réservés.",
@@ -263,5 +265,8 @@
     "external": "Le site charge les polices de l’interface depuis Google Fonts. Votre navigateur demande donc des ressources de police aux domaines de Google, qui peuvent recevoir des informations techniques sur ces requêtes. Les fournisseurs de recherches réseau et les sites cibles reçoivent également le nom d’hôte ou l’URL nécessaires.",
     "accountsTitle": "6. Comptes et emplacements facultatifs",
     "accounts": "Aucun compte utilisateur n’est nécessaire pour utiliser les outils disponibles. Les composants réservés à la publicité et à l’affiliation dans l’interface actuelle sont désactivés par défaut. Si des services tiers facultatifs sont ajoutés ou activés ultérieurement, cette politique devra être mise à jour avant leur utilisation."
+  },
+  "categories": {
+    "description": "Explorez les outils disponibles par catégorie. Chaque espace regroupe des utilitaires associés accessibles dans le navigateur."
   }
 }
