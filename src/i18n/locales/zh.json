@@ -182,10 +182,12 @@
   },
   "category": {
     "featuredWorkspace": "精选工作区",
-    "allTools": "中的全部工具",
+    "allTools": "全部工具",
     "chooseWorkspace": "选择下方工具以打开对应工作区。",
     "searchPlaceholder": "筛选此类别中的工具...",
-    "relatedCategories": "相关类别"
+    "relatedCategories": "相关类别",
+    "toolsInSuite": "此类别中的工具",
+    "functionalCount": "可用"
   },
   "search": {
     "navigate": "移动",
