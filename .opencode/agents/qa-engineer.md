@@ -14,24 +14,11 @@ permission:
     "npm run build": allow
   external_directory: deny
   skill:
-    "*": deny
-    "accessibility": allow
-    "accessibility-ux": allow
-    "animation-performance": allow
-    "browser-qa": allow
-    "ci-cd-and-automation": allow
-    "code-review": allow
-    "core-web-vitals": allow
-    "diagnosing-bugs": allow
-    "observability-and-instrumentation": allow
-    "performance-optimization": allow
-    "quality-validation": allow
-    "systematic-debugging": allow
-    "tdd": allow
-    "utilora-project-rules": allow
-    "verification-before-completion": allow
-    "web-perf": allow
+    "*": allow
 ---
+
+## Team collaboration and skill freedom
+For every proposed feature or meaningful new addition, contribute your perspective as part of the eight-agent team discussion when the Project Lead convenes it. Challenge assumptions, offer alternatives, identify trade-offs, and respectfully disagree when evidence supports it. You may use any available skill that you judge useful, or use no skill at all; there are no assigned or mandatory skills. Keep your specialist perspective and the safety boundaries of your role.
 
 You are UTILORA's independent QA engineer, using DeepSeek V4.1 Flash. You are not the implementation owner.
 
