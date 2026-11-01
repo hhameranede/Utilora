@@ -24,16 +24,43 @@ type SkillManifest = {
   curatedExternalCount: number;
   agents: string[];
   assignmentsByAgent: Record<string, string[]>;
+  modelAssignments: Record<string, string>;
   skills: SkillRecord[];
+};
+type ProviderModel = { id?: string; name?: string; limit?: { context?: number; output?: number } };
+type OpenCodeProvider = {
+  npm?: string;
+  name?: string;
+  options?: { baseURL?: string; apiKey?: string };
+  models?: Record<string, ProviderModel>;
 };
 
 const root = process.cwd();
 const config = JSON.parse(readFileSync(join(root, 'opencode.json'), 'utf8')) as {
   $schema?: string; default_agent?: string; mcp?: Record<string, McpServer>;
+  provider?: Record<string, OpenCodeProvider>;
 };
 assert.equal(config.$schema, 'https://opencode.ai/config.json');
 assert.ok(config.mcp);
 assert.equal(config.default_agent, 'project-lead', 'Project lead must be the default primary agent');
+
+const nvidia = config.provider?.['nvidia-nim'];
+assert.ok(nvidia, 'Missing shared NVIDIA NIM provider');
+assert.equal(nvidia.npm, '@ai-sdk/openai-compatible');
+assert.equal(nvidia.options?.baseURL, 'https://integrate.api.nvidia.com/v1');
+assert.equal(nvidia.options?.apiKey, '{env:NVIDIA_API_KEY}', 'NVIDIA key must be injected from the runtime environment');
+const expectedModelIds: Record<string, string> = {
+  'nemotron-ultra': 'nvidia/nemotron-3-ultra-550b-a55b',
+  'deepseek-v4-1-flash': 'deepseek-ai/deepseek-v4.1-flash',
+  'minimax-m3-1-flash': 'minimaxai/minimax-m3.1-flash',
+  'glm-5-3-flash': 'z-ai/glm-5.3-flash',
+  'nemotron-super-vl': 'nvidia/nemotron-3.5-super-vl-120b-a12b',
+  'laguna-xs-2-1': 'poolside/laguna-xs-2.1',
+};
+assert.deepEqual(Object.keys(nvidia.models ?? {}).sort(), Object.keys(expectedModelIds).sort());
+for (const [alias, id] of Object.entries(expectedModelIds)) {
+  assert.equal(nvidia.models?.[alias]?.id, id, 'Unexpected NVIDIA model mapping for ' + alias);
+}
 
 const expectedRemote: Record<string, string> = {
   context7: 'https://mcp.context7.com/mcp',
@@ -83,8 +110,8 @@ function parseSkillPermissions(lines: string[], label: string): Map<string, stri
 }
 
 const expectedAgents = [
-  'project-lead', 'implementation-engineer', 'qa-engineer', 'security-auditor',
-  'seo-auditor', 'ux-reviewer', 'analytics-reviewer', 'release-reviewer',
+  'project-lead', 'problem-analyst', 'implementation-engineer', 'fast-task-engineer',
+  'visual-reviewer', 'long-horizon-engineer', 'qa-engineer', 'security-auditor',
 ] as const;
 const agentDir = join(root, '.opencode', 'agents');
 const agentFiles = readdirSync(agentDir).filter((name) => name.endsWith('.md'));
@@ -168,6 +195,9 @@ for (const agentFile of agentFiles) {
   assert.ok(hasNonEmptyField(lines, 'description'), 'Missing description in ' + agentFile);
   const mode = lines.find((line) => line.startsWith('mode:'))?.slice(5).trim();
   assert.ok(mode === 'primary' || mode === 'subagent', 'Invalid mode in ' + agentFile);
+  const agentModel = lines.find((line) => line.startsWith('model:'))?.slice(6).trim();
+  assert.equal(agentModel, manifest.modelAssignments[agent], 'Wrong model assignment for ' + agent);
+  assert.ok(Object.values(nvidia.models ?? {}).some((model) => model.id && agentModel === 'nvidia-nim/' + Object.keys(nvidia.models ?? {}).find((key) => nvidia.models?.[key] === model)), 'Agent model alias is not registered for ' + agent);
 
   const permissions = parseSkillPermissions(lines, agentFile);
   const allowed = [...permissions.entries()]
@@ -252,4 +282,4 @@ if (process.env.OPENCODE_RUNTIME_TEST === '1') {
   assert.ok(skills.stdout.includes('"name":'), 'OpenCode skill diagnostic returned no skill entries');
   console.log('OpenCode resolved all eight agents and their scoped skill permissions.');
 }
-console.log('Agent configuration verified: 8 agents, exactly 50 skills (9 first-party + 41 upstream), and ' + Object.keys(config.mcp).length + ' MCP servers.');
+console.log('Agent configuration verified: 8 model-specialized agents, exactly 50 skills (9 first-party + 41 upstream), 6 NVIDIA NIM models, and ' + Object.keys(config.mcp).length + ' MCP servers.');
