@@ -241,5 +241,27 @@
     "step1": "Open the workspace and add your input",
     "step2": "Choose the available options for your task",
     "step3": "Review the result and save or copy it"
+  },
+  "legal": {
+    "kicker": "Platform information",
+    "lastUpdated": "Last updated",
+    "updatedDate": "November 2026",
+    "effective": "Effective globally"
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "subtitle": "A clear explanation of what runs in your browser, what is sent to public services, and what technical data our infrastructure may process.",
+    "processingTitle": "1. File and text processing",
+    "processing": "Image, PDF, text, developer and supported media operations are designed to run in your browser. These operations process the files or text you select on your device and do not upload their contents to UTILORA application servers.",
+    "networkTitle": "2. Website and domain lookups",
+    "network": "Website and domain tools need network access to perform their checks. When you run one, the hostname or URL you submit is sent to the relevant public DNS or RDAP service, or to the target website, to retrieve the requested information. Those external services and websites may process the request under their own privacy policies.",
+    "infrastructureTitle": "3. Hosting, delivery and technical logs",
+    "infrastructure": "UTILORA is delivered through hosting and content-delivery infrastructure. Infrastructure providers may process technical request data such as IP address, user-agent, requested path, timestamps and security events for delivery, caching, abuse prevention and service reliability. Their own privacy terms and retention practices apply to that infrastructure data.",
+    "preferencesTitle": "4. Language preferences and local storage",
+    "preferences": "When you change the interface language, UTILORA stores that preference in your browser's localStorage so the site can remember your selection. This preference remains in that browser unless you clear its site data.",
+    "externalTitle": "5. External resources",
+    "external": "The site loads interface fonts from Google Fonts. Your browser therefore requests font resources from Google domains, which may receive technical request information. Network lookup providers and target websites also receive the specific hostname or URL required for the lookup.",
+    "accountsTitle": "6. Accounts and optional placements",
+    "accounts": "A user account is not required to use the available tools. Advertising and affiliate placeholder components in the current interface are disabled by default. If optional third-party services are introduced or enabled in the future, this policy should be updated before they are used."
   }
 }
