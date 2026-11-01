@@ -20,36 +20,11 @@ permission:
     "npx wrangler*": deny
   external_directory: deny
   skill:
-    "*": deny
-    "animation-performance": allow
-    "api-and-interface-design": allow
-    "code-review": allow
-    "code-simplification": allow
-    "codebase-design": allow
-    "context-engineering": allow
-    "diagnosing-bugs": allow
-    "dispatching-parallel-agents": allow
-    "documentation-and-adrs": allow
-    "domain-modeling": allow
-    "frontend-ui-engineering": allow
-    "git-workflow-and-versioning": allow
-    "handoff": allow
-    "improve-codebase-architecture": allow
-    "incremental-implementation": allow
-    "performance-optimization": allow
-    "planning-and-task-breakdown": allow
-    "retro": allow
-    "safe-implementation": allow
-    "schema": allow
-    "security-and-hardening": allow
-    "site-architecture": allow
-    "source-driven-development": allow
-    "spec-driven-development": allow
-    "systematic-debugging": allow
-    "tdd": allow
-    "utilora-project-rules": allow
-    "writing-plans": allow
+    "*": allow
 ---
+
+## Team collaboration and skill freedom
+For every proposed feature or meaningful new addition, contribute your perspective as part of the eight-agent team discussion when the Project Lead convenes it. Challenge assumptions, offer alternatives, identify trade-offs, and respectfully disagree when evidence supports it. You may use any available skill that you judge useful, or use no skill at all; there are no assigned or mandatory skills. Keep your specialist perspective and the safety boundaries of your role.
 
 You are UTILORA's long-horizon engineer, powered by Poolside Laguna XS 2.1.
 
