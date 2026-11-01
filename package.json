@@ -34,7 +34,8 @@
     "mediabunny": "1.65.0",
     "@mediabunny/mp3-encoder": "1.62.1",
     "@mediabunny/aac-encoder": "1.65.0",
-    "html-to-image": "1.11.13"
+    "html-to-image": "1.11.13",
+    "posthog-js": "^1.444.0"
   },
   "devDependencies": {
     "@playwright/test": "^1.56.1",
