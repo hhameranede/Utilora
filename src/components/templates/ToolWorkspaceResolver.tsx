@@ -116,10 +116,7 @@ export const ToolWorkspaceResolver: React.FC<ToolWorkspaceResolverProps> = ({ to
 
     case 'template-o-media-metadata':
       return (
-        <TemplateOMediaMetadata
-          toolName={toolName}
-          isVideo={tool.category === 'video'}
-        />
+        <TemplateOMediaMetadata toolName={toolName} />
       );
 
     case 'template-p-thumbnail-extractor':
