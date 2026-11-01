@@ -71,7 +71,7 @@ npm run e2e
 npm run build
 ```
 
-CI installs OpenCode and runs CLI discovery checks for all eight agents and all 50 skills, plus deterministic checks for model routing, upstream commit pins, licences, and role permissions. The UTILORA-native model smoke workflow can be launched manually or runs when the agent configuration changes; it verifies the live NVIDIA catalogue, performs real inference, then asks each agent for a concise role-specific response without requiring a skill call, fixed evidence count, or rigid report format. It writes sanitized per-agent reports and diagnostics as workflow artifacts. A green discovery check alone is not proof of model execution.
+CI installs OpenCode and runs CLI discovery checks for all eight agents and all 50 skills, plus deterministic checks for model routing, upstream commit pins, licences, and role permissions. The optional UTILORA-native model capability workflow is manually triggered; it performs real inference, then asks each agent for a concise role-specific response without requiring a skill call, fixed evidence count, or rigid report format. It writes sanitized per-agent reports and diagnostics as workflow artifacts. A green discovery check alone is not proof of model execution.
 
 ## Important limitations
 
