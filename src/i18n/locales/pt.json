@@ -241,5 +241,27 @@
     "step1": "Abra a área de trabalho e adicione seus dados",
     "step2": "Escolha as opções disponíveis para sua tarefa",
     "step3": "Revise o resultado e salve ou copie"
+  },
+  "legal": {
+    "kicker": "Informações da plataforma",
+    "lastUpdated": "Última atualização",
+    "updatedDate": "Novembro de 2026",
+    "effective": "Válida globalmente"
+  },
+  "privacy": {
+    "title": "Política de Privacidade",
+    "subtitle": "Uma explicação clara do que é processado no navegador, do que é enviado a serviços públicos e dos dados técnicos que a infraestrutura pode tratar.",
+    "processingTitle": "1. Processamento de arquivos e textos",
+    "processing": "As operações com imagens, PDF, textos, ferramentas para desenvolvedores e mídias compatíveis foram projetadas para funcionar no navegador. Os arquivos ou textos selecionados são processados no seu dispositivo e seu conteúdo não é enviado aos servidores da aplicação UTILORA.",
+    "networkTitle": "2. Consultas de sites e domínios",
+    "network": "As ferramentas de verificação de sites e domínios precisam de acesso à rede. Ao executar uma consulta, o host ou a URL informada é enviado ao serviço DNS ou RDAP público relevante, ou ao site de destino, para obter as informações solicitadas. Esses serviços e sites externos podem processar a solicitação conforme suas próprias políticas de privacidade.",
+    "infrastructureTitle": "3. Hospedagem, entrega e registros técnicos",
+    "infrastructure": "A UTILORA é entregue por uma infraestrutura de hospedagem e distribuição de conteúdo. Esses provedores podem processar dados técnicos como endereço IP, agente do usuário, caminho solicitado, horários e eventos de segurança para entrega, cache, prevenção de abuso e confiabilidade. Aplicam-se as próprias regras de privacidade e retenção desses provedores.",
+    "preferencesTitle": "4. Preferências de idioma e armazenamento local",
+    "preferences": "Quando você altera o idioma da interface, a UTILORA salva essa preferência no localStorage do navegador para lembrar sua escolha. A preferência permanece nesse navegador até que os dados do site sejam apagados.",
+    "externalTitle": "5. Recursos externos",
+    "external": "O site carrega as fontes da interface pelo Google Fonts. Assim, seu navegador solicita arquivos de fontes a domínios do Google, que podem receber informações técnicas dessas solicitações. Provedores de consultas de rede e sites de destino também recebem o host ou a URL necessários.",
+    "accountsTitle": "6. Contas e espaços opcionais",
+    "accounts": "Não é necessário criar uma conta para usar as ferramentas disponíveis. Os componentes reservados para publicidade e afiliados na interface atual ficam desativados por padrão. Caso serviços de terceiros opcionais sejam adicionados ou ativados no futuro, esta política deverá ser atualizada antes do uso."
   }
 }
