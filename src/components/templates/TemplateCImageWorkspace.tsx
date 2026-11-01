@@ -42,6 +42,7 @@ export const TemplateCImageWorkspace: React.FC<TemplateCImageWorkspaceProps> = (
   const [cropWidth, setCropWidth] = useState(0);
   const [cropHeight, setCropHeight] = useState(0);
   const [busy, setBusy] = useState(false);
+  const [preparingFile, setPreparingFile] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
 
@@ -60,13 +61,17 @@ export const TemplateCImageWorkspace: React.FC<TemplateCImageWorkspaceProps> = (
     if (!selected) return;
     const fileRevision = ++fileRevisionRef.current;
     setBusy(false);
+    setPreparingFile(true);
+    setMetadata(null);
     setError('');
     setMessage('');
     if (!selected.type.startsWith('image/')) {
+      setPreparingFile(false);
       setError('Please choose a valid image file.');
       return;
     }
     if (selected.size > 50 * 1024 * 1024) {
+      setPreparingFile(false);
       setError('Image size exceeds the 50 MB limit.');
       return;
     }
@@ -97,9 +102,11 @@ export const TemplateCImageWorkspace: React.FC<TemplateCImageWorkspaceProps> = (
       setCropY(0);
       setCropWidth(details.width);
       setCropHeight(details.height);
+      setPreparingFile(false);
       if (isMetadata) setMessage('Image properties loaded. EXIF camera and GPS tags are not read by this tool.');
     } catch (cause) {
       if (fileRevision === fileRevisionRef.current) {
+        setPreparingFile(false);
         setError(cause instanceof Error ? cause.message : 'Unable to read this image.');
       }
     }
@@ -158,8 +165,12 @@ export const TemplateCImageWorkspace: React.FC<TemplateCImageWorkspaceProps> = (
   };
 
   const processImage = async () => {
-    if (!file || !metadata) {
+    if (!file) {
       setError('Choose an image first.');
+      return;
+    }
+    if (!metadata || preparingFile) {
+      setError('The image is still being prepared. Please try again when inspection finishes.');
       return;
     }
     const fileRevision = fileRevisionRef.current;
@@ -345,9 +356,9 @@ export const TemplateCImageWorkspace: React.FC<TemplateCImageWorkspaceProps> = (
             </div>
           )}
 
-          <button type="button" onClick={processImage} disabled={!file || busy} className="w-full py-3 rounded-xl bg-stone-900 hover:bg-stone-800 disabled:opacity-40 text-white text-xs font-semibold flex items-center justify-center gap-2">
+          <button type="button" onClick={processImage} disabled={!file || !metadata || preparingFile || busy} className="w-full py-3 rounded-xl bg-stone-900 hover:bg-stone-800 disabled:opacity-40 text-white text-xs font-semibold flex items-center justify-center gap-2">
             <RefreshCw size={15} className={busy ? 'animate-spin' : ''} />
-            {busy ? 'Processing…' : isMetadata ? 'Inspect image' : 'Process image'}
+            {preparingFile ? 'Preparing image…' : busy ? 'Processing…' : isMetadata ? 'Inspect image' : 'Process image'}
           </button>
 
           {resultUrl && (
