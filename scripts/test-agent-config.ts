@@ -28,7 +28,7 @@ const expectedRemote: Record<string, string> = {
   posthog: 'https://mcp.posthog.com/mcp',
 };
 for (const [name, url] of Object.entries(expectedRemote)) {
-  const server = config.mcp[name];
+  const server: McpServer | undefined = config.mcp[name];
   assert.ok(server, 'Missing MCP server: ' + name);
   assert.equal(server.type, 'remote');
   assert.equal(server.url, url);
