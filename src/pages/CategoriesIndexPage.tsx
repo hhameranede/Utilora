@@ -26,7 +26,7 @@ export const CategoriesIndexPage: React.FC = () => {
             {t('nav.categories')}
           </h1>
           <p className="text-sm text-stone-600 mt-2 max-w-2xl leading-relaxed">
-            Discover specialized utilities grouped across six key domains. Every category provides dedicated browser workspaces.
+            {t('categories.description')}
           </p>
         </div>
 
