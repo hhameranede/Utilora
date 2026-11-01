@@ -21,9 +21,9 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ variant = 'h
       }
     };
     if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('pointerdown', handleClickOutside);
     }
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('pointerdown', handleClickOutside);
   }, [isOpen]);
 
   const handleSelect = (code: SupportedLocale) => {
@@ -34,7 +34,7 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ variant = 'h
   if (variant === 'footer') {
     return (
       <div className={`flex flex-wrap items-center gap-3 text-xs ${className}`}>
-        <span className="text-stone-400 flex items-center gap-1.5">
+        <span className="text-stone-600 flex items-center gap-1.5">
           <Globe size={13} className="text-orange-500" />
           <span>{t('nav.switchLanguage')}</span>
         </span>
@@ -74,7 +74,8 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ variant = 'h
 
       {isOpen && (
         <div
-          role="listbox"
+          role="group"
+          aria-label={t('nav.switchLanguage')}
           className="absolute end-0 mt-1.5 w-44 rounded-xl bg-white border border-stone-200 shadow-xl shadow-stone-200/50 py-1.5 z-50"
         >
           {languages.map((lang) => {
@@ -82,8 +83,7 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ variant = 'h
             return (
               <button
                 key={lang.code}
-                role="option"
-                aria-selected={isSelected}
+                aria-pressed={isSelected}
                 onClick={() => handleSelect(lang.code)}
                 className={`w-full flex items-center justify-between px-3 py-1.5 text-xs text-start transition-colors ${
                   isSelected
@@ -93,7 +93,7 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ variant = 'h
               >
                 <div className="flex flex-col">
                   <span>{lang.nativeName}</span>
-                  <span className="text-[10px] text-stone-400">{lang.name}</span>
+                  <span className="text-xs text-stone-600">{lang.name}</span>
                 </div>
                 {isSelected && <Check size={13} className="text-orange-600" />}
               </button>
