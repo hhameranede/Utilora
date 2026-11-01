@@ -185,9 +185,9 @@ export const TemplateGalleryPage: React.FC = () => {
       id: 'template-m',
       code: 'Template M',
       name: 'Video Editor Workspace (Timeline & Trimmer)',
-      useCase: 'Used for trimming video footage and compressing MP4/WebM files with CRF controls.',
+      useCase: 'Used for trimming video clips or compressing supported files with quality and resolution controls.',
       associatedTools: ['video-compressor', 'video-trimmer'],
-      render: () => <TemplateMVideoEditor toolName="Video Trimmer Demo" />,
+      render: () => <TemplateMVideoEditor toolName="Video Trimmer Demo" toolSlug="video-trimmer" />,
     },
     {
       id: 'template-n',

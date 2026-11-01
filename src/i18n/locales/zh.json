@@ -79,9 +79,7 @@
     "trustHeading": "建立在信任与现代标准之上",
     "trustDesc": "我们坚信数字工具应当纯粹：无骚扰广告、免强制注册、深度保护用户隐私。",
     "articlesPreviewHeading": "精选技术博文与指南",
-    "articlesPreviewSub": "深入探讨压缩算法、PDF 规范及现代前端工程标准。",
-    "communityPreviewHeading": "社区与技术生态",
-    "communityPreviewSub": "参与功能建议、探讨开发工作流并与全球用户共同交流。"
+    "articlesPreviewSub": "深入探讨压缩算法、PDF 规范及现代前端工程标准。"
   },
   "templates": {
     "dropzonePrompt": "将文件拖放到此处，或点击浏览上传",

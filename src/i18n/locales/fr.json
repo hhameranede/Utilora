@@ -79,9 +79,7 @@
     "trustHeading": "Fondé sur la confiance",
     "trustDesc": "Des outils numériques gratuits, rapides, sans compte et sans publicité.",
     "articlesPreviewHeading": "Derniers guides & analyses",
-    "articlesPreviewSub": "Articles techniques sur la compression et les standards du web.",
-    "communityPreviewHeading": "Communauté",
-    "communityPreviewSub": "Partagez vos retours et suggérez de nouveaux outils."
+    "articlesPreviewSub": "Articles techniques sur la compression et les standards du web."
   },
   "templates": {
     "dropzonePrompt": "Glissez-déposez votre fichier ici, ou parcourez",

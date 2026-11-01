@@ -9,7 +9,6 @@ import { FeaturedToolCard } from '../components/common/FeaturedToolCard';
 import { Head } from '../seo/Head';
 import { Search, Shield, Zap, Sparkles, ArrowRight, CheckCircle2, Lock, Cpu, Globe } from 'lucide-react';
 import { SAMPLE_ARTICLES } from '../data/articles.data';
-import { SAMPLE_TOPICS } from '../data/community.data';
 
 export const HomePage: React.FC = () => {
   const { locale, t } = useI18n();
@@ -348,67 +347,6 @@ export const HomePage: React.FC = () => {
           </div>
         </section>
 
-        {/* ========================================== */}
-        {/* COMMUNITY PREVIEW                          */}
-        {/* ========================================== */}
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-4">
-            <div>
-              <h2 className="text-xl sm:text-2xl font-bold text-stone-900">
-                {t('home.communityPreviewHeading')}
-              </h2>
-              <p className="text-xs sm:text-sm text-stone-500 mt-1">
-                {t('home.communityPreviewSub')}
-              </p>
-            </div>
-
-            <Link
-              routeType="community-index"
-              className="text-xs font-semibold text-orange-600 hover:text-orange-700 flex items-center gap-1 group"
-            >
-              <span>{t('nav.community')}</span>
-              <ArrowRight size={13} className="group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5 transition-transform" />
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {SAMPLE_TOPICS.map((topic) => (
-              <Link
-                key={topic.id}
-                routeType="community-topic"
-                slug={topic.slug}
-                className="group p-6 rounded-2xl bg-white hover:bg-white border border-stone-200/90 hover:border-orange-300 transition-all flex flex-col justify-between shadow-xs hover:shadow-md hover:shadow-orange-500/5"
-              >
-                <div>
-                  <div className="flex items-center gap-2 text-xs text-stone-400 mb-2">
-                    <span className="text-orange-600 font-mono text-[11px] font-semibold">
-                      #{topic.categorySlug}
-                    </span>
-                    <span aria-hidden="true" className="text-stone-300">·</span>
-                    <span>{topic.replyCount} {t('community.replies')}</span>
-                    <span aria-hidden="true" className="text-stone-300">·</span>
-                    <span>{topic.lastActivity}</span>
-                  </div>
-
-                  <h3 className="text-sm font-semibold text-stone-900 group-hover:text-orange-600 transition-colors mb-2">
-                    {topic.title[locale] || topic.title.en}
-                  </h3>
-
-                  <p className="text-xs text-stone-600 line-clamp-2 leading-relaxed">
-                    {topic.content}
-                  </p>
-                </div>
-
-                <div className="flex items-center justify-between text-xs text-stone-400 pt-4 border-t border-stone-100 mt-4">
-                  <span>Author: {topic.author}</span>
-                  <span className="text-stone-600 group-hover:text-orange-600 font-medium">
-                    View Thread →
-                  </span>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </section>
       </div>
     </>
   );

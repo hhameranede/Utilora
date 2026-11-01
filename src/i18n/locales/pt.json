@@ -79,9 +79,7 @@
     "trustHeading": "Construído sobre confiança",
     "trustDesc": "Ferramentas digitais gratuitas, sem anúncios invasivos e sem cadastros.",
     "articlesPreviewHeading": "Artigos e Destaques",
-    "articlesPreviewSub": "Publicações técnicas sobre padrões e arquivos digitais.",
-    "communityPreviewHeading": "Comunidade",
-    "communityPreviewSub": "Sugira melhorias e tire dúvidas com a comunidade."
+    "articlesPreviewSub": "Publicações técnicas sobre padrões e arquivos digitais."
   },
   "templates": {
     "dropzonePrompt": "Arraste e solte seu arquivo aqui, ou clique para selecionar",

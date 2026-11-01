@@ -79,9 +79,7 @@
     "trustHeading": "Basado en la confianza",
     "trustDesc": "Sin suscripciones forzadas, sin anuncios y respetando tu privacidad.",
     "articlesPreviewHeading": "Últimas guías y artículos",
-    "articlesPreviewSub": "Análisis técnicos sobre algoritmos y estándares web.",
-    "communityPreviewHeading": "Comunidad",
-    "communityPreviewSub": "Aporta ideas y comenta sobre flujos de trabajo."
+    "articlesPreviewSub": "Análisis técnicos sobre algoritmos y estándares web."
   },
   "templates": {
     "dropzonePrompt": "Arrastra y suelta tu archivo aquí, o haz clic para explorar",

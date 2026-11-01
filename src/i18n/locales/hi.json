@@ -79,9 +79,7 @@
     "trustHeading": "विश्वास पर आधारित",
     "trustDesc": "विज्ञापन-मुक्त, निःशुल्क और गोपनीयता-अनुकूल डिजिटल अनुभव।",
     "articlesPreviewHeading": "नवीनतम लेख और गाइड",
-    "articlesPreviewSub": "वेब मानकों और कम्प्रेशन पर तकनीकी चर्चा।",
-    "communityPreviewHeading": "समुदाय",
-    "communityPreviewSub": "नए विचारों और उपकरणों पर चर्चा करें।"
+    "articlesPreviewSub": "वेब मानकों और कम्प्रेशन पर तकनीकी चर्चा।"
   },
   "templates": {
     "dropzonePrompt": "फ़ाइल यहाँ खींचें और छोड़ें, या चुनने के लिए क्लिक करें",

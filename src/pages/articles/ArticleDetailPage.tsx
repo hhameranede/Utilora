@@ -19,7 +19,6 @@ import {
   Info,
   Terminal,
   ExternalLink,
-  MessageSquare,
 } from 'lucide-react';
 
 interface ArticleDetailPageProps {
@@ -279,16 +278,6 @@ export const ArticleDetailPage: React.FC<ArticleDetailPageProps> = ({ articleSlu
                 </div>
               )}
 
-              {/* Related Community Topic Link */}
-              <div className="pt-4 border-t border-stone-100">
-                <Link
-                  routeType="community-index"
-                  className="flex items-center gap-2 text-xs text-orange-600 hover:underline font-medium"
-                >
-                  <MessageSquare size={13} />
-                  <span>Join discussion on forum</span>
-                </Link>
-              </div>
             </div>
           </aside>
         </div>

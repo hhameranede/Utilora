@@ -79,9 +79,7 @@
     "trustHeading": "Built on Trust & Modern Standards",
     "trustDesc": "We believe digital tools should be rapid, ad-free, account-free, and respectful of your confidentiality.",
     "articlesPreviewHeading": "Latest Guides & Editorial",
-    "articlesPreviewSub": "Deep dives into compression mathematics, PDF architecture, and developer standards.",
-    "communityPreviewHeading": "Community & Ecosystem",
-    "communityPreviewSub": "Join discussions, suggest utility improvements, and explore engineering workflows."
+    "articlesPreviewSub": "Deep dives into compression mathematics, PDF architecture, and developer standards."
   },
   "templates": {
     "dropzonePrompt": "Drag and drop your file here, or browse",
