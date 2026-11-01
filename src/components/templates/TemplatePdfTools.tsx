@@ -20,7 +20,7 @@ export const TemplatePdfTools: React.FC<TemplatePdfToolsProps> = ({ toolName, to
   const [ranges, setRanges] = useState('1-3');
   const [burst, setBurst] = useState(false);
   const [rotation, setRotation] = useState<90 | 180 | 270>(90);
-  const [targetPages, setTargetPages] = useState('all');
+  const [targetPages, setTargetPages] = useState('');
   const [dpi, setDpi] = useState<150 | 300>(150);
   const [imageFormat, setImageFormat] = useState<'jpg' | 'png'>('jpg');
   const [pageSize, setPageSize] = useState<'fit' | 'a4' | 'letter'>('fit');
@@ -79,33 +79,34 @@ export const TemplatePdfTools: React.FC<TemplatePdfToolsProps> = ({ toolName, to
     try {
       if (toolSlug === 'merge-pdf') {
         const result = await mergePdfFiles(files);
-        setOutputs([{ name: 'merged-document.pdf', blob: result.blob, note: `${result.pageCount} pages · ${formatBytes(result.size)}` }]);
+        setOutputs([{ name: 'merged-document.pdf', blob: result.blob, note: `${result.pageCount} ${result.pageCount === 1 ? t('pdfWorkspace.page') : t('pdfWorkspace.pages')} · ${formatBytes(result.size)}` }]);
         setMessage(t('pdfWorkspace.successMerged'));
       } else if (toolSlug === 'jpg-to-pdf') {
         const result = await imagesToPdf(files, pageSize, margin, orientation);
-        setOutputs([{ name: 'images-to-pdf.pdf', blob: result.blob, note: `${result.pageCount} page(s)` }]);
+        setOutputs([{ name: 'images-to-pdf.pdf', blob: result.blob, note: `${result.pageCount} ${result.pageCount === 1 ? t('pdfWorkspace.page') : t('pdfWorkspace.pages')}` }]);
         setMessage(t('pdfWorkspace.successImagesConverted'));
       } else if (toolSlug === 'split-pdf') {
         const result = await splitPdfFile(files[0], ranges, burst);
-        setOutputs(result.map((item) => ({ name: item.filename, blob: item.blob, note: `${item.pageCount} page(s)` })));
+        setOutputs(result.map((item) => ({ name: item.filename, blob: item.blob, note: `${item.pageCount} ${item.pageCount === 1 ? t('pdfWorkspace.page') : t('pdfWorkspace.pages')}` })));
         setMessage(t('pdfWorkspace.createdOutputFiles').replace('{count}', String(result.length)));
       } else if (toolSlug === 'rotate-pdf') {
-        const pages = targetPages.trim().toLowerCase() === 'all'
+        const pageSelection = targetPages.trim().toLowerCase();
+        const pages = !pageSelection || pageSelection === 'all'
           ? 'all'
           : targetPages.split(',').map((part) => Number(part.trim()) - 1);
         const result = await rotatePdfFile(files[0], rotation, pages);
-        setOutputs([{ name: files[0].name.replace(/\.pdf$/i, '') + '-rotated.pdf', blob: result.blob, note: `${result.rotatedPageCount} page(s) rotated` }]);
+        setOutputs([{ name: files[0].name.replace(/\.pdf$/i, '') + '-rotated.pdf', blob: result.blob, note: `${result.rotatedPageCount} ${result.rotatedPageCount === 1 ? t('pdfWorkspace.page') : t('pdfWorkspace.pages')} ${t('pdfWorkspace.rotated')}` }]);
         setMessage(t('pdfWorkspace.successRotationSaved'));
       } else if (toolSlug === 'pdf-to-jpg') {
         const result = await renderPdfToImages(files[0], dpi, imageFormat);
-        setOutputs(result.map((item) => ({ name: item.filename, blob: item.blob, note: `Page ${item.pageNumber}` })));
+        setOutputs(result.map((item) => ({ name: item.filename, blob: item.blob, note: `${t('pdfWorkspace.page')} ${item.pageNumber}` })));
         setMessage(t('pdfWorkspace.renderedPageImages').replace('{count}', String(result.length)));
       } else if (toolSlug === 'pdf-page-counter') {
         const result = await countPdfPages(files[0]);
         setMessage(`${result.title}: ${result.pageCount} ${result.pageCount === 1 ? t('pdfWorkspace.page') : t('pdfWorkspace.pages')} · ${formatBytes(result.size)} · ${result.hasFormFields ? t('pdfWorkspace.containsFormFields') : t('pdfWorkspace.noFillableForms')}.`);
       }
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : 'PDF processing failed.');
+      setError(cause instanceof Error ? cause.message : t('pdfWorkspace.errorProcessing'));
     } finally {
       setBusy(false);
     }
@@ -181,32 +182,32 @@ export const TemplatePdfTools: React.FC<TemplatePdfToolsProps> = ({ toolName, to
 
           {isSplit && (
             <div className="space-y-3">
-              <div className="flex flex-wrap gap-2"><button type="button" onClick={() => setBurst(false)} className={`px-3 py-2 rounded-lg border text-xs ${!burst ? 'bg-orange-50 border-orange-300 text-orange-800' : 'border-stone-200 text-stone-600'}`}>Page ranges</button><button type="button" onClick={() => setBurst(true)} className={`px-3 py-2 rounded-lg border text-xs ${burst ? 'bg-orange-50 border-orange-300 text-orange-800' : 'border-stone-200 text-stone-600'}`}>One PDF per page</button></div>
-              {!burst && <label className="block space-y-1"><span className="text-xs font-semibold text-stone-700">Pages to extract</span><input value={ranges} onChange={(event) => setRanges(event.target.value)} placeholder="1-3, 5, 8-10" className="w-full px-3 py-2.5 rounded-lg border border-stone-200 bg-stone-50 text-sm text-stone-900" /><span className="text-[11px] text-stone-500">Use page numbers and ranges separated by commas.</span></label>}
+              <div className="flex flex-wrap gap-2"><button type="button" onClick={() => setBurst(false)} className={`px-3 py-2 rounded-lg border text-xs ${!burst ? 'bg-orange-50 border-orange-300 text-orange-800' : 'border-stone-200 text-stone-600'}`}>{t('pdfWorkspace.pageRanges')}</button><button type="button" onClick={() => setBurst(true)} className={`px-3 py-2 rounded-lg border text-xs ${burst ? 'bg-orange-50 border-orange-300 text-orange-800' : 'border-stone-200 text-stone-600'}`}>{t('pdfWorkspace.onePdfPerPage')}</button></div>
+              {!burst && <label className="block space-y-1"><span className="text-xs font-semibold text-stone-700">{t('pdfWorkspace.pagesToExtract')}</span><input value={ranges} onChange={(event) => setRanges(event.target.value)} placeholder={t('pdfWorkspace.pageRangePlaceholder')} className="w-full px-3 py-2.5 rounded-lg border border-stone-200 bg-stone-50 text-sm text-stone-900" /><span className="text-[11px] text-stone-500">{t('pdfWorkspace.pageRangeHelp')}</span></label>}
             </div>
           )}
 
           {isRotate && (
             <div className="space-y-3">
-              <label className="block space-y-1"><span className="text-xs font-semibold text-stone-700">Pages to rotate</span><input value={targetPages} onChange={(event) => setTargetPages(event.target.value)} placeholder="all or 1, 3, 5" className="w-full px-3 py-2.5 rounded-lg border border-stone-200 bg-stone-50 text-sm text-stone-900" /><span className="text-[11px] text-stone-500">Enter all or comma-separated page numbers.</span></label>
-              <label className="block space-y-1"><span className="text-xs font-semibold text-stone-700">Rotation</span><select value={rotation} onChange={(event) => setRotation(Number(event.target.value) as 90 | 180 | 270)} className="w-full px-3 py-2.5 rounded-lg border border-stone-200 bg-stone-50 text-sm text-stone-900"><option value={90}>90° clockwise</option><option value={180}>180°</option><option value={270}>270° clockwise</option></select></label>
+              <label className="block space-y-1"><span className="text-xs font-semibold text-stone-700">{t('pdfWorkspace.pagesToRotate')}</span><input value={targetPages} onChange={(event) => setTargetPages(event.target.value)} placeholder={t('pdfWorkspace.allOrNumbersPlaceholder')} className="w-full px-3 py-2.5 rounded-lg border border-stone-200 bg-stone-50 text-sm text-stone-900" /><span className="text-[11px] text-stone-500">{t('pdfWorkspace.allOrNumbersHelp')}</span></label>
+              <label className="block space-y-1"><span className="text-xs font-semibold text-stone-700">{t('pdfWorkspace.rotation')}</span><select value={rotation} onChange={(event) => setRotation(Number(event.target.value) as 90 | 180 | 270)} className="w-full px-3 py-2.5 rounded-lg border border-stone-200 bg-stone-50 text-sm text-stone-900"><option value={90}>{t('pdfWorkspace.rotation90')}</option><option value={180}>180°</option><option value={270}>{t('pdfWorkspace.rotation270')}</option></select></label>
             </div>
           )}
 
           {isImages && (
             <div className="space-y-3">
-              <label className="block space-y-1"><span className="text-xs font-semibold text-stone-700">Page size</span><select value={pageSize} onChange={(event) => setPageSize(event.target.value as typeof pageSize)} className="w-full px-3 py-2.5 rounded-lg border border-stone-200 bg-stone-50 text-sm text-stone-900"><option value="fit">Fit image dimensions</option><option value="a4">A4</option><option value="letter">US Letter</option></select></label>
-              <label className="block space-y-1"><span className="text-xs font-semibold text-stone-700">Orientation</span><select value={orientation} onChange={(event) => setOrientation(event.target.value as typeof orientation)} className="w-full px-3 py-2.5 rounded-lg border border-stone-200 bg-stone-50 text-sm text-stone-900"><option value="auto">Match each image</option><option value="portrait">Portrait</option><option value="landscape">Landscape</option></select></label>
-              <label className="block space-y-1"><span className="text-xs font-semibold text-stone-700">Margin (mm)</span><input type="number" min="0" max="30" value={margin} onChange={(event) => setMargin(Math.max(0, Math.min(30, Number(event.target.value) || 0)))} className="w-full px-3 py-2.5 rounded-lg border border-stone-200 bg-stone-50 text-sm text-stone-900" /></label>
-              <p className="text-[11px] text-stone-500">One image per PDF page. JPG and PNG are supported.</p>
+              <label className="block space-y-1"><span className="text-xs font-semibold text-stone-700">{t('pdfWorkspace.pageSize')}</span><select value={pageSize} onChange={(event) => setPageSize(event.target.value as typeof pageSize)} className="w-full px-3 py-2.5 rounded-lg border border-stone-200 bg-stone-50 text-sm text-stone-900"><option value="fit">{t('pdfWorkspace.fitImageDimensions')}</option><option value="a4">A4</option><option value="letter">{t('pdfWorkspace.letter')}</option></select></label>
+              <label className="block space-y-1"><span className="text-xs font-semibold text-stone-700">{t('pdfWorkspace.orientation')}</span><select value={orientation} onChange={(event) => setOrientation(event.target.value as typeof orientation)} className="w-full px-3 py-2.5 rounded-lg border border-stone-200 bg-stone-50 text-sm text-stone-900"><option value="auto">{t('pdfWorkspace.matchEachImage')}</option><option value="portrait">{t('pdfWorkspace.portrait')}</option><option value="landscape">{t('pdfWorkspace.landscape')}</option></select></label>
+              <label className="block space-y-1"><span className="text-xs font-semibold text-stone-700">{t('pdfWorkspace.marginMm')}</span><input type="number" min="0" max="30" value={margin} onChange={(event) => setMargin(Math.max(0, Math.min(30, Number(event.target.value) || 0)))} className="w-full px-3 py-2.5 rounded-lg border border-stone-200 bg-stone-50 text-sm text-stone-900" /></label>
+              <p className="text-[11px] text-stone-500">{t('pdfWorkspace.oneImagePerPdfPage')}</p>
             </div>
           )}
 
           {isRender && (
             <div className="grid grid-cols-2 gap-3">
-              <label className="block space-y-1"><span className="text-xs font-semibold text-stone-700">Resolution</span><select value={dpi} onChange={(event) => setDpi(Number(event.target.value) as 150 | 300)} className="w-full px-3 py-2.5 rounded-lg border border-stone-200 bg-stone-50 text-sm text-stone-900"><option value={150}>150 DPI</option><option value={300}>300 DPI</option></select></label>
-              <label className="block space-y-1"><span className="text-xs font-semibold text-stone-700">Image type</span><select value={imageFormat} onChange={(event) => setImageFormat(event.target.value as typeof imageFormat)} className="w-full px-3 py-2.5 rounded-lg border border-stone-200 bg-stone-50 text-sm text-stone-900"><option value="jpg">JPG</option><option value="png">PNG</option></select></label>
-              <p className="col-span-2 text-[11px] text-stone-500">Up to 40 PDF pages per conversion to protect device memory.</p>
+              <label className="block space-y-1"><span className="text-xs font-semibold text-stone-700">{t('pdfWorkspace.resolution')}</span><select value={dpi} onChange={(event) => setDpi(Number(event.target.value) as 150 | 300)} className="w-full px-3 py-2.5 rounded-lg border border-stone-200 bg-stone-50 text-sm text-stone-900"><option value={150}>150 DPI</option><option value={300}>300 DPI</option></select></label>
+              <label className="block space-y-1"><span className="text-xs font-semibold text-stone-700">{t('pdfWorkspace.imageType')}</span><select value={imageFormat} onChange={(event) => setImageFormat(event.target.value as typeof imageFormat)} className="w-full px-3 py-2.5 rounded-lg border border-stone-200 bg-stone-50 text-sm text-stone-900"><option value="jpg">JPG</option><option value="png">PNG</option></select></label>
+              <p className="col-span-2 text-[11px] text-stone-500">{t('pdfWorkspace.memoryLimit')}</p>
             </div>
           )}
 
