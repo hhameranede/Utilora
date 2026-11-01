@@ -160,22 +160,47 @@ if (process.env.OPENCODE_RUNTIME_TEST === '1') {
   const agentOutput = agents.stdout + '\n' + agents.stderr;
   for (const agent of expectedAgents) assert.ok(agentOutput.includes(agent), 'OpenCode did not discover agent ' + agent);
 
-  const debugAgent = spawnSync('opencode', ['debug', 'agent', 'project-lead'], { encoding: 'utf8', timeout: 45_000 });
-  assert.equal(debugAgent.status, 0, 'OpenCode could not resolve project-lead: ' + (debugAgent.stderr || debugAgent.stdout));
-  console.log('Resolved project-lead config:\n' + debugAgent.stdout.slice(0, 8000));
+  // OpenCode resolves each allowed skill to a scoped project path in the effective agent permissions.
+  // Verify each role independently instead of assuming debug skill uses the project default agent.
+  for (const agent of expectedAgents) {
+    const debug = spawnSync('opencode', ['debug', 'agent', agent], { encoding: 'utf8', timeout: 45_000 });
+    assert.equal(debug.status, 0, 'OpenCode could not resolve agent ' + agent + ': ' + (debug.stderr || debug.stdout));
+    const resolved = JSON.parse(debug.stdout) as {
+      name?: string;
+      mode?: string;
+      permission?: Array<{ permission?: string; pattern?: string; action?: string }>;
+    };
+    assert.equal(resolved.name, agent, 'OpenCode resolved the wrong agent');
+    assert.ok(Array.isArray(resolved.permission), 'OpenCode did not expose resolved permissions for ' + agent);
 
+    const allowedExternal = catalog.skills.filter((skill) => skill.assigned_agents.includes(agent)).map((skill) => skill.id);
+    const allowedAll = [...new Set([...expectedInternalAssignments[agent], ...allowedExternal])];
+    const externalRules = resolved.permission.filter((rule) => rule.permission === 'external_directory' && rule.action === 'allow');
+    for (const name of allowedAll) {
+      const expectedPath = join(root, '.opencode', 'skills', name, '*');
+      assert.ok(
+        externalRules.some((rule) => rule.pattern === expectedPath),
+        'OpenCode did not grant ' + agent + ' access to assigned skill ' + name,
+      );
+    }
+
+    const deniedExternal = catalog.skills.filter((skill) => !skill.assigned_agents.includes(agent)).map((skill) => skill.id);
+    for (const name of deniedExternal) {
+      const deniedPath = join(root, '.opencode', 'skills', name, '*');
+      assert.ok(
+        !externalRules.some((rule) => rule.pattern === deniedPath),
+        'OpenCode granted ' + agent + ' access to unassigned skill ' + name,
+      );
+    }
+  }
+
+  // Confirm the native skill diagnostic command itself starts and returns valid JSON.
   const skills = spawnSync('opencode', ['debug', 'skill'], { encoding: 'utf8', timeout: 45_000 });
-  assert.equal(skills.status, 0, 'OpenCode skill discovery failed: ' + (skills.stderr || skills.stdout));
-  const skillOutput = skills.stdout + '\n' + skills.stderr;
-  console.log('OpenCode debug skill output:\n' + skillOutput.slice(0, 20000));
-  const leadAllowed = catalog.skills.filter((skill) => skill.assigned_agents.includes('project-lead')).map((skill) => skill.id);
-  for (const name of [...leadAllowed, ...expectedInternalAssignments['project-lead']]) {
-    assert.ok(skillOutput.includes(name), 'OpenCode did not advertise project-lead skill ' + name + '\nCLI output:\n' + skillOutput.slice(0, 12000));
-  }
-  const notAssigned = catalog.skills.filter((skill) => !skill.assigned_agents.includes('project-lead')).map((skill) => skill.id);
-  for (const name of notAssigned) {
-    assert.ok(!skillOutput.includes('"name": "' + name + '"'), 'Project lead must not see unassigned skill ' + name);
-  }
-  console.log('OpenCode CLI discovery verified for all eight agents and 109 skills.');
+  assert.equal(skills.status, 0, 'OpenCode skill diagnostic failed: ' + (skills.stderr || skills.stdout));
+  const skillOutput = JSON.parse(skills.stdout) as Array<{ name?: string; description?: string }>;
+  assert.ok(Array.isArray(skillOutput), 'OpenCode skill diagnostic did not return a skill list');
+  assert.ok(skillOutput.every((skill) => typeof skill.name === 'string' && typeof skill.description === 'string'));
+
+  console.log('OpenCode resolved all eight agents and their scoped skill permissions.');
 }
 console.log('Agent configuration verified: 8 agents, 100 external + 9 first-party skills, and 6 MCP servers.');
