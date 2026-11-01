@@ -1,15 +1,13 @@
 name: Utilora quality checks
 
 concurrency:
-  group: utilora-quality-${{ github.ref }}
+  group: utilora-quality-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 on:
   push:
     branches:
       - main
-      - "fix/**"
-      - "feat/**"
   pull_request:
     branches:
       - main
