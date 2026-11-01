@@ -1,16 +1,16 @@
 import React from 'react';
+import { ArrowRight, CheckCircle2, FileText, Info, Lock, ShieldCheck, Sparkles, Workflow } from 'lucide-react';
 import { useI18n } from '../i18n';
 import { getToolBySlug } from '../registry/tools.registry';
 import { getCategoryById } from '../registry/categories.registry';
+import { getToolExperience, localizedExperience } from '../registry/tool-experience.registry';
 import { Breadcrumbs } from '../components/common/Breadcrumbs';
 import { Link } from '../router';
 import { ToolWorkspaceResolver } from '../components/templates/ToolWorkspaceResolver';
 import { RelatedTools } from '../components/common/RelatedTools';
-import { RelatedArticles } from '../components/common/RelatedArticles';
-import { FAQAccordion } from '../components/common/FAQAccordion';
+import { FAQAccordion, FAQItem } from '../components/common/FAQAccordion';
 import { Icon } from '../components/common/Icon';
 import { Head } from '../seo/Head';
-import { Shield, Sparkles, CheckCircle, Info, Lock } from 'lucide-react';
 
 interface ToolPageProps {
   toolSlug: string;
@@ -19,214 +19,367 @@ interface ToolPageProps {
 export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
   const { locale, t } = useI18n();
   const tool = getToolBySlug(toolSlug);
-
   if (!tool) return null;
 
+  const experience = getToolExperience(tool.slug);
   const category = getCategoryById(tool.category);
   const toolName = tool.localizedName[locale] || tool.localizedName.en;
   const toolDesc = tool.localizedDescription[locale] || tool.localizedDescription.en;
-  const isNetworkLookup = tool.category === 'website-domain';
   const categoryTitle = category ? category.localizedTitle[locale] || category.localizedTitle.en : tool.category;
+  const isNetworkLookup = tool.category === 'website-domain';
+  const isFunctional = tool.status === 'functional';
+  const positioning = experience
+    ? localizedExperience(experience.positioning, locale)
+    : toolDesc;
+  const benefits = experience
+    ? localizedExperience(experience.benefits, locale)
+    : [];
+  const steps = experience
+    ? localizedExperience(experience.steps, locale)
+    : [];
+  const example = experience
+    ? localizedExperience(experience.example, locale)
+    : toolDesc;
+  const seoTitle = tool.seo.metaTitle[locale] || tool.seo.metaTitle.en || `${toolName} | UTILORA`;
+  const seoDescription = tool.seo.metaDescription[locale] || tool.seo.metaDescription.en || toolDesc;
+  const localProcessingText = locale === 'ar'
+    ? 'تتم معالجة الملفات أو النصوص محلياً داخل متصفحك، ولا تُرفع إلى خوادم UTILORA.'
+    : 'Files and text are processed locally in your browser and are not uploaded to UTILORA servers.';
+  const networkProcessingText = locale === 'ar'
+    ? 'تحتاج هذه الأداة إلى إرسال النطاق أو الرابط الذي أدخلته إلى خدمات DNS/RDAP العامة أو إلى الموقع المستهدف. لا ترفع ملفاتك إلى UTILORA.'
+    : 'This lookup sends the domain or URL you submit to public DNS/RDAP services or the target website. It does not upload files to UTILORA.';
+  const previewText = locale === 'ar'
+    ? 'هذه الأداة في وضع المعاينة؛ لا تنفّذ معالجة أو تنزيل حقيقي حالياً.'
+    : 'This tool is currently a preview and does not perform real processing or downloading.';
 
-  const defaultFaqs = [
+  const faqs: FAQItem[] = tool.faqs || [
     {
       question: {
-        en: 'Is ' + toolName + ' safe to use with sensitive files?',
-        ar: 'هل ' + toolName + ' آمن للاستخدام مع المدخلات الحساسة؟',
+        en: `What is ${toolName} designed to do?`,
+        ar: `ما المهمة التي صُممت لها أداة ${toolName}؟`,
+      },
+      answer: { en: positioning, ar: positioning },
+    },
+    {
+      question: {
+        en: `How do I use ${toolName}?`,
+        ar: `كيف أستخدم أداة ${toolName}؟`,
       },
       answer: {
-        en: tool.status === 'functional'
-          ? (isNetworkLookup
-            ? 'This lookup sends only the domain or URL you enter to public DNS/RDAP services or directly to the target website. No files are uploaded.'
-            : 'Yes. This tool processes its input locally in your browser without uploading it to an intermediate server.')
-          : 'This workspace is currently a visual preview. It does not process files yet.',
-        ar: tool.status === 'functional'
-          ? (isNetworkLookup
-            ? 'ترسل هذه الأداة النطاق أو الرابط الذي تدخله إلى خدمات DNS/RDAP العامة أو إلى الموقع المستهدف مباشرةً. لا تُرفع أي ملفات.'
-            : 'نعم. تعالج هذه الأداة مدخلاتها محليًا داخل متصفحك دون رفعها إلى خادم وسيط.')
-          : 'مساحة العمل هذه معاينة للواجهة حاليًا، ولم تُفعّل المعالجة فيها بعد.',
+        en: steps.length ? steps.map((step, index) => `${index + 1}. ${step}`).join(' ') : toolDesc,
+        ar: steps.length ? steps.map((step, index) => `${index + 1}. ${step}`).join(' ') : toolDesc,
       },
     },
     {
-      question: tool.acceptedFormats && tool.status === 'functional'
-        ? {
-            en: 'What file formats and size limits does ' + toolName + ' support?',
-            ar: 'ما صيغ الملفات وحدود الحجم التي تدعمها ' + toolName + '؟',
-          }
-        : isNetworkLookup
-          ? {
-              en: 'What information does ' + toolName + ' check?',
-              ar: 'ما المعلومات التي تفحصها ' + toolName + '؟',
-            }
-          : {
-              en: 'Is my input stored or sent to a server?',
-              ar: 'هل تُحفظ مدخلاتي أو تُرسل إلى خادم؟',
-            },
-      answer: tool.acceptedFormats && tool.status === 'functional'
-        ? {
-            en: 'Supported formats: ' + tool.acceptedFormats.join(', ') + '. Maximum file size: ' + (tool.maxFileSize || 'See the tool-specific processing limit') + '.',
-            ar: 'الصيغ المدعومة: ' + tool.acceptedFormats.join('، ') + '. الحد الأقصى لحجم الملف: ' + (tool.maxFileSize || 'راجع حد المعالجة الخاص بالأداة') + '.',
-          }
-        : isNetworkLookup
-          ? {
-              en: 'The tool queries public domain registration or DNS records, or sends a credential-free HEAD request to the public website URL you submit. It does not inspect private content.',
-              ar: 'تستعلم الأداة عن بيانات تسجيل النطاق أو سجلات DNS العامة، أو ترسل طلب HEAD دون بيانات اعتماد إلى رابط الموقع العام الذي تدخله. لا تفحص المحتوى الخاص.',
-            }
-          : {
-              en: tool.status === 'functional'
-                ? 'No. Your text or code input is processed locally in this browser and is not sent to UTILORA servers.'
-                : 'This workspace is a preview and does not process or store submitted files.',
-              ar: tool.status === 'functional'
-                ? 'لا. تتم معالجة النص أو الشيفرة محليًا في هذا المتصفح ولا تُرسل إلى خوادم UTILORA.'
-                : 'مساحة العمل معاينة ولا تعالج الملفات المُدخلة أو تحفظها.',
-            },
+      question: {
+        en: 'Are my files uploaded to UTILORA?',
+        ar: 'هل تُرفع ملفاتي إلى خوادم UTILORA؟',
+      },
+      answer: {
+        en: isFunctional ? (isNetworkLookup ? networkProcessingText : localProcessingText) : previewText,
+        ar: isFunctional ? (isNetworkLookup ? networkProcessingText : localProcessingText) : previewText,
+      },
     },
+    ...(tool.acceptedFormats && isFunctional ? [{
+      question: {
+        en: 'Which file formats and size limits are supported?',
+        ar: 'ما صيغ الملفات وحدود الحجم المدعومة؟',
+      },
+      answer: {
+        en: `Supported formats: ${tool.acceptedFormats.join(', ')}. Maximum file size: ${tool.maxFileSize || 'The limit shown in the workspace'}.`,
+        ar: `الصيغ المدعومة: ${tool.acceptedFormats.join('، ')}. الحد الأقصى للحجم: ${tool.maxFileSize || 'الحد الموضح في مساحة العمل'}.`,
+      },
+    }] : []),
   ];
 
   return (
-    <>
+    <article className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
       <Head
-        title={`${toolName} — Free Online Tool | UTILORA`}
-        description={toolDesc}
+        title={seoTitle}
+        description={seoDescription}
         locale={locale}
         routeType="tool"
         slug={tool.slug}
-        // Functional tools are indexable; unfinished preview workspaces remain noindex.
-        isIndexable={tool.status === 'functional'}
+        isIndexable={isFunctional}
         schemaType="SoftwareApplication"
         schemaData={{
-          operatingSystem: 'All Modern Browsers',
-          fileFormat: tool.acceptedFormats || ['*/*'],
+          name: toolName,
+          description: seoDescription,
+          applicationCategory: 'UtilityApplication',
+          operatingSystem: 'Any',
+          isAccessibleForFree: true,
+          featureList: benefits,
+          ...(tool.acceptedFormats ? { fileFormat: tool.acceptedFormats } : {}),
         }}
       />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-        {/* Breadcrumbs */}
-        <Breadcrumbs
-          items={[
-            { label: t('nav.tools'), routeType: 'tools-index' },
-            { label: categoryTitle, routeType: 'category', slug: tool.category },
-            { label: toolName },
-          ]}
-        />
+      <Breadcrumbs
+        items={[
+          { label: t('nav.tools'), routeType: 'tools-index' },
+          { label: categoryTitle, routeType: 'category', slug: tool.category },
+          { label: toolName },
+        ]}
+      />
 
-        {/* Tool Header & Badge */}
-        <div className="space-y-4 max-w-4xl">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-orange-50 border border-orange-100 flex items-center justify-center text-orange-600 shadow-xs">
-              <Icon name={tool.icon} size={24} />
-            </div>
-
-            <div>
-              <div className="flex items-center gap-2 text-xs text-stone-400">
-                <span>{categoryTitle}</span>
-                <span aria-hidden="true" className="text-stone-300">·</span>
-                <span className="text-orange-600 font-mono font-medium">{tool.status === "functional" ? "Functional" : "Preview only"}</span>
-              </div>
-              <h1 className="text-2xl sm:text-4xl font-extrabold text-stone-900 mt-1">
-                {toolName}
-              </h1>
-            </div>
-          </div>
-
-          <p className="text-sm sm:text-base text-stone-600 leading-relaxed">
-            {toolDesc}
-          </p>
+      <header className="overflow-hidden rounded-[2rem] border border-stone-200 bg-gradient-to-br from-white via-white to-orange-50/70 p-6 shadow-sm sm:p-9">
+        <div className="flex flex-wrap items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-500">
+          <span className="rounded-full border border-orange-200 bg-orange-50 px-3 py-1 text-orange-700">UTILORA</span>
+          <span>{experience?.eyebrow || categoryTitle}</span>
+          <span aria-hidden="true">/</span>
+          <span>{categoryTitle}</span>
         </div>
 
-        {tool.status !== 'functional' && (
-          <div className="p-4 rounded-2xl bg-orange-50/80 border border-orange-200/90 flex items-center gap-3 text-xs text-orange-900 shadow-xs">
-            <Info size={16} className="text-orange-600 shrink-0" />
-            <div className="flex-1">
-              <span className="font-semibold text-stone-900">Preview only: </span>
-              {t('common.previewNotice')}
+        <div className="mt-6 grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+          <div className="max-w-3xl">
+            <div className="flex items-center gap-3">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-orange-100 bg-white text-orange-600 shadow-sm">
+                <Icon name={tool.icon} size={25} />
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs font-medium text-stone-500">
+                  {locale === 'ar' ? 'أداة متخصصة من UTILORA' : 'A focused tool by UTILORA'}
+                </p>
+                <p className="mt-0.5 text-xs font-semibold text-orange-700">
+                  {isFunctional
+                    ? (locale === 'ar' ? 'متاحة للاستخدام' : 'Ready to use')
+                    : (locale === 'ar' ? 'معاينة فقط' : 'Preview only')}
+                </p>
+              </div>
+            </div>
+
+            <h1 className="mt-5 text-3xl font-extrabold tracking-tight text-stone-950 sm:text-5xl">
+              {toolName}
+            </h1>
+            <p className="mt-4 max-w-2xl text-base leading-8 text-stone-600 sm:text-lg">
+              {positioning}
+            </p>
+            <p className="mt-3 max-w-2xl text-sm leading-7 text-stone-500">
+              {toolDesc}
+            </p>
+
+            <div className="mt-6 flex flex-wrap gap-2">
+              <span className="inline-flex items-center gap-2 rounded-full border border-stone-200 bg-white px-3 py-2 text-xs font-medium text-stone-700">
+                <CheckCircle2 size={14} className="text-orange-600" />
+                {locale === 'ar' ? 'مجانية' : 'Free to use'}
+              </span>
+              <span className="inline-flex items-center gap-2 rounded-full border border-stone-200 bg-white px-3 py-2 text-xs font-medium text-stone-700">
+                <ShieldCheck size={14} className="text-orange-600" />
+                {isNetworkLookup
+                  ? (locale === 'ar' ? 'استعلامات عامة' : 'Public lookups')
+                  : (locale === 'ar' ? 'معالجة داخل المتصفح' : 'Browser-based processing')}
+              </span>
+              <span className="inline-flex items-center gap-2 rounded-full border border-stone-200 bg-white px-3 py-2 text-xs font-medium text-stone-700">
+                <Sparkles size={14} className="text-orange-600" />
+                {locale === 'ar' ? 'بدون تثبيت برنامج' : 'No installation'}
+              </span>
             </div>
           </div>
-        )}
 
-        {/* Main Specialized Tool Workspace */}
-        <section className="pt-2">
-          <ToolWorkspaceResolver tool={tool} />
-        </section>
-
-        {/* Specifications & Instructions Section */}
-        <section className="p-8 sm:p-10 rounded-3xl bg-white border border-stone-200/90 shadow-xs space-y-8">
-          <div>
-            <h2 className="text-lg font-bold text-stone-900 mb-2">
-              {t('common.howToUse')}
-            </h2>
+          <div className="flex flex-wrap gap-2 lg:justify-end">
+            <a
+              href="#tool-workspace"
+              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-orange-500 px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
+            >
+              {locale === 'ar' ? 'ابدأ الاستخدام' : 'Open the tool'}
+              <ArrowRight size={16} />
+            </a>
             <Link
               routeType="tool-guide"
               slug={tool.slug}
-              className="group mt-5 flex flex-col gap-3 rounded-2xl border border-orange-200 bg-orange-50/60 p-5 transition-colors hover:border-orange-300 sm:flex-row sm:items-center sm:justify-between"
+              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-stone-200 bg-white px-5 py-3 text-sm font-semibold text-stone-700 transition hover:border-orange-300 hover:text-orange-700"
             >
-              <div>
-                <h3 className="text-sm font-bold text-stone-900">
-                  {locale === 'ar' ? 'شاهد الدليل المرئي لهذه الأداة' : 'See the visual step-by-step guide'}
-                </h3>
-                <p className="mt-1 text-xs leading-relaxed text-stone-600">
-                  {locale === 'ar'
-                    ? 'لقطات من واجهة الأداة الفعلية مع أسهم توضّح أماكن الرفع والإعدادات والنتائج.'
-                    : 'Screenshots from the actual tool interface, annotated to show uploads, settings, and results.'}
-                </p>
-              </div>
-              <span className="inline-flex shrink-0 items-center gap-2 text-xs font-semibold text-orange-700">
-                {locale === 'ar' ? 'افتح دليل الاستعمال' : 'Open usage guide'}
-                <span aria-hidden="true">→</span>
-              </span>
+              <FileText size={16} />
+              {locale === 'ar' ? 'دليل الاستعمال' : 'How to use'}
             </Link>
           </div>
+        </div>
 
-          {/* Supported Formats or Constraints */}
-          {tool.acceptedFormats && (
-            <div className="pt-6 border-t border-stone-100">
-              <h3 className="text-xs font-semibold text-stone-800 uppercase tracking-wider mb-2">
-                {t('common.supportedFormats')}
-              </h3>
-              <div className="flex items-center gap-2 flex-wrap">
-                {tool.acceptedFormats.map((fmt) => (
-                  <span
-                    key={fmt}
-                    className="px-2.5 py-1 rounded-lg bg-stone-50 border border-stone-200 text-xs font-mono text-stone-700"
-                  >
-                    {fmt}
-                  </span>
-                ))}
-                {tool.maxFileSize && (
-                  <span className="text-xs font-mono text-stone-400 ml-2">
-                    Max size: {tool.maxFileSize}
-                  </span>
-                )}
+        <nav aria-label={locale === 'ar' ? 'أقسام صفحة الأداة' : 'Tool page sections'} className="mt-8 flex flex-wrap gap-x-5 gap-y-2 border-t border-stone-200/80 pt-5 text-xs font-semibold text-stone-500">
+          <a className="transition hover:text-orange-700" href="#tool-workspace">{locale === 'ar' ? 'الأداة' : 'Workspace'}</a>
+          <a className="transition hover:text-orange-700" href="#tool-features">{locale === 'ar' ? 'الميزات' : 'Features'}</a>
+          <a className="transition hover:text-orange-700" href="#how-it-works">{locale === 'ar' ? 'طريقة العمل' : 'How it works'}</a>
+          <a className="transition hover:text-orange-700" href="#tool-faq">{locale === 'ar' ? 'الأسئلة الشائعة' : 'FAQ'}</a>
+        </nav>
+      </header>
+
+      {!isFunctional && (
+        <div className="flex items-start gap-3 rounded-2xl border border-orange-200 bg-orange-50/80 p-4 text-sm text-orange-950">
+          <Info size={18} className="mt-0.5 shrink-0 text-orange-600" />
+          <div>
+            <p className="font-semibold">{locale === 'ar' ? 'هذه معاينة وليست أداة مكتملة' : 'Preview only — not a working tool yet'}</p>
+            <p className="mt-1 leading-6">{previewText}</p>
+          </div>
+        </div>
+      )}
+
+      <section id="tool-workspace" className="scroll-mt-6 space-y-4">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.14em] text-orange-700">
+              {locale === 'ar' ? 'مساحة العمل' : 'WORKSPACE'}
+            </p>
+            <h2 className="mt-2 text-2xl font-bold text-stone-950 sm:text-3xl">
+              {locale === 'ar' ? 'استخدم الأداة مباشرةً' : `Use ${toolName}`}
+            </h2>
+          </div>
+          <p className="text-xs text-stone-500">
+            {isNetworkLookup
+              ? (locale === 'ar' ? 'تتصل بخدمات عامة عند تنفيذ الاستعلام' : 'Connects to public services when you run a lookup')
+              : (locale === 'ar' ? 'المعالجة تتم على جهازك' : 'Processing happens on your device')}
+          </p>
+        </div>
+        <div className="rounded-[1.75rem] border border-stone-200 bg-white p-3 shadow-sm sm:p-5">
+          <ToolWorkspaceResolver tool={tool} />
+        </div>
+      </section>
+
+      {benefits.length > 0 && (
+        <section id="tool-features" className="scroll-mt-6 space-y-5">
+          <div className="max-w-2xl">
+            <p className="text-xs font-bold uppercase tracking-[0.14em] text-orange-700">
+              {locale === 'ar' ? 'مصممة لمهمة واضحة' : 'BUILT FOR A SPECIFIC TASK'}
+            </p>
+            <h2 className="mt-2 text-2xl font-bold text-stone-950 sm:text-3xl">
+              {locale === 'ar' ? 'ما الذي تقدمه هذه الأداة؟' : 'What this tool helps you do'}
+            </h2>
+          </div>
+          <div className="grid gap-3 md:grid-cols-3">
+            {benefits.map((benefit, index) => (
+              <div key={benefit} className="rounded-2xl border border-stone-200 bg-white p-5">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-orange-50 text-sm font-bold text-orange-700">
+                  0{index + 1}
+                </div>
+                <p className="mt-4 text-sm font-semibold leading-6 text-stone-800">{benefit}</p>
               </div>
-            </div>
-          )}
-
-          {/* Privacy & Guarantee Statement */}
-          <div className="pt-6 border-t border-stone-100 flex items-start gap-3">
-            <Lock size={16} className="text-orange-500 shrink-0 mt-0.5" />
-            <div className="text-xs leading-relaxed text-stone-600">
-              <span className="font-semibold text-stone-900">{t('common.privacyStatement')}: </span>
-              {isNetworkLookup ? 'Network lookup: only the domain or URL you submit is sent to public DNS/RDAP services or the target website. No files or cookies are collected by UTILORA.' : t('common.privacyStatementDesc')}
-            </div>
+            ))}
           </div>
         </section>
+      )}
 
-        {/* FAQs */}
-        <section className="space-y-6 pt-6">
-          <h2 className="text-xl font-bold text-stone-900">
-            {t('common.faq')}
-          </h2>
-          <FAQAccordion faqs={tool.faqs || defaultFaqs} />
+      {steps.length > 0 && (
+        <section id="how-it-works" className="scroll-mt-6 rounded-[1.75rem] border border-stone-200 bg-white p-6 sm:p-8">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50 text-orange-700">
+              <Workflow size={20} />
+            </div>
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.14em] text-orange-700">
+                {locale === 'ar' ? 'خطوات بسيطة' : 'A SIMPLE WORKFLOW'}
+              </p>
+              <h2 className="mt-1 text-xl font-bold text-stone-950 sm:text-2xl">
+                {locale === 'ar' ? 'كيف تعمل الأداة؟' : 'How it works'}
+              </h2>
+            </div>
+          </div>
+          <ol className="mt-7 grid gap-5 md:grid-cols-3">
+            {steps.map((step, index) => (
+              <li key={step} className="relative border-s-2 border-orange-200 ps-4">
+                <span className="text-xs font-bold text-orange-700">
+                  {locale === 'ar' ? `الخطوة ${index + 1}` : `STEP 0${index + 1}`}
+                </span>
+                <p className="mt-2 text-sm leading-7 text-stone-700">{step}</p>
+              </li>
+            ))}
+          </ol>
         </section>
+      )}
 
-        {/* Related Tools */}
-        {tool.relatedTools && tool.relatedTools.length > 0 && (
-          <RelatedTools toolSlugs={tool.relatedTools} />
-        )}
+      <section className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
+        <div className="rounded-[1.75rem] border border-stone-200 bg-white p-6 sm:p-8">
+          <div className="flex items-center gap-2 text-orange-700">
+            <Sparkles size={17} />
+            <p className="text-xs font-bold uppercase tracking-[0.14em]">
+              {locale === 'ar' ? 'مثال عملي' : 'PRACTICAL USE CASE'}
+            </p>
+          </div>
+          <h2 className="mt-3 text-xl font-bold text-stone-950">
+            {locale === 'ar' ? 'متى تحتاج إلى هذه الأداة؟' : 'When would you use it?'}
+          </h2>
+          <p className="mt-3 text-sm leading-7 text-stone-600">{example}</p>
+        </div>
 
-        {/* Related Guides */}
-        <RelatedArticles />
-      </div>
-    </>
+        <div className="rounded-[1.75rem] border border-stone-200 bg-stone-50/80 p-6 sm:p-8">
+          <div className="flex items-center gap-2 text-orange-700">
+            <Lock size={17} />
+            <p className="text-xs font-bold uppercase tracking-[0.14em]">
+              {locale === 'ar' ? 'الخصوصية والاتصال' : 'PRIVACY & CONNECTION'}
+            </p>
+          </div>
+          <h2 className="mt-3 text-xl font-bold text-stone-950">
+            {locale === 'ar' ? 'ماذا يحدث لمدخلاتك؟' : 'What happens to your input?'}
+          </h2>
+          <p className="mt-3 text-sm leading-7 text-stone-600">
+            {isFunctional
+              ? (isNetworkLookup ? networkProcessingText : localProcessingText)
+              : previewText}
+          </p>
+        </div>
+      </section>
+
+      {tool.acceptedFormats && (
+        <section className="rounded-[1.75rem] border border-stone-200 bg-white p-6 sm:p-8">
+          <h2 className="text-xl font-bold text-stone-950">
+            {locale === 'ar' ? 'الصيغ والحدود المدعومة' : 'Supported formats & limits'}
+          </h2>
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            {tool.acceptedFormats.map((format) => (
+              <span key={format} className="rounded-lg border border-stone-200 bg-stone-50 px-3 py-2 font-mono text-xs text-stone-700">
+                {format}
+              </span>
+            ))}
+            {tool.maxFileSize && (
+              <span className="text-xs text-stone-500">
+                {locale === 'ar' ? 'الحد الأقصى:' : 'Maximum size:'} {tool.maxFileSize}
+              </span>
+            )}
+          </div>
+        </section>
+      )}
+
+      <section className="rounded-[1.75rem] border border-orange-200 bg-orange-50/60 p-6 sm:p-8">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="max-w-2xl">
+            <p className="text-xs font-bold uppercase tracking-[0.14em] text-orange-700">
+              {locale === 'ar' ? 'الدليل المرئي' : 'VISUAL GUIDE'}
+            </p>
+            <h2 className="mt-2 text-xl font-bold text-stone-950">
+              {locale === 'ar' ? `تعلّم استخدام ${toolName} خطوة بخطوة` : `Learn ${toolName} step by step`}
+            </h2>
+            <p className="mt-2 text-sm leading-6 text-stone-600">
+              {locale === 'ar'
+                ? 'لقطات من مساحة العمل الفعلية مع أسهم توضيحية لمواضع الإدخال والإعدادات والنتائج.'
+                : 'Screenshots from the actual workspace, with annotations for inputs, settings, and results.'}
+            </p>
+          </div>
+          <Link
+            routeType="tool-guide"
+            slug={tool.slug}
+            className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl border border-orange-300 bg-white px-5 py-3 text-sm font-bold text-orange-800 transition hover:bg-orange-100"
+          >
+            {locale === 'ar' ? 'افتح دليل الاستعمال' : 'Open the usage guide'}
+            <ArrowRight size={16} />
+          </Link>
+        </div>
+      </section>
+
+      <section id="tool-faq" className="scroll-mt-6 space-y-5">
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.14em] text-orange-700">
+            {locale === 'ar' ? 'المساعدة' : 'HELP'}
+          </p>
+          <h2 className="mt-2 text-2xl font-bold text-stone-950">
+            {locale === 'ar' ? 'أسئلة شائعة حول الأداة' : 'Frequently asked questions'}
+          </h2>
+        </div>
+        <FAQAccordion faqs={faqs} />
+      </section>
+
+      {tool.relatedTools?.length > 0 && (
+        <RelatedTools
+          toolSlugs={tool.relatedTools}
+          title={locale === 'ar' ? 'أدوات تكمل هذه المهمة' : 'Tools that work well with this one'}
+        />
+      )}
+    </article>
   );
 };
