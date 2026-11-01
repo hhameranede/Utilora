@@ -200,10 +200,10 @@ export const TemplateGalleryPage: React.FC = () => {
     {
       id: 'template-o',
       code: 'Template O',
-      name: 'Media Metadata Workspace (EXIF & Codec Atoms)',
-      useCase: 'Used for deep inspection of camera EXIF tags, GPS metadata, and container codec specs.',
-      associatedTools: ['image-metadata-viewer', 'video-metadata-viewer'],
-      render: () => <TemplateOMediaMetadata toolName="Technical Metadata Demo" isVideo={true} />,
+      name: 'Video Metadata Workspace (Browser Metadata)',
+      useCase: 'Used to inspect browser-exposed video duration, dimensions, aspect ratio, and estimated average bitrate.',
+      associatedTools: ['video-metadata-viewer'],
+      render: () => <TemplateOMediaMetadata toolName="Video Metadata Demo" />,
     },
     {
       id: 'template-p',
