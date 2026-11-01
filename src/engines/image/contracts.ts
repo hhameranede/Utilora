@@ -1,5 +1,5 @@
 import { ToolAdapter } from '../types';
-import { readBrowserImageMetadata, transformBrowserImage } from './browser';
+import { getBrowserImageDimensions, readBrowserImageMetadata, transformBrowserImage } from './browser';
 
 function failure<T>(error: unknown) {
   return {
@@ -34,12 +34,11 @@ export const ImageCompressorAdapter: ToolAdapter<ImageCompressorInput, ImageComp
   async execute(input, options = { quality: 75 }) {
     const started = performance.now();
     try {
-      const bitmap = await createImageBitmap(input.file);
+      const dimensions = await getBrowserImageDimensions(input.file);
       const limit = Math.max(1, Math.min(12000, options.maxDimension ?? 12000));
-      const scale = Math.min(1, limit / Math.max(bitmap.width, bitmap.height));
-      const width = Math.max(1, Math.round(bitmap.width * scale));
-      const height = Math.max(1, Math.round(bitmap.height * scale));
-      bitmap.close();
+      const scale = Math.min(1, limit / Math.max(dimensions.width, dimensions.height));
+      const width = Math.max(1, Math.round(dimensions.width * scale));
+      const height = Math.max(1, Math.round(dimensions.height * scale));
       const result = await transformBrowserImage(input.file, { format: 'webp', quality: options.quality, width, height });
       return { success: true, data: {
         blob: result.blob,
@@ -61,10 +60,7 @@ export const ImageResizerAdapter: ToolAdapter<ImageResizerInput, ImageResizerOpt
   async execute(input, options = { mode: 'pixels', maintainAspectRatio: true }) {
     const started = performance.now();
     try {
-      const bitmap = await createImageBitmap(input.file);
-      const sourceWidth = bitmap.width;
-      const sourceHeight = bitmap.height;
-      bitmap.close();
+      const { width: sourceWidth, height: sourceHeight } = await getBrowserImageDimensions(input.file);
       const width = options.mode === 'percentage' ? Math.round(sourceWidth * (options.percentage ?? 100) / 100) : (options.targetWidth ?? sourceWidth);
       const height = options.maintainAspectRatio ? Math.round(width * sourceHeight / sourceWidth) : (options.mode === 'percentage' ? Math.round(sourceHeight * (options.percentage ?? 100) / 100) : (options.targetHeight ?? sourceHeight));
       const result = await transformBrowserImage(input.file, { format: 'png', width, height });
