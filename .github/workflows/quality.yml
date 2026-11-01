@@ -64,3 +64,9 @@ jobs:
           grep -q 'noindex, nofollow' dist/404.html
           grep -q 'Page not found' dist/404.html
           grep -q 'id="root"><' dist/en.html
+
+      - name: Install Chromium for browser tests
+        run: npx playwright install --with-deps chromium
+
+      - name: Run browser end-to-end tests
+        run: npm run e2e
