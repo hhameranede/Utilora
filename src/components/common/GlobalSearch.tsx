@@ -211,18 +211,18 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({ isOpen, onOpen, onCl
               setSelectedIndex(0);
             }}
             placeholder={t('hero.searchPlaceholder', 'Search 36 tools, guides, topics...')}
-            className="w-full bg-transparent text-sm text-stone-900 placeholder-stone-400 focus:outline-none"
+            className="w-full bg-transparent text-sm text-stone-900 placeholder-stone-500 focus:outline-none"
           />
           {query && (
             <button
               onClick={() => setQuery('')}
-              className="text-stone-400 hover:text-stone-600 p-1"
+              className="text-stone-500 hover:text-stone-600 p-1"
               aria-label="Clear query"
             >
               <X size={15} />
             </button>
           )}
-          <kbd className="hidden sm:inline-flex items-center gap-0.5 px-2 py-0.5 text-[11px] font-mono text-stone-400 bg-white border border-stone-200 rounded">
+          <kbd className="hidden sm:inline-flex items-center gap-0.5 px-2 py-0.5 text-[11px] font-mono text-stone-500 bg-white border border-stone-200 rounded">
             ESC
           </kbd>
         </div>
@@ -230,15 +230,15 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({ isOpen, onOpen, onCl
         {/* Results Body */}
         <div className="overflow-y-auto p-3 space-y-4">
           {flatItems.length === 0 ? (
-            <div className="py-12 text-center text-stone-400">
+            <div className="py-12 text-center text-stone-500">
               <Zap size={28} className="mx-auto mb-2 text-stone-300" />
               <p className="text-sm font-medium text-stone-700">{t('common.noResults')}</p>
-              <p className="text-xs text-stone-400 mt-1">{t('common.tryAnother')}</p>
+              <p className="text-xs text-stone-500 mt-1">{t('common.tryAnother')}</p>
             </div>
           ) : (
             <div>
               {!query && (
-                <div className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-stone-400">
+                <div className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-stone-500">
                   {t('hero.explorePopular')}
                 </div>
               )}
@@ -263,7 +263,7 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({ isOpen, onOpen, onCl
                       <div className="flex items-center gap-3 min-w-0">
                         <div
                           className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-                            isSelected ? 'bg-orange-500 text-white' : 'bg-stone-100 text-stone-600'
+                            isSelected ? 'bg-orange-700 text-white' : 'bg-stone-100 text-stone-600'
                           }`}
                         >
                           <Icon name={item.icon} size={16} />
@@ -271,7 +271,7 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({ isOpen, onOpen, onCl
                         <div className="min-w-0">
                           <div className="text-xs font-semibold truncate flex items-center gap-2">
                             <span>{item.title}</span>
-                            <span className="text-[10px] uppercase font-mono tracking-wider text-stone-400">
+                            <span className="text-[10px] uppercase font-mono tracking-wider text-stone-500">
                               {item.type}
                             </span>
                           </div>
@@ -284,9 +284,9 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({ isOpen, onOpen, onCl
                       </div>
                       <div className="shrink-0 flex items-center ps-3">
                         {isSelected ? (
-                          <CornerDownLeft size={14} className="text-orange-600" />
+                          <CornerDownLeft size={14} className="text-orange-700" />
                         ) : (
-                          <ArrowRight size={13} className="text-stone-400" />
+                          <ArrowRight size={13} className="text-stone-500" />
                         )}
                       </div>
                     </button>
@@ -298,7 +298,7 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({ isOpen, onOpen, onCl
         </div>
 
         {/* Footer shortcuts */}
-        <div className="px-4 py-2.5 bg-stone-50 border-t border-stone-200 flex items-center justify-between text-[11px] text-stone-400">
+        <div className="px-4 py-2.5 bg-stone-50 border-t border-stone-200 flex items-center justify-between text-[11px] text-stone-500">
           <div className="flex items-center gap-3">
             <span>
               {t('search.navigate')} <kbd className="px-1 py-0.5 bg-white border border-stone-200 rounded text-stone-600">↑</kbd>{' '}
