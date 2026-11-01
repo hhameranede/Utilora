@@ -2,7 +2,7 @@ import { expect, test, type Page } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
 
 async function makeWebm(page: Page, withAudio = false): Promise<Buffer> {
-  const bytes = await page.evaluate(async () => {
+  const bytes = await page.evaluate(async (withAudio: boolean) => {
     const mimeType = withAudio ? 'video/webm;codecs=vp8,opus' : 'video/webm;codecs=vp8';
     if (!MediaRecorder.isTypeSupported(mimeType)) {
       throw new Error('Chromium does not support the WebM VP8 fixture required by this test.');
@@ -66,7 +66,7 @@ async function makeWebm(page: Page, withAudio = false): Promise<Buffer> {
     const blob = new Blob(chunks, { type: mimeType });
     if (blob.size < 1000) throw new Error('The browser produced an empty WebM fixture.');
     return Array.from(new Uint8Array(await blob.arrayBuffer()));
-  });
+  }, withAudio);
 
   return Buffer.from(bytes);
 }
