@@ -1,33 +1,46 @@
 import React from 'react';
 import { LegalLayout } from './LegalLayout';
+import { useI18n } from '../../i18n';
 
 export const PrivacyPage: React.FC = () => {
+  const { t } = useI18n();
+
   return (
     <LegalLayout
-      title="Privacy Policy"
-      subtitle="UTILORA is engineered with a strict zero-retention, client-first confidentiality model."
+      title={t('privacy.title')}
+      subtitle={t('privacy.subtitle')}
       routeType="privacy"
     >
       <div className="space-y-6">
-        <h2 className="text-xl font-bold text-stone-900">1. Architectural Invariant: Client-Side Execution</h2>
-        <p>
-          Unlike conventional digital conversion portals, UTILORA is architected to perform data manipulations directly within your client browser runtime (via HTML5 Canvas, Web Audio, and WebAssembly). Your images, documents, text files, and video clips are not transmitted to or stored on our servers.
-        </p>
+        <section className="space-y-2">
+          <h2 className="text-xl font-bold text-stone-900">{t('privacy.processingTitle')}</h2>
+          <p>{t('privacy.processing')}</p>
+        </section>
 
-        <h2 className="text-xl font-bold text-stone-900 pt-4">2. Zero Account Requirement</h2>
-        <p>
-          You are never asked to provide your name, phone number, physical address, or credit card details to use standard tools. We do not maintain user account databases for normal tool functionality.
-        </p>
+        <section className="space-y-2">
+          <h2 className="text-xl font-bold text-stone-900">{t('privacy.networkTitle')}</h2>
+          <p>{t('privacy.network')}</p>
+        </section>
 
-        <h2 className="text-xl font-bold text-stone-900 pt-4">3. Local Storage & Preferences</h2>
-        <p>
-          We store minimal functional state (such as your chosen language preference: English, Arabic, French, Spanish, Portuguese, Hindi, Chinese, or Bengali) inside your browser’s standard <code>localStorage</code>. This data never leaves your device.
-        </p>
+        <section className="space-y-2">
+          <h2 className="text-xl font-bold text-stone-900">{t('privacy.infrastructureTitle')}</h2>
+          <p>{t('privacy.infrastructure')}</p>
+        </section>
 
-        <h2 className="text-xl font-bold text-stone-900 pt-4">4. No Behavioral Tracking or Third-Party Scripts</h2>
-        <p>
-          We do not inject third-party ad networks, cross-site trackers, or invasive telemetry cookies. Our content delivery network logs anonymous request metrics (IP addresses, user-agent strings, and requested asset paths) solely for DDoS mitigation, caching, and infrastructure stability.
-        </p>
+        <section className="space-y-2">
+          <h2 className="text-xl font-bold text-stone-900">{t('privacy.preferencesTitle')}</h2>
+          <p>{t('privacy.preferences')}</p>
+        </section>
+
+        <section className="space-y-2">
+          <h2 className="text-xl font-bold text-stone-900">{t('privacy.externalTitle')}</h2>
+          <p>{t('privacy.external')}</p>
+        </section>
+
+        <section className="space-y-2">
+          <h2 className="text-xl font-bold text-stone-900">{t('privacy.accountsTitle')}</h2>
+          <p>{t('privacy.accounts')}</p>
+        </section>
       </div>
     </LegalLayout>
   );

@@ -78,7 +78,14 @@ interface ToolGuidePageProps { toolSlug: string }
 
 interface GuideStep { title: string; description: string; annotation: string }
 
-function getGuideSteps(category: string, locale: string, name: string, formats: string): GuideStep[] {
+function getGuideSteps(category: string, locale: string, name: string, formats: string, translate: (key: string) => string): GuideStep[] {
+  if (locale !== 'ar' && locale !== 'en') {
+    return [
+      { title: translate('product.step1'), description: translate('guide.step1Desc'), annotation: translate('guide.inputArea') },
+      { title: translate('product.step2'), description: translate('guide.step2Desc'), annotation: translate('guide.settingsArea') },
+      { title: translate('product.step3'), description: translate('guide.step3Desc'), annotation: translate('guide.resultArea') },
+    ];
+  }
   const arabic = locale === 'ar';
   const labels = {
     image: arabic
@@ -174,10 +181,10 @@ export const ToolGuidePage: React.FC<ToolGuidePageProps> = ({ toolSlug }) => {
   const toolName = tool ? (tool.localizedName[locale] || tool.localizedName.en) : toolSlug;
   const category = tool ? getCategoryById(tool.category) : undefined;
   const categoryName = category ? (category.localizedTitle[locale] || category.localizedTitle.en) : '';
-  const formats = tool?.acceptedFormats?.join(', ') || 'the formats shown in the tool';
+  const formats = tool?.acceptedFormats?.join(', ') || t('guide.formatsShown');
   const steps = useMemo(
-    () => tool ? getGuideSteps(tool.category, locale, toolName, formats) : [],
-    [tool, locale, toolName, formats],
+    () => tool ? getGuideSteps(tool.category, locale, toolName, formats, t) : [],
+    [tool, locale, toolName, formats, t],
   );
 
   useEffect(() => {
@@ -218,10 +225,8 @@ export const ToolGuidePage: React.FC<ToolGuidePageProps> = ({ toolSlug }) => {
 
   if (!tool) return null;
 
-  const title = locale === 'ar' ? 'كيفية استعمال ' + toolName : 'How to use ' + toolName;
-  const description = locale === 'ar'
-    ? 'شرح مرئي خطوة بخطوة يوضح واجهة ' + toolName + ' الحقيقية داخل UTILORA، مع أسهم توضيحية.'
-    : 'A visual, step-by-step walkthrough of the real ' + toolName + ' interface in UTILORA, with annotated arrows.';
+  const title = `${t('guide.titlePrefix')} ${toolName}`;
+  const description = t('guide.description').replace('{tool}', toolName);
   const guideIsIndexable = tool.status === 'functional';
 
   return (
@@ -240,45 +245,43 @@ export const ToolGuidePage: React.FC<ToolGuidePageProps> = ({ toolSlug }) => {
           { label: t('nav.tools'), routeType: 'tools-index' },
           { label: categoryName, routeType: 'category', slug: tool.category },
           { label: toolName, routeType: 'tool', slug: tool.slug },
-          { label: locale === 'ar' ? 'كيفية الاستعمال' : 'How to use' },
+          { label: t('guide.breadcrumb') },
         ]} />
 
         <header className="max-w-4xl space-y-3">
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-orange-600">
+          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-orange-700">
             <CircleHelp size={15} />
-            <span>{locale === 'ar' ? 'دليل مصوّر للأداة' : 'Visual tool guide'}</span>
+            <span>{t('guide.kicker')}</span>
           </div>
           <h1 className="text-3xl font-extrabold tracking-tight text-stone-900 sm:text-4xl">{title}</h1>
           <p className="max-w-3xl text-sm leading-7 text-stone-600">{description}</p>
           <div className="flex flex-wrap items-center gap-2 text-[11px] text-stone-500">
             <span className="rounded-lg border border-stone-200 bg-white px-2.5 py-1">{categoryName}</span>
             {tool.acceptedFormats && <span className="rounded-lg border border-stone-200 bg-white px-2.5 py-1">{formats}</span>}
-            {tool.maxFileSize && <span className="rounded-lg border border-stone-200 bg-white px-2.5 py-1">{locale === 'ar' ? 'الحد الأقصى' : 'Max size'}: {tool.maxFileSize}</span>}
+            {tool.maxFileSize && <span className="rounded-lg border border-stone-200 bg-white px-2.5 py-1">{t('guide.maxSize')}: {tool.maxFileSize}</span>}
           </div>
         </header>
 
         {tool.status !== 'functional' && (
           <div className="flex items-start gap-3 rounded-2xl border border-orange-200 bg-orange-50/70 p-4 text-xs leading-relaxed text-stone-700">
-            <ShieldCheck size={17} className="mt-0.5 shrink-0 text-orange-600" />
-            <span>{locale === 'ar'
-              ? 'تنبيه: هذه الأداة ما زالت في وضع المعاينة؛ يشرح الدليل عناصر الواجهة الحالية ولا يعني أن المعالجة مفعّلة.'
-              : 'Note: this tool is still in preview mode. This guide explains the current interface and does not mean processing is enabled.'}</span>
+            <ShieldCheck size={17} className="mt-0.5 shrink-0 text-orange-700" />
+            <span>{t('guide.previewNotice')}</span>
           </div>
         )}
 
         <section className="overflow-hidden rounded-3xl border border-stone-200 bg-white shadow-xs">
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-stone-200 bg-stone-50 px-4 py-3 sm:px-6">
             <div className="flex items-center gap-2 text-xs font-semibold text-stone-800">
-              <Camera size={15} className="text-orange-600" />
-              {locale === 'ar' ? 'لقطة من واجهة UTILORA الفعلية' : 'Screenshot from the real UTILORA interface'}
+              <Camera size={15} className="text-orange-700" />
+              {t('guide.screenshotTitle')}
             </div>
-            <span className="text-[10px] text-stone-400">{locale === 'ar' ? 'تتولّد تلقائيًا من الواجهة' : 'Generated directly from the rendered workspace'}</span>
+            <span className="text-xs text-stone-500">{t('guide.screenshotCaption')}</span>
           </div>
 
           <div className="relative bg-[#fafaf9] p-2 sm:p-5">
             {screenshot ? (
               <div className="relative mx-auto max-w-[1080px] overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
-                <img data-guide-screenshot src={screenshot} alt={locale === 'ar' ? 'لقطة حقيقية لواجهة ' + toolName + ' مع أسهم توضيحية' : 'Real screenshot of the ' + toolName + ' workspace with guide arrows'} className="block h-auto w-full" />
+                <img data-guide-screenshot src={screenshot} alt={t('guide.screenshotAlt').replace('{tool}', toolName)} className="block h-auto w-full" />
                 <svg
                   data-guide-annotations
                   data-guide-target-count={annotationTargets.length}
@@ -316,21 +319,21 @@ export const ToolGuidePage: React.FC<ToolGuidePageProps> = ({ toolSlug }) => {
               </div>
             ) : captureError ? (
               <div className="rounded-2xl border border-orange-200 bg-white p-5 text-center">
-                <p className="text-sm font-semibold text-stone-800">{locale === 'ar' ? 'تعذر إنشاء الصورة تلقائيًا في هذا المتصفح' : 'Automatic screenshot capture is unavailable in this browser'}</p>
-                <p className="mt-1 text-xs text-stone-500">{locale === 'ar' ? 'هذه معاينة مباشرة لنفس مساحة العمل، ويمكنك تجربة خطوات الاستعمال أسفلها.' : 'This is the live workspace itself; you can still follow the steps below.'}</p>
+                <p className="text-sm font-semibold text-stone-800">{t('guide.captureUnavailable')}</p>
+                <p className="mt-1 text-xs text-stone-500">{t('guide.liveWorkspace')}</p>
                 <div className="mt-5 text-start"><ToolWorkspaceResolver tool={tool} /></div>
               </div>
             ) : (
               <div className="flex min-h-72 items-center justify-center gap-3 rounded-2xl border border-stone-200 bg-white text-xs text-stone-500" role="status">
                 <LoaderCircle size={17} className="animate-spin text-orange-500" />
-                {locale === 'ar' ? 'جارٍ التقاط الواجهة الفعلية وإضافة الأسهم...' : 'Capturing the real interface and preparing annotations…'}
+                {t('guide.captureLoading')}
               </div>
             )}
           </div>
           <div className="grid grid-cols-1 gap-3 border-t border-stone-200 p-4 sm:grid-cols-3 sm:p-5">
             {steps.map((step, index) => (
               <div key={step.title} className="relative rounded-2xl border border-stone-200 bg-white p-4">
-                <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-orange-500 text-xs font-bold text-white">{index + 1}</span>
+                <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-orange-700 text-xs font-bold text-white">{index + 1}</span>
                 <h2 className="mt-3 text-sm font-bold text-stone-900">{step.title}</h2>
                 <p className="mt-1.5 text-xs leading-6 text-stone-600">{step.description}</p>
                 <p className="mt-3 border-t border-stone-100 pt-2 text-[10px] font-semibold text-orange-700">{step.annotation}</p>
@@ -341,11 +344,11 @@ export const ToolGuidePage: React.FC<ToolGuidePageProps> = ({ toolSlug }) => {
 
         <section className="flex flex-col items-start justify-between gap-4 rounded-3xl border border-stone-200 bg-white p-5 sm:flex-row sm:items-center sm:p-7">
           <div>
-            <h2 className="text-base font-bold text-stone-900">{locale === 'ar' ? 'هل أنت جاهز لتجربة الأداة؟' : 'Ready to try the tool?'}</h2>
-            <p className="mt-1 text-xs text-stone-500">{locale === 'ar' ? 'افتح مساحة العمل وطبّق الخطوات بنفسك.' : 'Open the workspace and follow the same steps yourself.'}</p>
+            <h2 className="text-base font-bold text-stone-900">{t('guide.readyTitle')}</h2>
+            <p className="mt-1 text-xs text-stone-500">{t('guide.readyBody')}</p>
           </div>
-          <Link routeType="tool" slug={tool.slug} className="inline-flex items-center gap-2 rounded-xl bg-orange-500 px-5 py-3 text-xs font-semibold text-white transition-colors hover:bg-orange-600">
-            {locale === 'ar' ? 'افتح الأداة' : 'Open tool'} <ChevronRight size={15} />
+          <Link routeType="tool" slug={tool.slug} className="inline-flex items-center gap-2 rounded-xl bg-orange-700 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-orange-800">
+            {t('guide.openTool')} <ChevronRight size={15} />
           </Link>
         </section>
 
@@ -353,7 +356,7 @@ export const ToolGuidePage: React.FC<ToolGuidePageProps> = ({ toolSlug }) => {
           <div ref={captureRef} className="w-[1080px] bg-[#fafaf9] p-8 text-stone-900">
             <div className="mb-6 flex items-center justify-between border-b border-stone-200 pb-4">
               <span className="text-xl font-extrabold tracking-tight">UTILORA</span>
-              <span className="text-xs text-stone-500">{locale === 'ar' ? 'دليل واجهة الأداة' : 'Tool workspace preview'}</span>
+              <span className="text-xs text-stone-500">{t('guide.workspacePreview')}</span>
             </div>
             <h2 className="mb-2 text-2xl font-bold">{toolName}</h2>
             <p className="mb-6 text-sm text-stone-600">{tool.localizedDescription[locale] || tool.localizedDescription.en}</p>

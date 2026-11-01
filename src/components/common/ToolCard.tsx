@@ -3,7 +3,7 @@ import { ToolDefinition } from '../../registry/tool-types';
 import { useI18n } from '../../i18n';
 import { Link } from '../../router';
 import { Icon } from './Icon';
-import { ArrowUpRight, Lock, Sparkles } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 import { getCategoryById } from '../../registry/categories.registry';
 
 interface ToolCardProps {
@@ -28,19 +28,19 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, className = '', varian
         className={`group p-3.5 rounded-xl bg-white hover:bg-orange-50/40 border border-stone-200/80 hover:border-orange-300 transition-all flex items-center justify-between gap-3 shadow-xs hover:shadow-sm ${className}`}
       >
         <div className="flex items-center gap-3 min-w-0">
-          <div className="w-8 h-8 rounded-lg bg-orange-50 group-hover:bg-orange-500 flex items-center justify-center text-orange-600 group-hover:text-white shrink-0 transition-colors">
+          <div className="w-8 h-8 rounded-lg bg-orange-50 group-hover:bg-orange-700 flex items-center justify-center text-orange-700 group-hover:text-white shrink-0 transition-colors">
             <Icon name={tool.icon} size={16} />
           </div>
           <div className="min-w-0">
-            <h4 className="text-xs font-semibold text-stone-900 group-hover:text-orange-600 truncate">
+            <h4 className="text-xs font-semibold text-stone-900 group-hover:text-orange-700 truncate">
               {name}
             </h4>
-            <span className="text-[11px] text-stone-400 truncate block">
+            <span className="text-xs text-stone-500 truncate block">
               {categoryTitle}
             </span>
           </div>
         </div>
-        <ArrowUpRight size={14} className="text-stone-400 group-hover:text-orange-600 shrink-0 transition-colors" />
+        <ArrowUpRight size={14} className="text-stone-500 group-hover:text-orange-700 shrink-0 transition-colors" />
       </Link>
     );
   }
@@ -54,40 +54,40 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, className = '', varian
       <div>
         {/* Header Icon + Metadata in Zero-Pill Unboxed Text */}
         <div className="flex items-center justify-between gap-2 mb-3.5">
-          <div className="w-10 h-10 rounded-xl bg-orange-50 group-hover:bg-orange-500 border border-orange-100 flex items-center justify-center text-orange-600 group-hover:text-white transition-all shadow-xs">
+          <div className="w-10 h-10 rounded-xl bg-orange-50 group-hover:bg-orange-700 border border-orange-100 flex items-center justify-center text-orange-700 group-hover:text-white transition-all shadow-xs">
             <Icon name={tool.icon} size={19} />
           </div>
 
-          <div className="flex items-center gap-1.5 text-[11px] text-stone-400">
-            <span className="font-medium text-stone-500 group-hover:text-orange-600 transition-colors">
+          <div className="flex items-center gap-1.5 text-xs text-stone-500">
+            <span className="font-medium text-stone-500 group-hover:text-orange-700 transition-colors">
               {categoryTitle}
             </span>
             {tool.isPopular && (
               <>
                 <span aria-hidden="true" className="text-stone-300">·</span>
-                <span className="text-orange-600 font-medium">Popular</span>
+                <span className="text-orange-700 font-semibold">{t('common.popular')}</span>
               </>
             )}
           </div>
         </div>
 
         {/* Title */}
-        <h3 className="text-sm font-semibold text-stone-900 group-hover:text-orange-600 transition-colors mb-1.5">
+        <h3 className="text-sm font-semibold text-stone-900 group-hover:text-orange-700 transition-colors mb-1.5">
           {name}
         </h3>
 
         {/* Description */}
-        <p className="text-xs text-stone-600 line-clamp-2 leading-relaxed mb-4">
+        <p className="text-sm text-stone-600 line-clamp-2 leading-relaxed mb-4">
           {description}
         </p>
       </div>
 
       {/* Footer State: Formats or Engine preview reminder */}
-      <div className="pt-3 border-t border-stone-100 flex items-center justify-between text-[11px] text-stone-400">
+      <div className="pt-3 border-t border-stone-100 flex items-center justify-between text-xs text-stone-500">
         <span className="truncate">
-          {tool.acceptedFormats ? tool.acceptedFormats.slice(0, 3).join(', ') : 'In-browser tool'}
+          {tool.status !== 'functional' ? t('common.previewOnly') : tool.acceptedFormats ? tool.acceptedFormats.slice(0, 3).join(', ') : tool.category === 'website-domain' ? t('common.publicLookup') : t('common.runsLocally')}
         </span>
-        <div className="flex items-center gap-1 text-orange-600 font-medium group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5 transition-transform">
+        <div className="flex items-center gap-1 text-orange-700 font-semibold group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5 transition-transform">
           <span>{t('common.openTool')}</span>
           <ArrowUpRight size={13} />
         </div>

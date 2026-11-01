@@ -34,9 +34,10 @@ export const FAQAccordion: React.FC<FAQAccordionProps> = ({ faqs, className = ''
             className="rounded-2xl border border-stone-200/90 bg-white shadow-xs overflow-hidden transition-colors"
           >
             <button
+              type="button"
               onClick={() => toggle(index)}
               aria-expanded={isOpen}
-              className="w-full flex items-center justify-between p-4 text-left rtl:text-right text-xs sm:text-sm font-semibold text-stone-900 hover:text-orange-600 transition-colors"
+              className="w-full flex items-center justify-between p-4 text-start text-sm font-semibold text-stone-900 hover:text-orange-700 transition-colors"
             >
               <span>{qText}</span>
               <ChevronDown
@@ -46,7 +47,7 @@ export const FAQAccordion: React.FC<FAQAccordionProps> = ({ faqs, className = ''
             </button>
 
             {isOpen && (
-              <div className="px-4 pb-4 pt-1 text-xs text-stone-600 leading-relaxed border-t border-stone-100">
+              <div className="px-4 pb-4 pt-1 text-sm text-stone-600 leading-relaxed border-t border-stone-100">
                 {aText}
               </div>
             )}

@@ -22,7 +22,7 @@ export const SiteFooter: React.FC = () => {
             <p className="text-xs text-stone-500 max-w-sm leading-relaxed">
               {t('hero.subtitle', 'Powerful, simple, and free online utilities for your images, documents, text, code, websites, and videos.')}
             </p>
-            <div className="flex items-center gap-2 text-xs text-stone-400 pt-2">
+            <div className="flex items-center gap-2 text-xs text-stone-500 pt-2">
               <Shield size={14} className="text-orange-500" />
               <span>{t('footer.cookieNotice')}</span>
             </div>
@@ -39,7 +39,7 @@ export const SiteFooter: React.FC = () => {
                   <Link
                     routeType="category"
                     slug={cat.slug}
-                    className="hover:text-orange-600 transition-colors"
+                    className="hover:text-orange-700 transition-colors"
                   >
                     {cat.localizedTitle[locale] || cat.localizedTitle.en}
                   </Link>
@@ -51,7 +51,7 @@ export const SiteFooter: React.FC = () => {
           {/* Categories 4-6 */}
           <div>
             <h4 className="text-xs font-semibold text-stone-900 uppercase tracking-wider mb-3">
-              {t('nav.categories')}
+              {t('footer.moreCategories')}
             </h4>
             <ul className="space-y-2 text-xs">
               {CATEGORIES_LIST.slice(3, 6).map((cat) => (
@@ -59,7 +59,7 @@ export const SiteFooter: React.FC = () => {
                   <Link
                     routeType="category"
                     slug={cat.slug}
-                    className="hover:text-orange-600 transition-colors"
+                    className="hover:text-orange-700 transition-colors"
                   >
                     {cat.localizedTitle[locale] || cat.localizedTitle.en}
                   </Link>
@@ -71,16 +71,16 @@ export const SiteFooter: React.FC = () => {
           {/* Resources & Content */}
           <div>
             <h4 className="text-xs font-semibold text-stone-900 uppercase tracking-wider mb-3">
-              Platform
+              {t('footer.platform')}
             </h4>
             <ul className="space-y-2 text-xs">
               <li>
-                <Link routeType="tools-index" className="hover:text-orange-600 transition-colors">
+                <Link routeType="tools-index" className="hover:text-orange-700 transition-colors">
                   {t('nav.allTools')} (36)
                 </Link>
               </li>
               <li>
-                <Link routeType="articles-index" className="hover:text-orange-600 transition-colors">
+                <Link routeType="articles-index" className="hover:text-orange-700 transition-colors">
                   {t('nav.articles')}
                 </Link>
               </li>
@@ -90,36 +90,36 @@ export const SiteFooter: React.FC = () => {
           {/* Legal & Compliance */}
           <div>
             <h4 className="text-xs font-semibold text-stone-900 uppercase tracking-wider mb-3">
-              Legal
+              {t('footer.legal')}
             </h4>
             <ul className="space-y-2 text-xs">
               <li>
-                <Link routeType="privacy" className="hover:text-orange-600 transition-colors">
+                <Link routeType="privacy" className="hover:text-orange-700 transition-colors">
                   {t('footer.privacy')}
                 </Link>
               </li>
               <li>
-                <Link routeType="terms" className="hover:text-orange-600 transition-colors">
+                <Link routeType="terms" className="hover:text-orange-700 transition-colors">
                   {t('footer.terms')}
                 </Link>
               </li>
               <li>
-                <Link routeType="copyright" className="hover:text-orange-600 transition-colors">
+                <Link routeType="copyright" className="hover:text-orange-700 transition-colors">
                   {t('footer.copyright')}
                 </Link>
               </li>
               <li>
-                <Link routeType="acceptable-use" className="hover:text-orange-600 transition-colors">
+                <Link routeType="acceptable-use" className="hover:text-orange-700 transition-colors">
                   {t('footer.acceptableUse')}
                 </Link>
               </li>
               <li>
-                <Link routeType="about" className="hover:text-orange-600 transition-colors">
+                <Link routeType="about" className="hover:text-orange-700 transition-colors">
                   {t('footer.about')}
                 </Link>
               </li>
               <li>
-                <Link routeType="contact" className="hover:text-orange-600 transition-colors">
+                <Link routeType="contact" className="hover:text-orange-700 transition-colors">
                   {t('footer.contact')}
                 </Link>
               </li>
@@ -130,7 +130,7 @@ export const SiteFooter: React.FC = () => {
         {/* Middle Divider & Language Selector */}
         <div className="pt-8 border-t border-stone-200/80 flex flex-col md:flex-row items-center justify-between gap-6">
           <LanguageSwitcher variant="footer" />
-          <div className="text-xs text-stone-400">
+          <div className="text-xs text-stone-500">
             © {new Date().getFullYear()} UTILORA. {t('footer.rights')}
           </div>
         </div>
