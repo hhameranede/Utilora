@@ -19,6 +19,8 @@ The repository configures one NVIDIA NIM provider with six model IDs using the `
 | QA Engineer | DeepSeek V4.1 Flash | Independent reproduction, regression and end-to-end testing |
 | Security Auditor | NVIDIA Nemotron 3 Ultra 550B | Independent read-only security and privacy review |
 
+**Live admission and recovery status:** see [AGENT-ADMISSION.md](AGENT-ADMISSION.md) for agents that passed, the dedicated recovery workflows for failures, and agents whose smoke jobs are still pending. Admission is partial; the full autonomous operating charter remains gated on all eight passing.
+
 SEO, analytics and release-review skills remain in the 50-skill library and are assigned to the Problem Analyst and other relevant agents; they are capabilities, not separate extra workers.
 
 ## Skill library
