@@ -29,6 +29,24 @@ async function expectNoHorizontalOverflow(page: import('@playwright/test').Page,
     viewportWidth: window.innerWidth,
     documentWidth: document.documentElement.scrollWidth,
     bodyWidth: document.body.scrollWidth,
+    overflowCandidates: Array.from(document.querySelectorAll('body *'))
+      .map((element) => {
+        const rect = element.getBoundingClientRect();
+        const style = getComputedStyle(element);
+        return {
+          tag: element.tagName.toLowerCase(),
+          className: typeof element.className === 'string' ? element.className.slice(0, 140) : '',
+          left: Math.round(rect.left),
+          right: Math.round(rect.right),
+          width: Math.round(rect.width),
+          scrollWidth: element.scrollWidth,
+          clientWidth: element.clientWidth,
+          overflowX: style.overflowX,
+        };
+      })
+      .filter((item) => item.width > 0 && (item.right > window.innerWidth + 1 || item.left < -1))
+      .sort((a, b) => b.right - a.right)
+      .slice(0, 12),
   }));
 
   expect(
