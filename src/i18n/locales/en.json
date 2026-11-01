@@ -268,5 +268,30 @@
   },
   "categories": {
     "description": "Explore the available tools by category. Each suite groups related browser-based utilities in one place."
+  },
+  "guide": {
+    "titlePrefix": "How to use",
+    "description": "A visual, step-by-step walkthrough of the real {tool} interface in UTILORA, with annotated arrows.",
+    "breadcrumb": "How to use",
+    "kicker": "Visual tool guide",
+    "maxSize": "Max size",
+    "previewNotice": "Note: this tool is still in preview mode. This guide explains the current interface and does not mean processing is enabled.",
+    "screenshotTitle": "Screenshot from the real UTILORA interface",
+    "screenshotCaption": "Generated directly from the rendered workspace",
+    "screenshotAlt": "Real screenshot of the {tool} workspace with guide arrows",
+    "captureUnavailable": "Automatic screenshot capture is unavailable in this browser",
+    "liveWorkspace": "This is the live workspace itself; you can still follow the steps below.",
+    "captureLoading": "Capturing the real interface and preparing annotations…",
+    "readyTitle": "Ready to try the tool?",
+    "readyBody": "Open the workspace and follow the same steps yourself.",
+    "openTool": "Open tool",
+    "workspacePreview": "Tool workspace preview",
+    "formatsShown": "the formats shown in the tool",
+    "inputArea": "Input area",
+    "settingsArea": "Settings and options",
+    "resultArea": "Result and output area",
+    "step1Desc": "Add the file, text, domain, or other input requested by the workspace.",
+    "step2Desc": "Choose the available controls or settings relevant to the task.",
+    "step3Desc": "Run the available action, review the result, and save or copy it when applicable."
   }
 }
