@@ -19,13 +19,13 @@ The repository configures one NVIDIA NIM provider with six model IDs using the `
 | QA Engineer | DeepSeek V4.1 Flash | Independent reproduction, regression and end-to-end testing |
 | Security Auditor | NVIDIA Nemotron 3 Ultra 550B | Independent read-only security and privacy review |
 
-**Live admission and recovery status:** see [AGENT-ADMISSION.md](AGENT-ADMISSION.md) for agents that passed, the dedicated recovery workflows for failures, and agents whose smoke jobs are still pending. Admission is partial; the full autonomous operating charter remains gated on all eight passing.
+All eight agents are available as contributors. A model smoke result is diagnostic information only; it never blocks a role from participating in the team. The eight roles collaborate on new features and meaningful additions through the Project Lead's team council.
 
 SEO, analytics and release-review skills remain in the 50-skill library and are assigned to the Problem Analyst and other relevant agents; they are capabilities, not separate extra workers.
 
 ## Skill library
 
-UTILORA uses exactly **50 reusable skills**: 9 first-party project skills and 41 curated upstream skills. Skills are shared on disk, pinned to their upstream commit, and assigned through least-privilege per-agent allow-lists. See the [skill catalogue](SKILLS-CATALOG.md), [machine-readable manifest](../../.opencode/skills/manifest.json), and [third-party notices](THIRD_PARTY_NOTICES.md).
+UTILORA uses exactly **50 reusable skills**: 9 first-party project skills and 41 curated upstream skills. Skills are shared on disk and available to every agent. They are optional references: each agent chooses whether a skill helps, and may use any skill or none. See the [skill catalogue](SKILLS-CATALOG.md), [machine-readable manifest](../../.opencode/skills/manifest.json), and [third-party notices](THIRD_PARTY_NOTICES.md).
 
 ## Shared NVIDIA model provider
 
@@ -35,13 +35,9 @@ NVIDIA advertises free trial endpoints for these models, but quota, account enti
 
 NVIDIA's trial terms may record prompts and outputs for service operation and improvement. Never send credentials, personal data, user uploads, or confidential production content through the trial endpoint.
 
-## Execution phases
+## Team workflow
 
-1. **Foundation:** scheduled repository quality checks, manual dispatch, documented roles and least-privilege permissions.
-2. **Observability:** add live-site checks and deployment status checks after confirming the canonical production URL and Cloudflare project.
-3. **Model verification:** run the UTILORA-native workflow using the repository-level `NVIDIA_API_KEY` secret; verify catalog availability and one inference request per assigned agent. Never copy the key into source or log values.
-4. **Bounded agents:** read-only audit first; then branch-scoped code changes and pull requests. Each task has a timeout, budget, allowed paths, and acceptance tests.
-5. **Release automation:** only after deployment provider, health endpoint, rollback method and protection rules are verified.
+For every new feature or meaningful addition, the Project Lead invites all seven specialists to discuss the proposal. Each contributes from its role, challenges assumptions, and offers alternatives. The team records agreement, dissent and trade-offs before implementation. No fixed skill, mandatory tool sequence, admission gate or rigid response template is required.
 
 ## Non-negotiable safety rules
 
@@ -60,7 +56,7 @@ NVIDIA's trial terms may record prompts and outputs for service operation and im
 
 - Repository visibility: public (verified 2026-11-01).
 - Existing CI: TypeScript, product-content tests, local engine tests, SEO build assertions, and Chromium E2E.
-- The branch configures the six-hour quality workflow, manual dispatch, eight model-specialized OpenCode agents, and one shared NVIDIA NIM provider.
-- The model smoke workflow is owned and executed by UTILORA; it does not use a workflow caller in another repository.
+- The branch configures quality workflows, eight role-specialized OpenCode agents, and one shared NVIDIA NIM provider.
+- The model smoke workflow is a lightweight diagnostic of model routing and agent response; it does not determine whether an agent may participate.
 - The existing API credential must be added as a repository-level `NVIDIA_API_KEY` Actions secret in UTILORA before live inference can run. If it is missing, the credential preflight fails once before starting any agent jobs.
 - No always-on worker, automatic merge, live-site monitor, or production deployment/rollback is configured.
