@@ -107,7 +107,7 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ categorySlug }) => {
         {/* Category Hero Banner */}
         <div className="p-8 sm:p-12 rounded-3xl bg-gradient-to-br from-white via-white to-orange-50/40 border border-stone-200/90 shadow-xs relative">
           <div className="max-w-3xl space-y-4">
-            <div className="w-14 h-14 rounded-2xl bg-orange-50 border border-orange-100 flex items-center justify-center text-orange-600 shadow-xs">
+            <div className="w-14 h-14 rounded-2xl bg-orange-50 border border-orange-100 flex items-center justify-center text-orange-700 shadow-xs">
               <Icon name={category.icon} size={28} />
             </div>
 
@@ -119,7 +119,7 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ categorySlug }) => {
               {description}
             </p>
 
-            <div className="pt-2 flex items-center gap-4 text-xs font-mono text-stone-400">
+            <div className="pt-2 flex items-center gap-4 text-xs font-mono text-stone-500">
               <span>{tools.length} {t('category.toolsInSuite')}</span>
               <span aria-hidden="true">·</span>
               <span>{tools.filter((tool) => tool.status === 'functional').length} {t('category.functionalCount')}</span>
@@ -151,13 +151,13 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ categorySlug }) => {
 
             {/* Quick in-category filter input */}
             <div className="relative w-full sm:w-64">
-              <Search size={14} className="absolute start-3 top-1/2 -translate-y-1/2 text-orange-500" />
+              <Search size={14} className="absolute start-3 top-1/2 -translate-y-1/2 text-orange-600" />
               <input
                 type="text"
                 value={filterQuery}
                 onChange={(e) => setFilterQuery(e.target.value)}
                 placeholder={t('category.searchPlaceholder')}
-                className="w-full ps-9 pe-3 py-2 rounded-xl bg-white border border-stone-200 text-xs text-stone-900 placeholder-stone-400 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 shadow-xs transition-all"
+                className="w-full ps-9 pe-3 py-2 rounded-xl bg-white border border-stone-200 text-xs text-stone-900 placeholder-stone-500 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 shadow-xs transition-all"
               />
             </div>
           </div>
