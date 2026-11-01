@@ -10,7 +10,7 @@ No agent is currently admitted on the basis of the latest full smoke run. Earlie
 
 | Agent | Latest verified result | Next step |
 |---|---|---|
-| Project Lead | FAIL — returned a text event with no usable assistant text; skill call and two evidence calls were recorded. | Re-run after report-format and retry improvements. |
+| Project Lead | FAIL — returned a text event with no usable assistant text; skill call and two evidence calls were recorded. | Re-run after report-format improvements. |
 | Problem Analyst | FAIL — 130 assistant-text characters; report did not contain the required role/evidence section structure. | Re-run after report-format improvements. |
 | Implementation Engineer | FAIL — assigned model returned HTTP 429 in the full smoke run. Its isolated recovery reached real MiniMax inference and recorded a native skill call plus ten evidence calls, but did not produce a complete labeled report. | Re-run with bounded inference retries and the corrected report prompt. |
 | Fast Task Engineer | IN PROGRESS at the last captured job snapshot; do not infer success from an unfinished job. | Refresh the latest run and record its final conclusion. |
@@ -19,7 +19,7 @@ No agent is currently admitted on the basis of the latest full smoke run. Earlie
 | Independent QA | IN PROGRESS at the last captured job snapshot; do not infer success from an unfinished job. | Refresh the latest run and record its final conclusion. |
 | Security Auditor | QUEUED at the last captured job snapshot; no result exists yet. | Wait for its actual job conclusion, then record it. |
 
-## Recovery workflow fixes being applied
+## Recovery workflow corrections in this revision
 
 - Main smoke inference retries transient HTTP 429/500/502/503/504 and transport failures with bounded backoff; persistent errors still fail.
 - Agent report prompts require six exact, separately labeled sections: ROLE, MODEL, SKILL_LOADED, EVIDENCE, FINDING, LIMITATION.
