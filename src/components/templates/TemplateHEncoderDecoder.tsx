@@ -46,11 +46,23 @@ export const TemplateHEncoderDecoder: React.FC<TemplateHEncoderDecoderProps> = (
     }
   };
 
-  const handleCopy = () => {
-    if (typeof navigator !== 'undefined' && navigator.clipboard) {
-      navigator.clipboard.writeText(outputVal);
+  const handleCopy = async () => {
+    if (!outputVal) {
+      setResultMessage('There is no output to copy yet.');
+      setResultError(true);
+      return;
+    }
+    try {
+      if (!navigator.clipboard?.writeText) throw new Error('Clipboard access is unavailable in this browser.');
+      await navigator.clipboard.writeText(outputVal);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      setResultError(false);
+      setResultMessage('Copied to clipboard.');
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setCopied(false);
+      setResultMessage('Clipboard access is blocked by this browser. Select and copy the output manually.');
+      setResultError(true);
     }
   };
 
