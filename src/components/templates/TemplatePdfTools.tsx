@@ -50,6 +50,9 @@ export const TemplatePdfTools: React.FC<TemplatePdfToolsProps> = ({ toolName, to
       [next[index], next[target]] = [next[target], next[index]];
       return next;
     });
+    setOutputs([]);
+    setMessage('');
+    setError('');
   };
 
   const removeFile = (index: number) => {
@@ -138,7 +141,7 @@ export const TemplatePdfTools: React.FC<TemplatePdfToolsProps> = ({ toolName, to
         </label>
 
         <div className="p-4 rounded-2xl bg-white border border-stone-200 shadow-xs space-y-3">
-          <div className="flex items-center justify-between gap-3"><h3 className="text-xs font-semibold text-stone-800">Selected files ({files.length})</h3><button type="button" onClick={() => setFiles([])} className="text-[11px] text-stone-500 hover:text-red-600">Clear list</button></div>
+          <div className="flex items-center justify-between gap-3"><h3 className="text-xs font-semibold text-stone-800">Selected files ({files.length})</h3><button type="button" onClick={() => { setFiles([]); setOutputs([]); setMessage(''); setError(''); }} className="text-[11px] text-stone-500 hover:text-red-600">Clear list</button></div>
           {files.length === 0 ? <p className="text-xs text-stone-400 py-4 text-center">No files selected yet.</p> : (
             <ul className="space-y-2 max-h-72 overflow-y-auto">
               {files.map((file, index) => (
