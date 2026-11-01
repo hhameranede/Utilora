@@ -268,5 +268,30 @@
   },
   "categories": {
     "description": "按类别浏览可用工具。每个类别将相关的浏览器工具集中在一起，方便查找。"
+  },
+  "guide": {
+    "titlePrefix": "使用方法：",
+    "description": "通过标注箭头，逐步了解 UTILORA 中 {tool} 的真实界面。",
+    "breadcrumb": "使用方法",
+    "kicker": "工具可视化指南",
+    "maxSize": "最大大小",
+    "previewNotice": "注意：此工具目前仅供预览。本指南展示当前界面，并不表示处理功能已经启用。",
+    "screenshotTitle": "UTILORA 真实界面截图",
+    "screenshotCaption": "直接从当前工作区界面生成",
+    "screenshotAlt": "带有说明箭头的 {tool} 工作区真实截图",
+    "captureUnavailable": "此浏览器无法自动截取工作区",
+    "liveWorkspace": "这是实际工作区，您仍可按照下方步骤操作。",
+    "captureLoading": "正在截取真实界面并准备标注…",
+    "readyTitle": "准备好试用此工具了吗？",
+    "readyBody": "打开工作区并亲自完成相同步骤。",
+    "openTool": "打开工具",
+    "workspacePreview": "工具工作区预览",
+    "formatsShown": "工具中显示的格式",
+    "inputArea": "输入区域",
+    "settingsArea": "设置和选项",
+    "resultArea": "结果区域",
+    "step1Desc": "添加工作区要求的文件、文本、域名或其他输入。",
+    "step2Desc": "选择适用于该任务的可用控件或设置。",
+    "step3Desc": "执行可用操作，检查结果，并在适用时保存或复制。"
   }
 }
