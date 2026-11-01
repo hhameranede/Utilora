@@ -45,7 +45,7 @@ test('image converter accepts a local image and exposes an actual downloadable r
 
   const sourcePreview = page.getByAltText('Original image preview');
   await expect(sourcePreview).toBeVisible();
-  await expect(sourcePreview).toHaveJSProperty('naturalWidth', 1);
+  await expect(sourcePreview).toHaveJSProperty('naturalWidth', 4);
   const processButton = page.getByRole('button', { name: 'Process image' });
   await expect(processButton).toBeEnabled();
   await processButton.click();
@@ -130,10 +130,10 @@ test('image cropper maps pointer dragging to source pixel coordinates', async ({
   await page.mouse.move(bounds.x + bounds.width * 0.75, bounds.y + bounds.height * 0.75, { steps: 5 });
   await page.mouse.up();
 
-  await expect(page.getByLabel('X')).toHaveValue('200');
-  await expect(page.getByLabel('Y')).toHaveValue('100');
-  await expect(page.getByLabel('Width')).toHaveValue('400');
-  await expect(page.getByLabel('Height')).toHaveValue('200');
+  await expect(page.getByRole('spinbutton', { name: 'X' })).toHaveValue('200');
+  await expect(page.getByRole('spinbutton', { name: 'Y' })).toHaveValue('100');
+  await expect(page.getByRole('spinbutton', { name: 'Width' })).toHaveValue('400');
+  await expect(page.getByRole('spinbutton', { name: 'Height' })).toHaveValue('200');
 
   await processButton.click();
   await expect(page.getByRole('status')).toContainText('Done: 400 × 200px');
