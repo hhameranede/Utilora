@@ -113,6 +113,69 @@ jobs:
           path.unlink(missing_ok=True)
           PY
 
+      - name: Verify real NVIDIA inference for this assigned model
+        env:
+          NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+          MODEL_ID: ${{ matrix.model_id }}
+        run: |
+          set -euo pipefail
+          set +x
+          python3 - <<'PY'
+          import json, os, pathlib
+          payload = {
+              "model": os.environ["MODEL_ID"],
+              "messages": [{"role": "user", "content": "Reply with exactly this token: UTILORA_NIM_OK"}],
+              "max_tokens": 96,
+              "temperature": 0.1,
+              "stream": False
+          }
+          path = pathlib.Path(os.environ["RUNNER_TEMP"]) / "nvidia-request.json"
+          path.write_text(json.dumps(payload), encoding="utf-8")
+          PY
+          set +e
+          status=$(curl --connect-timeout 10 --max-time 120 --silent --show-error \
+            -o "$RUNNER_TEMP/nvidia-inference.json" -w "%{http_code}" \
+            https://integrate.api.nvidia.com/v1/chat/completions \
+            -H "Authorization: Bearer $NVIDIA_API_KEY" \
+            -H "Content-Type: application/json" \
+            --data-binary @"$RUNNER_TEMP/nvidia-request.json")
+          curl_exit=$?
+          set -e
+          echo "NIM_HTTP_STATUS=$status" >> "$GITHUB_ENV"
+          echo "NIM_CURL_EXIT=$curl_exit" >> "$GITHUB_ENV"
+          python3 - <<'PY'
+          import json, os, pathlib, re, sys
+          temp = pathlib.Path(os.environ["RUNNER_TEMP"])
+          status = os.environ.get("NIM_HTTP_STATUS", "")
+          curl_exit = os.environ.get("NIM_CURL_EXIT", "")
+          body_path = temp / "nvidia-inference.json"
+          try:
+              payload = json.loads(body_path.read_text(encoding="utf-8"))
+          except Exception:
+              payload = {}
+          if curl_exit != "0" or status != "200":
+              error = payload.get("error", {})
+              detail = error.get("message", "") if isinstance(error, dict) else str(error)
+              detail = str(detail)[:280]
+              secret = os.environ.get("NVIDIA_API_KEY", "")
+              if secret:
+                  detail = detail.replace(secret, "[REDACTED]")
+              detail = re.sub(r"(?i)(bearer\\s+)[^\\s,]+", r"\\1[REDACTED]", detail)
+              print("::error::NVIDIA inference failed for " + os.environ["MODEL_ID"] + "; HTTP " + status + "; curl exit " + curl_exit)
+              if detail:
+                  print("Provider error: " + detail)
+              sys.exit(1)
+          choices = payload.get("choices", [])
+          message = choices[0].get("message", {}) if choices and isinstance(choices[0], dict) else {}
+          content = message.get("content", "")
+          if not isinstance(content, str) or not content.strip():
+              print("::error::NVIDIA returned HTTP 200 but no text output for " + os.environ["MODEL_ID"])
+              sys.exit(1)
+          print("Real NVIDIA inference passed for: " + os.environ["MODEL_ID"])
+          body_path.unlink(missing_ok=True)
+          (temp / "nvidia-request.json").unlink(missing_ok=True)
+          PY
+
       - name: Install OpenCode CLI
         run: npm install --global opencode-ai@1
 
@@ -218,7 +281,24 @@ jobs:
           opencode_status=$?
           set -e
           if [ "$opencode_status" -ne 0 ]; then
-            echo "::error::OpenCode failed for $AGENT_NAME (exit $opencode_status). Provider errors are deliberately not printed to avoid credential disclosure."
+            echo "::error::OpenCode failed for $AGENT_NAME (exit $opencode_status). Sanitized diagnostic follows."
+            python3 - <<'PY'
+          import os, pathlib, re
+          path = pathlib.Path(os.environ["RUNNER_TEMP"], "opencode-stderr.txt")
+          if path.exists():
+              secret = os.environ.get("NVIDIA_API_KEY", "")
+              lines = path.read_text(encoding="utf-8", errors="replace").splitlines()
+              safe = []
+              for line in lines[-40:]:
+                  if re.search(r"(?i)(authorization|bearer|nvidia_api_key|nvapi-)", line):
+                      continue
+                  if secret:
+                      line = line.replace(secret, "[REDACTED]")
+                  line = re.sub(r"(?i)nvapi-[A-Za-z0-9_-]{8,}", "[REDACTED]", line)
+                  safe.append(line[:500])
+              for line in safe[-20:]:
+                  print(line)
+          PY
             exit "$opencode_status"
           fi
           python3 - <<'PY'
