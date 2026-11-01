@@ -112,11 +112,12 @@ test('image cropper maps pointer dragging to source pixel coordinates', async ({
   await page.locator('input[type="file"]').setInputFiles({
     name: 'crop-source.png',
     mimeType: 'image/png',
-    buffer: await makePng(page, 8, 4),
+    buffer: await makePng(page, 800, 400),
   });
 
   const preview = page.getByAltText('Original image preview');
   await expect(preview).toBeVisible();
+  await expect(preview).toHaveJSProperty('naturalWidth', 800);
   const processButton = page.getByRole('button', { name: 'Process image' });
   await expect(processButton).toBeEnabled();
 
@@ -129,13 +130,13 @@ test('image cropper maps pointer dragging to source pixel coordinates', async ({
   await page.mouse.move(bounds.x + bounds.width * 0.75, bounds.y + bounds.height * 0.75, { steps: 5 });
   await page.mouse.up();
 
-  await expect(page.getByLabel('X')).toHaveValue('2');
-  await expect(page.getByLabel('Y')).toHaveValue('1');
-  await expect(page.getByLabel('Width')).toHaveValue('4');
-  await expect(page.getByLabel('Height')).toHaveValue('2');
+  await expect(page.getByLabel('X')).toHaveValue('200');
+  await expect(page.getByLabel('Y')).toHaveValue('100');
+  await expect(page.getByLabel('Width')).toHaveValue('400');
+  await expect(page.getByLabel('Height')).toHaveValue('200');
 
   await processButton.click();
-  await expect(page.getByRole('status')).toContainText('Done: 4 × 2px');
+  await expect(page.getByRole('status')).toContainText('Done: 400 × 200px');
 });
 
 test('Arabic tool page stays within a mobile viewport and keeps RTL direction', async ({ page }) => {
