@@ -13,7 +13,12 @@ test('every tool guide captures its real rendered workspace and shows annotated 
     const source = await screenshot.getAttribute('src');
     expect(source, tool.slug + ' screenshot should be a generated PNG data URL').toMatch(/^data:image\/png;base64,/);
     expect(await screenshot.evaluate((image: HTMLImageElement) => image.naturalWidth)).toBeGreaterThan(1000);
-    await expect(page.locator('svg[data-guide-annotations]')).toBeVisible();
+    const annotations = page.locator('svg[data-guide-annotations]');
+    await expect(annotations).toBeVisible();
+    const targetCount = Number(await annotations.getAttribute('data-guide-target-count'));
+    expect(targetCount, tool.slug + ' guide should point to real workspace controls').toBeGreaterThanOrEqual(1);
+    expect(targetCount, tool.slug + ' guide should annotate at most three workflow targets').toBeLessThanOrEqual(3);
+    await expect(annotations.locator('[data-guide-target]')).toHaveCount(targetCount);
     await expect(page.getByRole('link', { name: /Open tool/ })).toHaveAttribute('href', '/en/tools/' + tool.slug);
   }
 });
