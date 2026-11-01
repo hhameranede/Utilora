@@ -241,5 +241,27 @@
     "step1": "Abre el espacio de trabajo y añade tus datos",
     "step2": "Elige las opciones disponibles para tu tarea",
     "step3": "Revisa el resultado y guárdalo o cópialo"
+  },
+  "legal": {
+    "kicker": "Información de la plataforma",
+    "lastUpdated": "Última actualización",
+    "updatedDate": "Noviembre de 2026",
+    "effective": "Aplicable en todo el mundo"
+  },
+  "privacy": {
+    "title": "Política de privacidad",
+    "subtitle": "Una explicación clara de lo que se procesa en tu navegador, lo que se envía a servicios públicos y los datos técnicos que puede procesar nuestra infraestructura.",
+    "processingTitle": "1. Procesamiento de archivos y texto",
+    "processing": "Las operaciones con imágenes, PDF, texto, herramientas para desarrolladores y medios compatibles están diseñadas para ejecutarse en tu navegador. Los archivos o textos que seleccionas se procesan en tu dispositivo y su contenido no se carga a los servidores de la aplicación UTILORA.",
+    "networkTitle": "2. Consultas de sitios web y dominios",
+    "network": "Las herramientas de comprobación de sitios y dominios necesitan acceso a la red. Al ejecutar una consulta, el nombre de host o la URL que introduces se envía al servicio DNS o RDAP público correspondiente, o al sitio de destino, para obtener la información solicitada. Esos servicios y sitios externos pueden procesar la solicitud según sus propias políticas de privacidad.",
+    "infrastructureTitle": "3. Alojamiento, distribución y registros técnicos",
+    "infrastructure": "UTILORA se entrega mediante infraestructura de alojamiento y distribución de contenido. Sus proveedores pueden procesar datos técnicos como la dirección IP, el agente de usuario, la ruta solicitada, las marcas de tiempo y los eventos de seguridad para la entrega, la caché, la prevención de abusos y la fiabilidad. Se aplican sus propias condiciones de privacidad y conservación.",
+    "preferencesTitle": "4. Preferencias de idioma y almacenamiento local",
+    "preferences": "Cuando cambias el idioma de la interfaz, UTILORA guarda esa preferencia en el localStorage de tu navegador para recordar tu selección. La preferencia permanece en ese navegador hasta que elimines los datos del sitio.",
+    "externalTitle": "5. Recursos externos",
+    "external": "El sitio carga las fuentes de la interfaz desde Google Fonts. Por ello, tu navegador solicita recursos tipográficos a dominios de Google, que pueden recibir datos técnicos de esas solicitudes. Los proveedores de consultas de red y los sitios de destino también reciben el nombre de host o la URL necesarios.",
+    "accountsTitle": "6. Cuentas y espacios opcionales",
+    "accounts": "No necesitas una cuenta para utilizar las herramientas disponibles. Los componentes reservados para publicidad y afiliación de la interfaz actual están desactivados por defecto. Si se añaden o activan servicios de terceros en el futuro, esta política deberá actualizarse antes de utilizarlos."
   }
 }
