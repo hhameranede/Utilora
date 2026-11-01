@@ -93,7 +93,7 @@ test('image metadata viewer inspects a local image without uploading it', async 
   await loadImage(page, 'image-metadata-viewer', 8, 4);
   await page.getByRole('button', { name: 'Inspect image' }).click();
   await expect(page.getByRole('status')).toContainText('Image properties inspected successfully.');
-  await expect(page.getByText('8 × 4px')).toBeVisible();
+  await expect(page.getByText('8 × 4', { exact: true })).toBeVisible();
 });
 
 test('PDF split extracts the requested pages into a real PDF', async ({ page }) => {
