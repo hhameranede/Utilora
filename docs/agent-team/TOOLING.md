@@ -24,11 +24,11 @@ From the UTILORA repository root, OpenCode reads `opencode.json`, `.opencode/age
 ## Connect NVIDIA
 
 1. In OpenCode, run `/connect`.
-2. Select **NVIDIA** and enter your NVIDIA API key in the terminal prompt.
+2. Select **NVIDIA** and enter the existing NVIDIA NIM API key in the terminal prompt.
 3. The project config exposes six NVIDIA NIM models through the `nvidia-nim` provider. Agent-specific defaults are assigned in `.opencode/agents/*.md`; use `opencode models` to inspect the configured catalogue.
 4. Never paste the key into a chat, source file, issue, PR, or log.
 
-For CI, Softnexa remains the source of the existing `NVIDIA_API_KEY` secret. Its workflow forwards the secret to the reusable workflow in UTILORA; the key is not duplicated in UTILORA, printed, or written to repository files. Do not create another key unless the live model-access test proves that the existing one is insufficient.
+For GitHub Actions, UTILORA reads a repository Actions secret named `NVIDIA_API_KEY`. To reuse the existing credential that was previously stored in another repository, add the same value directly in **UTILORA → Settings → Secrets and variables → Actions → New repository secret**. This is a one-time owner-side transfer because GitHub does not expose the plaintext value of an existing repository secret to another repository or to API clients. Do not send the key in chat, commit it, or create a new provider key unless the existing one is confirmed insufficient. The workflow runs inside UTILORA; it does not require a workflow caller or code changes in the credential-source repository.
 
 ## Authenticate optional account integrations
 
@@ -71,7 +71,7 @@ npm run e2e
 npm run build
 ```
 
-CI installs OpenCode and runs CLI discovery checks for all eight agents and all 50 skills, plus deterministic checks for model routing, upstream commit pins, licences, and role permissions. The separate Softnexa-triggered model smoke test verifies the live NVIDIA catalogue, then makes each agent load its assigned skill, inspect repository files, and return a role-specific report. A green discovery check alone is not proof of model execution.
+CI installs OpenCode and runs CLI discovery checks for all eight agents and all 50 skills, plus deterministic checks for model routing, upstream commit pins, licences, and role permissions. The UTILORA-native model smoke workflow can be launched manually or runs when the agent configuration changes; it verifies the live NVIDIA catalogue, performs real inference, then makes each agent load its assigned skill, inspect repository evidence, and return a role-specific report. It writes sanitized per-agent reports and diagnostics as workflow artifacts. A green discovery check alone is not proof of model execution.
 
 ## Important limitations
 
