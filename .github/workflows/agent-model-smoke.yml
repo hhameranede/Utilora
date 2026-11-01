@@ -15,6 +15,13 @@ on:
       - "opencode.json"
       - ".opencode/agents/**"
       - ".opencode/skills/**"
+  push:
+    branches: ["feat/autonomous-agent-foundation-2026-11-01"]
+    paths:
+      - ".github/workflows/agent-model-smoke.yml"
+      - "opencode.json"
+      - ".opencode/agents/**"
+      - ".opencode/skills/**"
 
 permissions:
   contents: read
