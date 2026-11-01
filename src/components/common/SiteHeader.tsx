@@ -124,7 +124,11 @@ export const SiteHeader: React.FC = () => {
             <button
               onClick={() => setIsSearchOpen(true)}
               className="flex items-center gap-2 px-2 sm:px-3 py-1.5 rounded-xl border border-stone-200 bg-stone-50 hover:bg-stone-100 hover:border-stone-300 text-xs text-stone-500 hover:text-stone-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
-              aria-label={t('nav.search')}
+              aria-label={t('nav.searchShort')}
+              aria-haspopup="dialog"
+              aria-controls="utilora-global-search"
+              aria-expanded={isSearchOpen}
+              aria-keyshortcuts="Control+K Meta+K"
             >
               <Search size={14} className="text-orange-500" />
               <span className="hidden sm:inline">{t('nav.searchShort')}</span>
