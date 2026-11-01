@@ -27,7 +27,12 @@ type SkillManifest = {
   modelAssignments: Record<string, string>;
   skills: SkillRecord[];
 };
-type ProviderModel = { id?: string; name?: string; limit?: { context?: number; output?: number } };
+type ProviderModel = {
+  id?: string;
+  name?: string;
+  limit?: { context?: number; output?: number };
+  modalities?: { input?: string[]; output?: string[] };
+};
 type OpenCodeProvider = {
   npm?: string;
   name?: string;
@@ -61,6 +66,11 @@ assert.deepEqual(Object.keys(nvidia.models ?? {}).sort(), Object.keys(expectedMo
 for (const [alias, id] of Object.entries(expectedModelIds)) {
   assert.equal(nvidia.models?.[alias]?.id, id, 'Unexpected NVIDIA model mapping for ' + alias);
 }
+assert.deepEqual(
+  nvidia.models?.['nemotron-super-vl']?.modalities,
+  { input: ['text', 'image'], output: ['text'] },
+  'The Visual Reviewer model must advertise image input to OpenCode',
+);
 
 const expectedRemote: Record<string, string> = {
   context7: 'https://mcp.context7.com/mcp',
