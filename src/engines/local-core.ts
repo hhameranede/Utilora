@@ -48,7 +48,7 @@ export function convertTextCase(text: string, mode: CaseMode): string {
   }
 
   const words = text.match(/[\p{L}\p{M}\p{N}]+/gu) ?? [];
-  if (mode === 'title') return text.toLocaleLowerCase().replace(/(^|\s)(\p{L})/gu, (_m, p: string, c: string) => p + c.toLocaleUpperCase());
+  if (mode === 'title') return text.toLocaleLowerCase().replace(/(^|[^\p{L}\p{M}\p{N}'’])(\p{L})/gu, (_m, p: string, c: string) => p + c.toLocaleUpperCase());
 
   const normalized = words.map((word) => word.toLocaleLowerCase());
   if (mode === 'snake') return normalized.join('_');
