@@ -30,23 +30,55 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
   const defaultFaqs = [
     {
       question: {
-        en: `Is ${toolName} safe to use with sensitive files?`,
-        ar: `هل ${toolName} آمن للاستخدام مع المستندات الحساسة؟`,
+        en: 'Is ' + toolName + ' safe to use with sensitive files?',
+        ar: 'هل ' + toolName + ' آمن للاستخدام مع المدخلات الحساسة؟',
       },
       answer: {
-        en: tool.status === 'functional' ? (isNetworkLookup ? `This lookup sends only the domain or URL you enter to public DNS/RDAP services or directly to the target website. No files are uploaded.` : `Yes. This tool processes its input locally in your browser without uploading it to an intermediate server.`) : `This workspace is currently a visual preview. It does not process files yet.`,
-        ar: tool.status === 'functional' ? (isNetworkLookup ? `ترسل هذه الأداة النطاق أو الرابط الذي تدخله إلى خدمات DNS/RDAP العامة أو إلى الموقع المستهدف مباشرةً. لا تُرفع أي ملفات.` : `نعم. تعالج هذه الأداة مدخلاتها محليًا داخل متصفحك دون رفعها إلى خادم وسيط.`) : `مساحة العمل هذه معاينة للواجهة حاليًا، ولم تُفعّل المعالجة فيها بعد.`,
+        en: tool.status === 'functional'
+          ? (isNetworkLookup
+            ? 'This lookup sends only the domain or URL you enter to public DNS/RDAP services or directly to the target website. No files are uploaded.'
+            : 'Yes. This tool processes its input locally in your browser without uploading it to an intermediate server.')
+          : 'This workspace is currently a visual preview. It does not process files yet.',
+        ar: tool.status === 'functional'
+          ? (isNetworkLookup
+            ? 'ترسل هذه الأداة النطاق أو الرابط الذي تدخله إلى خدمات DNS/RDAP العامة أو إلى الموقع المستهدف مباشرةً. لا تُرفع أي ملفات.'
+            : 'نعم. تعالج هذه الأداة مدخلاتها محليًا داخل متصفحك دون رفعها إلى خادم وسيط.')
+          : 'مساحة العمل هذه معاينة للواجهة حاليًا، ولم تُفعّل المعالجة فيها بعد.',
       },
     },
     {
-      question: {
-        en: `What is the maximum file size for ${toolName}?`,
-        ar: `ما هو الحد الأقصى لحجم الملفات في ${toolName}؟`,
-      },
-      answer: {
-        en: `The tool comfortably accepts files up to ${tool.maxFileSize || '100 MB'}, bounded only by your local device memory.`,
-        ar: `تدعم الأداة ملفات حتى ${tool.maxFileSize || '100 ميجابايت'}، وتعتمد حدود المعالجة على ذاكرة جهازك المحلي.`,
-      },
+      question: tool.acceptedFormats && tool.status === 'functional'
+        ? {
+            en: 'What file formats and size limits does ' + toolName + ' support?',
+            ar: 'ما صيغ الملفات وحدود الحجم التي تدعمها ' + toolName + '؟',
+          }
+        : isNetworkLookup
+          ? {
+              en: 'What information does ' + toolName + ' check?',
+              ar: 'ما المعلومات التي تفحصها ' + toolName + '؟',
+            }
+          : {
+              en: 'Is my input stored or sent to a server?',
+              ar: 'هل تُحفظ مدخلاتي أو تُرسل إلى خادم؟',
+            },
+      answer: tool.acceptedFormats && tool.status === 'functional'
+        ? {
+            en: 'Supported formats: ' + tool.acceptedFormats.join(', ') + '. Maximum file size: ' + (tool.maxFileSize || 'See the tool-specific processing limit') + '.',
+            ar: 'الصيغ المدعومة: ' + tool.acceptedFormats.join('، ') + '. الحد الأقصى لحجم الملف: ' + (tool.maxFileSize || 'راجع حد المعالجة الخاص بالأداة') + '.',
+          }
+        : isNetworkLookup
+          ? {
+              en: 'The tool queries public domain registration or DNS records, or sends a credential-free HEAD request to the public website URL you submit. It does not inspect private content.',
+              ar: 'تستعلم الأداة عن بيانات تسجيل النطاق أو سجلات DNS العامة، أو ترسل طلب HEAD دون بيانات اعتماد إلى رابط الموقع العام الذي تدخله. لا تفحص المحتوى الخاص.',
+            }
+          : {
+              en: tool.status === 'functional'
+                ? 'No. Your text or code input is processed locally in this browser and is not sent to UTILORA servers.'
+                : 'This workspace is a preview and does not process or store submitted files.',
+              ar: tool.status === 'functional'
+                ? 'لا. تتم معالجة النص أو الشيفرة محليًا في هذا المتصفح ولا تُرسل إلى خوادم UTILORA.'
+                : 'مساحة العمل معاينة ولا تعالج الملفات المُدخلة أو تحفظها.',
+            },
     },
   ];
 
