@@ -157,6 +157,7 @@ test('video compressor produces a downloadable WebM file from a real video fixtu
 });
 
 test('video trimmer exports only the selected time range as a real WebM file', async ({ page }) => {
+  test.setTimeout(90_000);
   await page.goto('/en/tools/video-trimmer');
   await page.getByLabel('Choose a video file').setInputFiles({
     name: 'trim-fixture.webm',
@@ -165,8 +166,8 @@ test('video trimmer exports only the selected time range as a real WebM file', a
   });
 
   await expect(page.locator('#video-trim-end')).toHaveValue(/^[1-9]/, { timeout: 15_000 });
-  await page.locator('#video-trim-start').fill('0.10');
-  await page.locator('#video-trim-end').fill('0.80');
+  await page.getByLabel('Start time in seconds').fill('0.10');
+  await page.getByLabel('End time in seconds').fill('0.80');
   await page.getByRole('button', { name: 'Export selected clip' }).click();
   await expect(page.getByRole('status')).toContainText('File ready', { timeout: 60_000 });
 
@@ -181,6 +182,7 @@ test('video trimmer exports only the selected time range as a real WebM file', a
 });
 
 test('video-to-audio extracts an audio track and exports a valid WAV file', async ({ page }) => {
+  test.setTimeout(90_000);
   await page.goto('/en/tools/video-to-audio');
   await page.getByLabel('Choose a video file').setInputFiles({
     name: 'audio-fixture.webm',

@@ -284,6 +284,7 @@ export const TemplateVideoConversionWorkspace: React.FC<TemplateVideoConversionW
                     />
                     <input
                       type="number"
+                      aria-label="Start time in seconds"
                       min="0"
                       max={Math.max(0, endTime - 0.1)}
                       step="0.05"
@@ -311,6 +312,7 @@ export const TemplateVideoConversionWorkspace: React.FC<TemplateVideoConversionW
                     />
                     <input
                       type="number"
+                      aria-label="End time in seconds"
                       min={Math.min(duration, startTime + 0.1)}
                       max={duration || undefined}
                       step="0.05"

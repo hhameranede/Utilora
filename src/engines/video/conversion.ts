@@ -61,9 +61,13 @@ function errorMessage(error: unknown): string {
   return 'The browser could not process this media file. Try another supported video.';
 }
 
-function throwIfDiscardedMediaTracks(conversion: Awaited<ReturnType<typeof Conversion.init>>): void {
-  const unsupported = conversion.discardedTracks.filter(({ track }) =>
-    track.type === 'video' || track.type === 'audio',
+function throwIfDiscardedMediaTracks(
+  conversion: Awaited<ReturnType<typeof Conversion.init>>,
+  allowedUserDiscardedTracks: readonly ('video' | 'audio')[] = [],
+): void {
+  const unsupported = conversion.discardedTracks.filter(({ track, reason }) =>
+    (track.type === 'video' || track.type === 'audio') &&
+    !(reason === 'discarded_by_user' && allowedUserDiscardedTracks.includes(track.type)),
   );
   if (unsupported.length > 0) {
     const detail = unsupported
@@ -84,6 +88,7 @@ async function convertToBlob(
   format: OutputFormatType,
   settings: ConversionSettings,
   onProgress?: (progress: EngineProgress) => void,
+  allowedUserDiscardedTracks: readonly ('video' | 'audio')[] = [],
 ): Promise<Blob> {
   const input = new Input({
     source: new BlobSource(file, { maxCacheSize: 32 * 1024 * 1024 }),
@@ -96,7 +101,7 @@ async function convertToBlob(
     onProgress?.({ stage: 'Reading media tracks', percent: 8 });
     const output = new Output({ format, target });
     conversion = await Conversion.init({ input, output, ...settings });
-    throwIfDiscardedMediaTracks(conversion);
+    throwIfDiscardedMediaTracks(conversion, allowedUserDiscardedTracks);
 
     activeConversions.add(conversion);
     onProgress?.({ stage: 'Preparing browser media encoder', percent: 15 });
@@ -389,6 +394,7 @@ export const VideoToAudioAdapter: ToolAdapter<
           audio,
         } as ConversionSettings,
         onProgress,
+        ['video'],
       );
 
       const data: VideoToAudioOutput = {
