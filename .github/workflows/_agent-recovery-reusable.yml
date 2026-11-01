@@ -235,7 +235,8 @@ jobs:
           The sole purpose is to resolve this previously observed failure:
           $RECOVERY_FOCUS
 
-          FIRST: invoke the native skill tool and load exactly "$SKILL_NAME".
+          FIRST: load exactly "$SKILL_NAME" through the native skill tool. Use the exact @skill trigger @$SKILL_NAME so OpenCode can resolve the skill.
+          A tool attempt is not a successful load: only a completed native skill-tool result counts.
           Do not merely read the skill file and claim that the tool was used.
           SECOND: inspect README.md, your own .opencode/agents/$AGENT_NAME.md,
           and the assigned skill's repository content using read-only tools.
@@ -298,6 +299,7 @@ jobs:
                   continue
           skill = os.environ["SKILL_NAME"]
           skill_calls = 0
+          skill_failures = []
           read_calls = 0
           text_parts = []
           session_id = ""
@@ -310,8 +312,11 @@ jobs:
                   state = part.get("state") or {}
                   details = json.dumps(state.get("input") or {}, ensure_ascii=False)
                   if tool == "skill" and skill in details:
-                      skill_calls += 1
-                  if tool in {"read", "grep", "glob", "list", "bash"} and state.get("status") == "completed":
+                      if state.get("status") == "completed":
+                          skill_calls += 1
+                      else:
+                          skill_failures.append(str(state.get("status", "unknown")))
+                  if tool in {"read", "grep", "glob", "list"} and state.get("status") == "completed":
                       read_calls += 1
               elif event.get("type") == "text":
                   value = part.get("text")
@@ -325,12 +330,13 @@ jobs:
           precheck = {
               "session_id": session_id,
               "skill_calls": skill_calls,
+              "skill_failures": skill_failures,
               "read_calls": read_calls,
               "text_chars": len(final_text.strip()),
               "missing_labels": missing,
           }
           pathlib.Path(os.environ["PRECHECK"]).write_text(json.dumps(precheck), encoding="utf-8")
-          print("Recovery completion check: skill_calls=%d, evidence_calls=%d, text_chars=%d, missing_labels=%d" % (skill_calls, read_calls, len(final_text.strip()), len(missing)))
+          print("Recovery completion check: completed_skill_calls=%d, failed_skill_attempts=%d, evidence_reads=%d, text_chars=%d, missing_labels=%d" % (skill_calls, len(skill_failures), read_calls, len(final_text.strip()), len(missing)))
           PY
           needs_followup="$(python3 -c 'import json,sys; d=json.load(open(sys.argv[1])); print("yes" if d["skill_calls"] < 1 or d["read_calls"] < 2 or d["text_chars"] < 180 or d["missing_labels"] else "no")' "$RUNNER_TEMP/recovery-precheck.json")"
           if [ "$needs_followup" = "yes" ]; then
@@ -341,7 +347,7 @@ jobs:
             fi
             FOLLOWUP_PROMPT="$(cat <<EOF
           Continue this same read-only recovery session. The first response or evidence was incomplete.
-          Check the actual tool history. If the assigned native skill tool was not invoked for exactly "$SKILL_NAME", invoke it now before writing your report.
+          Check the actual tool history. If the assigned native skill tool for "$SKILL_NAME" did not complete successfully, invoke it now using the exact @skill trigger @$SKILL_NAME before writing your report.
           If fewer than two completed evidence-inspection calls exist, inspect README.md and your own .opencode/agents/$AGENT_NAME.md using read-only tools.
           For visual-reviewer, inspect the attached real homepage screenshot; for implementation-engineer, give the minimal change plan and regression test.
           Do not edit files, inspect environment variables, read .env files, commit, push, deploy, or call external services.
@@ -382,8 +388,9 @@ jobs:
                   "- Model: " + os.environ["MODEL_ID"] + "\n"
                   "- Assigned skill: " + os.environ["SKILL_NAME"] + "\n"
                   "- Parsed events: " + str(len(events)) + "\n"
-                  "- Assigned skill tool calls: " + str(skill_calls) + "\n"
-                  "- Completed evidence calls: " + str(read_calls) + "\n"
+                  "- Successfully completed skill calls: " + str(skill_calls) + "\n"
+                  "- Failed/denied skill attempts: " + ", ".join(skill_failures) + "\n"
+                  "- Completed evidence reads: " + str(read_calls) + "\n"
                   "- Assistant text characters: " + str(text_length) + "\n"
                   "- Observed tool names: " + ", ".join(sorted({(e.get("part") or {}).get("tool", "") for e in events if (e.get("part") or {}).get("tool")})) + "\n"
                   "- Missing report labels: " + (", ".join(missing) or "none") + "\n"
@@ -406,6 +413,7 @@ jobs:
                   continue
 
           skill_calls = 0
+          skill_failures = []
           read_calls = 0
           text_parts = []
           for event in events:
@@ -415,8 +423,11 @@ jobs:
               details = json.dumps(event, ensure_ascii=False)
               if event.get("type") == "tool_use":
                   if tool == "skill" and os.environ["SKILL_NAME"] in details:
-                      skill_calls += 1
-                  if tool in {"read", "grep", "glob", "list", "bash"} and state.get("status") == "completed":
+                      if state.get("status") == "completed":
+                          skill_calls += 1
+                      else:
+                          skill_failures.append(str(state.get("status", "unknown")))
+                  if tool in {"read", "grep", "glob", "list"} and state.get("status") == "completed":
                       read_calls += 1
               if event.get("type") == "text":
                   value = part.get("text")
@@ -434,9 +445,9 @@ jobs:
               )
           ]
           if skill_calls < 1:
-              fail("The agent still did not invoke its assigned native skill tool.", events, skill_calls, read_calls, len(final_text), missing)
+              fail("The agent did not successfully load its assigned native skill; failed attempt statuses: " + ", ".join(skill_failures) + ".", events, skill_calls, read_calls, len(final_text), missing)
           if read_calls < 2:
-              fail("The agent did not complete at least two evidence-inspection tool calls.", events, skill_calls, read_calls, len(final_text), missing)
+              fail("The agent did not complete at least two repository evidence reads.", events, skill_calls, read_calls, len(final_text), missing)
           if len(final_text) < 180 or missing:
               fail("The recovery report is incomplete or missing required labeled sections.", events, skill_calls, read_calls, len(final_text), missing)
           if re.search(r"(?i)nvapi-[A-Za-z0-9_-]{12,}", final_text):
@@ -453,7 +464,6 @@ jobs:
           raw_path.unlink(missing_ok=True)
           print("PASS: isolated recovery evidence is complete for " + os.environ["AGENT_NAME"])
           PY
-          git diff --exit-code
           worktree_status="$(git status --porcelain=v1 --untracked-files=all)"
           if [ -n "$worktree_status" ]; then
             echo "::error::The read-only recovery agent modified the repository checkout."
