@@ -67,7 +67,8 @@
     "previewOnly": "Somente prévia",
     "publicLookup": "Consulta pública de rede",
     "runsLocally": "Executado no navegador",
-    "readGuide": "Ler guia"
+    "readGuide": "Ler guia",
+    "tryAgain": "Tentar novamente"
   },
   "home": {
     "categoriesHeading": "Navegue por Categoria",
@@ -160,7 +161,8 @@
     "newsletterTitle": "Newsletter",
     "newsletterDesc": "Receba atualizações sobre novas ferramentas. (Apenas prévia)",
     "newsletterPlaceholder": "Seu e-mail profissional",
-    "subscribe": "Inscrever-se"
+    "subscribe": "Inscrever-se",
+    "readArticle": "Ler artigo"
   },
   "footer": {
     "rights": "Todos os direitos reservados.",
@@ -263,5 +265,8 @@
     "external": "O site carrega as fontes da interface pelo Google Fonts. Assim, seu navegador solicita arquivos de fontes a domínios do Google, que podem receber informações técnicas dessas solicitações. Provedores de consultas de rede e sites de destino também recebem o host ou a URL necessários.",
     "accountsTitle": "6. Contas e espaços opcionais",
     "accounts": "Não é necessário criar uma conta para usar as ferramentas disponíveis. Os componentes reservados para publicidade e afiliados na interface atual ficam desativados por padrão. Caso serviços de terceiros opcionais sejam adicionados ou ativados no futuro, esta política deverá ser atualizada antes do uso."
+  },
+  "categories": {
+    "description": "Explore as ferramentas disponíveis por categoria. Cada grupo reúne utilitários relacionados que funcionam no navegador."
   }
 }
