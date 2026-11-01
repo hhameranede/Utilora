@@ -36,21 +36,27 @@ MD5 is not exposed by the current browser-native hash workspace. It requires a s
 
 | Tool | Implementation | Scope and limitations |
 | :--- | :--- | :--- |
+| Video Compressor | Mediabunny decode/encode to WebM | Applies a selected quality and target resolution locally. Device codec support and memory constrain source size; output size can be larger than the source for some clips. |
+| Video to Audio | Mediabunny audio-track extraction and encoding | Exports WAV, MP3, or AAC where the browser has a compatible encoder. Files without an audio track or unsupported codecs return an explicit error. |
+| Video Trimmer | Mediabunny time-range trimming and WebM encoding | Exports the requested time range locally; validates duration, track compatibility, and cancellation. |
 | Video Metadata Viewer | Native HTMLVideoElement metadata | Reads duration, dimensions, container, aspect ratio, and an estimated average bitrate from file size and duration. Browser playback APIs do not reliably expose stream codecs or frame rate, so those values are explicitly shown as unavailable. |
 | Thumbnail Extractor | Native HTMLVideoElement seeking + Canvas | Seeks to a chosen timestamp and exports a PNG or JPEG frame locally. Canvas output is capped at 12 megapixels to reduce memory pressure; supported codecs depend on the browser. |
 
-## Still preview-only
+## Preview-only tool
 
-The five Website & Domain tools are functional and connected to public read-only services: Domain Age Checker and RDAP Lookup use RDAP, DNS Lookup uses DNS-over-HTTPS, and Website Status / HTTP Headers use credential-free browser-originated HEAD requests. These browser probes are subject to public-service availability and CORS limitations; a CORS-blocked result must remain unknown rather than being labeled offline. The two browser-local video tools above are also functional. The four remaining video workspaces — compressor, video-to-audio, downloader, and trimmer — remain preview-only until their processing paths, safety controls, error handling, and downloadable outputs are implemented and tested.
+`video-downloader` remains a UI-only preview. It does not pretend to download media. A future implementation should only accept direct media resources the user is authorized to download; it must not bypass DRM, access controls, or a platform's download restrictions.
 
-## Engine architecture for remaining tools
+The five Website & Domain tools are functional and connected to public read-only services: Domain Age Checker and RDAP Lookup use RDAP, DNS Lookup uses DNS-over-HTTPS, and Website Status / HTTP Headers use credential-free browser-originated HEAD requests. These probes depend on public-service availability and browser CORS; a CORS-blocked result must remain unknown rather than being labeled offline.
 
-| Domain | Planned technology | Execution model |
+## Technology and remaining engineering work
+
+| Domain | Current execution model | Remaining work |
 | :--- | :--- | :--- |
-| Image conversion/compression/resize/crop/rotate | Browser Canvas APIs | Main thread currently; large inputs need performance profiling |
-| PDF manipulation/rendering | `pdf-lib` + PDF.js | In-memory browser processing; PDF.js worker for rendering |
-| Network and diagnostics | Cloudflare Worker with strict URL validation, SSRF protection and rate limiting | Edge API |
-| Video processing | WebCodecs / Mediabunny with optional ffmpeg.wasm fallback | Worker where supported |
+| Image processing | Browser Canvas APIs | Profile large inputs and monitor memory on lower-powered devices |
+| PDF manipulation/rendering | `pdf-lib` + PDF.js in the browser | Expand PDF.js browser coverage and stress-test large documents |
+| Network diagnostics | Public RDAP / DNS-over-HTTPS / credential-free HEAD requests | Verify real-world CORS and provider rate limits; keep private-address protections in place |
+| Video compression, trimming, and audio extraction | Mediabunny browser codecs | Expand browser/device codec coverage and test longer high-resolution clips |
+| Direct video downloading | Not connected | Design a permissions-respecting direct-file workflow before enabling processing |
 
 ## Safety and privacy requirements
 
@@ -66,5 +72,5 @@ The five Website & Domain tools are functional and connected to public read-only
 - `scripts/test-local-core.ts` exercises the text and developer helper functions, including Unicode text, JSON, Base64, URL encoding, UUID generation, and SHA-256.
 - `scripts/test-pdf-core.ts` covers page counting, ordered merge, range and burst splitting, selected-page rotation, image-to-PDF orientation, and rejection of invalid rotation/margin values. PDF.js page rendering still needs browser-level execution coverage.
 - `scripts/test-image-core.ts` uses deterministic browser API mocks to test Canvas transforms, crop validation, resizing, rotation/flips, MIME export failures, resource cleanup, pixel metadata, and all six image adapter result contracts.
-- `e2e/video-tools.spec.ts` records a small WebM fixture in Chromium and verifies actual metadata inspection, exact frame seeking, image export, and JSON export for the two connected video tools.
+- `e2e/video-tools.spec.ts` records small WebM fixtures in Chromium and verifies actual compression, time-range trimming, audio extraction, metadata inspection, thumbnail seeking, image/audio/video downloads, and JSON export. Codec availability is tested against the Chromium browser used by CI.
 - These are engine-level smoke tests. They do **not** replace browser-based UI, touch interaction, real-device compatibility, or visual regression testing; those remain separate QA tasks.
