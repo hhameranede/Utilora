@@ -13,17 +13,18 @@
     "searchShort": "搜索",
     "devTemplates": "模板工坊",
     "allTools": "全部工具",
-    "switchLanguage": "切换语言"
+    "switchLanguage": "切换语言",
+    "toggleNavigation": "打开或关闭导航菜单"
   },
   "hero": {
     "badge": "全球免费数字化工具平台",
     "title": "每一个数字任务。尽在一处。",
     "subtitle": "为图像、文档、文本、代码、网站和视频打造的强劲、纯净且永久免费的在线实用工具箱。",
     "searchPlaceholder": "输入工具名称、格式或关键词（例如：压缩、JSON、PDF）...",
-    "privacyBadge": "隐私优先架构 · 浏览器本地极速运算 · 无需注册账号",
+    "privacyBadge": "文件和文本在浏览器中处理 · 网站查询会联系公共服务 · 无需账户",
     "browseCategories": "浏览六大分类",
     "explorePopular": "热门工具推荐",
-    "statsTools": "36 款规划工具",
+    "statsTools": "36 个工具 · 35 个可用",
     "statsCategories": "6 大核心分类",
     "statsGlobal": "8 种国际语言"
   },
@@ -53,13 +54,20 @@
     "relatedTools": "相关推荐工具",
     "relatedArticles": "相关技术指南",
     "privacyStatement": "隐私与本地执行保障",
-    "privacyStatementDesc": "采用零云端留存、客户端本地优先架构。接入引擎后，您的文件与数据将全程在浏览器本地处理，绝不上传。",
+    "privacyStatementDesc": "文件和文本操作在浏览器中运行。网站和域名检查会将您输入的主机名或 URL 发送给相关公共服务或目标网站。仅供预览的工具尚未投入使用。",
     "supportedFormats": "支持格式与规格限制",
     "sampleData": "界面演示数据",
     "demoOnly": "视觉预览模式",
     "pageNotFound": "页面未找到",
     "pageNotFoundDesc": "您访问的工具或页面不存在或已被移除。",
-    "returnHome": "返回首页"
+    "returnHome": "返回首页",
+    "popular": "热门",
+    "featured": "精选",
+    "supported": "支持格式",
+    "previewOnly": "仅供预览",
+    "publicLookup": "公共网络查询",
+    "runsLocally": "在浏览器中运行",
+    "readGuide": "阅读指南"
   },
   "home": {
     "categoriesHeading": "按工具分类探索",
@@ -75,11 +83,12 @@
     "step2Title": "2. 在专属工作区完成配置",
     "step2Desc": "针对图像对比、文档编排、代码校验等不同场景量身定制的交互面板。",
     "step3Title": "3. 本地运算极速响应",
-    "step3Desc": "无需冗余服务端中转，保护数据私密性并提供极致响应速度。",
+    "step3Desc": "文件和文本任务在浏览器中运行。网站检查会使用您提交的主机名或 URL 联系相关公共服务。",
     "trustHeading": "建立在信任与现代标准之上",
     "trustDesc": "我们坚信数字工具应当纯粹：无骚扰广告、免强制注册、深度保护用户隐私。",
     "articlesPreviewHeading": "精选技术博文与指南",
-    "articlesPreviewSub": "深入探讨压缩算法、PDF 规范及现代前端工程标准。"
+    "articlesPreviewSub": "深入探讨压缩算法、PDF 规范及现代前端工程标准。",
+    "privacyKicker": "数据处理方式"
   },
   "templates": {
     "dropzonePrompt": "将文件拖放到此处，或点击浏览上传",
@@ -161,6 +170,25 @@
     "acceptableUse": "合理使用规范",
     "about": "关于平台",
     "contact": "联系与技术支持",
-    "cookieNotice": "零广告追踪 Cookie。极速、纯粹、尊重用户。"
+    "cookieNotice": "零广告追踪 Cookie。极速、纯粹、尊重用户。",
+    "platform": "平台",
+    "legal": "法律信息",
+    "moreCategories": "更多类别"
+  },
+  "tools": {
+    "description": "浏览全部 36 个工具。可按名称、描述或支持的格式搜索，也可按类别筛选。仅供预览的工具会明确标记。",
+    "searchPlaceholder": "搜索工具、任务或文件格式...",
+    "scrollHint": "横向滑动类别筛选栏以查看全部选项。"
+  },
+  "category": {
+    "featuredWorkspace": "精选工作区",
+    "allTools": "中的全部工具",
+    "chooseWorkspace": "选择下方工具以打开对应工作区。",
+    "searchPlaceholder": "筛选此类别中的工具...",
+    "relatedCategories": "相关类别"
+  },
+  "search": {
+    "navigate": "移动",
+    "select": "选择"
   }
 }
