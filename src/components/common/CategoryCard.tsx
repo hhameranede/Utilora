@@ -24,10 +24,10 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({ category, className 
     >
       <div>
         <div className="flex items-center justify-between mb-4">
-          <div className="w-12 h-12 rounded-xl bg-orange-50 group-hover:bg-orange-500 border border-orange-100 flex items-center justify-center text-orange-600 group-hover:text-white transition-all shadow-xs">
+          <div className="w-12 h-12 rounded-xl bg-orange-50 group-hover:bg-orange-700 border border-orange-100 flex items-center justify-center text-orange-600 group-hover:text-white transition-all shadow-xs">
             <Icon name={category.icon} size={22} />
           </div>
-          <span className="text-xs font-mono text-stone-400">
+          <span className="text-xs font-mono text-stone-500">
             {category.toolCount} {t('nav.tools').toLowerCase()}
           </span>
         </div>
@@ -36,7 +36,7 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({ category, className 
           {title}
         </h3>
 
-        <p className="text-xs text-stone-600 line-clamp-2 leading-relaxed mb-6">
+        <p className="text-sm text-stone-600 line-clamp-2 leading-relaxed mb-6">
           {description}
         </p>
       </div>
