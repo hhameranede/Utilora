@@ -30,12 +30,14 @@ function installBrowserMocks(options: HarnessOptions = {}) {
   let getContextOptions: unknown;
   let alphaPixels: number[] = [];
 
+  let currentFillStyle = '#000000';
   const context = {
-    fillStyle: '#000000',
+    get fillStyle() { return currentFillStyle; },
+    set fillStyle(value: string) { currentFillStyle = value; },
     imageSmoothingEnabled: false,
     imageSmoothingQuality: 'low',
     fillRect(...args: number[]) {
-      fills.push({ color: String(this.fillStyle), args });
+      fills.push({ color: currentFillStyle, args });
     },
     translate(...args: number[]) { translations.push(args); },
     scale(...args: number[]) { scales.push(args); },
@@ -340,9 +342,9 @@ await run('executes all six image tool adapters and returns truthful output meta
     assert.ok(resized.data);
     assert.equal(resized.data.width, 2);
     assert.equal(resized.data.height, 1);
-    assert.equal(resizedMock.canvases[0].width, 2);
+    assert.equal(resizerMock.canvases[0].width, 2);
     assert.equal(resizedMock.canvases[0].height, 1);
-    assert.equal(resizedMock.bitmaps.every((bitmap) => bitmap.closed), true);
+    assert.equal(resizerMock.bitmaps.every((bitmap) => bitmap.closed), true);
   } finally {
     resizerMock.restore();
   }
