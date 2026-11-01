@@ -11,9 +11,9 @@ UTILORA is a premium, free online digital tools platform engineered to unify hig
 This repository contains the **complete frontend foundation, UI system, reusable workspace templates, internationalization, routing, and future engine integration contracts**.
 
 ### Scope Invariants & Anti-Deception Guardrails
-- **30 Functional Tools:** 25 image, PDF, text, and developer tools process locally in the browser. Five Website & Domain tools perform live, read-only RDAP and DNS lookups or credential-free HTTP HEAD checks.
-- **Six Video Previews:** Video workspaces remain clearly marked as previews until real media engines are integrated; no fake conversions or downloads are shown.
-- **Privacy First:** Files handled by the 25 local tools stay in the browser. Website lookups send only the submitted hostname to public DNS-over-HTTPS and make a direct HEAD request without cookies, request bodies, or automatic redirect following. Browser CORS restrictions are reported honestly.
+- **32 Functional Tools:** 27 browser-local utilities across Image, PDF, Text, Developer, and Video categories. This includes local video metadata inspection and frame extraction. Five Website & Domain tools perform live, read-only RDAP and DNS lookups or credential-free HTTP HEAD checks.
+- **Four Video Previews:** Video compression, video-to-audio, video downloading, and video trimming remain clearly marked as previews until their real media engines are integrated; no fake conversions or downloads are shown.
+- **Privacy First:** Files handled by the 27 local tools stay in browser memory and are not uploaded to UTILORA. Website lookups send only the submitted hostname or URL to public DNS-over-HTTPS, RDAP, or a credential-free HEAD request; CORS restrictions are reported honestly.
 - **Quality Gates:** TypeScript, browser-engine tests, PDF/image tests, lookup-security tests, SEO build assertions, and real Chromium E2E flows run in GitHub Actions.
 
 ---

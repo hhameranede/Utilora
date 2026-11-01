@@ -32,9 +32,16 @@ MD5 is not exposed by the current browser-native hash workspace. It requires a s
 | PDF to JPG/PNG | Mozilla PDF.js renderer with DPI controls and a per-batch page limit |
 | PDF page counter | PDF page count, PDF header version, and AcroForm field presence |
 
+## Browser-local video engines now connected
+
+| Tool | Implementation | Scope and limitations |
+| :--- | :--- | :--- |
+| Video Metadata Viewer | Native HTMLVideoElement metadata | Reads duration, dimensions, container, aspect ratio, and an estimated average bitrate from file size and duration. Browser playback APIs do not reliably expose stream codecs or frame rate, so those values are explicitly shown as unavailable. |
+| Thumbnail Extractor | Native HTMLVideoElement seeking + Canvas | Seeks to a chosen timestamp and exports a PNG or JPEG frame locally. Canvas output is capped at 12 megapixels to reduce memory pressure; supported codecs depend on the browser. |
+
 ## Still preview-only
 
-The five Website & Domain tools are functional and connected to public read-only services: Domain Age Checker and RDAP Lookup use RDAP, DNS Lookup uses DNS-over-HTTPS, and Website Status / HTTP Headers use credential-free browser-originated HEAD requests. These browser probes are subject to public-service availability and CORS limitations; a CORS-blocked result must remain unknown rather than being labeled offline. The six video workspaces remain preview-only until their processing paths, input validation, safety controls, error handling, and downloadable outputs are implemented and tested.
+The five Website & Domain tools are functional and connected to public read-only services: Domain Age Checker and RDAP Lookup use RDAP, DNS Lookup uses DNS-over-HTTPS, and Website Status / HTTP Headers use credential-free browser-originated HEAD requests. These browser probes are subject to public-service availability and CORS limitations; a CORS-blocked result must remain unknown rather than being labeled offline. The two browser-local video tools above are also functional. The four remaining video workspaces — compressor, video-to-audio, downloader, and trimmer — remain preview-only until their processing paths, safety controls, error handling, and downloadable outputs are implemented and tested.
 
 ## Engine architecture for remaining tools
 
@@ -59,4 +66,5 @@ The five Website & Domain tools are functional and connected to public read-only
 - `scripts/test-local-core.ts` exercises the text and developer helper functions, including Unicode text, JSON, Base64, URL encoding, UUID generation, and SHA-256.
 - `scripts/test-pdf-core.ts` covers page counting, ordered merge, range and burst splitting, selected-page rotation, image-to-PDF orientation, and rejection of invalid rotation/margin values. PDF.js page rendering still needs browser-level execution coverage.
 - `scripts/test-image-core.ts` uses deterministic browser API mocks to test Canvas transforms, crop validation, resizing, rotation/flips, MIME export failures, resource cleanup, pixel metadata, and all six image adapter result contracts.
+- `e2e/video-tools.spec.ts` records a small WebM fixture in Chromium and verifies actual metadata inspection, exact frame seeking, image export, and JSON export for the two connected video tools.
 - These are engine-level smoke tests. They do **not** replace browser-based UI, touch interaction, real-device compatibility, or visual regression testing; those remain separate QA tasks.

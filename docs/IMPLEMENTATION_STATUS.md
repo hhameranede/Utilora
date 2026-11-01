@@ -36,14 +36,14 @@ This checklist records repository implementation separately from production depl
 - [x] Client-side SEO metadata handles titles, descriptions, canonical URLs, hreflang links, robots directives, and JSON-LD.
 - [x] Preview tool and sample content routes carry `noindex` directives in prerendered HTML.
 - [x] Internal template gallery exists at non-public `/dev/templates` route with state toggles.
-- [x] Engine interfaces and browser-local implementations are connected for 25 tools across image, PDF, text, and developer categories.
+- [x] Engine interfaces and browser-local implementations are connected for 27 tools across image, PDF, text, developer, and video categories.
 - [x] Five Website & Domain tools now perform live RDAP registration lookups, DNS-over-HTTPS queries, and credential-free browser-originated HTTP HEAD diagnostics.
 - [x] Image tools: conversion, compression, resizing, crop, rotation, and basic pixel/file metadata inspection (EXIF camera/GPS extraction is not included).
 - [x] PDF tools: merge, range/burst split, rotate, JPG/PNG to PDF, PDF to JPG/PNG, and page/form-field inspection.
 - [x] Text and developer tools: all 13 utilities run in the browser using native browser APIs.
-- [x] The 25 file/text/developer tools execute locally and the five Website & Domain tools use live public read-only lookups; only the six video workspaces remain preview-only.
+- [x] The 27 browser-local tools execute locally (including video metadata inspection and thumbnail extraction) and the five Website & Domain tools use live public read-only lookups; four video workspaces remain preview-only.
 - [x] The CI workflow is configured to run text/developer, PDF, and image-engine smoke-test commands; image coverage now includes all six image adapters and common invalid-input/resource-cleanup paths.
-- [x] Playwright E2E coverage exercises the 25 connected local tools and all five Website & Domain lookups, plus Arabic RTL and mobile crop interaction. It verifies live-lookup UI flows with deterministic mocked public-service responses; production CORS behavior still requires manual verification against real registries and target sites.
+- [x] Playwright E2E coverage exercises the connected local tools, including real video metadata and thumbnail extraction flows, and all five Website & Domain lookups, plus Arabic RTL and mobile crop interaction. It verifies live-lookup UI flows with deterministic mocked public-service responses; production CORS behavior still requires manual verification against real registries and target sites.
 - [x] Website diagnostic probes use public-DNS preflight, reject local/private/reserved address ranges and non-standard ports, send HEAD only with credentials omitted, and never follow redirects. CORS-limited results are labeled unknown rather than offline.
 - [x] No database has been added.
 - [x] No external advertising scripts have been added (AdSlot/AffiliateSlot hidden by default).
