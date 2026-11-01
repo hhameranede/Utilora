@@ -38,7 +38,7 @@ export const TemplateFTwoPanelCompare: React.FC<TemplateFTwoPanelCompareProps> =
   return (
     <div className="w-full space-y-6">
       <div className="p-4 rounded-2xl bg-white border border-stone-200/90 shadow-xs flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2 min-w-0">
           <GitCompare size={16} className="text-orange-600" />
           <span className="text-xs font-semibold text-stone-900">Comparison scope:</span>
           <div className="flex items-center gap-1 p-1 bg-stone-100 rounded-xl">

@@ -18,7 +18,7 @@ export const SiteHeader: React.FC = () => {
   return (
     <>
       <header className="sticky top-0 z-40 w-full border-b border-stone-200/80 bg-white/90 backdrop-blur-md shadow-xs">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2 sm:gap-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-1 sm:gap-4">
           {/* Brand Logo */}
           <div className="flex items-center gap-6">
             <Link
@@ -119,7 +119,7 @@ export const SiteHeader: React.FC = () => {
           </div>
 
           {/* Right Controls: Search, Language, Dev Lab, Mobile Toggle */}
-          <div className="flex items-center gap-1.5 sm:gap-2.5">
+          <div className="flex items-center gap-1 sm:gap-2.5">
             {/* Quick Search Button */}
             <button
               onClick={() => setIsSearchOpen(true)}
