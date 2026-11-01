@@ -70,17 +70,6 @@
 | `qa-engineer` | Independent tests and verification |
 | `security-auditor` | Independent security and secret review |
 
-## Skill availability
-
-
-
-
-
-
-
-
-
-
 ## Quality and safety rules
 
 - Exactly 50 skill IDs remain installed: 9 first-party and 41 curated upstream.
