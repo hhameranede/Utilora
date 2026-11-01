@@ -39,14 +39,14 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ categorySlug }) => {
   const categoryFaqs = [
   {
     "question": {
-      "en": "Are all ${title} tools free to use?",
-      "ar": "هل أدوات ${title} مجانية؟",
-      "fr": "Les outils ${title} sont-ils gratuits ?",
-      "es": "¿Las herramientas de ${title} son gratuitas?",
-      "pt": "As ferramentas de ${title} são gratuitas?",
-      "hi": "क्या ${title} के टूल मुफ़्त हैं?",
-      "zh": "${title} 工具可以免费使用吗？",
-      "bn": "${title} টুলগুলো কি বিনামূল্যে?"
+      "en": "Are all tools in this category free to use?",
+      "ar": "هل أدوات هذه الفئة مجانية؟",
+      "fr": "Les outils de cette catégorie sont-ils gratuits ?",
+      "es": "¿Las herramientas de esta categoría son gratuitas?",
+      "pt": "As ferramentas desta categoria são gratuitas?",
+      "hi": "क्या इस श्रेणी के टूल मुफ़्त हैं?",
+      "zh": "此类别中的工具可以免费使用吗？",
+      "bn": "এই বিভাগের টুলগুলো কি বিনামূল্যে?"
     },
     "answer": {
       "en": "Available tools can be used without a subscription. A tool marked as a preview is not yet operational; its page explains that limitation.",
