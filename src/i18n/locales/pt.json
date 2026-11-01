@@ -268,5 +268,30 @@
   },
   "categories": {
     "description": "Explore as ferramentas disponíveis por categoria. Cada grupo reúne utilitários relacionados que funcionam no navegador."
+  },
+  "guide": {
+    "titlePrefix": "Como usar",
+    "description": "Um guia visual passo a passo da interface real de {tool} na UTILORA, com setas explicativas.",
+    "breadcrumb": "Como usar",
+    "kicker": "Guia visual da ferramenta",
+    "maxSize": "Tamanho máx.",
+    "previewNotice": "Nota: esta ferramenta ainda está em prévia. Este guia explica a interface atual e não significa que o processamento esteja ativado.",
+    "screenshotTitle": "Captura da interface real da UTILORA",
+    "screenshotCaption": "Gerada diretamente da área de trabalho exibida",
+    "screenshotAlt": "Captura real da área de trabalho de {tool} com setas explicativas",
+    "captureUnavailable": "A captura automática não está disponível neste navegador",
+    "liveWorkspace": "Esta é a própria área de trabalho; ainda pode seguir as etapas abaixo.",
+    "captureLoading": "Capturando a interface e preparando as anotações…",
+    "readyTitle": "Pronto para testar a ferramenta?",
+    "readyBody": "Abra a área de trabalho e siga as mesmas etapas.",
+    "openTool": "Abrir ferramenta",
+    "workspacePreview": "Prévia da área de trabalho",
+    "formatsShown": "os formatos indicados na ferramenta",
+    "inputArea": "Área de entrada",
+    "settingsArea": "Configurações e opções",
+    "resultArea": "Área de resultados",
+    "step1Desc": "Adicione o arquivo, texto, domínio ou outra entrada solicitada pela área de trabalho.",
+    "step2Desc": "Escolha os controles ou configurações disponíveis para a tarefa.",
+    "step3Desc": "Execute a ação disponível, confira o resultado e salve ou copie quando possível."
   }
 }
