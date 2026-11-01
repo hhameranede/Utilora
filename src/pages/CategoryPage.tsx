@@ -142,7 +142,7 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ categorySlug }) => {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-stone-200">
             <div>
               <h2 className="text-xl font-bold text-stone-900">
-                {title} · {t('category.allTools')} ({tools.length})
+                {title} · {t('category.allTools')} ({filteredTools.length})
               </h2>
               <p className="text-xs text-stone-500 mt-0.5">
                 {t('category.chooseWorkspace')}
