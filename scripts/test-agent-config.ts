@@ -162,8 +162,9 @@ if (process.env.OPENCODE_RUNTIME_TEST === '1') {
   const skills = spawnSync('opencode', ['debug', 'skill'], { encoding: 'utf8', timeout: 45_000 });
   assert.equal(skills.status, 0, 'OpenCode skill discovery failed: ' + (skills.stderr || skills.stdout));
   const skillOutput = skills.stdout + '\n' + skills.stderr;
+  console.log('OpenCode debug skill output:\n' + skillOutput.slice(0, 20000));
   for (const name of [...externalIds, ...internalSkills]) {
-    assert.ok(skillOutput.includes(name), 'OpenCode did not discover skill ' + name);
+    assert.ok(skillOutput.includes(name), 'OpenCode did not discover skill ' + name + '\nCLI output:\n' + skillOutput.slice(0, 12000));
   }
   console.log('OpenCode CLI discovery verified for all eight agents and 109 skills.');
 }
