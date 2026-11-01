@@ -100,7 +100,7 @@ export const TemplatePdfTools: React.FC<TemplatePdfToolsProps> = ({ toolName, to
         setMessage(`Rendered ${result.length} page image(s).`);
       } else if (toolSlug === 'pdf-page-counter') {
         const result = await countPdfPages(files[0]);
-        setMessage(`${result.title}: ${result.pageCount} page(s) · ${formatBytes(result.size)}.`);
+        setMessage(`${result.title}: ${result.pageCount} page(s) · ${formatBytes(result.size)} · ${result.hasFormFields ? 'Contains fillable form fields' : 'No fillable form fields detected'}.`);
       }
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'PDF processing failed.');
