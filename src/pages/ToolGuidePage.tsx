@@ -8,6 +8,72 @@ import { ToolWorkspaceResolver } from '../components/templates/ToolWorkspaceReso
 import { Head } from '../seo/Head';
 import { Link } from '../router';
 
+interface GuideAnnotationPoint { x: number; y: number }
+
+const GUIDE_CAPTURE_WIDTH = 1080;
+
+function findGuideAnnotationPoints(node: HTMLDivElement): { points: GuideAnnotationPoint[]; height: number } {
+  const nodeRect = node.getBoundingClientRect();
+  const scale = GUIDE_CAPTURE_WIDTH / Math.max(1, nodeRect.width);
+  const height = Math.max(900, Math.ceil(Math.max(node.scrollHeight, nodeRect.height) * scale));
+  const points: GuideAnnotationPoint[] = [];
+  const used = new Set<Element>();
+
+  const isVisible = (element: Element): boolean => {
+    const rect = element.getBoundingClientRect();
+    return rect.width >= 18 && rect.height >= 14 &&
+      rect.bottom > nodeRect.top && rect.top < nodeRect.bottom + node.scrollHeight;
+  };
+
+  const visualAnchor = (element: Element | null): Element | null => {
+    let current = element;
+    while (current && current !== node) {
+      const rect = current.getBoundingClientRect();
+      if (rect.width >= 80 && rect.height >= 28) return current;
+      current = current.parentElement;
+    }
+    return element;
+  };
+
+  const addPoint = (element: Element | null): void => {
+    if (!element) return;
+    const anchor = visualAnchor(element);
+    if (!anchor || used.has(anchor) || !isVisible(anchor)) return;
+    const rect = anchor.getBoundingClientRect();
+    const x = Math.max(34, Math.min(GUIDE_CAPTURE_WIDTH - 34, (rect.left - nodeRect.left + rect.width / 2) * scale));
+    const y = Math.max(34, Math.min(height - 34, (rect.top - nodeRect.top + rect.height / 2) * scale));
+    if (points.some((point) => Math.abs(point.x - x) < 26 && Math.abs(point.y - y) < 26)) return;
+    used.add(anchor);
+    points.push({ x, y });
+  };
+
+  const fileInput = node.querySelector<HTMLInputElement>('input[type="file"]');
+  const editor = node.querySelector('textarea, [contenteditable="true"], input:not([type="hidden"]):not([type="checkbox"]):not([type="range"]):not([type="file"])');
+  const primaryInput = fileInput
+    ? fileInput.closest('label, button, [role="button"]') || fileInput.parentElement
+    : editor;
+  addPoint(primaryInput);
+
+  const options = Array.from(node.querySelectorAll('select, input[type="range"], input[type="number"], input[type="checkbox"], [role="combobox"]'))
+    .filter((element) => isVisible(element) && !used.has(element));
+  addPoint(options[0] || null);
+
+  const actionPattern = /\b(process|convert|compress|inspect|extract|generate|validate|format|sort|merge|split|rotate|resize|crop|lookup|check|search|analy[sz]e|apply|export|create|trim|compare|run|transform|encode|decode)\b/i;
+  const buttons = Array.from(node.querySelectorAll('button, [role="button"]')).filter(isVisible);
+  const action = buttons.find((button) => actionPattern.test([
+    button.textContent || '',
+    button.getAttribute('aria-label') || '',
+    button.getAttribute('title') || '',
+  ].join(' ')));
+  addPoint(action || buttons.find((button) => /copy|result|output/i.test([
+    button.textContent || '',
+    button.getAttribute('aria-label') || '',
+    button.getAttribute('title') || '',
+  ].join(' '))) || buttons[0] || null);
+
+  return { points: points.slice(0, 3), height };
+}
+
 interface ToolGuidePageProps { toolSlug: string }
 
 interface GuideStep { title: string; description: string; annotation: string }
@@ -102,6 +168,8 @@ export const ToolGuidePage: React.FC<ToolGuidePageProps> = ({ toolSlug }) => {
   const captureRef = useRef<HTMLDivElement>(null);
   const [screenshot, setScreenshot] = useState('');
   const [captureError, setCaptureError] = useState(false);
+  const [annotationTargets, setAnnotationTargets] = useState<GuideAnnotationPoint[]>([]);
+  const [annotationHeight, setAnnotationHeight] = useState(1000);
 
   const toolName = tool ? (tool.localizedName[locale] || tool.localizedName.en) : toolSlug;
   const category = tool ? getCategoryById(tool.category) : undefined;
@@ -117,24 +185,31 @@ export const ToolGuidePage: React.FC<ToolGuidePageProps> = ({ toolSlug }) => {
     let active = true;
     setCaptureError(false);
     setScreenshot('');
+    setAnnotationTargets([]);
+    setAnnotationHeight(1000);
 
     const capture = async () => {
       try {
         await new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
         if (!active || !captureRef.current) return;
         const node = captureRef.current;
+        const annotations = findGuideAnnotationPoints(node);
         const { toPng } = await import('html-to-image');
         const dataUrl = await toPng(node, {
           cacheBust: true,
           pixelRatio: 1.15,
           backgroundColor: '#fafaf9',
-          width: 1080,
+          width: GUIDE_CAPTURE_WIDTH,
+          height: annotations.height,
           style: { transform: 'none', margin: '0' },
         });
-        if (active) setScreenshot(dataUrl);
+        if (active) {
+          setAnnotationTargets(annotations.points);
+          setAnnotationHeight(annotations.height);
+          setScreenshot(dataUrl);
+        }
       } catch {
         if (active) setCaptureError(true);
-      } finally {
       }
     };
     void capture();
@@ -204,24 +279,39 @@ export const ToolGuidePage: React.FC<ToolGuidePageProps> = ({ toolSlug }) => {
             {screenshot ? (
               <div className="relative mx-auto max-w-[1080px] overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
                 <img data-guide-screenshot src={screenshot} alt={locale === 'ar' ? 'لقطة حقيقية لواجهة ' + toolName + ' مع أسهم توضيحية' : 'Real screenshot of the ' + toolName + ' workspace with guide arrows'} className="block h-auto w-full" />
-                <svg data-guide-annotations viewBox="0 0 1000 1000" preserveAspectRatio="none" className="pointer-events-none absolute inset-0 h-full w-full" aria-hidden="true">
+                <svg
+                  data-guide-annotations
+                  data-guide-target-count={annotationTargets.length}
+                  viewBox={`0 0 ${GUIDE_CAPTURE_WIDTH} ${annotationHeight}`}
+                  preserveAspectRatio="none"
+                  className="pointer-events-none absolute inset-0 h-full w-full"
+                  aria-hidden="true"
+                >
                   <defs>
                     <marker id="guide-arrow-head" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto">
                       <path d="M0,0 L8,4 L0,8 Z" fill="#f97316" />
                     </marker>
                   </defs>
-                  <path d="M48 155 C180 125 235 205 330 270" fill="none" stroke="#f97316" strokeWidth="5" strokeLinecap="round" markerEnd="url(#guide-arrow-head)" />
-                  <path d="M948 490 C850 450 790 520 670 565" fill="none" stroke="#f97316" strokeWidth="5" strokeLinecap="round" markerEnd="url(#guide-arrow-head)" />
-                  <path d="M70 870 C210 840 260 785 360 755" fill="none" stroke="#f97316" strokeWidth="5" strokeLinecap="round" markerEnd="url(#guide-arrow-head)" />
-                  <circle cx="330" cy="270" r="35" fill="#f97316" fillOpacity=".12" stroke="#f97316" strokeWidth="5" />
-                  <circle cx="670" cy="565" r="35" fill="#f97316" fillOpacity=".12" stroke="#f97316" strokeWidth="5" />
-                  <circle cx="360" cy="755" r="35" fill="#f97316" fillOpacity=".12" stroke="#f97316" strokeWidth="5" />
-                  <g fill="#fff" stroke="#f97316" strokeWidth="5" fontFamily="Arial,sans-serif" fontSize="34" fontWeight="700" textAnchor="middle">
-                    <circle cx="330" cy="270" r="23" /><circle cx="670" cy="565" r="23" /><circle cx="360" cy="755" r="23" />
-                  </g>
-                  <g fill="#c2410c" fontFamily="Arial,sans-serif" fontSize="27" fontWeight="700" textAnchor="middle">
-                    <text x="330" y="280">1</text><text x="670" y="575">2</text><text x="360" y="765">3</text>
-                  </g>
+                  {annotationTargets.map((target, index) => {
+                    const startX = target.x >= GUIDE_CAPTURE_WIDTH / 2 ? GUIDE_CAPTURE_WIDTH - 34 : 34;
+                    const startY = Math.max(34, Math.min(annotationHeight - 34, target.y + (index - 1) * 64));
+                    const controlX = (startX + target.x) / 2;
+                    return (
+                      <g key={index} data-guide-target={index + 1}>
+                        <path
+                          d={`M ${startX} ${startY} Q ${controlX} ${startY} ${target.x} ${target.y}`}
+                          fill="none"
+                          stroke="#f97316"
+                          strokeWidth="5"
+                          strokeLinecap="round"
+                          markerEnd="url(#guide-arrow-head)"
+                        />
+                        <circle cx={target.x} cy={target.y} r="35" fill="#f97316" fillOpacity=".13" stroke="#f97316" strokeWidth="5" />
+                        <circle cx={target.x} cy={target.y} r="23" fill="#ffffff" stroke="#f97316" strokeWidth="5" />
+                        <text x={target.x} y={target.y + 10} fill="#c2410c" fontFamily="Arial,sans-serif" fontSize="27" fontWeight="700" textAnchor="middle">{index + 1}</text>
+                      </g>
+                    );
+                  })}
                 </svg>
               </div>
             ) : captureError ? (
