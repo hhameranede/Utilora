@@ -6,6 +6,7 @@ import { Head } from '../../seo/Head';
 import { Link } from '../../router';
 import { RelatedTools } from '../../components/common/RelatedTools';
 import { RelatedArticles } from '../../components/common/RelatedArticles';
+import { NotFoundPage } from '../NotFoundPage';
 import {
   Calendar,
   Clock,
@@ -18,7 +19,6 @@ import {
   Info,
   Terminal,
   ExternalLink,
-  MessageSquare,
 } from 'lucide-react';
 
 interface ArticleDetailPageProps {
@@ -29,7 +29,8 @@ export const ArticleDetailPage: React.FC<ArticleDetailPageProps> = ({ articleSlu
   const { locale, t } = useI18n();
   const [copiedShare, setCopiedShare] = useState(false);
 
-  const article = SAMPLE_ARTICLES.find((a) => a.slug === articleSlug) || SAMPLE_ARTICLES[0];
+  const article = SAMPLE_ARTICLES.find((a) => a.slug === articleSlug);
+  if (!article) return <NotFoundPage />;
   const title = article.title[locale] || article.title.en;
   const excerpt = article.excerpt[locale] || article.excerpt.en;
 
@@ -52,7 +53,7 @@ export const ArticleDetailPage: React.FC<ArticleDetailPageProps> = ({ articleSlu
         ogType="article"
         publishedTime={article.publishedAt}
         author={article.author}
-        isIndexable={true}
+        isIndexable={false}
         schemaType="Article"
       />
 
@@ -277,16 +278,6 @@ export const ArticleDetailPage: React.FC<ArticleDetailPageProps> = ({ articleSlu
                 </div>
               )}
 
-              {/* Related Community Topic Link */}
-              <div className="pt-4 border-t border-stone-100">
-                <Link
-                  routeType="community-index"
-                  className="flex items-center gap-2 text-xs text-orange-600 hover:underline font-medium"
-                >
-                  <MessageSquare size={13} />
-                  <span>Join discussion on forum</span>
-                </Link>
-              </div>
             </div>
           </aside>
         </div>

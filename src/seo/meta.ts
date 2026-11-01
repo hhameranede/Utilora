@@ -17,24 +17,28 @@ export interface PageMetadataConfig {
 }
 
 export function buildCanonicalUrl(locale: SupportedLocale, routeType: RouteType, slug?: string): string {
-  const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://utilora.com';
+  const origin = typeof window !== 'undefined' ? window.location.origin : '';
   const path = buildRoutePath(locale, routeType, slug);
-  return `${baseUrl}${path}`;
+  return origin ? `${origin}${path}` : path;
 }
 
 export function generateHreflangLinks(routeType: RouteType, slug?: string): Array<{ lang: string; url: string }> {
-  const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://utilora.com';
-  return SUPPORTED_LANGUAGES.map((lang) => ({
-    lang: lang.code,
-    url: `${baseUrl}${buildRoutePath(lang.code, routeType, slug)}`,
-  }));
+  const origin = typeof window !== 'undefined' ? window.location.origin : '';
+  return SUPPORTED_LANGUAGES.map((lang) => {
+    const path = buildRoutePath(lang.code, routeType, slug);
+    return { lang: lang.code, url: origin ? `${origin}${path}` : path };
+  });
 }
 
 export function applyDocumentMetadata(config: PageMetadataConfig) {
   if (typeof document === 'undefined') return;
 
-  // 1. Update Title
+  // 1. Update document language and title for localized routes
+  document.documentElement.lang = config.locale;
+  document.documentElement.dir = config.locale === 'ar' ? 'rtl' : 'ltr';
   document.title = config.title;
+
+  const siteOrigin = typeof window !== 'undefined' ? window.location.origin : undefined;
 
   // 2. Helper to set or create meta tag
   const setMeta = (nameAttr: 'name' | 'property', attrValue: string, content: string) => {
@@ -71,6 +75,10 @@ export function applyDocumentMetadata(config: PageMetadataConfig) {
   setMeta('property', 'og:description', config.description);
   setMeta('property', 'og:type', config.ogType || 'website');
   setMeta('property', 'og:site_name', 'UTILORA');
+  if (siteOrigin) {
+    setMeta('property', 'og:image', `${siteOrigin}/og-utilora.svg`);
+    setMeta('name', 'twitter:image', `${siteOrigin}/og-utilora.svg`);
+  }
   setMeta('name', 'twitter:card', 'summary_large_image');
   setMeta('name', 'twitter:title', config.title);
   setMeta('name', 'twitter:description', config.description);
@@ -90,7 +98,9 @@ export function applyDocumentMetadata(config: PageMetadataConfig) {
     setLink('alternate', url, { hreflang: lang });
   });
   // x-default hreflang pointing to English
-  setLink('alternate', `${typeof window !== 'undefined' ? window.location.origin : 'https://utilora.com'}${buildRoutePath('en', config.routeType, config.slug)}`, {
+  const origin = typeof window !== 'undefined' ? window.location.origin : '';
+  const englishPath = buildRoutePath('en', config.routeType, config.slug);
+  setLink('alternate', origin ? `${origin}${englishPath}` : englishPath, {
     hreflang: 'x-default',
   });
 
@@ -107,7 +117,7 @@ export function applyDocumentMetadata(config: PageMetadataConfig) {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     name: 'UTILORA',
-    url: 'https://utilora.com',
+    ...(siteOrigin ? { url: siteOrigin } : {}),
     description: 'Every Digital Task. One Place.',
   };
 
@@ -131,7 +141,7 @@ export function applyDocumentMetadata(config: PageMetadataConfig) {
       '@type': 'Article',
       headline: config.title,
       description: config.description,
-      datePublished: config.publishedTime || '2026-03-01T00:00:00Z',
+      ...(config.publishedTime ? { datePublished: config.publishedTime } : {}),
       author: {
         '@type': 'Organization',
         name: config.author || 'UTILORA Editorial',
@@ -139,7 +149,7 @@ export function applyDocumentMetadata(config: PageMetadataConfig) {
       publisher: {
         '@type': 'Organization',
         name: 'UTILORA',
-        url: 'https://utilora.com',
+        ...(siteOrigin ? { url: siteOrigin } : {}),
       },
       ...config.schemaData,
     };

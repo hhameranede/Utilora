@@ -1,0 +1,105 @@
+name: Utilora quality checks
+
+concurrency:
+  group: utilora-quality-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  push:
+    branches:
+      - main
+      - "fix/**"
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Type check
+        run: npm run lint
+
+      - name: Test local browser engines
+        run: npm run test:core
+
+      - name: Test local PDF engines
+        run: npm run test:pdf
+
+      - name: Test local image engines
+        run: npm run test:image
+
+      - name: Test public website and domain lookup engines
+        run: npm run test:diagnostics
+
+      - name: Build and generate SEO files
+        run: npm run build
+        env:
+          SITE_URL: https://utilora.invalid
+
+      - name: Verify generated SEO files
+        run: |
+          test -s public/sitemap.xml
+          test -s public/robots.txt
+          grep -q "https://utilora.invalid/sitemap.xml" public/robots.txt
+          grep -q 'hreflang="ar"' public/sitemap.xml
+          grep -q 'hreflang="bn"' public/sitemap.xml
+          grep -q "/tools/json-formatter" public/sitemap.xml
+          grep -q "/tools/video-compressor/how-to" public/sitemap.xml
+          ! grep -q "/tools/video-downloader/how-to" public/sitemap.xml
+          test -s dist/ar.html
+          test -s dist/en/tools.html
+          test -s dist/en/tools/image-converter.html
+          test -s dist/en/tools/image-converter/how-to.html
+          test -s dist/ar/tools/video-compressor/how-to.html
+          ! grep -R -q '/community' dist
+          test -s dist/en/tools/json-formatter.html
+          test -s dist/en/tools/video-compressor.html
+          test -s dist/manifest.webmanifest
+          test -s dist/sw.js
+          test -s dist/offline.html
+          test -s dist/pwa-icon.svg
+          test -s dist/404.html
+          test ! -e dist/ar/index.html
+          test ! -e dist/en/tools/index.html
+          grep -q 'dir="rtl"' dist/ar.html
+          grep -q 'canonical" href="https://utilora.invalid/ar"' dist/ar.html
+          grep -q 'index, follow' dist/en/tools/json-formatter.html
+          grep -q 'index, follow' dist/en/tools/video-compressor.html
+          grep -q 'index, follow' dist/en/tools/video-compressor/how-to.html
+          grep -q 'noindex, nofollow' dist/en/tools/video-downloader/how-to.html
+          grep -q 'noindex, nofollow' dist/404.html
+          grep -q 'Page not found' dist/404.html
+          grep -q 'id="root"><' dist/en.html
+
+      - name: Install Chromium for browser tests
+        run: npx playwright install --with-deps chromium
+
+      - name: Run browser end-to-end tests
+        run: npm run e2e
+
+      - name: Upload Playwright failure artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-failure-artifacts
+          path: |
+            test-results/
+            playwright-report/
+          if-no-files-found: ignore
+          retention-days: 7
+

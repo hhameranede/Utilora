@@ -6,12 +6,10 @@ export type RouteType =
   | 'category'
   | 'tools-index'
   | 'tool'
+  | 'tool-guide'
   | 'articles-index'
   | 'article-category'
   | 'article-detail'
-  | 'community-index'
-  | 'community-category'
-  | 'community-topic'
   | 'about'
   | 'contact'
   | 'privacy'
@@ -27,6 +25,5 @@ export interface ParsedRoute {
   categorySlug?: string;
   toolSlug?: string;
   articleSlug?: string;
-  topicSlug?: string;
   rawPath: string;
 }

@@ -30,7 +30,7 @@ export const ArticlesIndexPage: React.FC = () => {
         description="Comprehensive technical tutorials, image compression benchmarks, and web standard guides authored by UTILORA."
         locale={locale}
         routeType="articles-index"
-        isIndexable={true}
+        isIndexable={false}
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">

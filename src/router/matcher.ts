@@ -98,6 +98,11 @@ export function parseRoute(pathname: string): ParsedRoute {
     if (restSegments.length === 1) {
       return { type: 'tools-index', locale, rawPath: cleanPath };
     }
+    if (restSegments.length === 3 && third === 'how-to') {
+      return TOOLS_REGISTRY[second]
+        ? { type: 'tool-guide', locale, toolSlug: second, rawPath: cleanPath }
+        : { type: 'not-found', locale, rawPath: cleanPath };
+    }
     if (restSegments.length === 2) {
       const toolSlug = second;
       if (TOOLS_REGISTRY[toolSlug]) {
@@ -135,29 +140,6 @@ export function parseRoute(pathname: string): ParsedRoute {
     }
   }
 
-  // Community routes: /community, /community/categories, /community/category/:slug, /community/topic/:slug
-  if (first === 'community') {
-    if (restSegments.length === 1 || (restSegments.length === 2 && second === 'categories')) {
-      return { type: 'community-index', locale, rawPath: cleanPath };
-    }
-    if (restSegments.length === 3 && second === 'category') {
-      return {
-        type: 'community-category',
-        locale,
-        categorySlug: third,
-        rawPath: cleanPath,
-      };
-    }
-    if (restSegments.length === 3 && second === 'topic') {
-      return {
-        type: 'community-topic',
-        locale,
-        topicSlug: third,
-        rawPath: cleanPath,
-      };
-    }
-  }
-
   // If nothing matched, 404
   return {
     type: 'not-found',
@@ -182,18 +164,14 @@ export function buildRoutePath(
       return `/${locale}/tools`;
     case 'tool':
       return `/${locale}/tools/${slug || ''}`;
+    case 'tool-guide':
+      return `/${locale}/tools/${slug || ''}/how-to`;
     case 'articles-index':
       return `/${locale}/articles`;
     case 'article-category':
       return `/${locale}/articles/category/${slug || ''}`;
     case 'article-detail':
       return `/${locale}/articles/${slug || ''}`;
-    case 'community-index':
-      return `/${locale}/community`;
-    case 'community-category':
-      return `/${locale}/community/category/${slug || ''}`;
-    case 'community-topic':
-      return `/${locale}/community/topic/${slug || ''}`;
     case 'about':
       return `/${locale}/about`;
     case 'contact':

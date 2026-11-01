@@ -84,9 +84,7 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ categorySlug }) => {
         />
 
         {/* Category Hero Banner */}
-        <div className="p-8 sm:p-12 rounded-3xl bg-gradient-to-br from-white via-white to-orange-50/40 border border-stone-200/90 shadow-xs relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-80 h-80 bg-orange-500/5 rounded-full blur-3xl pointer-events-none" />
-
+        <div className="p-8 sm:p-12 rounded-3xl bg-gradient-to-br from-white via-white to-orange-50/40 border border-stone-200/90 shadow-xs relative">
           <div className="max-w-3xl space-y-4">
             <div className="w-14 h-14 rounded-2xl bg-orange-50 border border-orange-100 flex items-center justify-center text-orange-600 shadow-xs">
               <Icon name={category.icon} size={28} />
@@ -103,7 +101,7 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ categorySlug }) => {
             <div className="pt-2 flex items-center gap-4 text-xs font-mono text-stone-400">
               <span>{tools.length} Tools in Suite</span>
               <span aria-hidden="true">·</span>
-              <span>Local In-Browser Ready</span>
+              <span>{tools.filter((tool) => tool.status === 'functional').length} Fully Functional</span>
             </div>
           </div>
         </div>

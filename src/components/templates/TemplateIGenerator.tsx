@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { Fingerprint, Copy, Check, RefreshCw, Sliders, Shield } from 'lucide-react';
-import { useI18n } from '../../i18n';
-import { DisabledAction } from '../common/DisabledAction';
+import { Fingerprint, Copy, Check } from 'lucide-react';
+import { generateDigest, generateUuid } from '../../engines/local-core';
 
 interface TemplateIGeneratorProps {
   toolName: string;
@@ -9,153 +8,157 @@ interface TemplateIGeneratorProps {
 }
 
 export const TemplateIGenerator: React.FC<TemplateIGeneratorProps> = ({ toolName, type = 'uuid' }) => {
-  const { t } = useI18n();
   const [count, setCount] = useState<number>(5);
   const [version, setVersion] = useState<'v4' | 'v7'>('v4');
   const [uppercase, setUppercase] = useState<boolean>(false);
+  const [algorithm, setAlgorithm] = useState<'SHA-256' | 'SHA-384' | 'SHA-512'>('SHA-256');
+  const [hashInput, setHashInput] = useState('');
+  const [results, setResults] = useState<string[]>([]);
+  const [resultMessage, setResultMessage] = useState('');
+  const [resultError, setResultError] = useState(false);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
-  const [copiedAll, setCopiedAll] = useState<boolean>(false);
+  const [copiedAll, setCopiedAll] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
 
-  // Sample preview items
-  const sampleItems = [
-    'f47ac10b-58cc-4372-a567-0e02b2c3d479',
-    '8e38d338-9844-482f-8cb0-3942004e0e5a',
-    '3d508499-e659-42b8-933e-10ff828ef050',
-    'd2a3f769-1b32-4467-bc18-2831846c4f3e',
-    'b291583a-4461-46f0-ba3e-9080c10a30b5',
-  ].slice(0, count).map((item) => (uppercase ? item.toUpperCase() : item));
-
-  const copyItem = (val: string, idx: number) => {
-    if (typeof navigator !== 'undefined' && navigator.clipboard) {
-      navigator.clipboard.writeText(val);
-      setCopiedIndex(idx);
-      setTimeout(() => setCopiedIndex(null), 1500);
+  const handleGenerate = async () => {
+    setIsGenerating(true);
+    setResultMessage('');
+    setResultError(false);
+    try {
+      if (type === 'uuid') {
+        const values = Array.from({ length: count }, () => {
+          const value = generateUuid(version);
+          return uppercase ? value.toUpperCase() : value;
+        });
+        setResults(values);
+        setResultMessage(`Generated ${values.length} cryptographically random UUID ${version.toUpperCase()} value(s).`);
+      } else {
+        const value = await generateDigest(hashInput, algorithm);
+        setResults([`${algorithm}: ${uppercase ? value.toUpperCase() : value}`]);
+        setResultMessage(`${algorithm} digest generated locally.`);
+      }
+    } catch (error) {
+      setResults([]);
+      setResultMessage(error instanceof Error ? error.message : 'Generation failed.');
+      setResultError(true);
+    } finally {
+      setIsGenerating(false);
     }
   };
 
-  const copyAll = () => {
-    if (typeof navigator !== 'undefined' && navigator.clipboard) {
-      navigator.clipboard.writeText(sampleItems.join('\n'));
+  const copyValue = async (value: string, index: number) => {
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopiedIndex(index);
+      window.setTimeout(() => setCopiedIndex(null), 1500);
+    } catch {
+      setResultMessage('Clipboard access is blocked by this browser. Select and copy the value manually.');
+      setResultError(true);
+    }
+  };
+
+  const copyAll = async () => {
+    try {
+      await navigator.clipboard.writeText(results.join('\n'));
       setCopiedAll(true);
-      setTimeout(() => setCopiedAll(false), 2000);
+      window.setTimeout(() => setCopiedAll(false), 1500);
+    } catch {
+      setResultMessage('Clipboard access is blocked by this browser. Select and copy the values manually.');
+      setResultError(true);
     }
   };
 
   return (
     <div className="w-full space-y-6">
-      {/* Configuration Bar */}
       <div className="p-5 rounded-3xl bg-white border border-stone-200/90 shadow-xs space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-stone-100">
           <div className="flex items-center gap-2">
             <Fingerprint size={18} className="text-orange-600" />
-            <h3 className="text-sm font-semibold text-stone-900">Generation Parameters</h3>
+            <h3 className="text-sm font-semibold text-stone-900">{toolName}</h3>
           </div>
-
-          <button
-            onClick={copyAll}
-            className="px-3 py-1.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-xs font-medium text-stone-700 hover:text-stone-900 transition-colors flex items-center gap-1.5"
-          >
-            {copiedAll ? <Check size={13} className="text-emerald-600" /> : <Copy size={13} />}
-            <span>{copiedAll ? 'Copied All' : 'Copy All Results'}</span>
-          </button>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
-          {/* Count Selector */}
-          <div>
-            <label className="text-stone-700 font-medium block mb-1.5">Batch Quantity</label>
-            <div className="grid grid-cols-4 gap-1 p-1 bg-stone-100 rounded-xl">
-              {[1, 5, 10, 20].map((num) => (
-                <button
-                  key={num}
-                  onClick={() => setCount(num)}
-                  className={`py-1 text-xs font-mono rounded-lg transition-colors ${
-                    count === num ? 'bg-white text-orange-600 shadow-xs font-semibold' : 'text-stone-500 hover:text-stone-800'
-                  }`}
-                >
-                  {num}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Version Selector */}
-          <div>
-            <label className="text-stone-700 font-medium block mb-1.5">Standard Spec</label>
-            <div className="grid grid-cols-2 gap-1 p-1 bg-stone-100 rounded-xl">
-              <button
-                onClick={() => setVersion('v4')}
-                className={`py-1 text-xs font-mono rounded-lg transition-colors ${
-                  version === 'v4' ? 'bg-white text-orange-600 shadow-xs font-semibold' : 'text-stone-500 hover:text-stone-800'
-                }`}
-              >
-                v4 (Random)
-              </button>
-              <button
-                onClick={() => setVersion('v7')}
-                className={`py-1 text-xs font-mono rounded-lg transition-colors ${
-                  version === 'v7' ? 'bg-white text-orange-600 shadow-xs font-semibold' : 'text-stone-500 hover:text-stone-800'
-                }`}
-              >
-                v7 (Time-based)
-              </button>
-            </div>
-          </div>
-
-          {/* Uppercase Toggle */}
-          <div>
-            <label className="text-stone-700 font-medium block mb-1.5">Formatting</label>
-            <button
-              onClick={() => setUppercase(!uppercase)}
-              className="w-full py-2 px-3 bg-stone-50 rounded-xl border border-stone-200 text-stone-700 hover:border-stone-300 flex items-center justify-between transition-colors"
-            >
-              <span>Uppercase Strings</span>
-              <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${uppercase ? 'bg-orange-100 text-orange-800 font-bold border border-orange-200' : 'bg-stone-200 text-stone-600'}`}>
-                {uppercase ? 'ON' : 'OFF'}
-              </span>
+          {results.length > 0 && (
+            <button type="button" onClick={copyAll} className="px-3 py-1.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-xs font-medium text-stone-700 transition-colors flex items-center gap-1.5">
+              {copiedAll ? <Check size={13} className="text-emerald-600" /> : <Copy size={13} />}
+              <span>{copiedAll ? 'Copied' : 'Copy all results'}</span>
             </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Generated Results List */}
-      <div className="rounded-3xl bg-stone-50 border border-stone-200/90 shadow-xs p-5 space-y-2">
-        <div className="flex justify-between items-center text-xs font-mono text-stone-500 mb-3 px-1">
-          <span>SAMPLE PREVIEW POOL ({sampleItems.length} ITEMS)</span>
-          <span>WebCrypto CSPRNG Target</span>
+          )}
         </div>
 
-        <div className="space-y-1.5">
-          {sampleItems.map((val, idx) => (
-            <div
-              key={idx}
-              className="p-3 rounded-xl bg-white border border-stone-200/80 flex items-center justify-between gap-3 font-mono text-xs text-stone-900 hover:border-orange-300 shadow-2xs transition-colors group"
-            >
-              <div className="flex items-center gap-3 min-w-0">
-                <span className="text-[10px] text-stone-400 select-none w-5 text-right">{idx + 1}</span>
-                <span className="truncate select-all">{val}</span>
+        {type === 'uuid' ? (
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+            <div>
+              <label className="text-stone-700 font-medium block mb-1.5">Batch quantity</label>
+              <div className="grid grid-cols-4 gap-1 p-1 bg-stone-100 rounded-xl">
+                {[1, 5, 10, 20].map((num) => (
+                  <button key={num} type="button" onClick={() => setCount(num)} className={`py-1 text-xs font-mono rounded-lg transition-colors ${count === num ? 'bg-white text-orange-600 shadow-xs font-semibold' : 'text-stone-500 hover:text-stone-800'}`}>
+                    {num}
+                  </button>
+                ))}
               </div>
-
-              <button
-                onClick={() => copyItem(val, idx)}
-                className="p-1.5 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-500 hover:text-stone-900 transition-colors shrink-0"
-                title="Copy single value"
-              >
-                {copiedIndex === idx ? <Check size={13} className="text-emerald-600" /> : <Copy size={13} />}
-              </button>
             </div>
-          ))}
-        </div>
+            <div>
+              <label className="text-stone-700 font-medium block mb-1.5">UUID standard</label>
+              <div className="grid grid-cols-2 gap-1 p-1 bg-stone-100 rounded-xl">
+                <button type="button" onClick={() => setVersion('v4')} className={`py-1 text-xs font-mono rounded-lg ${version === 'v4' ? 'bg-white text-orange-600 shadow-xs font-semibold' : 'text-stone-500'}`}>v4 Random</button>
+                <button type="button" onClick={() => setVersion('v7')} className={`py-1 text-xs font-mono rounded-lg ${version === 'v7' ? 'bg-white text-orange-600 shadow-xs font-semibold' : 'text-stone-500'}`}>v7 Time-based</button>
+              </div>
+            </div>
+            <div className="flex flex-col justify-end">
+              <label className="flex items-center justify-between gap-2 py-2 px-3 bg-stone-50 rounded-xl border border-stone-200 text-stone-700">
+                <span>Uppercase</span>
+                <input type="checkbox" checked={uppercase} onChange={(e) => setUppercase(e.target.checked)} />
+              </label>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            <label htmlFor="utilora-hash-input" className="block text-xs font-semibold text-stone-700">Text to hash</label>
+            <textarea id="utilora-hash-input" value={hashInput} onChange={(e) => setHashInput(e.target.value)} rows={5} className="w-full p-4 rounded-xl bg-stone-50 border border-stone-200 text-xs font-mono text-stone-900 focus:outline-none focus:border-orange-500" placeholder="Type or paste the text you want to hash..." />
+            <div className="flex flex-wrap items-center gap-3">
+              <label htmlFor="utilora-hash-algorithm" className="text-xs font-semibold text-stone-700">Algorithm</label>
+              <select id="utilora-hash-algorithm" value={algorithm} onChange={(e) => setAlgorithm(e.target.value as typeof algorithm)} className="px-3 py-2 rounded-lg bg-stone-50 border border-stone-200 text-xs text-stone-800">
+                <option value="SHA-256">SHA-256</option>
+                <option value="SHA-384">SHA-384</option>
+                <option value="SHA-512">SHA-512</option>
+              </select>
+              <label className="flex items-center gap-2 text-xs text-stone-700"><input type="checkbox" checked={uppercase} onChange={(e) => setUppercase(e.target.checked)} /> Uppercase output</label>
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Action Footer */}
+      <div className="rounded-3xl bg-stone-50 border border-stone-200/90 shadow-xs p-5 space-y-3">
+        <div className="flex justify-between items-center text-xs font-mono text-stone-500">
+          <span>GENERATED RESULTS ({results.length})</span>
+          <span>{type === 'uuid' ? 'Web Crypto random source' : 'Web Crypto digest'}</span>
+        </div>
+        {results.length === 0 ? (
+          <p className="p-5 rounded-xl bg-white border border-dashed border-stone-300 text-center text-xs text-stone-500">Your results will appear here after generation.</p>
+        ) : (
+          <div className="space-y-1.5">
+            {results.map((value, index) => (
+              <div key={index} className="p-3 rounded-xl bg-white border border-stone-200/80 flex items-center justify-between gap-3 font-mono text-xs text-stone-900">
+                <div className="flex items-center gap-3 min-w-0">
+                  <span className="text-[10px] text-stone-400 w-5 text-right">{index + 1}</span>
+                  <span className="break-all select-all">{value}</span>
+                </div>
+                <button type="button" onClick={() => copyValue(value, index)} className="p-1.5 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-500 shrink-0" title="Copy value">
+                  {copiedIndex === index ? <Check size={13} className="text-emerald-600" /> : <Copy size={13} />}
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
       <div className="p-6 rounded-2xl bg-white border border-stone-200/90 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="text-xs text-stone-600">
-          Generator pipeline ready for Phase 2 WebCrypto RNG connection.
+        <div className="flex-1 text-xs">
+          <p className="text-stone-600">All calculations happen locally in this browser. No input is uploaded.</p>
+          {resultMessage && <p role="status" className={`mt-1 ${resultError ? 'text-red-600' : 'text-emerald-700'}`}>{resultMessage}</p>}
         </div>
-        <div className="w-full sm:w-auto">
-          <DisabledAction label="Generate Fresh Entropy" size="md" />
-        </div>
+        <button type="button" disabled={isGenerating} onClick={handleGenerate} className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-stone-900 hover:bg-stone-800 disabled:opacity-50 text-white text-xs font-semibold shadow-sm transition-colors">
+          {isGenerating ? 'Generating…' : type === 'uuid' ? 'Generate UUIDs' : 'Generate Hash'}
+        </button>
       </div>
     </div>
   );

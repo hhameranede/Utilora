@@ -1,39 +1,50 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Search, X, ArrowRight, CornerDownLeft, FileText, Layers, MessageSquare, Zap } from 'lucide-react';
+import { Search, X, ArrowRight, CornerDownLeft, FileText, Layers, Zap } from 'lucide-react';
 import { useI18n } from '../../i18n';
 import { useNavigate } from '../../router';
 import { TOOLS_LIST } from '../../registry/tools.registry';
 import { CATEGORIES_LIST } from '../../registry/categories.registry';
 import { SAMPLE_ARTICLES } from '../../data/articles.data';
-import { SAMPLE_TOPICS } from '../../data/community.data';
 import { Icon } from './Icon';
 
 interface GlobalSearchProps {
   isOpen: boolean;
+  onOpen: () => void;
   onClose: () => void;
 }
 
-export const GlobalSearch: React.FC<GlobalSearchProps> = ({ isOpen, onClose }) => {
+export const GlobalSearch: React.FC<GlobalSearchProps> = ({ isOpen, onOpen, onClose }) => {
   const { locale, t } = useI18n();
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (isOpen) {
-      setTimeout(() => inputRef.current?.focus(), 50);
-      setQuery('');
-      setSelectedIndex(0);
-    }
+    if (!isOpen) return;
+
+    const previouslyFocused = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    setQuery('');
+    setSelectedIndex(0);
+    const frame = window.requestAnimationFrame(() => inputRef.current?.focus());
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      document.body.style.overflow = previousOverflow;
+      previouslyFocused?.focus();
+    };
   }, [isOpen]);
 
   // Global hotkey Ctrl+K / Cmd+K
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
         if (isOpen) onClose();
+        else onOpen();
       }
       if (e.key === 'Escape' && isOpen) {
         onClose();
@@ -41,7 +52,7 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({ isOpen, onClose }) =
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, onClose]);
+  }, [isOpen, onOpen, onClose]);
 
   // Filtered results
   const searchResults = useMemo(() => {
@@ -52,7 +63,6 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({ isOpen, onClose }) =
         tools: TOOLS_LIST.slice(0, 6),
         categories: CATEGORIES_LIST,
         articles: SAMPLE_ARTICLES.slice(0, 2),
-        topics: [],
       };
     }
 
@@ -76,23 +86,17 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({ isOpen, onClose }) =
       return title.includes(q) || tags.includes(q);
     });
 
-    const matchedTopics = SAMPLE_TOPICS.filter((top) => {
-      const title = (top.title[locale] || top.title.en).toLowerCase();
-      return title.includes(q);
-    });
-
     return {
       tools: matchedTools,
       categories: matchedCategories,
       articles: matchedArticles,
-      topics: matchedTopics,
     };
   }, [query, locale]);
 
   // Flatten for keyboard navigation
   const flatItems = useMemo(() => {
     const items: Array<{
-      type: 'tool' | 'category' | 'article' | 'topic';
+      type: 'tool' | 'category' | 'article';
       id: string;
       title: string;
       subtitle?: string;
@@ -142,24 +146,11 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({ isOpen, onClose }) =
       });
     });
 
-    searchResults.topics.forEach((top) => {
-      items.push({
-        type: 'topic',
-        id: `topic-${top.slug}`,
-        title: top.title[locale] || top.title.en,
-        subtitle: `${top.replyCount} replies`,
-        icon: 'MessageSquare',
-        action: () => {
-          navigate({ type: 'community-topic', slug: top.slug, locale });
-          onClose();
-        },
-      });
-    });
-
     return items;
   }, [searchResults, locale, navigate, onClose]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.target !== inputRef.current) return;
     if (e.key === 'ArrowDown') {
       e.preventDefault();
       setSelectedIndex((prev) => (prev + 1) % (flatItems.length || 1));
@@ -174,6 +165,26 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({ isOpen, onClose }) =
     }
   };
 
+  const handleDialogKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === 'Tab' && dialogRef.current) {
+      const focusable = Array.from(dialogRef.current.querySelectorAll<HTMLElement>(
+        'button:not([disabled]):not([tabindex="-1"]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])',
+      ));
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (first && last) {
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    }
+    handleKeyDown(e);
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -182,9 +193,14 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({ isOpen, onClose }) =
       onClick={onClose}
     >
       <div
+        ref={dialogRef}
+        id="utilora-global-search"
+        role="dialog"
+        aria-modal="true"
+        aria-label={t('nav.searchShort')}
         className="w-full max-w-2xl rounded-2xl bg-white border border-stone-200 shadow-2xl shadow-stone-900/20 overflow-hidden flex flex-col max-h-[80vh]"
         onClick={(e) => e.stopPropagation()}
-        onKeyDown={handleKeyDown}
+        onKeyDown={handleDialogKeyDown}
       >
         {/* Search Input Bar */}
         <div className="flex items-center px-4 py-3.5 border-b border-stone-200 gap-3 bg-stone-50/70">
@@ -192,6 +208,10 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({ isOpen, onClose }) =
           <input
             ref={inputRef}
             type="text"
+            aria-label={t('nav.searchShort')}
+            aria-autocomplete="list"
+            aria-controls={flatItems.length ? 'utilora-search-results' : undefined}
+            aria-activedescendant={flatItems[selectedIndex] ? 'utilora-search-option-' + flatItems[selectedIndex].id : undefined}
             value={query}
             onChange={(e) => {
               setQuery(e.target.value);
@@ -229,12 +249,16 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({ isOpen, onClose }) =
                   {t('hero.explorePopular')}
                 </div>
               )}
-              <div className="space-y-1">
+              <div id="utilora-search-results" role="listbox" aria-label={t('nav.searchShort')} className="space-y-1">
                 {flatItems.map((item, index) => {
                   const isSelected = index === selectedIndex;
                   return (
                     <button
                       key={item.id}
+                      id={'utilora-search-option-' + item.id}
+                      role="option"
+                      aria-selected={isSelected}
+                      tabIndex={-1}
                       onClick={item.action}
                       onMouseEnter={() => setSelectedIndex(index)}
                       className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-left transition-all ${

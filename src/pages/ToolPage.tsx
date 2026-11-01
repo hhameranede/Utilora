@@ -3,6 +3,7 @@ import { useI18n } from '../i18n';
 import { getToolBySlug } from '../registry/tools.registry';
 import { getCategoryById } from '../registry/categories.registry';
 import { Breadcrumbs } from '../components/common/Breadcrumbs';
+import { Link } from '../router';
 import { ToolWorkspaceResolver } from '../components/templates/ToolWorkspaceResolver';
 import { RelatedTools } from '../components/common/RelatedTools';
 import { RelatedArticles } from '../components/common/RelatedArticles';
@@ -24,28 +25,61 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
   const category = getCategoryById(tool.category);
   const toolName = tool.localizedName[locale] || tool.localizedName.en;
   const toolDesc = tool.localizedDescription[locale] || tool.localizedDescription.en;
+  const isNetworkLookup = tool.category === 'website-domain';
   const categoryTitle = category ? category.localizedTitle[locale] || category.localizedTitle.en : tool.category;
 
   const defaultFaqs = [
     {
       question: {
-        en: `Is ${toolName} safe to use with sensitive files?`,
-        ar: `هل ${toolName} آمن للاستخدام مع المستندات الحساسة؟`,
+        en: 'Is ' + toolName + ' safe to use with sensitive files?',
+        ar: 'هل ' + toolName + ' آمن للاستخدام مع المدخلات الحساسة؟',
       },
       answer: {
-        en: `Yes. In UTILORA's architecture, data processing takes place directly in your local browser sandbox without intermediate server persistence.`,
-        ar: `نعم. تضمن معمارية يوتيلورا أن تتم المعالجة في بيئة المتصفح المحلية لديك دون تخزينها على خوادم وسيطة.`,
+        en: tool.status === 'functional'
+          ? (isNetworkLookup
+            ? 'This lookup sends only the domain or URL you enter to public DNS/RDAP services or directly to the target website. No files are uploaded.'
+            : 'Yes. This tool processes its input locally in your browser without uploading it to an intermediate server.')
+          : 'This workspace is currently a visual preview. It does not process files yet.',
+        ar: tool.status === 'functional'
+          ? (isNetworkLookup
+            ? 'ترسل هذه الأداة النطاق أو الرابط الذي تدخله إلى خدمات DNS/RDAP العامة أو إلى الموقع المستهدف مباشرةً. لا تُرفع أي ملفات.'
+            : 'نعم. تعالج هذه الأداة مدخلاتها محليًا داخل متصفحك دون رفعها إلى خادم وسيط.')
+          : 'مساحة العمل هذه معاينة للواجهة حاليًا، ولم تُفعّل المعالجة فيها بعد.',
       },
     },
     {
-      question: {
-        en: `What is the maximum file size for ${toolName}?`,
-        ar: `ما هو الحد الأقصى لحجم الملفات في ${toolName}؟`,
-      },
-      answer: {
-        en: `The tool comfortably accepts files up to ${tool.maxFileSize || '100 MB'}, bounded only by your local device memory.`,
-        ar: `تدعم الأداة ملفات حتى ${tool.maxFileSize || '100 ميجابايت'}، وتعتمد حدود المعالجة على ذاكرة جهازك المحلي.`,
-      },
+      question: tool.acceptedFormats && tool.status === 'functional'
+        ? {
+            en: 'What file formats and size limits does ' + toolName + ' support?',
+            ar: 'ما صيغ الملفات وحدود الحجم التي تدعمها ' + toolName + '؟',
+          }
+        : isNetworkLookup
+          ? {
+              en: 'What information does ' + toolName + ' check?',
+              ar: 'ما المعلومات التي تفحصها ' + toolName + '؟',
+            }
+          : {
+              en: 'Is my input stored or sent to a server?',
+              ar: 'هل تُحفظ مدخلاتي أو تُرسل إلى خادم؟',
+            },
+      answer: tool.acceptedFormats && tool.status === 'functional'
+        ? {
+            en: 'Supported formats: ' + tool.acceptedFormats.join(', ') + '. Maximum file size: ' + (tool.maxFileSize || 'See the tool-specific processing limit') + '.',
+            ar: 'الصيغ المدعومة: ' + tool.acceptedFormats.join('، ') + '. الحد الأقصى لحجم الملف: ' + (tool.maxFileSize || 'راجع حد المعالجة الخاص بالأداة') + '.',
+          }
+        : isNetworkLookup
+          ? {
+              en: 'The tool queries public domain registration or DNS records, or sends a credential-free HEAD request to the public website URL you submit. It does not inspect private content.',
+              ar: 'تستعلم الأداة عن بيانات تسجيل النطاق أو سجلات DNS العامة، أو ترسل طلب HEAD دون بيانات اعتماد إلى رابط الموقع العام الذي تدخله. لا تفحص المحتوى الخاص.',
+            }
+          : {
+              en: tool.status === 'functional'
+                ? 'No. Your text or code input is processed locally in this browser and is not sent to UTILORA servers.'
+                : 'This workspace is a preview and does not process or store submitted files.',
+              ar: tool.status === 'functional'
+                ? 'لا. تتم معالجة النص أو الشيفرة محليًا في هذا المتصفح ولا تُرسل إلى خوادم UTILORA.'
+                : 'مساحة العمل معاينة ولا تعالج الملفات المُدخلة أو تحفظها.',
+            },
     },
   ];
 
@@ -57,8 +91,8 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
         locale={locale}
         routeType="tool"
         slug={tool.slug}
-        // Section 15: "all unfinished tool pages ... must initially be marked noindex and excluded from production sitemaps"
-        isIndexable={false}
+        // Functional tools are indexable; unfinished preview workspaces remain noindex.
+        isIndexable={tool.status === 'functional'}
         schemaType="SoftwareApplication"
         schemaData={{
           operatingSystem: 'All Modern Browsers',
@@ -87,7 +121,7 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
               <div className="flex items-center gap-2 text-xs text-stone-400">
                 <span>{categoryTitle}</span>
                 <span aria-hidden="true" className="text-stone-300">·</span>
-                <span className="text-orange-600 font-mono font-medium">UI Ready</span>
+                <span className="text-orange-600 font-mono font-medium">{tool.status === "functional" ? "Functional" : "Preview only"}</span>
               </div>
               <h1 className="text-2xl sm:text-4xl font-extrabold text-stone-900 mt-1">
                 {toolName}
@@ -100,19 +134,20 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
           </p>
         </div>
 
-        {/* Engine Disconnected Notice Banner */}
-        <div className="p-4 rounded-2xl bg-orange-50/80 border border-orange-200/90 flex items-center gap-3 text-xs text-orange-900 shadow-xs">
-          <Info size={16} className="text-orange-600 shrink-0" />
-          <div className="flex-1">
-            <span className="font-semibold text-stone-900">Interactive UI Preview: </span>
-            {t('common.previewNotice')}
+        {tool.status !== 'functional' && (
+          <div className="p-4 rounded-2xl bg-orange-50/80 border border-orange-200/90 flex items-center gap-3 text-xs text-orange-900 shadow-xs">
+            <Info size={16} className="text-orange-600 shrink-0" />
+            <div className="flex-1">
+              <span className="font-semibold text-stone-900">Preview only: </span>
+              {t('common.previewNotice')}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Main Specialized Tool Workspace */}
-        <main className="pt-2">
+        <section className="pt-2">
           <ToolWorkspaceResolver tool={tool} />
-        </main>
+        </section>
 
         {/* Specifications & Instructions Section */}
         <section className="p-8 sm:p-10 rounded-3xl bg-white border border-stone-200/90 shadow-xs space-y-8">
@@ -120,31 +155,26 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
             <h2 className="text-lg font-bold text-stone-900 mb-2">
               {t('common.howToUse')}
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-              <div className="space-y-1.5">
-                <span className="text-xs font-mono font-bold text-orange-600">STEP 01</span>
-                <h4 className="text-sm font-semibold text-stone-900">Load Input</h4>
-                <p className="text-xs text-stone-600 leading-relaxed">
-                  Select, drop, or type your data directly into the active canvas workspace.
+            <Link
+              routeType="tool-guide"
+              slug={tool.slug}
+              className="group mt-5 flex flex-col gap-3 rounded-2xl border border-orange-200 bg-orange-50/60 p-5 transition-colors hover:border-orange-300 sm:flex-row sm:items-center sm:justify-between"
+            >
+              <div>
+                <h3 className="text-sm font-bold text-stone-900">
+                  {locale === 'ar' ? 'شاهد الدليل المرئي لهذه الأداة' : 'See the visual step-by-step guide'}
+                </h3>
+                <p className="mt-1 text-xs leading-relaxed text-stone-600">
+                  {locale === 'ar'
+                    ? 'لقطات من واجهة الأداة الفعلية مع أسهم توضّح أماكن الرفع والإعدادات والنتائج.'
+                    : 'Screenshots from the actual tool interface, annotated to show uploads, settings, and results.'}
                 </p>
               </div>
-
-              <div className="space-y-1.5">
-                <span className="text-xs font-mono font-bold text-orange-600">STEP 02</span>
-                <h4 className="text-sm font-semibold text-stone-900">Adjust Configuration</h4>
-                <p className="text-xs text-stone-600 leading-relaxed">
-                  Fine-tune sliders, quality presets, target formats, or parameter toggles.
-                </p>
-              </div>
-
-              <div className="space-y-1.5">
-                <span className="text-xs font-mono font-bold text-orange-600">STEP 03</span>
-                <h4 className="text-sm font-semibold text-stone-900">Save Local Output</h4>
-                <p className="text-xs text-stone-600 leading-relaxed">
-                  Once connected to Phase 2 engine, export your finished file directly to your disk.
-                </p>
-              </div>
-            </div>
+              <span className="inline-flex shrink-0 items-center gap-2 text-xs font-semibold text-orange-700">
+                {locale === 'ar' ? 'افتح دليل الاستعمال' : 'Open usage guide'}
+                <span aria-hidden="true">→</span>
+              </span>
+            </Link>
           </div>
 
           {/* Supported Formats or Constraints */}
@@ -176,7 +206,7 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
             <Lock size={16} className="text-orange-500 shrink-0 mt-0.5" />
             <div className="text-xs leading-relaxed text-stone-600">
               <span className="font-semibold text-stone-900">{t('common.privacyStatement')}: </span>
-              {t('common.privacyStatementDesc')}
+              {isNetworkLookup ? 'Network lookup: only the domain or URL you submit is sent to public DNS/RDAP services or the target website. No files or cookies are collected by UTILORA.' : t('common.privacyStatementDesc')}
             </div>
           </div>
         </section>

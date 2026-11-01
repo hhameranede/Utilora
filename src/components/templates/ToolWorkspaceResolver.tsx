@@ -1,4 +1,5 @@
 import React from 'react';
+import { TemplatePdfTools } from './TemplatePdfTools';
 import { ToolDefinition } from '../../registry/tool-types';
 import { TemplateASingleFile } from './TemplateASingleFile';
 import { TemplateBMultiFile } from './TemplateBMultiFile';
@@ -24,6 +25,20 @@ interface ToolWorkspaceResolverProps {
 export const ToolWorkspaceResolver: React.FC<ToolWorkspaceResolverProps> = ({ tool }) => {
   const toolName = tool.localizedName.en;
 
+  if (tool.category === 'image') {
+    return (
+      <TemplateCImageWorkspace
+        toolName={toolName}
+        toolSlug={tool.slug}
+        defaultFormat={tool.slug === 'image-converter' ? 'webp' : 'jpeg'}
+      />
+    );
+  }
+
+  if (tool.category === 'pdf') {
+    return <TemplatePdfTools toolName={toolName} toolSlug={tool.slug} />;
+  }
+
   switch (tool.template) {
     case 'template-a-single-file':
       return (
@@ -46,7 +61,8 @@ export const ToolWorkspaceResolver: React.FC<ToolWorkspaceResolverProps> = ({ to
       return (
         <TemplateCImageWorkspace
           toolName={toolName}
-          defaultFormat={tool.slug === 'image-converter' ? 'webp' : 'jpg'}
+          toolSlug={tool.slug}
+          defaultFormat={tool.slug === 'image-converter' ? 'webp' : 'jpeg'}
           showCropperGrid={tool.slug === 'image-cropper'}
         />
       );
@@ -58,6 +74,8 @@ export const ToolWorkspaceResolver: React.FC<ToolWorkspaceResolverProps> = ({ to
       return (
         <TemplateETextEditor
           toolName={toolName}
+          toolSlug={tool.slug}
+          defaultText=""
           showCaseOptions={tool.slug === 'case-converter'}
           showDedupeOptions={tool.slug === 'duplicate-lines-remover'}
           showSortOptions={tool.slug === 'sort-text-lines'}
@@ -68,10 +86,10 @@ export const ToolWorkspaceResolver: React.FC<ToolWorkspaceResolverProps> = ({ to
       return <TemplateFTwoPanelCompare toolName={toolName} />;
 
     case 'template-g-code-editor':
-      return <TemplateGCodeEditor toolName={toolName} />;
+      return <TemplateGCodeEditor toolName={toolName} toolSlug={tool.slug} />;
 
     case 'template-h-encoder-decoder':
-      return <TemplateHEncoderDecoder toolName={toolName} />;
+      return <TemplateHEncoderDecoder toolName={toolName} toolSlug={tool.slug} />;
 
     case 'template-i-generator':
       return (
@@ -82,26 +100,23 @@ export const ToolWorkspaceResolver: React.FC<ToolWorkspaceResolverProps> = ({ to
       );
 
     case 'template-j-domain-lookup':
-      return <TemplateJDomainLookup toolName={toolName} />;
+      return <TemplateJDomainLookup toolName={toolName} toolSlug={tool.slug} />;
 
     case 'template-k-dns-lookup':
       return <TemplateKDnsLookup toolName={toolName} />;
 
     case 'template-l-website-diagnostics':
-      return <TemplateLWebsiteDiagnostics toolName={toolName} />;
+      return <TemplateLWebsiteDiagnostics toolName={toolName} toolSlug={tool.slug} />;
 
     case 'template-m-video-editor':
-      return <TemplateMVideoEditor toolName={toolName} />;
+      return <TemplateMVideoEditor toolName={toolName} toolSlug={tool.slug} />;
 
     case 'template-n-media-converter':
       return <TemplateNMediaConverter toolName={toolName} />;
 
     case 'template-o-media-metadata':
       return (
-        <TemplateOMediaMetadata
-          toolName={toolName}
-          isVideo={tool.category === 'video'}
-        />
+        <TemplateOMediaMetadata toolName={toolName} />
       );
 
     case 'template-p-thumbnail-extractor':

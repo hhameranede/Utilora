@@ -1,12 +1,24 @@
 # Implementation Status Checklist
 
-All items from Section 24 of the Master Brief have been systematically built and verified:
+This checklist separates repository implementation from CI verification, deployment, and real-device QA. The current registry contains 36 tools: 35 marked `functional` and one UI-only preview (`video-downloader`). The functional set consists of 30 browser-local tools and five public Website & Domain lookups. Five video tools now have working local processing or inspection flows. All 36 tools have localized `/how-to` guides with screenshots captured from their rendered workspaces and numbered orange SVG annotations. Community/forum pages, data, and public routes have been removed. The workflow is configured for type checks, engine tests, SEO/prerender checks, and Playwright E2E; confirm the latest run before merging. Production deployment from `main` remains disabled pending approval.
 
-- [x] Application starts and compiles cleanly (`compile_applet`).
-- [x] React 19 and TypeScript structure is clean and strictly typed.
-- [x] Design system exists with deep black, charcoal, and restrained metallic gold palette.
-- [x] Premium responsive visual identity is applied (mobile-first reflow).
-- [x] Home page is complete with Hero, 6 categories, popular tools, featured workspaces, how it works, trust, articles, and community sections.
+## Verification status
+- [x] TypeScript check and Vite production build passed in GitHub Actions run #18.
+- [x] Sitemap/robots output generated and validated in that build.
+- [x] Static HTML prerendering generated 528 localized routes; CI checks sample route bodies, canonical URLs, RTL direction, preview noindex, and 404 output.
+- [x] Automated responsive route audit covers all 36 tool routes at 360px, 768px, and 1280px, plus all eight locale routes at 360px. This is automated Chromium viewport coverage, not physical-device QA.
+- [ ] Manual visual QA on real mobile and desktop devices completed.
+- [x] Cloudflare Pages project connected; preview build and asset deployment succeeded (537 files uploaded).
+- [ ] Direct HTTP/browser verification of localized routes, canonical tags, and 404 status still pending.
+- [x] Production deployment from `main` explicitly disabled pending approval.
+
+
+
+- [ ] Application startup and production compilation successfully re-verified.
+- [x] React 19 and TypeScript project structure exists; TypeScript strict mode is not enabled yet.
+- [x] Brand palette uses warm white, white surfaces, stone-gray typography and borders, and orange accents; global browser color-scheme and brand SVG assets now match.
+- [x] Responsive viewport regression coverage is enforced in Playwright at mobile, tablet, and desktop widths; real-device visual QA remains separate.
+- [x] Home page is complete with Hero, 6 categories, popular tools, featured workspaces, how it works, trust, and article previews.
 - [x] Six category pages exist (`image`, `pdf`, `text`, `developer`, `website-domain`, `video`).
 - [x] All 36 tool definitions exist in `src/registry/tools.registry.ts`.
 - [x] All 36 individual tool routes exist and map to appropriate templates.
@@ -15,18 +27,34 @@ All items from Section 24 of the Master Brief have been systematically built and
 - [x] Article landing page exists (`/:lang/articles`).
 - [x] Article detail template exists (`/:lang/articles/:slug`) with Table of Contents, code blocks, callouts, and author metadata.
 - [x] Article category templates exist (`/:lang/articles/category/:slug`).
-- [x] Community landing page exists (`/:lang/community`).
-- [x] Community category templates exist (`/:lang/community/category/:slug`).
-- [x] Discussion detail templates exist (`/:lang/community/topic/:slug`) with thread preview and solution badges.
-- [x] Global Search UI exists with `Ctrl+K` / `Cmd+K` hotkey, searching local registry, categories, articles, and topics.
+- [x] Community/forum landing pages, category pages, discussion routes, and sample data have been removed from the public application.
+- [x] Global Search UI exists; `Ctrl+K` / `Cmd+K` now toggles the search dialog.
 - [x] Eight localization dictionaries exist (`en`, `ar`, `fr`, `es`, `pt`, `hi`, `zh`, `bn`).
-- [x] Arabic RTL works with `dir="rtl"` and appropriate typographic hierarchy.
-- [x] SEO metadata architecture exists with dynamic titles, descriptions, hreflang links, and JSON-LD schemas.
-- [x] Noindex behavior for unfinished tool pages and dev templates is enforced.
+- [x] Route metadata updates the document language and sets Arabic routes to `dir="rtl"`; visual RTL QA remains pending.
+- [x] Client-side SEO metadata handles titles, descriptions, canonical URLs, hreflang links, robots directives, and JSON-LD.
+- [x] Preview tool and sample content routes carry `noindex` directives in prerendered HTML.
 - [x] Internal template gallery exists at non-public `/dev/templates` route with state toggles.
-- [x] Future engine interfaces exist in `src/engines/` with typed inputs, outputs, progress, and cancellation.
-- [x] No actual tool processing has been implemented.
-- [x] No fake processing success messages exist.
+- [x] Browser-local engines are connected for 30 tools across image, PDF, text, developer, and video categories.
+- [x] Five Website & Domain tools now perform live RDAP registration lookups, DNS-over-HTTPS queries, and credential-free browser-originated HTTP HEAD diagnostics.
+- [x] Image tools: conversion, compression, resizing, crop, rotation, and basic pixel/file metadata inspection (EXIF camera/GPS extraction is not included).
+- [x] PDF tools: merge, range/burst split, rotate, JPG/PNG to PDF, PDF to JPG/PNG, and page/form-field inspection.
+- [x] Text and developer tools: all 13 utilities run in the browser using native browser APIs.
+- [x] All 30 browser-local tools execute locally; the five Website & Domain tools use live, public read-only lookups. Five video tools are functional; only `video-downloader` remains UI-ready and is excluded from indexable routes.
+- [x] The CI workflow is configured to run text/developer, PDF, and image-engine smoke-test commands; image coverage now includes all six image adapters and common invalid-input/resource-cleanup paths.
+- [x] Playwright E2E coverage includes real video compression, trimming, audio extraction, metadata inspection, thumbnail extraction, all five Website & Domain flows, Arabic RTL, mobile crop interaction, and per-tool guide screenshot/annotation checks. Live-lookup tests use deterministic mocked public-service responses; production CORS behavior still requires manual verification against real registries and target sites.
+- [x] Website diagnostic probes use public-DNS preflight, reject local/private/reserved address ranges and non-standard ports, send HEAD only with credentials omitted, and never follow redirects. CORS-limited results are labeled unknown rather than offline.
 - [x] No database has been added.
 - [x] No external advertising scripts have been added (AdSlot/AffiliateSlot hidden by default).
 - [x] README and architecture documentation exist in `docs/`.
+
+- [x] Production sitemap includes localized home, tools-directory, category, legal, and tool-guide routes. It includes detail pages and guides for all 35 functional tools across eight locales; the `video-downloader` workspace and guide remain noindex and excluded.
+- [x] Build-time SEO script generates robots.txt and generates sitemap.xml only when a verified SITE_URL is supplied.
+- [x] Header/footer use a shared UTILORA brand mark and internal template links are removed from public navigation.
+- [x] Browser tab icon assets include SVG and a 96×96 PNG.
+- [x] Static route prerendering emits one extensionless-URL HTML file per localized route and a top-level `404.html`; Cloudflare Pages HTTP behavior is pending live deployment verification.
+
+## Cloudflare Pages preview configuration
+- [x] The `utilora` Pages project is connected to `hhameranede/Utilora`, with `npm run build`, output directory `dist`, and Node.js 22.
+- [x] The current quality branch `fix/white-gray-orange-and-accurate-status-2026-11-01` is explicitly included in preview deployments.
+- [x] Production deployments remain disabled for `main`; this task does not enable them.
+- [ ] The new branch preview deployment has completed and its localized routes have passed live HTTP/browser checks.

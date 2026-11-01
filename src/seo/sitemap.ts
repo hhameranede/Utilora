@@ -1,91 +1,71 @@
-import { SUPPORTED_LANGUAGES, SupportedLocale } from '../i18n';
+import { SUPPORTED_LANGUAGES } from '../i18n';
 import { CATEGORIES_LIST } from '../registry/categories.registry';
-import { TOOLS_LIST } from '../registry/tools.registry';
-import { SAMPLE_ARTICLES } from '../data/articles.data';
 import { buildRoutePath } from '../router/matcher';
+import { TOOLS_LIST } from '../registry/tools.registry';
 
-export interface SitemapEntry {
-  url: string;
-  changefreq: 'daily' | 'weekly' | 'monthly' | 'yearly';
-  priority: number;
-  lastmod?: string;
+type PublicRoute = 'home' | 'tools-index' | 'categories-index' | 'category' | 'tool' |
+  'tool-guide' | 'about' | 'contact' | 'privacy' | 'terms' | 'copyright' | 'acceptable-use';
+
+interface SitemapRoute {
+  type: PublicRoute;
+  slug?: string;
+}
+
+const PUBLIC_ROUTES: SitemapRoute[] = [
+  { type: 'home' },
+  { type: 'tools-index' },
+  { type: 'categories-index' },
+  ...CATEGORIES_LIST.map((category) => ({ type: 'category' as const, slug: category.slug })),
+  ...TOOLS_LIST.filter((tool) => tool.status === 'functional')
+    .flatMap((tool) => [
+      { type: 'tool' as const, slug: tool.slug },
+      { type: 'tool-guide' as const, slug: tool.slug },
+    ]),
+  { type: 'about' },
+  { type: 'contact' },
+  { type: 'privacy' },
+  { type: 'terms' },
+  { type: 'copyright' },
+  { type: 'acceptable-use' },
+];
+
+function escapeXml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
 }
 
 /**
- * Generates XML sitemap content for production indexable routes.
- * In accordance with Phase 1 constraints, unfinished preview tool pages
- * and sample forum discussions are EXCLUDED from the sitemap.
+ * Generates a sitemap for completed, indexable routes only.
+ * Only tool workspaces whose processing engines are marked functional are included.
+ * Preview-only tools and their guides stay excluded.
  */
-export function generateProductionSitemap(baseUrl = 'https://utilora.com'): string {
-  const entries: SitemapEntry[] = [];
-  const currentDate = new Date().toISOString().split('T')[0];
+export function generateProductionSitemap(siteUrl: string): string {
+  const parsedUrl = new URL(siteUrl);
+  if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
+    throw new Error('SITE_URL must use HTTP or HTTPS.');
+  }
+  if (parsedUrl.pathname !== '/' || parsedUrl.search || parsedUrl.hash ||
+      parsedUrl.username || parsedUrl.password) {
+    throw new Error('SITE_URL must be an origin only, such as https://example.com.');
+  }
 
-  // 1. Homepages in all 8 languages (High Priority)
-  SUPPORTED_LANGUAGES.forEach((lang) => {
-    entries.push({
-      url: `${baseUrl}${buildRoutePath(lang.code, 'home')}`,
-      changefreq: 'daily',
-      priority: 1.0,
-      lastmod: currentDate,
-    });
-  });
+  const origin = parsedUrl.origin;
+  const languages = SUPPORTED_LANGUAGES.map((language) => language.code);
+  const urlBlocks = PUBLIC_ROUTES.flatMap((route) =>
+    languages.map((locale) => {
+      const url = `${origin}${buildRoutePath(locale, route.type, route.slug)}`;
+      const alternates = languages.map((alternateLocale) => {
+        const alternateUrl = `${origin}${buildRoutePath(alternateLocale, route.type, route.slug)}`;
+        return `    <xhtml:link rel="alternate" hreflang="${escapeXml(alternateLocale)}" href="${escapeXml(alternateUrl)}" />`;
+      }).join('\n');
+      const englishUrl = `${origin}${buildRoutePath('en', route.type, route.slug)}`;
+      return `  <url>\n    <loc>${escapeXml(url)}</loc>\n${alternates}\n    <xhtml:link rel="alternate" hreflang="x-default" href="${escapeXml(englishUrl)}" />\n  </url>`;
+    }),
+  );
 
-  // 2. Categories Index & Category Pages in 8 languages
-  SUPPORTED_LANGUAGES.forEach((lang) => {
-    entries.push({
-      url: `${baseUrl}${buildRoutePath(lang.code, 'categories-index')}`,
-      changefreq: 'weekly',
-      priority: 0.9,
-      lastmod: currentDate,
-    });
-
-    CATEGORIES_LIST.forEach((cat) => {
-      entries.push({
-        url: `${baseUrl}${buildRoutePath(lang.code, 'category', cat.slug)}`,
-        changefreq: 'weekly',
-        priority: 0.8,
-        lastmod: currentDate,
-      });
-    });
-  });
-
-  // 3. Informational & Legal Pages
-  const staticPages: Array<'about' | 'contact' | 'privacy' | 'terms' | 'copyright' | 'acceptable-use'> = [
-    'about',
-    'contact',
-    'privacy',
-    'terms',
-    'copyright',
-    'acceptable-use',
-  ];
-
-  SUPPORTED_LANGUAGES.forEach((lang) => {
-    staticPages.forEach((page) => {
-      entries.push({
-        url: `${baseUrl}${buildRoutePath(lang.code, page)}`,
-        changefreq: 'monthly',
-        priority: 0.4,
-        lastmod: currentDate,
-      });
-    });
-  });
-
-  // NOTE: Unfinished tool routes (288 localized URLs) are intentionally excluded from sitemap until Phase 2
-  // and have <meta name="robots" content="noindex, nofollow" /> applied automatically.
-
-  const xmlEntries = entries
-    .map(
-      (e) => `  <url>
-    <loc>${e.url}</loc>
-    <lastmod>${e.lastmod}</lastmod>
-    <changefreq>${e.changefreq}</changefreq>
-    <priority>${e.priority.toFixed(1)}</priority>
-  </url>`
-    )
-    .join('\n');
-
-  return `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${xmlEntries}
-</urlset>`;
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n${urlBlocks.join('\n')}\n</urlset>`;
 }

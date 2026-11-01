@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
 import { Code, Copy, Check, Sliders, CheckCircle2, AlertCircle, FileCode } from 'lucide-react';
 import { useI18n } from '../../i18n';
-import { DisabledAction } from '../common/DisabledAction';
+import { processJson } from '../../engines/local-core';
 
 interface TemplateGCodeEditorProps {
   toolName: string;
+  toolSlug?: string;
   defaultPayload?: string;
   actionLabel?: string;
 }
 
 export const TemplateGCodeEditor: React.FC<TemplateGCodeEditorProps> = ({
   toolName,
+  toolSlug = 'json-formatter',
   defaultPayload = `{\n  "service": "UTILORA",\n  "version": "2.4.0",\n  "status": "operational",\n  "capabilities": [\n    "in_browser_processing",\n    "zero_cloud_storage",\n    "local_privacy"\n  ]\n}`,
   actionLabel = 'Format & Prettify JSON',
 }) => {
@@ -18,14 +20,46 @@ export const TemplateGCodeEditor: React.FC<TemplateGCodeEditorProps> = ({
   const [code, setCode] = useState<string>(defaultPayload);
   const [indentSize, setIndentSize] = useState<2 | 4>(2);
   const [copied, setCopied] = useState<boolean>(false);
+  const [resultMessage, setResultMessage] = useState('');
+  const [resultError, setResultError] = useState(false);
 
   const lines = code.split('\n');
 
-  const handleCopy = () => {
-    if (typeof navigator !== 'undefined' && navigator.clipboard) {
-      navigator.clipboard.writeText(code);
+  const handleProcess = () => {
+    try {
+      const mode = toolSlug === 'json-minifier' ? 'minify' : toolSlug === 'json-validator' ? 'validate' : 'format';
+      const result = processJson(code, mode, indentSize);
+      if (mode === 'minify' || mode === 'format') {
+        const saved = new TextEncoder().encode(code).length - new TextEncoder().encode(result.output).length;
+        setCode(result.output);
+        setResultMessage(mode === 'minify' ? `JSON minified successfully. ${saved} bytes saved.` : 'JSON formatted successfully.');
+      } else {
+        setResultMessage('Valid JSON. No syntax errors were found.');
+      }
+      setResultError(false);
+    } catch (error) {
+      setResultMessage(error instanceof Error ? error.message : 'Invalid JSON input.');
+      setResultError(true);
+    }
+  };
+
+  const handleCopy = async () => {
+    if (!code) {
+      setResultMessage('There is no JSON content to copy.');
+      setResultError(true);
+      return;
+    }
+    try {
+      if (!navigator.clipboard?.writeText) throw new Error('Clipboard access is unavailable in this browser.');
+      await navigator.clipboard.writeText(code);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      setResultError(false);
+      setResultMessage('Copied to clipboard.');
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setCopied(false);
+      setResultMessage('Clipboard access is blocked by this browser. Select and copy the JSON manually.');
+      setResultError(true);
     }
   };
 
@@ -103,7 +137,7 @@ export const TemplateGCodeEditor: React.FC<TemplateGCodeEditorProps> = ({
         <div className="p-3 bg-stone-50 border-t border-stone-100 flex items-center justify-between text-[11px] text-stone-600 font-mono">
           <div className="flex items-center gap-2">
             <CheckCircle2 size={13} className="text-orange-600" />
-            <span>Ready for parser inspection</span>
+            <span>{resultMessage || 'Ready for local JSON validation'}</span>
           </div>
           <span className="text-stone-400">RFC 8259 Schema Target</span>
         </div>
@@ -111,11 +145,14 @@ export const TemplateGCodeEditor: React.FC<TemplateGCodeEditorProps> = ({
 
       {/* Action Footer */}
       <div className="p-6 rounded-2xl bg-white border border-stone-200/90 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="text-xs text-stone-600">
-          Developer utility workspace. Code parsing will connect via the RFC 8259 engine adapter.
+        <div className="flex-1 text-xs">
+          <p className="text-stone-600">Runs locally in your browser. Your JSON is not uploaded.</p>
+          {resultMessage && <p role="status" className={`mt-1 ${resultError ? 'text-red-600' : 'text-emerald-700'}`}>{resultMessage}</p>}
         </div>
         <div className="w-full sm:w-auto">
-          <DisabledAction label={actionLabel} size="md" />
+          <button type="button" onClick={handleProcess} className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-stone-900 hover:bg-stone-800 text-white text-xs font-semibold shadow-sm transition-colors">
+            {toolSlug === 'json-minifier' ? 'Minify JSON' : toolSlug === 'json-validator' ? 'Validate JSON' : 'Format JSON'}
+          </button>
         </div>
       </div>
     </div>

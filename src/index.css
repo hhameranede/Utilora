@@ -16,7 +16,7 @@
 
   --color-brand-bg: #fafaf9;
   --color-brand-surface: #ffffff;
-  --color-brand-surface-elevated: #fdfbf7;
+  --color-brand-surface-elevated: #f5f5f4;
   --color-brand-border: #e7e5e4;
   --color-brand-border-subtle: #f5f5f4;
 }
@@ -32,22 +32,31 @@ html {
   scroll-behavior: smooth;
 }
 
+body {
+  min-width: 320px;
+  background-color: #fafaf9;
+  color: #1c1917;
+}
+
 [dir="rtl"] {
   font-family: var(--font-arabic);
 }
 
-/* Custom subtle scrollbar */
+/* Quiet neutral scrollbar with the UTILORA orange accent. */
 ::-webkit-scrollbar {
   width: 7px;
   height: 7px;
 }
+
 ::-webkit-scrollbar-track {
-  background: #fafaf9;
+  background: #f5f5f4;
 }
+
 ::-webkit-scrollbar-thumb {
   background: #d6d3d1;
   border-radius: 4px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
-  background: #a8a29e;
+  background: #f97316;
 }

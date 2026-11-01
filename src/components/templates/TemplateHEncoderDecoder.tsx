@@ -1,25 +1,27 @@
 import React, { useState } from 'react';
 import { Binary, ArrowUpDown, Copy, Check, Trash2, ArrowRight } from 'lucide-react';
 import { useI18n } from '../../i18n';
-import { DisabledAction } from '../common/DisabledAction';
+import { decodeBase64Utf8, encodeBase64Utf8, transformUrl } from '../../engines/local-core';
 
 interface TemplateHEncoderDecoderProps {
   toolName: string;
+  toolSlug?: string;
   defaultInput?: string;
   defaultMode?: 'encode' | 'decode';
 }
 
 export const TemplateHEncoderDecoder: React.FC<TemplateHEncoderDecoderProps> = ({
   toolName,
+  toolSlug = 'base64-encoder-decoder',
   defaultInput = 'UTILORA Global Privacy Engine 2026',
   defaultMode = 'encode',
 }) => {
   const { t } = useI18n();
   const [mode, setMode] = useState<'encode' | 'decode'>(defaultMode);
   const [inputVal, setInputVal] = useState<string>(defaultInput);
-  const [outputVal, setOutputVal] = useState<string>(
-    'VVRJTE9SQSBHbG9iYWwgUHJpdmFjeSBFbmdpbmUgMjAyNg=='
-  );
+  const [outputVal, setOutputVal] = useState<string>('');
+  const [resultMessage, setResultMessage] = useState('');
+  const [resultError, setResultError] = useState(false);
   const [copied, setCopied] = useState<boolean>(false);
 
   const swap = () => {
@@ -29,11 +31,38 @@ export const TemplateHEncoderDecoder: React.FC<TemplateHEncoderDecoderProps> = (
     setOutputVal(temp);
   };
 
-  const handleCopy = () => {
-    if (typeof navigator !== 'undefined' && navigator.clipboard) {
-      navigator.clipboard.writeText(outputVal);
+  const handleProcess = () => {
+    try {
+      const result = toolSlug === 'url-encoder-decoder'
+        ? transformUrl(inputVal, mode)
+        : mode === 'encode' ? encodeBase64Utf8(inputVal) : decodeBase64Utf8(inputVal);
+      setOutputVal(result);
+      setResultMessage(mode === 'encode' ? 'Encoded successfully.' : 'Decoded successfully.');
+      setResultError(false);
+    } catch (error) {
+      setOutputVal('');
+      setResultMessage(error instanceof Error ? error.message : 'Unable to process this value.');
+      setResultError(true);
+    }
+  };
+
+  const handleCopy = async () => {
+    if (!outputVal) {
+      setResultMessage('There is no output to copy yet.');
+      setResultError(true);
+      return;
+    }
+    try {
+      if (!navigator.clipboard?.writeText) throw new Error('Clipboard access is unavailable in this browser.');
+      await navigator.clipboard.writeText(outputVal);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      setResultError(false);
+      setResultMessage('Copied to clipboard.');
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setCopied(false);
+      setResultMessage('Clipboard access is blocked by this browser. Select and copy the output manually.');
+      setResultError(true);
     }
   };
 
@@ -105,7 +134,7 @@ export const TemplateHEncoderDecoder: React.FC<TemplateHEncoderDecoderProps> = (
         <div className="rounded-3xl bg-white border border-stone-200/90 overflow-hidden flex flex-col shadow-xs">
           <div className="p-3 bg-stone-50 border-b border-stone-100 flex items-center justify-between text-xs">
             <span className="font-semibold text-orange-600">
-              {mode === 'encode' ? 'Encoded Output (Sample)' : 'Decoded Output (Sample)'}
+              {mode === 'encode' ? 'Encoded Output' : 'Decoded Output'}
             </span>
             <button
               onClick={handleCopy}
@@ -126,11 +155,14 @@ export const TemplateHEncoderDecoder: React.FC<TemplateHEncoderDecoderProps> = (
 
       {/* Action Footer */}
       <div className="p-6 rounded-2xl bg-white border border-stone-200/90 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="text-xs text-stone-600">
-          Bidirectional transformation workspace.
+        <div className="flex-1 text-xs">
+          <p className="text-stone-600">Processed locally in your browser. Nothing is uploaded.</p>
+          {resultMessage && <p role="status" className={`mt-1 ${resultError ? 'text-red-600' : 'text-emerald-700'}`}>{resultMessage}</p>}
         </div>
         <div className="w-full sm:w-auto">
-          <DisabledAction label={mode === 'encode' ? 'Encode Payload' : 'Decode Payload'} size="md" />
+          <button type="button" onClick={handleProcess} className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-stone-900 hover:bg-stone-800 text-white text-xs font-semibold shadow-sm transition-colors">
+            {mode === 'encode' ? (toolSlug === 'url-encoder-decoder' ? 'Encode URL' : 'Encode Base64') : (toolSlug === 'url-encoder-decoder' ? 'Decode URL' : 'Decode Base64')}
+          </button>
         </div>
       </div>
     </div>

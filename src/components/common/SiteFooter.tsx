@@ -3,7 +3,8 @@ import { useI18n } from '../../i18n';
 import { Link } from '../../router';
 import { CATEGORIES_LIST } from '../../registry/categories.registry';
 import { LanguageSwitcher } from './LanguageSwitcher';
-import { Shield, Sparkles, ExternalLink } from 'lucide-react';
+import { BrandLogo } from './BrandLogo';
+import { Shield } from 'lucide-react';
 
 export const SiteFooter: React.FC = () => {
   const { locale, t } = useI18n();
@@ -16,10 +17,7 @@ export const SiteFooter: React.FC = () => {
           {/* Brand Column */}
           <div className="col-span-2 space-y-4">
             <Link routeType="home" className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center text-white font-bold text-sm shadow-sm shadow-orange-500/20">
-                U
-              </div>
-              <span className="text-base font-bold tracking-wider text-stone-900">UTILORA</span>
+              <BrandLogo compact />
             </Link>
             <p className="text-xs text-stone-500 max-w-sm leading-relaxed">
               {t('hero.subtitle', 'Powerful, simple, and free online utilities for your images, documents, text, code, websites, and videos.')}
@@ -84,16 +82,6 @@ export const SiteFooter: React.FC = () => {
               <li>
                 <Link routeType="articles-index" className="hover:text-orange-600 transition-colors">
                   {t('nav.articles')}
-                </Link>
-              </li>
-              <li>
-                <Link routeType="community-index" className="hover:text-orange-600 transition-colors">
-                  {t('nav.community')}
-                </Link>
-              </li>
-              <li>
-                <Link to="/dev/templates" className="hover:text-orange-600 transition-colors text-orange-600 font-medium">
-                  {t('nav.devTemplates')} (Lab)
                 </Link>
               </li>
             </ul>

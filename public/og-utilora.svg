@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#fafaf9"/>
+  <circle cx="1050" cy="70" r="260" fill="none" stroke="#e7e5e4" stroke-width="2"/>
+  <circle cx="1050" cy="70" r="190" fill="none" stroke="#f5f5f4" stroke-width="2"/>
+  <rect x="526" y="100" width="148" height="148" rx="38" fill="#ffffff" stroke="#d6d3d1" stroke-width="3"/>
+  <path d="M570 140v38c0 23 13 38 30 38s30-15 30-38v-38" fill="none" stroke="#f97316" stroke-width="15" stroke-linecap="square"/>
+  <path d="M650 112l7 19 19 7-19 7-7 19-7-19-19-7 19-7z" fill="#fb923c"/>
+  <text x="600" y="355" fill="#1c1917" font-family="Arial,sans-serif" font-size="76" font-weight="800" letter-spacing="12" text-anchor="middle">UTILORA</text>
+  <text x="600" y="420" fill="#ea580c" font-family="Arial,sans-serif" font-size="28" font-weight="700" letter-spacing="4" text-anchor="middle">EVERY DIGITAL TASK. ONE PLACE.</text>
+  <text x="600" y="480" fill="#57534e" font-family="Arial,sans-serif" font-size="22" text-anchor="middle">Free online tools for your digital workflow</text>
+</svg>

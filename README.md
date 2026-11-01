@@ -11,19 +11,19 @@ UTILORA is a premium, free online digital tools platform engineered to unify hig
 This repository contains the **complete frontend foundation, UI system, reusable workspace templates, internationalization, routing, and future engine integration contracts**.
 
 ### Scope Invariants & Anti-Deception Guardrails
-- **Frontend & Product Shell Only:** The visual interfaces, responsive layouts, client validation forms, and 16 specialized templates are fully realized and runnable.
-- **Engines Pending Phase 2:** Heavy processing engines (WASM-based image encoders, PDF page manipulation, video transcoders, live DoH/RDAP network workers) are intentionally scheduled for Phase 2.
-- **No Mock or Fake Execution:** Processing buttons remain visibly disabled with clear preview notices (`"Engine Integration Preview"`). The application never fabricates successful file conversions or pretend downloads.
-- **Privacy First:** Designed for in-browser, client-side processing without uploading user files to central servers.
+- **35 Functional Tools:** 30 browser-local tools across Image, PDF, Text, Developer, and Video categories, plus five live, read-only Website & Domain lookups. Video processing includes compression, trimming, audio extraction, metadata inspection, and thumbnail extraction.
+- **One Video Preview:** `video-downloader` remains a clearly labelled UI preview until a safe, rights-respecting source workflow is available. It does not fabricate downloads or claim unsupported processing.
+- **Privacy First:** Files handled by the 30 browser-local tools stay in browser memory and are not uploaded to UTILORA. Website lookups send only the submitted hostname or URL to public DNS-over-HTTPS, RDAP, or a credential-free HEAD request; CORS restrictions are reported honestly.
+- **Quality Gates:** TypeScript, browser-engine tests, PDF/image tests, lookup-security tests, SEO build assertions, and real Chromium E2E flows run in GitHub Actions.
 
 ---
 
 ## 2. Technology Stack
 
-- **Framework:** React 19 + TypeScript (Strict mode)
+- **Framework:** React 19 + TypeScript
 - **Bundler:** Vite 8 + Tailwind CSS v4
 - **Icons:** Lucide React
-- **Design Direction:** Deep black (`#0A0B0E`), charcoal surfaces (`#12141C`, `#171A26`), restrained metallic gold accents (`#F3C64F`), white and soft gray typography. Anti-AI slop, zero-pill metadata discipline.
+- **Design Direction:** Warm white (`#FAFAF9`) and white surfaces, stone-gray borders and typography, and a clear orange accent (`#F97316`). Keep the interface calm, readable, responsive, and free of heavy glass effects. Zero-pill metadata discipline.
 - **Routing:** Path-based client router with direct link, browser back/forward, and locale persistence (`/:lang/...`).
 - **Internationalization (i18n):** 8 fully translated languages (English, Arabic RTL, French, Spanish, Portuguese, Hindi, Chinese, Bengali).
 - **SEO & Search:** Centralized dynamic metadata, hreflang links for all 8 languages, JSON-LD structured schemas, and controlled `noindex, nofollow` exclusion for unfinished preview tools.
@@ -40,9 +40,31 @@ npm run dev
 The application runs on `http://localhost:3000`.
 
 ### Production Build
+Set the real production origin before building so the sitemap, robots sitemap reference, and social preview image use the correct domain:
+
 ```bash
+SITE_URL=https://your-real-domain.example npm run build
+```
+
+On PowerShell:
+```powershell
+$env:SITE_URL = "https://your-real-domain.example"
 npm run build
 ```
+
+`SITE_URL` must be an origin only (scheme + hostname, no path). When it is not configured, the build still runs, but sitemap generation is skipped and the generated robots.txt omits its sitemap reference. Replace the example domain with the verified production domain.
+
+### Installable PWA and offline support
+UTILORA includes a web app manifest and a production-only service worker. The service worker uses network-first navigation with a bounded cache of recently visited pages, cache-first handling for versioned build assets, and an offline fallback page. It does not cache cross-origin requests, API calls, or non-GET requests. User files and tool outputs remain in browser memory and are never written to the service worker cache. See `docs/PWA.md` for the caching and privacy boundaries.
+
+### SEO file generation
+```bash
+SITE_URL=https://your-real-domain.example npm run seo:generate
+```
+
+This writes `public/sitemap.xml` and `public/robots.txt`. The sitemap contains localized home, tool-directory, category, and legal routes, plus every functional tool detail page and its usage guide across all eight languages. The single preview-only tool and sample article routes remain excluded.
+
+**Static route rendering:** `npm run build` prerenders the 528 localized routes into HTML files in `dist`, including page content and route-specific metadata before JavaScript runs. Each localized route is emitted once as `dist/<route>.html`; Cloudflare Pages serves that file at its extensionless URL (for example, `/en/tools`). We intentionally do not also emit `<route>/index.html`, because that would create a second trailing-slash URL for the same content. The build also creates a top-level `404.html`, so Cloudflare Pages returns a real 404 for unknown routes instead of falling back to the SPA shell. The root `/` still uses the Vite root document; the localized pages are the prerendered SEO routes.
 
 ### Run Unit Tests
 ```bash
@@ -53,7 +75,7 @@ npx --yes tsx --test src/tests/registry.test.ts
 
 ## 4. The Six Main Categories & 36 Registered Tools
 
-| Category | Slug | Planned Tools Count | Key Slug Examples |
+| Category | Slug | Registered tools | Key Slug Examples |
 | :--- | :--- | :--- | :--- |
 | **Image Tools** | `image` | 6 tools | `image-converter`, `image-compressor`, `image-resizer`, `image-cropper`, `image-rotator`, `image-metadata-viewer` |
 | **PDF Tools** | `pdf` | 6 tools | `merge-pdf`, `split-pdf`, `rotate-pdf`, `jpg-to-pdf`, `pdf-to-jpg`, `pdf-page-counter` |
@@ -107,8 +129,9 @@ Comprehensive guides for development and extension:
 - `docs/TOOL_REGISTRY.md` — Central registry schema and validation
 - `docs/ADDING_A_TOOL.md` — Step-by-step guide to add Tool #37
 - `docs/ADDING_AN_ARTICLE.md` — Content schema and authoring guides
-- `docs/ADDING_A_FORUM_SECTION.md` — Community forum expansion
 - `docs/ENGINE_INTEGRATION.md` — Phase 2 adapter contracts and WASM binding
 - `docs/LOCALIZATION.md` — 8-language translations and Arabic RTL handling
 - `docs/SEO.md` — Meta tags, structured JSON-LD, and noindex rules
 - `docs/IMPLEMENTATION_STATUS.md` — Verified feature checklist
+
+Every registered tool has a localized usage guide at `/:lang/tools/:slug/how-to`. The guide captures the rendered tool workspace at runtime and adds numbered orange annotations; automated browser coverage checks all 36 guides.

@@ -85,6 +85,16 @@ test('Router matches home, categories, tools, and dev-templates paths', () => {
   assert.equal(rTool.type, 'tool');
   assert.equal(rTool.toolSlug, 'merge-pdf');
 
+  // Visual how-to guide route
+  const guide = parseRoute('/ar/tools/image-converter/how-to');
+  assert.equal(guide.type, 'tool-guide');
+  assert.equal(guide.toolSlug, 'image-converter');
+  assert.equal(buildRoutePath('ar', 'tool-guide', 'image-converter'), '/ar/tools/image-converter/how-to');
+
+  // The removed community/forum is no longer a routable feature
+  assert.equal(parseRoute('/en/community').type, 'not-found');
+  assert.equal(parseRoute('/ar/community/topic/example').type, 'not-found');
+
   // Internal Lab
   const rDev = parseRoute('/dev/templates');
   assert.equal(rDev.type, 'dev-templates');

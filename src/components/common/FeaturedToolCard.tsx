@@ -21,11 +21,8 @@ export const FeaturedToolCard: React.FC<FeaturedToolCardProps> = ({ tool, classN
 
   return (
     <div
-      className={`p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-white via-white to-orange-50/40 border border-stone-200/90 hover:border-orange-300 transition-all flex flex-col justify-between shadow-xs hover:shadow-md relative overflow-hidden group ${className}`}
+      className={`p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-white via-white to-orange-50/40 border border-stone-200/90 hover:border-orange-300 transition-all flex flex-col justify-between shadow-xs hover:shadow-md relative group ${className}`}
     >
-      {/* Subtle orange decorative gradient halo */}
-      <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/5 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20 group-hover:bg-orange-500/10 transition-colors" />
-
       <div>
         <div className="flex items-center justify-between gap-3 mb-6">
           <div className="w-12 h-12 rounded-2xl bg-orange-50 border border-orange-100 flex items-center justify-center text-orange-600 shadow-xs">
@@ -64,7 +61,7 @@ export const FeaturedToolCard: React.FC<FeaturedToolCardProps> = ({ tool, classN
 
       <div className="pt-5 border-t border-stone-100 flex items-center justify-between">
         <span className="text-xs text-stone-400 font-mono">
-          Ready for local execution
+          {tool.status === 'functional' ? 'Runs locally in your browser' : 'Preview only · engine not connected'}
         </span>
 
         <Link

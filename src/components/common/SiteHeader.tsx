@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { useI18n } from '../../i18n';
 import { useRouter, Link } from '../../router';
-import { Search, Menu, X, ChevronDown, Layers, Sparkles, ShieldCheck } from 'lucide-react';
+import { Search, Menu, X, ChevronDown } from 'lucide-react';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { GlobalSearch } from './GlobalSearch';
+import { BrandLogo } from './BrandLogo';
 import { CATEGORIES_LIST } from '../../registry/categories.registry';
 import { Icon } from './Icon';
 
@@ -17,24 +18,14 @@ export const SiteHeader: React.FC = () => {
   return (
     <>
       <header className="sticky top-0 z-40 w-full border-b border-stone-200/80 bg-white/90 backdrop-blur-md shadow-xs">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-1 sm:gap-4">
           {/* Brand Logo */}
           <div className="flex items-center gap-6">
             <Link
               routeType="home"
               className="flex items-center gap-2.5 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 rounded-lg"
             >
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center text-white font-bold text-sm tracking-tighter shadow-sm shadow-orange-500/20 group-hover:scale-105 transition-transform">
-                U
-              </div>
-              <div className="flex flex-col">
-                <span className="text-base font-bold tracking-wider text-stone-900 group-hover:text-orange-600 transition-colors">
-                  UTILORA
-                </span>
-                <span className="text-[10px] uppercase font-mono tracking-widest text-orange-600 -mt-1 hidden sm:block">
-                  Tools Platform
-                </span>
-              </div>
+              <BrandLogo />
             </Link>
 
             {/* Desktop Navigation Links */}
@@ -42,7 +33,7 @@ export const SiteHeader: React.FC = () => {
               <Link
                 routeType="tools-index"
                 className={`transition-colors hover:text-orange-600 ${
-                  route.type === 'tools-index' || route.type === 'tool' ? 'text-orange-600 font-semibold' : ''
+                  route.type === 'tools-index' || route.type === 'tool' || route.type === 'tool-guide' ? 'text-orange-600 font-semibold' : ''
                 }`}
               >
                 {t('nav.tools')}
@@ -108,15 +99,6 @@ export const SiteHeader: React.FC = () => {
               </Link>
 
               <Link
-                routeType="community-index"
-                className={`transition-colors hover:text-orange-600 ${
-                  route.type.startsWith('community') ? 'text-orange-600 font-semibold' : ''
-                }`}
-              >
-                {t('nav.community')}
-              </Link>
-
-              <Link
                 routeType="about"
                 className={`transition-colors hover:text-orange-600 ${
                   route.type === 'about' ? 'text-orange-600 font-semibold' : ''
@@ -128,12 +110,16 @@ export const SiteHeader: React.FC = () => {
           </div>
 
           {/* Right Controls: Search, Language, Dev Lab, Mobile Toggle */}
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-1 sm:gap-2.5">
             {/* Quick Search Button */}
             <button
               onClick={() => setIsSearchOpen(true)}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-stone-200 bg-stone-50 hover:bg-stone-100 hover:border-stone-300 text-xs text-stone-500 hover:text-stone-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
-              aria-label={t('nav.search')}
+              className="flex items-center gap-2 px-2 sm:px-3 py-1.5 rounded-xl border border-stone-200 bg-stone-50 hover:bg-stone-100 hover:border-stone-300 text-xs text-stone-500 hover:text-stone-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
+              aria-label={t('nav.searchShort')}
+              aria-haspopup="dialog"
+              aria-controls="utilora-global-search"
+              aria-expanded={isSearchOpen}
+              aria-keyshortcuts="Control+K Meta+K"
             >
               <Search size={14} className="text-orange-500" />
               <span className="hidden sm:inline">{t('nav.searchShort')}</span>
@@ -144,16 +130,6 @@ export const SiteHeader: React.FC = () => {
 
             {/* Language Selector */}
             <LanguageSwitcher variant="header" />
-
-            {/* Internal Template Gallery Lab Shortcut */}
-            <Link
-              to="/dev/templates"
-              className="hidden xl:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-medium text-stone-500 hover:text-orange-600 hover:bg-orange-50 border border-dashed border-stone-200 transition-colors"
-              title="Internal UI Template Gallery (Non-Public)"
-            >
-              <Sparkles size={12} className="text-orange-500" />
-              <span>{t('nav.devTemplates')}</span>
-            </Link>
 
             {/* Mobile Menu Toggle Button */}
             <button
@@ -169,7 +145,7 @@ export const SiteHeader: React.FC = () => {
       </header>
 
       {/* Global Search Dialog */}
-      <GlobalSearch isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
+      <GlobalSearch isOpen={isSearchOpen} onOpen={() => setIsSearchOpen(true)} onClose={() => setIsSearchOpen(false)} />
 
       {/* Mobile Drawer Menu */}
       {isMobileMenuOpen && (
@@ -237,25 +213,11 @@ export const SiteHeader: React.FC = () => {
                 {t('nav.articles')}
               </Link>
               <Link
-                routeType="community-index"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="block px-3 py-2 text-sm font-semibold text-stone-800 hover:text-orange-600"
-              >
-                {t('nav.community')}
-              </Link>
-              <Link
                 routeType="about"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="block px-3 py-2 text-sm font-semibold text-stone-800 hover:text-orange-600"
               >
                 {t('nav.about')}
-              </Link>
-              <Link
-                to="/dev/templates"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="block px-3 py-2 text-xs font-mono text-orange-600 hover:underline"
-              >
-                ⚡ {t('nav.devTemplates')} (Internal Lab)
               </Link>
             </div>
 

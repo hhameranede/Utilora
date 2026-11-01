@@ -163,7 +163,7 @@ export const TemplateGalleryPage: React.FC = () => {
       name: 'Domain Lookup Workspace (Registration Intelligence)',
       useCase: 'Used for querying domain age, RDAP ownership data, and registrar status codes.',
       associatedTools: ['domain-age-checker', 'rdap-lookup'],
-      render: () => <TemplateJDomainLookup toolName="Domain RDAP Demo" />,
+      render: () => <TemplateJDomainLookup toolName="Domain RDAP Demo" toolSlug="rdap-lookup" />,
     },
     {
       id: 'template-k',
@@ -179,15 +179,15 @@ export const TemplateGalleryPage: React.FC = () => {
       name: 'Website Diagnostics Workspace (HTTP Probe)',
       useCase: 'Used for auditing server uptime, response latency, and HTTP security headers.',
       associatedTools: ['website-status-checker', 'http-headers-checker'],
-      render: () => <TemplateLWebsiteDiagnostics toolName="HTTP Diagnostic Demo" />,
+      render: () => <TemplateLWebsiteDiagnostics toolName="HTTP Diagnostic Demo" toolSlug="website-status-checker" />,
     },
     {
       id: 'template-m',
       code: 'Template M',
       name: 'Video Editor Workspace (Timeline & Trimmer)',
-      useCase: 'Used for trimming video footage and compressing MP4/WebM files with CRF controls.',
+      useCase: 'Used for trimming video clips or compressing supported files with quality and resolution controls.',
       associatedTools: ['video-compressor', 'video-trimmer'],
-      render: () => <TemplateMVideoEditor toolName="Video Trimmer Demo" />,
+      render: () => <TemplateMVideoEditor toolName="Video Trimmer Demo" toolSlug="video-trimmer" />,
     },
     {
       id: 'template-n',
@@ -200,10 +200,10 @@ export const TemplateGalleryPage: React.FC = () => {
     {
       id: 'template-o',
       code: 'Template O',
-      name: 'Media Metadata Workspace (EXIF & Codec Atoms)',
-      useCase: 'Used for deep inspection of camera EXIF tags, GPS metadata, and container codec specs.',
-      associatedTools: ['image-metadata-viewer', 'video-metadata-viewer'],
-      render: () => <TemplateOMediaMetadata toolName="Technical Metadata Demo" isVideo={true} />,
+      name: 'Video Metadata Workspace (Browser Metadata)',
+      useCase: 'Used to inspect browser-exposed video duration, dimensions, aspect ratio, and estimated average bitrate.',
+      associatedTools: ['video-metadata-viewer'],
+      render: () => <TemplateOMediaMetadata toolName="Video Metadata Demo" />,
     },
     {
       id: 'template-p',
