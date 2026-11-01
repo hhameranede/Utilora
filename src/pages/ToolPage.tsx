@@ -31,13 +31,14 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
   const positioning = experience
     ? localizedExperience(experience.positioning, locale)
     : toolDesc;
-  const benefits = experience
+  const hasCuratedExperience = locale === 'en' || locale === 'ar';
+  const benefits = experience && hasCuratedExperience
     ? localizedExperience(experience.benefits, locale)
-    : [];
-  const steps = experience
+    : [t('product.benefit1'), t('product.benefit2'), t('product.benefit3')];
+  const steps = experience && hasCuratedExperience
     ? localizedExperience(experience.steps, locale)
-    : [];
-  const example = experience
+    : [t('product.step1'), t('product.step2'), t('product.step3')];
+  const example = experience && hasCuratedExperience
     ? localizedExperience(experience.example, locale)
     : toolDesc;
   const localizedTitleSuffix: Record<string, string> = {
@@ -52,15 +53,9 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
   };
   const seoTitle = tool.seo.metaTitle[locale] || `${toolName} — ${localizedTitleSuffix[locale] || localizedTitleSuffix.en}`;
   const seoDescription = tool.seo.metaDescription[locale] || toolDesc;
-  const localProcessingText = locale === 'ar'
-    ? 'تتم معالجة الملفات أو النصوص محلياً داخل متصفحك، ولا تُرفع إلى خوادم UTILORA.'
-    : 'Files and text are processed locally in your browser and are not uploaded to UTILORA servers.';
-  const networkProcessingText = locale === 'ar'
-    ? 'تحتاج هذه الأداة إلى إرسال النطاق أو الرابط الذي أدخلته إلى خدمات DNS/RDAP العامة أو إلى الموقع المستهدف. لا ترفع ملفاتك إلى UTILORA.'
-    : 'This lookup sends the domain or URL you submit to public DNS/RDAP services or the target website. It does not upload files to UTILORA.';
-  const previewText = locale === 'ar'
-    ? 'هذه الأداة في وضع المعاينة؛ لا تنفّذ معالجة أو تنزيل حقيقي حالياً.'
-    : 'This tool is currently a preview and does not perform real processing or downloading.';
+  const localProcessingText = t('product.localProcessing');
+  const networkProcessingText = t('product.networkProcessing');
+  const previewText = t('product.previewMessage');
 
   const faqs: FAQItem[] = tool.faqs || [
     {
@@ -134,7 +129,7 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
       <header className="overflow-hidden rounded-[2rem] border border-stone-200 bg-gradient-to-br from-white via-white to-orange-50/70 p-6 shadow-sm sm:p-9">
         <div className="flex flex-wrap items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-500">
           <span className="rounded-full border border-orange-200 bg-orange-50 px-3 py-1 text-orange-700">UTILORA</span>
-          <span>{experience?.eyebrow || categoryTitle}</span>
+          <span>{categoryTitle}</span>
           <span aria-hidden="true">/</span>
           <span>{categoryTitle}</span>
         </div>
@@ -147,12 +142,12 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
               </div>
               <div className="min-w-0">
                 <p className="text-xs font-medium text-stone-500">
-                  {locale === 'ar' ? 'أداة متخصصة من UTILORA' : 'A focused tool by UTILORA'}
+                  {t('product.focusedTool')}
                 </p>
                 <p className="mt-0.5 text-xs font-semibold text-orange-700">
                   {isFunctional
-                    ? (locale === 'ar' ? 'متاحة للاستخدام' : 'Ready to use')
-                    : (locale === 'ar' ? 'معاينة فقط' : 'Preview only')}
+                    ? t('product.ready')
+                    : t('product.previewOnly')}
                 </p>
               </div>
             </div>
@@ -171,22 +166,22 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
               <span className="inline-flex items-center gap-2 rounded-full border border-stone-200 bg-white px-3 py-2 text-xs font-medium text-stone-700">
                 <CheckCircle2 size={14} className="text-orange-600" />
                 {isFunctional
-                  ? (locale === 'ar' ? 'مجانية' : 'Free to use')
-                  : (locale === 'ar' ? 'معاينة مجانية' : 'Free preview')}
+                  ? t('product.free')
+                  : t('product.freePreview')}
               </span>
               <span className="inline-flex items-center gap-2 rounded-full border border-stone-200 bg-white px-3 py-2 text-xs font-medium text-stone-700">
                 <ShieldCheck size={14} className="text-orange-600" />
                 {!isFunctional
                   ? (locale === 'ar' ? 'معاينة فقط' : 'Preview only')
                   : isNetworkLookup
-                    ? (locale === 'ar' ? 'استعلامات عامة' : 'Public lookups')
-                    : (locale === 'ar' ? 'معالجة داخل المتصفح' : 'Browser-based processing')}
+                    ? t('product.publicLookups')
+                    : t('product.browserProcessing')}
               </span>
               <span className="inline-flex items-center gap-2 rounded-full border border-stone-200 bg-white px-3 py-2 text-xs font-medium text-stone-700">
                 <Sparkles size={14} className="text-orange-600" />
                 {isFunctional
-                  ? (locale === 'ar' ? 'بدون تثبيت برنامج' : 'No installation')
-                  : (locale === 'ar' ? 'التنزيل غير متاح بعد' : 'Not available yet')}
+                  ? t('product.noInstall')
+                  : t('product.notAvailable')}
               </span>
             </div>
           </div>
@@ -196,7 +191,7 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
               href="#tool-workspace"
               className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-orange-700 px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-orange-800 focus:outline-none focus:ring-2 focus:ring-orange-700 focus:ring-offset-2"
             >
-              {locale === 'ar' ? 'ابدأ الاستخدام' : 'Open the tool'}
+              {t('product.openTool')}
               <ArrowRight size={16} />
             </a>
             <Link
@@ -205,16 +200,16 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
               className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-stone-200 bg-white px-5 py-3 text-sm font-semibold text-stone-700 transition hover:border-orange-300 hover:text-orange-700"
             >
               <FileText size={16} />
-              {locale === 'ar' ? 'دليل الاستعمال' : 'How to use'}
+              {t('product.howToUse')}
             </Link>
           </div>
         </div>
 
-        <nav aria-label={locale === 'ar' ? 'أقسام صفحة الأداة' : 'Tool page sections'} className="mt-8 flex flex-wrap gap-x-5 gap-y-2 border-t border-stone-200/80 pt-5 text-xs font-semibold text-stone-500">
-          <a className="transition hover:text-orange-700" href="#tool-workspace">{locale === 'ar' ? 'الأداة' : 'Workspace'}</a>
-          <a className="transition hover:text-orange-700" href="#tool-features">{locale === 'ar' ? 'الميزات' : 'Features'}</a>
-          <a className="transition hover:text-orange-700" href="#how-it-works">{locale === 'ar' ? 'طريقة العمل' : 'How it works'}</a>
-          <a className="transition hover:text-orange-700" href="#tool-faq">{locale === 'ar' ? 'الأسئلة الشائعة' : 'FAQ'}</a>
+        <nav aria-label={t('product.toolPageSections')} className="mt-8 flex flex-wrap gap-x-5 gap-y-2 border-t border-stone-200/80 pt-5 text-xs font-semibold text-stone-500">
+          <a className="transition hover:text-orange-700" href="#tool-workspace">{t('product.workspace')}</a>
+          <a className="transition hover:text-orange-700" href="#tool-features">{t('product.features')}</a>
+          <a className="transition hover:text-orange-700" href="#how-it-works">{t('product.workflow')}</a>
+          <a className="transition hover:text-orange-700" href="#tool-faq">{t('product.faq')}</a>
         </nav>
       </header>
 
@@ -222,7 +217,7 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
         <div className="flex items-start gap-3 rounded-2xl border border-orange-200 bg-orange-50/80 p-4 text-sm text-orange-950">
           <Info size={18} className="mt-0.5 shrink-0 text-orange-600" />
           <div>
-            <p className="font-semibold">{locale === 'ar' ? 'هذه معاينة وليست أداة مكتملة' : 'Preview only — not a working tool yet'}</p>
+            <p className="font-semibold">{t('product.previewNotWorking')}</p>
             <p className="mt-1 leading-6">{previewText}</p>
           </div>
         </div>
@@ -232,16 +227,16 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.14em] text-orange-700">
-              {locale === 'ar' ? 'مساحة العمل' : 'WORKSPACE'}
+              {t('product.workspace')}
             </p>
             <h2 className="mt-2 text-2xl font-bold text-stone-950 sm:text-3xl">
-              {locale === 'ar' ? 'استخدم الأداة مباشرةً' : `Use ${toolName}`}
+              {t('product.useTool').replace('{tool}', toolName)}
             </h2>
           </div>
           <p className="text-xs text-stone-500">
             {isNetworkLookup
-              ? (locale === 'ar' ? 'تتصل بخدمات عامة عند تنفيذ الاستعلام' : 'Connects to public services when you run a lookup')
-              : (locale === 'ar' ? 'المعالجة تتم على جهازك' : 'Processing happens on your device')}
+              ? t('product.connectsPublicServices')
+              : t('product.processesOnDevice')}
           </p>
         </div>
         <div className="rounded-[1.75rem] border border-stone-200 bg-white p-3 shadow-sm sm:p-5">
@@ -253,10 +248,10 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
         <section id="tool-features" className="scroll-mt-6 space-y-5">
           <div className="max-w-2xl">
             <p className="text-xs font-bold uppercase tracking-[0.14em] text-orange-700">
-              {locale === 'ar' ? 'مصممة لمهمة واضحة' : 'BUILT FOR A SPECIFIC TASK'}
+              {t('product.builtForTask')}
             </p>
             <h2 className="mt-2 text-2xl font-bold text-stone-950 sm:text-3xl">
-              {locale === 'ar' ? 'ما الذي تقدمه هذه الأداة؟' : 'What this tool helps you do'}
+              {t('product.whatHelps')}
             </h2>
           </div>
           <div className="grid gap-3 md:grid-cols-3">
@@ -280,10 +275,10 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
             </div>
             <div>
               <p className="text-xs font-bold uppercase tracking-[0.14em] text-orange-700">
-                {locale === 'ar' ? 'خطوات بسيطة' : 'A SIMPLE WORKFLOW'}
+                {t('product.simpleWorkflow')}
               </p>
               <h2 className="mt-1 text-xl font-bold text-stone-950 sm:text-2xl">
-                {locale === 'ar' ? 'كيف تعمل الأداة؟' : 'How it works'}
+                {t('product.howItWorks')}
               </h2>
             </div>
           </div>
@@ -291,7 +286,7 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
             {steps.map((step, index) => (
               <li key={step} className="relative border-s-2 border-orange-200 ps-4">
                 <span className="text-xs font-bold text-orange-700">
-                  {locale === 'ar' ? `الخطوة ${index + 1}` : `STEP 0${index + 1}`}
+                  {t('product.stepLabel').replace('{number}', String(index + 1))}
                 </span>
                 <p className="mt-2 text-sm leading-7 text-stone-700">{step}</p>
               </li>
@@ -305,11 +300,11 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
           <div className="flex items-center gap-2 text-orange-700">
             <Sparkles size={17} />
             <p className="text-xs font-bold uppercase tracking-[0.14em]">
-              {locale === 'ar' ? 'مثال عملي' : 'PRACTICAL USE CASE'}
+              {t('product.useCase')}
             </p>
           </div>
           <h2 className="mt-3 text-xl font-bold text-stone-950">
-            {locale === 'ar' ? 'متى تحتاج إلى هذه الأداة؟' : 'When would you use it?'}
+            {t('product.whenToUse')}
           </h2>
           <p className="mt-3 text-sm leading-7 text-stone-600">{example}</p>
         </div>
@@ -318,11 +313,11 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
           <div className="flex items-center gap-2 text-orange-700">
             <Lock size={17} />
             <p className="text-xs font-bold uppercase tracking-[0.14em]">
-              {locale === 'ar' ? 'الخصوصية والاتصال' : 'PRIVACY & CONNECTION'}
+              {t('product.privacyConnection')}
             </p>
           </div>
           <h2 className="mt-3 text-xl font-bold text-stone-950">
-            {locale === 'ar' ? 'ماذا يحدث لمدخلاتك؟' : 'What happens to your input?'}
+            {t('product.whatHappensInput')}
           </h2>
           <p className="mt-3 text-sm leading-7 text-stone-600">
             {isFunctional
@@ -335,7 +330,7 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
       {tool.acceptedFormats && (
         <section className="rounded-[1.75rem] border border-stone-200 bg-white p-6 sm:p-8">
           <h2 className="text-xl font-bold text-stone-950">
-            {locale === 'ar' ? 'الصيغ والحدود المدعومة' : 'Supported formats & limits'}
+            {t('product.supportedFormats')}
           </h2>
           <div className="mt-4 flex flex-wrap items-center gap-2">
             {tool.acceptedFormats.map((format) => (
@@ -345,7 +340,7 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
             ))}
             {tool.maxFileSize && (
               <span className="text-xs text-stone-500">
-                {locale === 'ar' ? 'الحد الأقصى:' : 'Maximum size:'} {tool.maxFileSize}
+                {t('product.maximumSize')} {tool.maxFileSize}
               </span>
             )}
           </div>
@@ -356,15 +351,13 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="max-w-2xl">
             <p className="text-xs font-bold uppercase tracking-[0.14em] text-orange-700">
-              {locale === 'ar' ? 'الدليل المرئي' : 'VISUAL GUIDE'}
+              {t('product.visualGuide')}
             </p>
             <h2 className="mt-2 text-xl font-bold text-stone-950">
-              {locale === 'ar' ? `تعلّم استخدام ${toolName} خطوة بخطوة` : `Learn ${toolName} step by step`}
+              {t('product.learnStepByStep').replace('{tool}', toolName)}
             </h2>
             <p className="mt-2 text-sm leading-6 text-stone-600">
-              {locale === 'ar'
-                ? 'لقطات من مساحة العمل الفعلية مع أسهم توضيحية لمواضع الإدخال والإعدادات والنتائج.'
-                : 'Screenshots from the actual workspace, with annotations for inputs, settings, and results.'}
+              {t('product.screenshotNote')}
             </p>
           </div>
           <Link
@@ -372,7 +365,7 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
             slug={tool.slug}
             className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl border border-orange-300 bg-white px-5 py-3 text-sm font-bold text-orange-800 transition hover:bg-orange-100"
           >
-            {locale === 'ar' ? 'افتح دليل الاستعمال' : 'Open the usage guide'}
+            {t('product.openUsageGuide')}
             <ArrowRight size={16} />
           </Link>
         </div>
@@ -381,10 +374,10 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
       <section id="tool-faq" className="scroll-mt-6 space-y-5">
         <div>
           <p className="text-xs font-bold uppercase tracking-[0.14em] text-orange-700">
-            {locale === 'ar' ? 'المساعدة' : 'HELP'}
+            {t('product.help')}
           </p>
           <h2 className="mt-2 text-2xl font-bold text-stone-950">
-            {locale === 'ar' ? 'أسئلة شائعة حول الأداة' : 'Frequently asked questions'}
+            {t('product.frequentlyAsked')}
           </h2>
         </div>
         <FAQAccordion faqs={faqs} />
@@ -393,7 +386,7 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
       {tool.relatedTools?.length > 0 && (
         <RelatedTools
           toolSlugs={tool.relatedTools}
-          title={locale === 'ar' ? 'أدوات تكمل هذه المهمة' : 'Tools that work well with this one'}
+          title={t('product.relatedTools')}
         />
       )}
     </article>
