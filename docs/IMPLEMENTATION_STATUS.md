@@ -52,3 +52,9 @@ This checklist separates repository implementation from CI verification, deploym
 - [x] Header/footer use a shared UTILORA brand mark and internal template links are removed from public navigation.
 - [x] Browser tab icon assets include SVG and a 96×96 PNG.
 - [x] Static route prerendering emits one extensionless-URL HTML file per localized route and a top-level `404.html`; Cloudflare Pages HTTP behavior is pending live deployment verification.
+
+## Cloudflare Pages preview configuration
+- [x] The `utilora` Pages project is connected to `hhameranede/Utilora`, with `npm run build`, output directory `dist`, and Node.js 22.
+- [x] The current quality branch `fix/white-gray-orange-and-accurate-status-2026-11-01` is explicitly included in preview deployments.
+- [x] Production deployments remain disabled for `main`; this task does not enable them.
+- [ ] The new branch preview deployment has completed and its localized routes have passed live HTTP/browser checks.
