@@ -24,7 +24,7 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({ category, className 
     >
       <div>
         <div className="flex items-center justify-between mb-4">
-          <div className="w-12 h-12 rounded-xl bg-orange-50 group-hover:bg-orange-700 border border-orange-100 flex items-center justify-center text-orange-600 group-hover:text-white transition-all shadow-xs">
+          <div className="w-12 h-12 rounded-xl bg-orange-50 group-hover:bg-orange-700 border border-orange-100 flex items-center justify-center text-orange-700 group-hover:text-white transition-all shadow-xs">
             <Icon name={category.icon} size={22} />
           </div>
           <span className="text-xs font-mono text-stone-500">
@@ -32,7 +32,7 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({ category, className 
           </span>
         </div>
 
-        <h3 className="text-base font-semibold text-stone-900 group-hover:text-orange-600 transition-colors mb-2">
+        <h3 className="text-base font-semibold text-stone-900 group-hover:text-orange-700 transition-colors mb-2">
           {title}
         </h3>
 
@@ -41,7 +41,7 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({ category, className 
         </p>
       </div>
 
-      <div className="flex items-center justify-between text-xs font-medium text-stone-500 group-hover:text-orange-600 transition-colors pt-4 border-t border-stone-100">
+      <div className="flex items-center justify-between text-xs font-medium text-stone-500 group-hover:text-orange-700 transition-colors pt-4 border-t border-stone-100">
         <span>{t('hero.browseCategories')}</span>
         <ArrowRight size={14} className="group-hover:translate-x-1 rtl:group-hover:-translate-x-1 transition-transform" />
       </div>
