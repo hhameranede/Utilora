@@ -29,7 +29,9 @@ test('image converter accepts a local image and exposes an actual downloadable r
   const sourcePreview = page.getByAltText('Original image preview');
   await expect(sourcePreview).toBeVisible();
   await expect(sourcePreview).toHaveJSProperty('naturalWidth', 1);
-  await page.getByRole('button', { name: 'Process image' }).click();
+  const processButton = page.getByRole('button', { name: 'Process image' });
+  await expect(processButton).toBeEnabled();
+  await processButton.click();
   await expect.poll(async () => (
     await page.getByRole('status').count() + await page.getByRole('alert').count()
   )).toBeGreaterThan(0);
