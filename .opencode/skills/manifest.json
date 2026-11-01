@@ -5,15 +5,107 @@
   "curatedExternalCount": 41,
   "agents": [
     "project-lead",
+    "problem-analyst",
     "implementation-engineer",
+    "fast-task-engineer",
+    "visual-reviewer",
+    "long-horizon-engineer",
     "qa-engineer",
-    "security-auditor",
-    "seo-auditor",
-    "ux-reviewer",
-    "analytics-reviewer",
-    "release-reviewer"
+    "security-auditor"
   ],
   "assignmentsByAgent": {
+    "qa-engineer": [
+      "accessibility",
+      "accessibility-ux",
+      "animation-performance",
+      "browser-qa",
+      "ci-cd-and-automation",
+      "code-review",
+      "core-web-vitals",
+      "diagnosing-bugs",
+      "observability-and-instrumentation",
+      "performance-optimization",
+      "quality-validation",
+      "systematic-debugging",
+      "tdd",
+      "utilora-project-rules",
+      "verification-before-completion",
+      "web-perf"
+    ],
+    "visual-reviewer": [
+      "accessibility",
+      "accessibility-ux",
+      "animation-performance",
+      "browser-qa",
+      "code-simplification",
+      "frontend-ui-engineering",
+      "site-architecture",
+      "utilora-project-rules"
+    ],
+    "problem-analyst": [
+      "ai-seo",
+      "analytics",
+      "ci-cd-and-automation",
+      "code-review",
+      "content-strategy",
+      "core-web-vitals",
+      "git-workflow-and-versioning",
+      "observability-and-instrumentation",
+      "performance-optimization",
+      "pr",
+      "programmatic-seo",
+      "quality-validation",
+      "release-safety",
+      "research",
+      "research-sources",
+      "retro",
+      "schema",
+      "security-review",
+      "seo-audit",
+      "seo-review",
+      "site-architecture",
+      "source-driven-development",
+      "utilora-project-rules",
+      "verification-before-completion",
+      "web-perf"
+    ],
+    "fast-task-engineer": [
+      "analytics",
+      "code-simplification",
+      "content-strategy",
+      "frontend-ui-engineering",
+      "incremental-implementation",
+      "observability-and-instrumentation",
+      "programmatic-seo",
+      "schema",
+      "source-driven-development",
+      "utilora-project-rules",
+      "verification-before-completion"
+    ],
+    "implementation-engineer": [
+      "animation-performance",
+      "api-and-interface-design",
+      "code-review",
+      "code-simplification",
+      "codebase-design",
+      "context-engineering",
+      "diagnosing-bugs",
+      "documentation-and-adrs",
+      "domain-modeling",
+      "frontend-ui-engineering",
+      "git-workflow-and-versioning",
+      "improve-codebase-architecture",
+      "incremental-implementation",
+      "performance-optimization",
+      "safe-implementation",
+      "schema",
+      "security-and-hardening",
+      "source-driven-development",
+      "spec-driven-development",
+      "systematic-debugging",
+      "tdd",
+      "utilora-project-rules"
+    ],
     "project-lead": [
       "api-and-interface-design",
       "code-review",
@@ -40,48 +132,6 @@
       "verification-before-completion",
       "writing-plans"
     ],
-    "implementation-engineer": [
-      "animation-performance",
-      "api-and-interface-design",
-      "code-review",
-      "code-simplification",
-      "codebase-design",
-      "context-engineering",
-      "diagnosing-bugs",
-      "documentation-and-adrs",
-      "domain-modeling",
-      "frontend-ui-engineering",
-      "git-workflow-and-versioning",
-      "improve-codebase-architecture",
-      "incremental-implementation",
-      "performance-optimization",
-      "safe-implementation",
-      "schema",
-      "security-and-hardening",
-      "source-driven-development",
-      "spec-driven-development",
-      "systematic-debugging",
-      "tdd",
-      "utilora-project-rules"
-    ],
-    "qa-engineer": [
-      "accessibility",
-      "accessibility-ux",
-      "animation-performance",
-      "browser-qa",
-      "ci-cd-and-automation",
-      "code-review",
-      "core-web-vitals",
-      "diagnosing-bugs",
-      "observability-and-instrumentation",
-      "performance-optimization",
-      "quality-validation",
-      "systematic-debugging",
-      "tdd",
-      "utilora-project-rules",
-      "verification-before-completion",
-      "web-perf"
-    ],
     "security-auditor": [
       "api-and-interface-design",
       "research",
@@ -93,48 +143,16 @@
       "using-agent-skills",
       "utilora-project-rules"
     ],
-    "seo-auditor": [
-      "ai-seo",
-      "content-strategy",
-      "core-web-vitals",
-      "performance-optimization",
-      "programmatic-seo",
-      "research",
-      "research-sources",
-      "schema",
-      "seo-audit",
-      "seo-review",
-      "site-architecture",
-      "source-driven-development",
-      "utilora-project-rules",
-      "web-perf"
-    ],
-    "ux-reviewer": [
-      "accessibility",
-      "accessibility-ux",
-      "animation-performance",
-      "browser-qa",
-      "code-simplification",
-      "frontend-ui-engineering",
-      "site-architecture",
-      "utilora-project-rules"
-    ],
-    "analytics-reviewer": [
-      "analytics",
-      "observability-and-instrumentation",
-      "utilora-project-rules"
-    ],
-    "release-reviewer": [
-      "ci-cd-and-automation",
-      "code-review",
-      "git-workflow-and-versioning",
-      "pr",
-      "quality-validation",
-      "release-safety",
+    "long-horizon-engineer": [
+      "dispatching-parallel-agents",
+      "documentation-and-adrs",
+      "domain-modeling",
+      "handoff",
+      "improve-codebase-architecture",
+      "planning-and-task-breakdown",
       "retro",
-      "security-review",
-      "utilora-project-rules",
-      "verification-before-completion"
+      "site-architecture",
+      "writing-plans"
     ]
   },
   "skills": [
@@ -142,8 +160,8 @@
       "name": "accessibility",
       "path": ".opencode/skills/accessibility/SKILL.md",
       "assignedTo": [
-        "ux-reviewer",
-        "qa-engineer"
+        "qa-engineer",
+        "visual-reviewer"
       ],
       "source": {
         "type": "external",
@@ -158,8 +176,8 @@
       "name": "accessibility-ux",
       "path": ".opencode/skills/accessibility-ux/SKILL.md",
       "assignedTo": [
-        "ux-reviewer",
-        "qa-engineer"
+        "qa-engineer",
+        "visual-reviewer"
       ],
       "source": {
         "type": "project",
@@ -174,7 +192,7 @@
       "name": "ai-seo",
       "path": ".opencode/skills/ai-seo/SKILL.md",
       "assignedTo": [
-        "seo-auditor"
+        "problem-analyst"
       ],
       "source": {
         "type": "external",
@@ -189,7 +207,8 @@
       "name": "analytics",
       "path": ".opencode/skills/analytics/SKILL.md",
       "assignedTo": [
-        "analytics-reviewer"
+        "fast-task-engineer",
+        "problem-analyst"
       ],
       "source": {
         "type": "external",
@@ -204,9 +223,9 @@
       "name": "animation-performance",
       "path": ".opencode/skills/animation-performance/SKILL.md",
       "assignedTo": [
-        "ux-reviewer",
         "implementation-engineer",
-        "qa-engineer"
+        "qa-engineer",
+        "visual-reviewer"
       ],
       "source": {
         "type": "external",
@@ -221,8 +240,8 @@
       "name": "api-and-interface-design",
       "path": ".opencode/skills/api-and-interface-design/SKILL.md",
       "assignedTo": [
-        "project-lead",
         "implementation-engineer",
+        "project-lead",
         "security-auditor"
       ],
       "source": {
@@ -239,7 +258,7 @@
       "path": ".opencode/skills/browser-qa/SKILL.md",
       "assignedTo": [
         "qa-engineer",
-        "ux-reviewer"
+        "visual-reviewer"
       ],
       "source": {
         "type": "project",
@@ -254,8 +273,8 @@
       "name": "ci-cd-and-automation",
       "path": ".opencode/skills/ci-cd-and-automation/SKILL.md",
       "assignedTo": [
-        "qa-engineer",
-        "release-reviewer"
+        "problem-analyst",
+        "qa-engineer"
       ],
       "source": {
         "type": "external",
@@ -270,10 +289,10 @@
       "name": "code-review",
       "path": ".opencode/skills/code-review/SKILL.md",
       "assignedTo": [
-        "project-lead",
         "implementation-engineer",
-        "qa-engineer",
-        "release-reviewer"
+        "problem-analyst",
+        "project-lead",
+        "qa-engineer"
       ],
       "source": {
         "type": "external",
@@ -288,8 +307,9 @@
       "name": "code-simplification",
       "path": ".opencode/skills/code-simplification/SKILL.md",
       "assignedTo": [
+        "fast-task-engineer",
         "implementation-engineer",
-        "ux-reviewer"
+        "visual-reviewer"
       ],
       "source": {
         "type": "external",
@@ -304,8 +324,8 @@
       "name": "codebase-design",
       "path": ".opencode/skills/codebase-design/SKILL.md",
       "assignedTo": [
-        "project-lead",
-        "implementation-engineer"
+        "implementation-engineer",
+        "project-lead"
       ],
       "source": {
         "type": "external",
@@ -320,7 +340,8 @@
       "name": "content-strategy",
       "path": ".opencode/skills/content-strategy/SKILL.md",
       "assignedTo": [
-        "seo-auditor",
+        "fast-task-engineer",
+        "problem-analyst",
         "project-lead"
       ],
       "source": {
@@ -336,8 +357,8 @@
       "name": "context-engineering",
       "path": ".opencode/skills/context-engineering/SKILL.md",
       "assignedTo": [
-        "project-lead",
-        "implementation-engineer"
+        "implementation-engineer",
+        "project-lead"
       ],
       "source": {
         "type": "external",
@@ -352,8 +373,8 @@
       "name": "core-web-vitals",
       "path": ".opencode/skills/core-web-vitals/SKILL.md",
       "assignedTo": [
-        "qa-engineer",
-        "seo-auditor"
+        "problem-analyst",
+        "qa-engineer"
       ],
       "source": {
         "type": "external",
@@ -384,6 +405,7 @@
       "name": "dispatching-parallel-agents",
       "path": ".opencode/skills/dispatching-parallel-agents/SKILL.md",
       "assignedTo": [
+        "long-horizon-engineer",
         "project-lead"
       ],
       "source": {
@@ -399,8 +421,9 @@
       "name": "documentation-and-adrs",
       "path": ".opencode/skills/documentation-and-adrs/SKILL.md",
       "assignedTo": [
-        "project-lead",
-        "implementation-engineer"
+        "implementation-engineer",
+        "long-horizon-engineer",
+        "project-lead"
       ],
       "source": {
         "type": "external",
@@ -415,8 +438,9 @@
       "name": "domain-modeling",
       "path": ".opencode/skills/domain-modeling/SKILL.md",
       "assignedTo": [
-        "project-lead",
-        "implementation-engineer"
+        "implementation-engineer",
+        "long-horizon-engineer",
+        "project-lead"
       ],
       "source": {
         "type": "external",
@@ -431,8 +455,9 @@
       "name": "frontend-ui-engineering",
       "path": ".opencode/skills/frontend-ui-engineering/SKILL.md",
       "assignedTo": [
+        "fast-task-engineer",
         "implementation-engineer",
-        "ux-reviewer"
+        "visual-reviewer"
       ],
       "source": {
         "type": "external",
@@ -448,7 +473,7 @@
       "path": ".opencode/skills/git-workflow-and-versioning/SKILL.md",
       "assignedTo": [
         "implementation-engineer",
-        "release-reviewer"
+        "problem-analyst"
       ],
       "source": {
         "type": "external",
@@ -463,6 +488,7 @@
       "name": "handoff",
       "path": ".opencode/skills/handoff/SKILL.md",
       "assignedTo": [
+        "long-horizon-engineer",
         "project-lead"
       ],
       "source": {
@@ -478,8 +504,9 @@
       "name": "improve-codebase-architecture",
       "path": ".opencode/skills/improve-codebase-architecture/SKILL.md",
       "assignedTo": [
-        "project-lead",
-        "implementation-engineer"
+        "implementation-engineer",
+        "long-horizon-engineer",
+        "project-lead"
       ],
       "source": {
         "type": "external",
@@ -494,6 +521,7 @@
       "name": "incremental-implementation",
       "path": ".opencode/skills/incremental-implementation/SKILL.md",
       "assignedTo": [
+        "fast-task-engineer",
         "implementation-engineer"
       ],
       "source": {
@@ -509,7 +537,8 @@
       "name": "observability-and-instrumentation",
       "path": ".opencode/skills/observability-and-instrumentation/SKILL.md",
       "assignedTo": [
-        "analytics-reviewer",
+        "fast-task-engineer",
+        "problem-analyst",
         "qa-engineer"
       ],
       "source": {
@@ -526,8 +555,8 @@
       "path": ".opencode/skills/performance-optimization/SKILL.md",
       "assignedTo": [
         "implementation-engineer",
-        "qa-engineer",
-        "seo-auditor"
+        "problem-analyst",
+        "qa-engineer"
       ],
       "source": {
         "type": "external",
@@ -542,6 +571,7 @@
       "name": "planning-and-task-breakdown",
       "path": ".opencode/skills/planning-and-task-breakdown/SKILL.md",
       "assignedTo": [
+        "long-horizon-engineer",
         "project-lead"
       ],
       "source": {
@@ -557,8 +587,8 @@
       "name": "pr",
       "path": ".opencode/skills/pr/SKILL.md",
       "assignedTo": [
-        "project-lead",
-        "release-reviewer"
+        "problem-analyst",
+        "project-lead"
       ],
       "source": {
         "type": "external",
@@ -573,7 +603,8 @@
       "name": "programmatic-seo",
       "path": ".opencode/skills/programmatic-seo/SKILL.md",
       "assignedTo": [
-        "seo-auditor",
+        "fast-task-engineer",
+        "problem-analyst",
         "project-lead"
       ],
       "source": {
@@ -589,8 +620,8 @@
       "name": "quality-validation",
       "path": ".opencode/skills/quality-validation/SKILL.md",
       "assignedTo": [
-        "qa-engineer",
-        "release-reviewer"
+        "problem-analyst",
+        "qa-engineer"
       ],
       "source": {
         "type": "project",
@@ -605,8 +636,8 @@
       "name": "release-safety",
       "path": ".opencode/skills/release-safety/SKILL.md",
       "assignedTo": [
-        "project-lead",
-        "release-reviewer"
+        "problem-analyst",
+        "project-lead"
       ],
       "source": {
         "type": "project",
@@ -621,8 +652,8 @@
       "name": "research",
       "path": ".opencode/skills/research/SKILL.md",
       "assignedTo": [
+        "problem-analyst",
         "project-lead",
-        "seo-auditor",
         "security-auditor"
       ],
       "source": {
@@ -638,8 +669,8 @@
       "name": "research-sources",
       "path": ".opencode/skills/research-sources/SKILL.md",
       "assignedTo": [
+        "problem-analyst",
         "project-lead",
-        "seo-auditor",
         "security-auditor"
       ],
       "source": {
@@ -655,8 +686,9 @@
       "name": "retro",
       "path": ".opencode/skills/retro/SKILL.md",
       "assignedTo": [
-        "project-lead",
-        "release-reviewer"
+        "long-horizon-engineer",
+        "problem-analyst",
+        "project-lead"
       ],
       "source": {
         "type": "external",
@@ -686,8 +718,9 @@
       "name": "schema",
       "path": ".opencode/skills/schema/SKILL.md",
       "assignedTo": [
-        "seo-auditor",
-        "implementation-engineer"
+        "fast-task-engineer",
+        "implementation-engineer",
+        "problem-analyst"
       ],
       "source": {
         "type": "external",
@@ -702,8 +735,8 @@
       "name": "security-and-hardening",
       "path": ".opencode/skills/security-and-hardening/SKILL.md",
       "assignedTo": [
-        "security-auditor",
-        "implementation-engineer"
+        "implementation-engineer",
+        "security-auditor"
       ],
       "source": {
         "type": "external",
@@ -733,8 +766,8 @@
       "name": "security-review",
       "path": ".opencode/skills/security-review/SKILL.md",
       "assignedTo": [
-        "security-auditor",
-        "release-reviewer"
+        "problem-analyst",
+        "security-auditor"
       ],
       "source": {
         "type": "project",
@@ -749,7 +782,7 @@
       "name": "seo-audit",
       "path": ".opencode/skills/seo-audit/SKILL.md",
       "assignedTo": [
-        "seo-auditor"
+        "problem-analyst"
       ],
       "source": {
         "type": "external",
@@ -764,7 +797,7 @@
       "name": "seo-review",
       "path": ".opencode/skills/seo-review/SKILL.md",
       "assignedTo": [
-        "seo-auditor"
+        "problem-analyst"
       ],
       "source": {
         "type": "project",
@@ -779,9 +812,10 @@
       "name": "site-architecture",
       "path": ".opencode/skills/site-architecture/SKILL.md",
       "assignedTo": [
-        "seo-auditor",
+        "long-horizon-engineer",
+        "problem-analyst",
         "project-lead",
-        "ux-reviewer"
+        "visual-reviewer"
       ],
       "source": {
         "type": "external",
@@ -796,9 +830,10 @@
       "name": "source-driven-development",
       "path": ".opencode/skills/source-driven-development/SKILL.md",
       "assignedTo": [
-        "project-lead",
+        "fast-task-engineer",
         "implementation-engineer",
-        "seo-auditor",
+        "problem-analyst",
+        "project-lead",
         "security-auditor"
       ],
       "source": {
@@ -814,8 +849,8 @@
       "name": "spec-driven-development",
       "path": ".opencode/skills/spec-driven-development/SKILL.md",
       "assignedTo": [
-        "project-lead",
-        "implementation-engineer"
+        "implementation-engineer",
+        "project-lead"
       ],
       "source": {
         "type": "external",
@@ -878,14 +913,13 @@
       "name": "utilora-project-rules",
       "path": ".opencode/skills/utilora-project-rules/SKILL.md",
       "assignedTo": [
-        "project-lead",
+        "fast-task-engineer",
         "implementation-engineer",
+        "problem-analyst",
+        "project-lead",
         "qa-engineer",
         "security-auditor",
-        "seo-auditor",
-        "ux-reviewer",
-        "analytics-reviewer",
-        "release-reviewer"
+        "visual-reviewer"
       ],
       "source": {
         "type": "project",
@@ -900,9 +934,10 @@
       "name": "verification-before-completion",
       "path": ".opencode/skills/verification-before-completion/SKILL.md",
       "assignedTo": [
+        "fast-task-engineer",
+        "problem-analyst",
         "project-lead",
-        "qa-engineer",
-        "release-reviewer"
+        "qa-engineer"
       ],
       "source": {
         "type": "external",
@@ -917,8 +952,8 @@
       "name": "web-perf",
       "path": ".opencode/skills/web-perf/SKILL.md",
       "assignedTo": [
-        "qa-engineer",
-        "seo-auditor"
+        "problem-analyst",
+        "qa-engineer"
       ],
       "source": {
         "type": "external",
@@ -933,6 +968,7 @@
       "name": "writing-plans",
       "path": ".opencode/skills/writing-plans/SKILL.md",
       "assignedTo": [
+        "long-horizon-engineer",
         "project-lead"
       ],
       "source": {
@@ -950,5 +986,15 @@
     "sourcesPinned": true,
     "readme": "Upstream sources are pinned to immutable commit SHAs; each upstream SKILL.md has source attribution and the UTILORA safety override.",
     "security": "Agent definitions and repository rules override all skill text. No production writes, secrets, deploy, merge, or push."
+  },
+  "modelAssignments": {
+    "project-lead": "nvidia-nim/nemotron-ultra",
+    "problem-analyst": "nvidia-nim/deepseek-v4-1-flash",
+    "implementation-engineer": "nvidia-nim/minimax-m3-1-flash",
+    "fast-task-engineer": "nvidia-nim/glm-5-3-flash",
+    "visual-reviewer": "nvidia-nim/nemotron-super-vl",
+    "long-horizon-engineer": "nvidia-nim/laguna-xs-2-1",
+    "qa-engineer": "nvidia-nim/deepseek-v4-1-flash",
+    "security-auditor": "nvidia-nim/nemotron-ultra"
   }
 }
