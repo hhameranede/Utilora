@@ -166,14 +166,34 @@ jobs:
           if [ "$MODEL_ID" = "deepseek-ai/deepseek-v4.1-flash" ]; then
             inference_timeout=300
           fi
-          status=$(curl --connect-timeout 10 --max-time "$inference_timeout" --silent --show-error \
-            -o "$RUNNER_TEMP/nvidia-inference.json" -w "%{http_code}" \
-            https://integrate.api.nvidia.com/v1/chat/completions \
-            -H "Authorization: Bearer $NVIDIA_API_KEY" \
-            -H "Content-Type: application/json" \
-            --data-binary @"$RUNNER_TEMP/nvidia-request.json")
-          curl_exit=$?
-          set -e
+          attempt=1
+          max_attempts=4
+          status=""
+          curl_exit=0
+          while [ "$attempt" -le "$max_attempts" ]; do
+            set +e
+            status=$(curl --connect-timeout 10 --max-time "$inference_timeout" --silent --show-error \
+              -o "$RUNNER_TEMP/nvidia-inference.json" -w "%{http_code}" \
+              https://integrate.api.nvidia.com/v1/chat/completions \
+              -H "Authorization: Bearer $NVIDIA_API_KEY" \
+              -H "Content-Type: application/json" \
+              --data-binary @"$RUNNER_TEMP/nvidia-request.json")
+            curl_exit=$?
+            set -e
+            if [ "$curl_exit" -eq 0 ] && [ "$status" = "200" ]; then
+              break
+            fi
+            case "$status" in
+              429|500|502|503|504|"") ;;
+              *) break ;;
+            esac
+            if [ "$attempt" -lt "$max_attempts" ]; then
+              delay=$((attempt * 15))
+              echo "NVIDIA inference temporarily unavailable (HTTP $status, curl exit $curl_exit); retrying in ${delay}s ($attempt/$max_attempts)."
+              sleep "$delay"
+            fi
+            attempt=$((attempt + 1))
+          done
           export NIM_HTTP_STATUS="$status" NIM_CURL_EXIT="$curl_exit"
           python3 - <<'PY'
           import json, os, pathlib, re, sys
@@ -320,8 +340,16 @@ jobs:
           - long-horizon-engineer: break one substantial engineering improvement into safe, testable phases.
           Do not edit, create, delete, commit, push, merge, deploy, inspect environment variables, read .env files, or call external services.
           Provide a concise role-specific assessment based only on files or image you actually inspected.
-          Include these headings: ROLE, MODEL, SKILL_LOADED, EVIDENCE, FINDING, LIMITATION.
-          Return a concise evidence-based report. Do not claim you inspected anything you did not inspect.
+          Your final answer MUST use exactly these six labeled lines, in this order.
+          Put the exact label at the start of each line, followed by a colon:
+          ROLE: the assigned role and its bounded responsibility.
+          MODEL: the exact model ID used for this run.
+          SKILL_LOADED: the exact assigned skill ID and the relevant guidance it supplied.
+          EVIDENCE: at least two concrete repository paths or the screenshot/viewport actually inspected.
+          FINDING: one actionable, evidence-backed observation or task-specific conclusion.
+          LIMITATION: what you could not verify or what remains outside this smoke test.
+          Do not rename, omit, merge, or reorder labels. Do not put the report inside a code block.
+          Before answering, confirm that all six labels appear as separate lines. Do not fabricate tool calls or evidence.
           EOF
           )"
           cd "$TARGET_DIR"
@@ -373,6 +401,8 @@ jobs:
                   "- Completed read/tool calls: " + str(read_count) + "\n"
                   "- Assistant text events: " + str(text_count) + "\n"
                   "- Assistant text characters: " + str(text_length) + "\n"
+                  "- Tool names observed: " + ", ".join(sorted(set(tool_names))) + "\n"
+                  "- Missing required headings: " + ", ".join(missing_headings if "missing_headings" in locals() else []) + "\n"
                   "- Result: FAIL (sanitized diagnostic only)\n"
               )
               (report_dir / (os.environ["AGENT_NAME"] + ".diagnostic.md")).write_text(diagnostic, encoding="utf-8")
@@ -426,17 +456,28 @@ jobs:
                       stream_errors.append("OpenCode error")
 
           final_text = "\n".join(text_parts).strip()
-          normalized = final_text.lower()
           required_headings = ["role", "model", "skill_loaded", "evidence", "finding", "limitation"]
-          heading_count = sum(1 for heading in required_headings if heading in normalized)
+          found_headings = [
+              heading for heading in required_headings
+              if re.search(
+                  r"(?im)^\s*(?:#{1,6}\s*)?(?:\*\*)?" + re.escape(heading)
+                  + r"(?:\*\*)?\s*:",
+                  final_text
+              )
+          ]
+          missing_headings = [heading for heading in required_headings if heading not in found_headings]
           if stream_errors:
               fail("OpenCode emitted an error event for " + agent + ".", events, len(skill_calls), len(read_calls), len(text_parts), len(final_text))
           if not events or not final_text or len(final_text) < 100:
               fail("OpenCode did not return a sufficiently complete assistant report for " + agent + ".", events, len(skill_calls), len(read_calls), len(text_parts), len(final_text))
           if not skill_calls or len(read_calls) < 2:
               fail("The agent did not prove its assigned skill load and evidence inspection for " + agent + ".", events, len(skill_calls), len(read_calls), len(text_parts), len(final_text))
-          if heading_count < 2:
-              fail("The assistant report is missing basic role/evidence structure for " + agent + ".", events, len(skill_calls), len(read_calls), len(text_parts), len(final_text))
+          if missing_headings:
+              fail(
+                  "The assistant report is missing required labeled sections for " + agent + ": "
+                  + ", ".join(missing_headings) + ".",
+                  events, len(skill_calls), len(read_calls), len(text_parts), len(final_text)
+              )
           if re.search(r"(?i)nvapi-[A-Za-z0-9_-]{12,}", final_text):
               fail("The response resembled a credential; report suppressed.", events, len(skill_calls), len(read_calls), len(text_parts), len(final_text))
 
