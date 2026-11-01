@@ -161,20 +161,26 @@ export async function renderPdfToImages(
     for (const pageNumber of pages) {
       if (!Number.isInteger(pageNumber) || pageNumber < 1 || pageNumber > pdfDocument.numPages) throw new Error(`Page ${pageNumber} is outside this PDF.`);
       const page = await pdfDocument.getPage(pageNumber);
-      const viewport = page.getViewport({ scale: dpi / 72 });
-      if (viewport.width * viewport.height > 45_000_000) throw new Error(`Page ${pageNumber} is too large at ${dpi} DPI. Try 150 DPI.`);
-      const canvas = globalThis.document.createElement('canvas');
-      canvas.width = Math.ceil(viewport.width);
-      canvas.height = Math.ceil(viewport.height);
-      const context = canvas.getContext('2d');
-      if (!context) throw new Error('Canvas rendering is unavailable in this browser.');
-      await page.render({ canvas, canvasContext: context, viewport }).promise;
-      const mime = format === 'png' ? 'image/png' : 'image/jpeg';
-      const blob = await new Promise<Blob>((resolve, reject) => canvas.toBlob((result) => result ? resolve(result) : reject(new Error('Unable to export rendered PDF page.')), mime, 0.92));
-      outputs.push({ filename: `${file.name.replace(/\.pdf$/i, '')}-page-${pageNumber}.${format}`, blob, pageNumber });
-      canvas.width = 0;
-      canvas.height = 0;
-      page.cleanup();
+      let canvas: HTMLCanvasElement | undefined;
+      try {
+        const viewport = page.getViewport({ scale: dpi / 72 });
+        if (viewport.width * viewport.height > 45_000_000) throw new Error(`Page ${pageNumber} is too large at ${dpi} DPI. Try 150 DPI.`);
+        canvas = globalThis.document.createElement('canvas');
+        canvas.width = Math.ceil(viewport.width);
+        canvas.height = Math.ceil(viewport.height);
+        const context = canvas.getContext('2d');
+        if (!context) throw new Error('Canvas rendering is unavailable in this browser.');
+        await page.render({ canvas, canvasContext: context, viewport }).promise;
+        const mime = format === 'png' ? 'image/png' : 'image/jpeg';
+        const blob = await new Promise<Blob>((resolve, reject) => canvas!.toBlob((result) => result ? resolve(result) : reject(new Error('Unable to export rendered PDF page.')), mime, 0.92));
+        outputs.push({ filename: `${file.name.replace(/\.pdf$/i, '')}-page-${pageNumber}.${format}`, blob, pageNumber });
+      } finally {
+        if (canvas) {
+          canvas.width = 0;
+          canvas.height = 0;
+        }
+        page.cleanup();
+      }
     }
     return outputs;
   } finally {
