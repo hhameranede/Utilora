@@ -245,15 +245,11 @@ jobs:
           do not modify files in this recovery run.
           Do not edit, create, delete, commit, push, merge, deploy, inspect environment variables,
           read .env files, or call external services.
-          Your final answer MUST use exactly these six labeled lines, in this order.
-          Put the exact label at the start of each line, followed by a colon:
-          ROLE: your assigned role and bounded responsibility.
-          MODEL: exact model ID used in this run.
-          SKILL_LOADED: exact skill ID and one useful rule from it.
-          EVIDENCE: at least two concrete paths actually read; visual-reviewer must also describe the attached screenshot and viewport.
-          FINDING: one specific, evidence-backed finding related to the recovery focus.
-          LIMITATION: what could not be verified.
-          Do not rename, omit, merge, or reorder labels. Do not use a code block.
+          Your final answer MUST contain exactly three labeled sections; the runner records your role, model, and assigned skill from trusted workflow metadata.
+          OUTCOME: the specific recovery result.
+          EVIDENCE: at least two repository paths you actually inspected, plus screenshot/viewport for visual review.
+          LIMITATIONS: what could not be verified.
+          Use these exact labels, one per line. Do not use a code block.
           The first action must be an actual native skill-tool call for exactly the assigned skill.
           Do not merely read SKILL.md and claim that the native skill tool was used.
           Do not claim a tool call, screenshot inspection, or finding that you did not actually perform.
@@ -303,7 +299,7 @@ jobs:
           read_calls = 0
           text_parts = []
           session_id = ""
-          labels = ["ROLE", "MODEL", "SKILL_LOADED", "EVIDENCE", "FINDING", "LIMITATION"]
+          labels = ["OUTCOME", "EVIDENCE", "LIMITATIONS"]
           for event in events:
               session_id = session_id or event.get("sessionID") or (event.get("part") or {}).get("sessionID", "")
               part = event.get("part") or {}
@@ -325,7 +321,11 @@ jobs:
           final_text = "\n".join(text_parts)
           missing = [
               label for label in labels
-              if not re.search(r"(?im)^\\s*(?:#{1,6}\\s*)?(?:\\*\\*)?" + label + r"(?:\\*\\*)?\\s*:", final_text)
+              if not re.search(
+                  r"(?im)^\s*(?:#{1,6}\s*)?(?:\*\*)?" + re.escape(label)
+                  + r"(?:\*\*)?\s*:",
+                  final_text
+              )
           ]
           precheck = {
               "session_id": session_id,
@@ -338,7 +338,7 @@ jobs:
           pathlib.Path(os.environ["PRECHECK"]).write_text(json.dumps(precheck), encoding="utf-8")
           print("Recovery completion check: completed_skill_calls=%d, failed_skill_attempts=%d, evidence_reads=%d, text_chars=%d, missing_labels=%d" % (skill_calls, len(skill_failures), read_calls, len(final_text.strip()), len(missing)))
           PY
-          needs_followup="$(python3 -c 'import json,sys; d=json.load(open(sys.argv[1])); print("yes" if d["skill_calls"] < 1 or d["read_calls"] < 2 or d["text_chars"] < 180 or d["missing_labels"] else "no")' "$RUNNER_TEMP/recovery-precheck.json")"
+          needs_followup="$(python3 -c 'import json,sys; d=json.load(open(sys.argv[1])); print("yes" if d["skill_calls"] < 1 or d["read_calls"] < 2 or d["text_chars"] < 80 or d["missing_labels"] else "no")' "$RUNNER_TEMP/recovery-precheck.json")"
           if [ "$needs_followup" = "yes" ]; then
             session_id="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1])).get("session_id",""))' "$RUNNER_TEMP/recovery-precheck.json")"
             if [ -z "$session_id" ]; then
@@ -351,14 +351,11 @@ jobs:
           If fewer than two completed evidence-inspection calls exist, inspect README.md and your own .opencode/agents/$AGENT_NAME.md using read-only tools.
           For visual-reviewer, inspect the attached real homepage screenshot; for implementation-engineer, give the minimal change plan and regression test.
           Do not edit files, inspect environment variables, read .env files, commit, push, deploy, or call external services.
-          Then return only these six separate labeled lines in this exact order:
-          ROLE: ...
-          MODEL: $MODEL_ID
-          SKILL_LOADED: $SKILL_NAME and one useful rule
-          EVIDENCE: at least two concrete paths actually inspected and screenshot/viewport when applicable
-          FINDING: one precise, evidence-backed finding related to the recovery focus
-          LIMITATION: what remains unverified
-          Do not invent tool calls, observations, or evidence.
+          Then return only these three separate labeled lines:
+          OUTCOME: ...
+          EVIDENCE: at least two concrete paths actually inspected, and screenshot/viewport for visual-reviewer.
+          LIMITATIONS: what remains unverified.
+          Use the exact labels and do not invent tool calls, observations, or evidence.
           EOF
           )"
             echo "The first recovery response was incomplete; requesting one bounded continuation in the same session."
@@ -437,7 +434,7 @@ jobs:
                       text_parts.append(value)
 
           final_text = "\n".join(text_parts).strip()
-          labels = ["ROLE", "MODEL", "SKILL_LOADED", "EVIDENCE", "FINDING", "LIMITATION"]
+          labels = ["OUTCOME", "EVIDENCE", "LIMITATIONS"]
           missing = [
               label for label in labels
               if not re.search(
@@ -450,7 +447,7 @@ jobs:
               fail("The agent did not successfully load its assigned native skill; failed attempt statuses: " + ", ".join(skill_failures) + ".", events, skill_calls, read_calls, len(final_text), missing)
           if read_calls < 2:
               fail("The agent did not complete at least two repository evidence reads.", events, skill_calls, read_calls, len(final_text), missing)
-          if len(final_text) < 180 or missing:
+          if len(final_text) < 80 or missing:
               fail("The recovery report is incomplete or missing required labeled sections.", events, skill_calls, read_calls, len(final_text), missing)
           if os.environ["AGENT_NAME"] == "visual-reviewer":
               if not re.search(r"(?i)screenshot|viewport", final_text):

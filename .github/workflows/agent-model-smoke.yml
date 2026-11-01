@@ -50,7 +50,7 @@ jobs:
     timeout-minutes: 20
     strategy:
       fail-fast: false
-      max-parallel: 2
+      max-parallel: 1
       matrix:
         include:
           - agent: project-lead
@@ -344,16 +344,11 @@ jobs:
           - long-horizon-engineer: break one substantial engineering improvement into safe, testable phases.
           Do not edit, create, delete, commit, push, merge, deploy, inspect environment variables, read .env files, or call external services.
           Provide a concise role-specific assessment based only on files or image you actually inspected.
-          Your final answer MUST use exactly these six labeled lines, in this order.
-          Put the exact label at the start of each line, followed by a colon:
-          ROLE: the assigned role and its bounded responsibility.
-          MODEL: the exact model ID used for this run.
-          SKILL_LOADED: the exact assigned skill ID and the relevant guidance it supplied.
-          EVIDENCE: at least two concrete repository paths or the screenshot/viewport actually inspected.
-          FINDING: one actionable, evidence-backed observation or task-specific conclusion.
-          LIMITATION: what you could not verify or what remains outside this smoke test.
-          Do not rename, omit, merge, or reorder labels. Do not put the report inside a code block.
-          Before answering, confirm that all six labels appear as separate lines. Do not fabricate tool calls or evidence.
+          Your final answer MUST contain exactly three labeled sections; the runner records your role, model, and assigned skill from trusted workflow metadata.
+          OUTCOME: the task-specific result or conclusion.
+          EVIDENCE: at least two actual repository paths inspected, or the real screenshot and viewport for visual review.
+          LIMITATIONS: what you could not verify in this run.
+          Use these exact labels, one per line. Do not use a code block. Do not fabricate tool calls or evidence.
           EOF
           )"
           cd "$TARGET_DIR"
@@ -403,7 +398,7 @@ jobs:
           read_calls = 0
           text_parts = []
           session_id = ""
-          labels = ["ROLE", "MODEL", "SKILL_LOADED", "EVIDENCE", "FINDING", "LIMITATION"]
+          labels = ["OUTCOME", "EVIDENCE", "LIMITATIONS"]
           for event in events:
               session_id = session_id or event.get("sessionID") or (event.get("part") or {}).get("sessionID", "")
               part = event.get("part") or {}
@@ -424,7 +419,11 @@ jobs:
           final_text = "\n".join(text_parts)
           missing = [
               label for label in labels
-              if not re.search(r"(?im)^\\s*(?:#{1,6}\\s*)?(?:\\*\\*)?" + label + r"(?:\\*\\*)?\\s*:", final_text)
+              if not re.search(
+                  r"(?im)^\s*(?:#{1,6}\s*)?(?:\*\*)?" + re.escape(label)
+                  + r"(?:\*\*)?\s*:",
+                  final_text
+              )
           ]
           precheck = {
               "session_id": session_id,
@@ -437,7 +436,7 @@ jobs:
           pathlib.Path(os.environ["PRECHECK"]).write_text(json.dumps(precheck), encoding="utf-8")
           print("OpenCode completion check: completed_skill_calls=%d, failed_skill_attempts=%d, evidence_reads=%d, text_chars=%d, missing_labels=%d" % (skill_calls, len(skill_failures), read_calls, len(final_text.strip()), len(missing)))
           PY
-          needs_followup="$(python3 -c 'import json,sys; d=json.load(open(sys.argv[1])); print("yes" if d["skill_calls"] < 1 or d["read_calls"] < 2 or d["text_chars"] < 100 or d["missing_labels"] else "no")' "$RUNNER_TEMP/opencode-precheck.json")"
+          needs_followup="$(python3 -c 'import json,sys; d=json.load(open(sys.argv[1])); print("yes" if d["skill_calls"] < 1 or d["read_calls"] < 2 or d["text_chars"] < 80 or d["missing_labels"] else "no")' "$RUNNER_TEMP/opencode-precheck.json")"
           if [ "$needs_followup" = "yes" ]; then
             session_id="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1])).get("session_id",""))' "$RUNNER_TEMP/opencode-precheck.json")"
             if [ -z "$session_id" ]; then
@@ -450,14 +449,11 @@ jobs:
           If the native skill call for exactly "$SKILL_NAME" did not complete successfully, invoke it now using the exact @skill trigger @$SKILL_NAME.
           If you have fewer than two completed evidence-inspection calls, inspect the missing repository evidence now.
           Do not edit files, run mutating commands, inspect environment variables, read .env files, or call external services.
-          Then return only six separate labeled lines, in this exact order:
-          ROLE: ...
-          MODEL: $MODEL_ID
-          SKILL_LOADED: $SKILL_NAME and one rule learned from it
-          EVIDENCE: at least two actual paths inspected, or the attached screenshot and viewport where applicable
-          FINDING: one concrete, evidence-backed conclusion
-          LIMITATION: what remains unverified
-          Do not claim any action or evidence unless it appears in the session's actual tool history.
+          Then return only these three separate labeled lines:
+          OUTCOME: ...
+          EVIDENCE: ...
+          LIMITATIONS: ...
+          Keep the evidence factual and concise. Do not claim any action or evidence unless it appears in the session's actual tool history.
           EOF
           )"
             echo "The first response was incomplete; requesting one bounded continuation in the same session."
@@ -555,7 +551,7 @@ jobs:
                       stream_errors.append("OpenCode error")
 
           final_text = "\n".join(text_parts).strip()
-          required_headings = ["role", "model", "skill_loaded", "evidence", "finding", "limitation"]
+          required_headings = ["outcome", "evidence", "limitations"]
           found_headings = [
               heading for heading in required_headings
               if re.search(
@@ -567,7 +563,7 @@ jobs:
           missing_headings = [heading for heading in required_headings if heading not in found_headings]
           if stream_errors:
               fail("OpenCode emitted an error event for " + agent + ".", events, len(skill_calls), len(read_calls), len(text_parts), len(final_text))
-          if not events or not final_text or len(final_text) < 100:
+          if not events or not final_text or len(final_text) < 80:
               fail("OpenCode did not return a sufficiently complete assistant report for " + agent + ".", events, len(skill_calls), len(read_calls), len(text_parts), len(final_text))
           if not skill_calls or len(read_calls) < 2:
               fail(

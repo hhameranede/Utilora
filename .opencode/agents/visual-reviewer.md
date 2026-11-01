@@ -5,7 +5,7 @@ model: nvidia-nim/nemotron-super-vl
 permission:
   edit: deny
   bash:
-    "*": ask
+    "*": deny
     "git status*": allow
     "git diff*": allow
   external_directory: deny

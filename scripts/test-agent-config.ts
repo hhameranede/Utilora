@@ -128,6 +128,14 @@ const agentFiles = readdirSync(agentDir).filter((name) => name.endsWith('.md'));
 assert.equal(agentFiles.length, expectedAgents.length, 'Expected exactly eight agent definitions');
 for (const agent of expectedAgents) assert.ok(agentFiles.includes(agent + '.md'), 'Missing agent ' + agent);
 
+const visualFrontmatter = readFrontmatter(join(agentDir, 'visual-reviewer.md'), 'visual-reviewer.md');
+const visualBashIndex = visualFrontmatter.findIndex((line) => line.trim() === 'bash:');
+assert.notEqual(visualBashIndex, -1, 'Visual Reviewer must declare an explicit bash boundary');
+const visualBashRules = visualFrontmatter.slice(visualBashIndex + 1).filter((line) => line.startsWith('    '));
+assert.ok(visualBashRules.some((line) => line.trim() === '"*": deny'), 'Visual Reviewer must deny general shell commands');
+assert.ok(visualBashRules.some((line) => line.trim() === '"git status*": allow'), 'Visual Reviewer may inspect git status');
+assert.ok(visualBashRules.some((line) => line.trim() === '"git diff*": allow'), 'Visual Reviewer may inspect git diff');
+
 const skillsDir = join(root, '.opencode', 'skills');
 const skillDirs = readdirSync(skillsDir)
   .filter((name) => statSync(join(skillsDir, name)).isDirectory())

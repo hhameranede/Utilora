@@ -10,7 +10,7 @@ The corrected full smoke run and dedicated recovery workflows have been triggere
 - its exact configured model route is used and responds to a real inference;
 - its assigned native skill-tool call completed successfully (a denied/error tool event is not a pass);
 - at least two real repository evidence reads completed;
-- a complete, labeled, evidence-based final report was returned;
+- an evidence-based final report contains the three required sections (`OUTCOME`, `EVIDENCE`, `LIMITATIONS`); role/model/skill metadata is supplied by the workflow, not authored by the model;
 - the agent respected its read-only/limited role and left the checkout unchanged.
 
 ## Last completed full smoke evidence
@@ -35,6 +35,8 @@ Run [41356136034](https://github.com/hhameranede/Utilora/actions/runs/4135613603
 ## Queue and run deduplication
 
 - The full eight-agent model smoke test remains automatic for relevant pull-request changes, with a workflow-level concurrency group that cancels older smoke attempts for the same PR when a newer commit arrives.
+- The eight-agent matrix runs one model-backed task at a time to reduce provider throttling and make failures attributable.
+- Agent reports require only `OUTCOME`, `EVIDENCE`, and `LIMITATIONS`; trusted workflow metadata supplies the role, model, and skill identity.
 - Individual recovery workflows are manual-dispatch only. Run them for a specific failed role when needed; they no longer launch five additional model runs on every PR synchronization.
 - Each recovery workflow has its own concurrency group so a newer manual recovery for the same role/ref supersedes an older one.
 - The full smoke matrix is the primary eight-agent admission gate; isolated recovery is targeted remediation, not a parallel second smoke suite.
