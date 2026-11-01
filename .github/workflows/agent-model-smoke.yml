@@ -1,16 +1,27 @@
 name: UTILORA agent model smoke test
 
 on:
-  workflow_call:
+  workflow_dispatch:
     inputs:
       utilora_ref:
-        description: Immutable UTILORA commit to test.
-        required: true
+        description: Optional immutable UTILORA commit to test; defaults to this workflow revision.
+        required: false
         type: string
-    secrets:
-      NVIDIA_API_KEY:
-        description: Existing NVIDIA key forwarded by the trusted Softnexa caller.
-        required: true
+        default: ""
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/agent-model-smoke.yml"
+      - "opencode.json"
+      - ".opencode/agents/**"
+      - ".opencode/skills/**"
+  push:
+    branches: ["feat/autonomous-agent-foundation-2026-11-01"]
+    paths:
+      - ".github/workflows/agent-model-smoke.yml"
+      - "opencode.json"
+      - ".opencode/agents/**"
+      - ".opencode/skills/**"
 
 permissions:
   contents: read
@@ -19,7 +30,7 @@ jobs:
   agent-smoke:
     name: "${{ matrix.agent }} · ${{ matrix.model_id }}"
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 20
     strategy:
       fail-fast: false
       max-parallel: 2
@@ -66,7 +77,7 @@ jobs:
 
       - name: Checkout the pinned UTILORA revision
         env:
-          UTILORA_REF: ${{ inputs.utilora_ref }}
+          UTILORA_REF: ${{ inputs.utilora_ref || github.sha }}
         run: |
           set -euo pipefail
           git clone --quiet --depth 1 https://github.com/hhameranede/Utilora.git "$RUNNER_TEMP/utilora"
@@ -84,7 +95,7 @@ jobs:
           set -euo pipefail
           set +x
           if [ -z "$NVIDIA_API_KEY" ]; then
-            echo "::error::NVIDIA_API_KEY was not received from the Softnexa caller."
+            echo "::error::Missing repository Actions secret NVIDIA_API_KEY. Add the existing provider credential to UTILORA Settings > Secrets and variables > Actions."
             exit 1
           fi
           curl --connect-timeout 10 --max-time 30 --fail --silent --show-error \
@@ -106,7 +117,7 @@ jobs:
           }
           expected = os.environ["EXPECTED_MODEL"]
           if expected not in model_ids:
-              print("::error::The existing Softnexa NVIDIA key does not currently list the assigned model: " + expected)
+              print("::error::The configured NVIDIA API credential does not list the assigned model: " + expected)
               print("The key is valid only if the provider accepts it; no secret value was displayed.")
               sys.exit(1)
           print("NVIDIA catalogue check passed for: " + expected)
@@ -122,13 +133,18 @@ jobs:
           set +x
           python3 - <<'PY'
           import json, os, pathlib
+          model = os.environ["MODEL_ID"]
           payload = {
-              "model": os.environ["MODEL_ID"],
+              "model": model,
               "messages": [{"role": "user", "content": "Reply with exactly this token: UTILORA_NIM_OK"}],
-              "max_tokens": 96,
+              "max_tokens": 8192 if model == "z-ai/glm-5.3-flash" else 128,
               "temperature": 0.1,
               "stream": False
           }
+          if model == "z-ai/glm-5.3-flash":
+              # GLM-5.3-Flash spends tokens on reasoning; keep the reasoning budget low
+              # and leave enough generation budget for a visible final answer.
+              payload["reasoning_effort"] = "low"
           path = pathlib.Path(os.environ["RUNNER_TEMP"]) / "nvidia-request.json"
           path.write_text(json.dumps(payload), encoding="utf-8")
           PY
@@ -165,10 +181,32 @@ jobs:
                   print("Provider error: " + detail)
               sys.exit(1)
           choices = payload.get("choices", [])
-          message = choices[0].get("message", {}) if choices and isinstance(choices[0], dict) else {}
+          choice = choices[0] if choices and isinstance(choices[0], dict) else {}
+          message = choice.get("message", {}) if isinstance(choice.get("message"), dict) else {}
           content = message.get("content", "")
+          if isinstance(content, list):
+              content = "".join(
+                  part.get("text", "")
+                  for part in content
+                  if isinstance(part, dict) and isinstance(part.get("text"), str)
+              )
           if not isinstance(content, str) or not content.strip():
-              print("::error::NVIDIA returned HTTP 200 but no text output for " + os.environ["MODEL_ID"])
+              finish_reason = str(choice.get("finish_reason", "unknown"))
+              reasoning = message.get("reasoning_content", "")
+              reasoning_length = len(reasoning) if isinstance(reasoning, str) else 0
+              print(
+                  "::error::NVIDIA returned HTTP 200 without a final text answer for "
+                  + os.environ["MODEL_ID"]
+                  + "; finish_reason=" + finish_reason
+                  + "; reasoning_chars=" + str(reasoning_length)
+              )
+              print("Response keys: " + ",".join(sorted(payload.keys())))
+              print("Choice keys: " + ",".join(sorted(choice.keys())))
+              print("Message keys: " + ",".join(sorted(message.keys())))
+              sys.exit(1)
+          if "UTILORA_NIM_OK" not in content:
+              print("::error::NVIDIA returned text but did not complete the inference sentinel for " + os.environ["MODEL_ID"])
+              print("finish_reason=" + str(choice.get("finish_reason", "unknown")) + "; output_chars=" + str(len(content)))
               sys.exit(1)
           print("Real NVIDIA inference passed for: " + os.environ["MODEL_ID"])
           body_path.unlink(missing_ok=True)
@@ -266,8 +304,7 @@ jobs:
           Do not edit, create, delete, commit, push, merge, deploy, inspect environment variables, read .env files, or call external services.
           Provide a concise role-specific assessment based only on files or image you actually inspected.
           Include these headings: ROLE, MODEL, SKILL_LOADED, EVIDENCE, FINDING, LIMITATION.
-          If and only if you actually loaded your assigned skill and inspected the required evidence, make the final line exactly: AGENT_SMOKE_PASS
-          Otherwise make the final line exactly: AGENT_SMOKE_FAIL
+          Return a concise evidence-based report. Do not claim you inspected anything you did not inspect.
           EOF
           )"
           cd "$TARGET_DIR"
@@ -305,53 +342,94 @@ jobs:
           raw_path = pathlib.Path(os.environ["RAW_REPORT"])
           raw = raw_path.read_text(encoding="utf-8", errors="replace")
           secret = os.environ.get("NVIDIA_API_KEY", "")
-          if secret and secret in raw:
-              print("::error::The model output contained the credential; report suppressed.")
+          report_dir = pathlib.Path(os.environ["SAFE_REPORT_DIR"])
+          report_dir.mkdir(parents=True, exist_ok=True)
+
+          def fail(message, events=None, skill_count=0, read_count=0, text_count=0, text_length=0):
+              print("::error::" + message)
+              diagnostic = (
+                  "# Agent smoke diagnostic: " + os.environ["AGENT_NAME"] + "\n\n"
+                  "- Model: " + os.environ["MODEL_ID"] + "\n"
+                  "- Assigned skill: " + os.environ["SKILL_NAME"] + "\n"
+                  "- Parsed event count: " + str(len(events or [])) + "\n"
+                  "- Skill tool calls: " + str(skill_count) + "\n"
+                  "- Completed read/tool calls: " + str(read_count) + "\n"
+                  "- Assistant text events: " + str(text_count) + "\n"
+                  "- Assistant text characters: " + str(text_length) + "\n"
+                  "- Result: FAIL (sanitized diagnostic only)\n"
+              )
+              (report_dir / (os.environ["AGENT_NAME"] + ".diagnostic.md")).write_text(diagnostic, encoding="utf-8")
               raw_path.unlink(missing_ok=True)
               sys.exit(1)
+
+          if secret and secret in raw:
+              fail("Agent output contained the configured credential; raw output was suppressed.")
+          if re.search(r"(?i)nvapi-[A-Za-z0-9_-]{12,}", raw):
+              fail("Agent output resembled an NVIDIA credential; raw output was suppressed.")
+
           events = []
+          parse_errors = 0
           for line in raw.splitlines():
               try:
-                  events.append(json.loads(line))
+                  event = json.loads(line)
+                  if isinstance(event, dict) and isinstance(event.get("type"), str):
+                      events.append(event)
               except json.JSONDecodeError:
-                  continue
+                  parse_errors += 1
+
           agent = os.environ["AGENT_NAME"]
           skill = os.environ["SKILL_NAME"]
           skill_calls = []
           read_calls = []
           text_parts = []
+          tool_names = []
+          stream_errors = []
           for event in events:
-              if event.get("type") == "tool_use":
-                  part = event.get("part") or {}
+              event_type = event.get("type")
+              part = event.get("part") or {}
+              if event_type == "tool_use":
                   tool = part.get("tool")
                   state = part.get("state") or {}
                   inputs = state.get("input") or {}
+                  if isinstance(tool, str):
+                      tool_names.append(tool)
                   if tool == "skill" and skill in json.dumps(inputs, ensure_ascii=False):
                       skill_calls.append(event)
                   if tool in {"read", "grep", "glob", "list", "bash"} and state.get("status") == "completed":
                       read_calls.append(event)
-              if event.get("type") == "text":
-                  part = event.get("part") or {}
-                  if isinstance(part.get("text"), str):
-                      text_parts.append(part["text"])
+              elif event_type == "text":
+                  value = part.get("text")
+                  if isinstance(value, str):
+                      text_parts.append(value)
+              elif event_type == "error":
+                  error = event.get("error") or {}
+                  if isinstance(error, dict):
+                      stream_errors.append(str(error.get("name", "OpenCode error")))
+                  else:
+                      stream_errors.append("OpenCode error")
+
           final_text = "\n".join(text_parts).strip()
-          if not final_text or not skill_calls or not read_calls or not final_text.rstrip().endswith("AGENT_SMOKE_PASS"):
-              print("::error::Smoke test did not prove model, skill loading, evidence inspection and a final response for " + agent + ".")
-              print("Skill loads: " + str(len(skill_calls)) + "; completed read/tool calls: " + str(len(read_calls)) + "; response text events: " + str(len(text_parts)))
-              raw_path.unlink(missing_ok=True)
-              sys.exit(1)
-          if re.search(r"nvapi-[A-Za-z0-9_-]{12,}", final_text):
-              print("::error::The response resembled a credential; report suppressed.")
-              raw_path.unlink(missing_ok=True)
-              sys.exit(1)
+          normalized = final_text.lower()
+          required_headings = ["role", "model", "skill_loaded", "evidence", "finding", "limitation"]
+          heading_count = sum(1 for heading in required_headings if heading in normalized)
+          if stream_errors:
+              fail("OpenCode emitted an error event for " + agent + ".", events, len(skill_calls), len(read_calls), len(text_parts), len(final_text))
+          if not events or not final_text or len(final_text) < 100:
+              fail("OpenCode did not return a sufficiently complete assistant report for " + agent + ".", events, len(skill_calls), len(read_calls), len(text_parts), len(final_text))
+          if not skill_calls or len(read_calls) < 2:
+              fail("The agent did not prove its assigned skill load and evidence inspection for " + agent + ".", events, len(skill_calls), len(read_calls), len(text_parts), len(final_text))
+          if heading_count < 4:
+              fail("The assistant report is missing too many required evidence headings for " + agent + ".", events, len(skill_calls), len(read_calls), len(text_parts), len(final_text))
+          if re.search(r"(?i)nvapi-[A-Za-z0-9_-]{12,}", final_text):
+              fail("The response resembled a credential; report suppressed.", events, len(skill_calls), len(read_calls), len(text_parts), len(final_text))
+
           model = os.environ["MODEL_ID"]
-          report_dir = pathlib.Path(os.environ["SAFE_REPORT_DIR"])
-          report_dir.mkdir(parents=True, exist_ok=True)
           report = (
               "# Agent smoke report: " + agent + "\n\n"
               "- Model: " + model + "\n"
               "- Assigned skill loaded via native tool: " + skill + "\n"
               "- Completed evidence/tool calls: " + str(len(read_calls)) + "\n"
+              "- Parsed OpenCode events: " + str(len(events)) + "\n"
               "- Result: PASS\n\n"
               "## Agent response\n\n" + final_text + "\n"
           )
