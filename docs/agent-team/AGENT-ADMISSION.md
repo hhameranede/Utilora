@@ -20,8 +20,8 @@ Admission means the agent passed its isolated baseline smoke test. It does not g
 
 | Agent | Observed failure | Dedicated workflow |
 |---|---|---|
-| Implementation Engineer | Live inference, route resolution, assigned skill call, and seven completed evidence/tool calls passed; the report failed the required structure check. | [Implementation Engineer recovery](../../actions/workflows/agent-recovery-implementation-engineer.yml) |
-| Visual Reviewer | Live inference, route resolution, screenshot capture, and two evidence calls passed; the run did not prove use of the assigned native skill tool. | [Visual Reviewer recovery](../../actions/workflows/agent-recovery-visual-reviewer.yml) |
+| Implementation Engineer | Live inference, route resolution, assigned skill call, and seven completed evidence/tool calls passed; the report failed the required structure check. | [Implementation Engineer recovery](https://github.com/hhameranede/Utilora/actions/workflows/agent-recovery-implementation-engineer.yml) |
+| Visual Reviewer | Live inference, route resolution, screenshot capture, and two evidence calls passed; the run did not prove use of the assigned native skill tool. | [Visual Reviewer recovery](https://github.com/hhameranede/Utilora/actions/workflows/agent-recovery-visual-reviewer.yml) |
 
 Each recovery workflow is independently dispatchable and calls the shared in-repository recovery implementation. It has read-only GitHub permissions, performs its own model and OpenCode checks, and uploads only sanitized reports/diagnostics.
 
