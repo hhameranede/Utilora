@@ -478,6 +478,7 @@ jobs:
           report_dir.mkdir(parents=True, exist_ok=True)
           tool_names = []
           missing_headings = []
+          skill_failures = []
 
           def fail(message, events=None, skill_count=0, read_count=0, text_count=0, text_length=0):
               print("::error::" + message)
@@ -576,6 +577,11 @@ jobs:
                   + ", ".join(missing_headings) + ".",
                   events, len(skill_calls), len(read_calls), len(text_parts), len(final_text)
               )
+          if agent == "visual-reviewer":
+              if not re.search(r"(?i)screenshot|viewport", final_text):
+                  fail("The visual reviewer did not provide screenshot/viewport-specific evidence.", events, len(skill_calls), len(read_calls), len(text_parts), len(final_text))
+              if re.search(r"(?i)(could not inspect|was not inspected|does not support image input|no image input)", final_text):
+                  fail("The visual reviewer reported that image input was unavailable; visual review cannot pass.", events, len(skill_calls), len(read_calls), len(text_parts), len(final_text))
           if re.search(r"(?i)nvapi-[A-Za-z0-9_-]{12,}", final_text):
               fail("The response resembled a credential; report suppressed.", events, len(skill_calls), len(read_calls), len(text_parts), len(final_text))
 
