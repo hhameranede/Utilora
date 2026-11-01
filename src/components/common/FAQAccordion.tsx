@@ -37,7 +37,7 @@ export const FAQAccordion: React.FC<FAQAccordionProps> = ({ faqs, className = ''
               type="button"
               onClick={() => toggle(index)}
               aria-expanded={isOpen}
-              className="w-full flex items-center justify-between p-4 text-start text-sm font-semibold text-stone-900 hover:text-orange-600 transition-colors"
+              className="w-full flex items-center justify-between p-4 text-start text-sm font-semibold text-stone-900 hover:text-orange-700 transition-colors"
             >
               <span>{qText}</span>
               <ChevronDown
