@@ -192,7 +192,7 @@ const publicConfigFiles = [
   'opencode.json',
   ...agentFiles.map((name) => join('.opencode', 'agents', name)),
   ...skillDirs.map((name) => join('.opencode', 'skills', name, 'SKILL.md')),
-  manifestPath,
+  join('.opencode', 'skills', 'manifest.json'),
 ];
 const joined = publicConfigFiles.map((file) => readFileSync(join(root, file), 'utf8')).join('\n');
 assert.doesNotMatch(joined, /nvapi-[A-Za-z0-9_-]{20,}/);
