@@ -132,6 +132,7 @@ assert.equal(manifest.projectSpecificCount, 9);
 assert.equal(manifest.curatedExternalCount, 41);
 assert.equal(manifest.skills.length, 50);
 assert.deepEqual([...manifest.agents].sort(), [...expectedAgents].sort());
+assert.deepEqual(Object.keys(manifest.modelAssignments).sort(), [...expectedAgents].sort(), 'Every agent must have exactly one model assignment');
 
 const skillNames = manifest.skills.map((skill) => skill.name).sort();
 assert.equal(new Set(skillNames).size, 50, 'Skill IDs must be unique');
@@ -197,7 +198,10 @@ for (const agentFile of agentFiles) {
   assert.ok(mode === 'primary' || mode === 'subagent', 'Invalid mode in ' + agentFile);
   const agentModel = lines.find((line) => line.startsWith('model:'))?.slice(6).trim();
   assert.equal(agentModel, manifest.modelAssignments[agent], 'Wrong model assignment for ' + agent);
-  assert.ok(Object.values(nvidia.models ?? {}).some((model) => model.id && agentModel === 'nvidia-nim/' + Object.keys(nvidia.models ?? {}).find((key) => nvidia.models?.[key] === model)), 'Agent model alias is not registered for ' + agent);
+  assert.ok(
+    Object.keys(nvidia.models ?? {}).some((alias) => agentModel === 'nvidia-nim/' + alias),
+    'Agent model alias is not registered for ' + agent,
+  );
 
   const permissions = parseSkillPermissions(lines, agentFile);
   const allowed = [...permissions.entries()]
