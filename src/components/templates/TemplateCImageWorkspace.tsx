@@ -62,7 +62,17 @@ export const TemplateCImageWorkspace: React.FC<TemplateCImageWorkspaceProps> = (
     const fileRevision = ++fileRevisionRef.current;
     setBusy(false);
     setPreparingFile(true);
+    setFile(null);
     setMetadata(null);
+    setSourceUrl((previous) => {
+      if (previous) URL.revokeObjectURL(previous);
+      return '';
+    });
+    setResultUrl((previous) => {
+      if (previous) URL.revokeObjectURL(previous);
+      return '';
+    });
+    setResultName('');
     setError('');
     setMessage('');
     if (!selected.type.startsWith('image/')) {
