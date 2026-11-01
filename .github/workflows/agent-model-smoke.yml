@@ -1,9 +1,6 @@
 name: UTILORA agent capability check
 
 on:
-  push:
-    branches:
-      - feat/autonomous-agent-foundation-2026-11-01
   workflow_dispatch:
     inputs:
       utilora_ref:
@@ -21,7 +18,6 @@ permissions:
 
 jobs:
   credential-preflight:
-    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[agent-smoke-once]')
     runs-on: ubuntu-latest
     timeout-minutes: 2
     steps:
@@ -38,7 +34,6 @@ jobs:
           echo "NVIDIA NIM credential is configured; its value is not displayed."
 
   agent-check:
-    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[agent-smoke-once]')
     needs: credential-preflight
     name: "${{ matrix.agent }} · ${{ matrix.model_id }}"
     runs-on: ubuntu-latest
