@@ -78,3 +78,11 @@ test('product page stays usable at a narrow mobile viewport', async ({ page }) =
   }));
   expect(dimensions.content).toBeLessThanOrEqual(dimensions.viewport + 1);
 });
+
+test('preview-only downloader never advertises enabled processing', async ({ page }) => {
+  await page.goto('/en/tools/video-downloader');
+  await expect(page.locator('body')).toContainText('Free preview');
+  await expect(page.locator('body')).toContainText('Preview only');
+  await expect(page.locator('body')).toContainText('Not available yet');
+  await expect(page.locator('body')).not.toContainText('Browser-based processing');
+});
