@@ -67,7 +67,8 @@
     "previewOnly": "Preview only",
     "publicLookup": "Public network lookup",
     "runsLocally": "Runs in your browser",
-    "readGuide": "Read guide"
+    "readGuide": "Read guide",
+    "tryAgain": "Try again"
   },
   "home": {
     "categoriesHeading": "Explore By Category",
@@ -160,7 +161,8 @@
     "newsletterTitle": "Stay Updated",
     "newsletterDesc": "Quarterly roundups of new tools, compression benchmarks, and web specs. (Preview Only)",
     "newsletterPlaceholder": "Enter your work email",
-    "subscribe": "Subscribe"
+    "subscribe": "Subscribe",
+    "readArticle": "Read article"
   },
   "footer": {
     "rights": "All rights reserved.",
@@ -263,5 +265,8 @@
     "external": "The site loads interface fonts from Google Fonts. Your browser therefore requests font resources from Google domains, which may receive technical request information. Network lookup providers and target websites also receive the specific hostname or URL required for the lookup.",
     "accountsTitle": "6. Accounts and optional placements",
     "accounts": "A user account is not required to use the available tools. Advertising and affiliate placeholder components in the current interface are disabled by default. If optional third-party services are introduced or enabled in the future, this policy should be updated before they are used."
+  },
+  "categories": {
+    "description": "Explore the available tools by category. Each suite groups related browser-based utilities in one place."
   }
 }
