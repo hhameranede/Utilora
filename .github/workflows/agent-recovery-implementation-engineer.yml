@@ -1,0 +1,33 @@
+name: UTILORA recovery · Implementation Engineer
+
+on:
+  workflow_dispatch:
+    inputs:
+      utilora_ref:
+        description: Optional immutable UTILORA commit to test; defaults to this workflow revision.
+        required: false
+        type: string
+        default: ""
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/agent-recovery-implementation-engineer.yml"
+      - ".github/workflows/_agent-recovery-reusable.yml"
+      - ".opencode/agents/implementation-engineer.md"
+      - ".opencode/skills/safe-implementation/**"
+
+permissions:
+  contents: read
+
+jobs:
+  recovery:
+    uses: ./.github/workflows/_agent-recovery-reusable.yml
+    with:
+      utilora_ref: ${{ inputs.utilora_ref || github.sha }}
+      agent_name: "implementation-engineer"
+      model_alias: "minimax-m3-1-flash"
+      model_id: "minimaxai/minimax-m3.1-flash"
+      skill_name: "safe-implementation"
+      diagnosis_focus: >-
+        The model catalogue, live inference, agent resolution, skill call, and seven completed evidence/tool calls succeeded. The previous rejection was the final report structure: it did not contain enough clearly labeled role/evidence headings. Diagnose the output-format gap and return the six required labeled sections.
+    secrets: inherit
