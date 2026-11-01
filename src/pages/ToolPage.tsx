@@ -28,10 +28,10 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
   const categoryTitle = category ? category.localizedTitle[locale] || category.localizedTitle.en : tool.category;
   const isNetworkLookup = tool.category === 'website-domain';
   const isFunctional = tool.status === 'functional';
-  const positioning = experience
+  const hasCuratedExperience = locale === 'en' || locale === 'ar';
+  const positioning = experience && hasCuratedExperience
     ? localizedExperience(experience.positioning, locale)
     : toolDesc;
-  const hasCuratedExperience = locale === 'en' || locale === 'ar';
   const benefits = experience && hasCuratedExperience
     ? localizedExperience(experience.benefits, locale)
     : [t('product.benefit1'), t('product.benefit2'), t('product.benefit3')];
@@ -57,7 +57,7 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
   const networkProcessingText = t('product.networkProcessing');
   const previewText = t('product.previewMessage');
 
-  const faqs: FAQItem[] = tool.faqs || [
+  const baseFaqs: FAQItem[] = tool.faqs || [
     {
       question: {
         en: `What is ${toolName} designed to do?`,
@@ -96,6 +96,34 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
       },
     }] : []),
   ];
+
+  const faqs: FAQItem[] = baseFaqs.map((faq, index) => {
+    const fallbackQuestions = [
+      t('product.whatHelps'),
+      t('product.howItWorks'),
+      t('product.whatHappensInput'),
+      t('product.supportedFormats'),
+    ];
+    const fallbackAnswers = [
+      positioning,
+      steps.map((step, stepIndex) => `${stepIndex + 1}. ${step}`).join(' '),
+      isFunctional ? (isNetworkLookup ? networkProcessingText : localProcessingText) : previewText,
+      tool.acceptedFormats
+        ? `${tool.acceptedFormats.join(', ')}. ${t('product.maximumSize')} ${tool.maxFileSize || t('product.workspace')}`
+        : toolDesc,
+    ];
+    return {
+      ...faq,
+      question: {
+        ...faq.question,
+        [locale]: faq.question[locale] || `${fallbackQuestions[index] || t('product.faq')}?`,
+      },
+      answer: {
+        ...faq.answer,
+        [locale]: faq.answer[locale] || fallbackAnswers[index] || positioning,
+      },
+    };
+  });
 
   return (
     <article className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
@@ -172,7 +200,7 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
               <span className="inline-flex items-center gap-2 rounded-full border border-stone-200 bg-white px-3 py-2 text-xs font-medium text-stone-700">
                 <ShieldCheck size={14} className="text-orange-600" />
                 {!isFunctional
-                  ? (locale === 'ar' ? 'معاينة فقط' : 'Preview only')
+                  ? t('product.previewOnly')
                   : isNetworkLookup
                     ? t('product.publicLookups')
                     : t('product.browserProcessing')}
