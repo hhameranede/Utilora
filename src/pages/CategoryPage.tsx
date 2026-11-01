@@ -120,9 +120,9 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ categorySlug }) => {
             </p>
 
             <div className="pt-2 flex items-center gap-4 text-xs font-mono text-stone-400">
-              <span>{tools.length} Tools in Suite</span>
+              <span>{tools.length} {t('category.toolsInSuite')}</span>
               <span aria-hidden="true">·</span>
-              <span>{tools.filter((tool) => tool.status === 'functional').length} Fully Functional</span>
+              <span>{tools.filter((tool) => tool.status === 'functional').length} {t('category.functionalCount')}</span>
             </div>
           </div>
         </div>
@@ -142,7 +142,7 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ categorySlug }) => {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-stone-200">
             <div>
               <h2 className="text-xl font-bold text-stone-900">
-                {t('category.allTools')} {title} ({tools.length})
+                {title} · {t('category.allTools')} ({tools.length})
               </h2>
               <p className="text-xs text-stone-500 mt-0.5">
                 {t('category.chooseWorkspace')}
