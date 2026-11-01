@@ -24,6 +24,8 @@ await run('counts Arabic and Latin text without losing Unicode characters', () =
   assert.equal(metrics.words, 3);
   assert.equal(metrics.lines, 2);
   assert.equal(metrics.charactersTotal, Array.from('Hello مرحبا\nUTILORA').length);
+  assert.equal(getTextMetrics('Hi🙂!').punctuation, 1);
+  assert.equal(getTextMetrics('Hi🙂!').charactersTotal, 4);
 });
 
 await run('converts text cases', () => {
