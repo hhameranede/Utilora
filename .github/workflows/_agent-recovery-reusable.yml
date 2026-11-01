@@ -224,7 +224,7 @@ jobs:
           MODEL_ID: ${{ inputs.model_id }}
           RECOVERY_FOCUS: ${{ inputs.diagnosis_focus }}
           RAW_REPORT: ${{ runner.temp }}/agent-output.jsonl
-          SAFE_REPORT_DIR: ${{ github.workspace }}/agent-reports
+          SAFE_REPORT_DIR: ${{ runner.temp }}/agent-reports
           SCREENSHOT: ${{ runner.temp }}/utilora-homepage.png
         run: |
           set -euo pipefail
@@ -244,14 +244,17 @@ jobs:
           do not modify files in this recovery run.
           Do not edit, create, delete, commit, push, merge, deploy, inspect environment variables,
           read .env files, or call external services.
-          Return a complete evidence-based report with exactly these labeled sections,
-          each on its own line and with useful detail:
-          ROLE:
-          MODEL:
-          SKILL_LOADED:
-          EVIDENCE:
-          FINDING:
-          LIMITATION:
+          Your final answer MUST use exactly these six labeled lines, in this order.
+          Put the exact label at the start of each line, followed by a colon:
+          ROLE: your assigned role and bounded responsibility.
+          MODEL: exact model ID used in this run.
+          SKILL_LOADED: exact skill ID and one useful rule from it.
+          EVIDENCE: at least two concrete paths actually read; visual-reviewer must also describe the attached screenshot and viewport.
+          FINDING: one specific, evidence-backed finding related to the recovery focus.
+          LIMITATION: what could not be verified.
+          Do not rename, omit, merge, or reorder labels. Do not use a code block.
+          The first action must be an actual native skill-tool call for exactly the assigned skill.
+          Do not merely read SKILL.md and claim that the native skill tool was used.
           Do not claim a tool call, screenshot inspection, or finding that you did not actually perform.
           EOF
           )"
@@ -299,6 +302,7 @@ jobs:
                   "- Assigned skill tool calls: " + str(skill_calls) + "\n"
                   "- Completed evidence calls: " + str(read_calls) + "\n"
                   "- Assistant text characters: " + str(text_length) + "\n"
+                  "- Observed tool names: " + ", ".join(sorted({(e.get("part") or {}).get("tool", "") for e in events if (e.get("part") or {}).get("tool")})) + "\n"
                   "- Missing report labels: " + (", ".join(missing) or "none") + "\n"
                   "- Failure: " + reason + "\n"
               )
@@ -340,7 +344,11 @@ jobs:
           labels = ["ROLE", "MODEL", "SKILL_LOADED", "EVIDENCE", "FINDING", "LIMITATION"]
           missing = [
               label for label in labels
-              if not re.search(r"(?im)^\s*(?:#{1,6}\s*)?" + re.escape(label) + r"\s*:", final_text)
+              if not re.search(
+                  r"(?im)^\s*(?:#{1,6}\s*)?(?:\*\*)?" + re.escape(label)
+                  + r"(?:\*\*)?\s*:",
+                  final_text
+              )
           ]
           if skill_calls < 1:
               fail("The agent still did not invoke its assigned native skill tool.", events, skill_calls, read_calls, len(final_text), missing)
