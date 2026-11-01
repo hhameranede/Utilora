@@ -32,8 +32,8 @@ export const SiteHeader: React.FC = () => {
             <nav className="hidden md:flex items-center gap-6 text-xs font-medium text-stone-600">
               <Link
                 routeType="tools-index"
-                className={`transition-colors hover:text-orange-600 ${
-                  route.type === 'tools-index' || route.type === 'tool' || route.type === 'tool-guide' ? 'text-orange-600 font-semibold' : ''
+                className={`transition-colors hover:text-orange-700 ${
+                  route.type === 'tools-index' || route.type === 'tool' || route.type === 'tool-guide' ? 'text-orange-700 font-semibold' : ''
                 }`}
               >
                 {t('nav.tools')}
@@ -65,7 +65,7 @@ export const SiteHeader: React.FC = () => {
                     <div className="space-y-1">
                       {CATEGORIES_LIST.map((cat) => (
                         <Link key={cat.id} routeType="category" slug={cat.slug} onClick={() => setIsCategoryMenuOpen(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-orange-50/70 text-stone-700 hover:text-stone-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-700 transition-colors group">
-                          <div className="w-8 h-8 rounded-lg bg-orange-50 text-orange-700 flex items-center justify-center group-hover:bg-orange-500 group-hover:text-white transition-colors"><Icon name={cat.icon} size={15} /></div>
+                          <div className="w-8 h-8 rounded-lg bg-orange-50 text-orange-700 flex items-center justify-center group-hover:bg-orange-700 group-hover:text-white transition-colors"><Icon name={cat.icon} size={15} /></div>
                           <div><div className="text-xs font-semibold text-stone-800 group-hover:text-orange-700">{cat.localizedTitle[locale] || cat.localizedTitle.en}</div><div className="text-xs text-stone-500">{cat.toolCount} {t('nav.tools').toLowerCase()}</div></div>
                         </Link>
                       ))}
@@ -76,8 +76,8 @@ export const SiteHeader: React.FC = () => {
 
               <Link
                 routeType="articles-index"
-                className={`transition-colors hover:text-orange-600 ${
-                  route.type.startsWith('article') ? 'text-orange-600 font-semibold' : ''
+                className={`transition-colors hover:text-orange-700 ${
+                  route.type.startsWith('article') ? 'text-orange-700 font-semibold' : ''
                 }`}
               >
                 {t('nav.articles')}
@@ -85,8 +85,8 @@ export const SiteHeader: React.FC = () => {
 
               <Link
                 routeType="about"
-                className={`transition-colors hover:text-orange-600 ${
-                  route.type === 'about' ? 'text-orange-600 font-semibold' : ''
+                className={`transition-colors hover:text-orange-700 ${
+                  route.type === 'about' ? 'text-orange-700 font-semibold' : ''
                 }`}
               >
                 {t('nav.about')}
@@ -106,9 +106,9 @@ export const SiteHeader: React.FC = () => {
               aria-expanded={isSearchOpen}
               aria-keyshortcuts="Control+K Meta+K"
             >
-              <Search size={14} className="text-orange-500" />
+              <Search size={14} className="text-orange-600" />
               <span className="hidden sm:inline">{t('nav.searchShort')}</span>
-              <kbd className="hidden lg:inline-flex items-center px-1.5 py-0.5 text-[10px] font-mono text-stone-400 bg-white border border-stone-200 rounded">
+              <kbd className="hidden lg:inline-flex items-center px-1.5 py-0.5 text-[10px] font-mono text-stone-500 bg-white border border-stone-200 rounded">
                 ⌘K
               </kbd>
             </button>
@@ -145,10 +145,10 @@ export const SiteHeader: React.FC = () => {
               className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-xs text-stone-500"
             >
               <div className="flex items-center gap-2">
-                <Search size={15} className="text-orange-500" />
+                <Search size={15} className="text-orange-600" />
                 <span>{t('nav.search')}</span>
               </div>
-              <kbd className="px-1.5 py-0.5 text-[10px] font-mono text-stone-400 bg-white border border-stone-200 rounded">
+              <kbd className="px-1.5 py-0.5 text-[10px] font-mono text-stone-500 bg-white border border-stone-200 rounded">
                 ⌘K
               </kbd>
             </button>
@@ -158,21 +158,21 @@ export const SiteHeader: React.FC = () => {
               <Link
                 routeType="home"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="block px-3 py-2 text-sm font-semibold text-stone-800 hover:text-orange-600"
+                className="block px-3 py-2 text-sm font-semibold text-stone-800 hover:text-orange-700"
               >
                 {t('brand.name')}
               </Link>
               <Link
                 routeType="tools-index"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="block px-3 py-2 text-sm font-semibold text-stone-800 hover:text-orange-600"
+                className="block px-3 py-2 text-sm font-semibold text-stone-800 hover:text-orange-700"
               >
                 {t('nav.tools')} (36)
               </Link>
               <Link
                 routeType="categories-index"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="block px-3 py-2 text-sm font-semibold text-stone-800 hover:text-orange-600"
+                className="block px-3 py-2 text-sm font-semibold text-stone-800 hover:text-orange-700"
               >
                 {t('nav.categories')}
               </Link>
@@ -183,9 +183,9 @@ export const SiteHeader: React.FC = () => {
                     routeType="category"
                     slug={cat.slug}
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="flex items-center gap-2 px-3 py-1.5 text-xs text-stone-600 hover:text-orange-600"
+                    className="flex items-center gap-2 px-3 py-1.5 text-xs text-stone-600 hover:text-orange-700"
                   >
-                    <Icon name={cat.icon} size={13} className="text-orange-500" />
+                    <Icon name={cat.icon} size={13} className="text-orange-600" />
                     <span>{cat.localizedTitle[locale] || cat.localizedTitle.en}</span>
                   </Link>
                 ))}
@@ -193,14 +193,14 @@ export const SiteHeader: React.FC = () => {
               <Link
                 routeType="articles-index"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="block px-3 py-2 text-sm font-semibold text-stone-800 hover:text-orange-600"
+                className="block px-3 py-2 text-sm font-semibold text-stone-800 hover:text-orange-700"
               >
                 {t('nav.articles')}
               </Link>
               <Link
                 routeType="about"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="block px-3 py-2 text-sm font-semibold text-stone-800 hover:text-orange-600"
+                className="block px-3 py-2 text-sm font-semibold text-stone-800 hover:text-orange-700"
               >
                 {t('nav.about')}
               </Link>
