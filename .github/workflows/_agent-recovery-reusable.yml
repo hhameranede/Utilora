@@ -389,6 +389,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: utilora-agent-recovery-${{ inputs.agent_name }}
-          path: agent-reports/
+          path: ${{ runner.temp }}/agent-reports/
           if-no-files-found: ignore
           retention-days: 7
