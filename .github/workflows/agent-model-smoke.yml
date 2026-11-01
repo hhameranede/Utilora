@@ -87,11 +87,14 @@ jobs:
       - name: Install OpenCode
         run: npm install --global opencode-ai@1
 
+      - name: Record OpenCode CLI version
+        run: opencode --version
+
       - name: Prepare a real visual sample
         if: matrix.agent == 'visual-reviewer'
         run: |
           set -euo pipefail
-          npm ci
+          npm install --no-package-lock --no-audit --no-fund
           npx playwright install --with-deps chromium
           npm run dev -- --host 127.0.0.1 --port 3000 > "$RUNNER_TEMP/utilora-vite.log" 2>&1 &
           echo $! > "$RUNNER_TEMP/utilora-vite.pid"
@@ -137,33 +140,92 @@ jobs:
             opencode run --dir "$GITHUB_WORKSPACE" --agent "$AGENT_NAME" --model "$MODEL_ROUTE" --format json "$PROMPT" > "$RUNNER_TEMP/agent-output.jsonl" 2> "$RUNNER_TEMP/opencode-stderr.txt"
           fi
           python3 - <<'PY'
-          import json, os, pathlib, re, sys
+          import json, os, pathlib, re, subprocess, sys, urllib.error, urllib.request
           path = pathlib.Path(os.environ["RUNNER_TEMP"]) / "agent-output.jsonl"
           raw = path.read_text(encoding="utf-8", errors="replace")
           secret = os.environ.get("NVIDIA_API_KEY", "")
-          if secret and secret in raw:
-              print("::error::Agent output contained the configured credential; output suppressed.")
-              sys.exit(1)
-          if re.search(r"(?i)nvapi-[A-Za-z0-9_-]{12,}|gh[pousr]_[A-Za-z0-9]{20,}", raw):
-              print("::error::Agent output resembled a credential; output suppressed.")
-              sys.exit(1)
-          parts = []
+          events = []
+          event_parts = []
+          session_id = ""
           for line in raw.splitlines():
               try:
                   event = json.loads(line)
               except json.JSONDecodeError:
                   continue
+              events.append(event)
+              session_id = session_id or event.get("sessionID") or (event.get("part") or {}).get("sessionID", "")
               part = event.get("part") or {}
               if event.get("type") == "text" and isinstance(part.get("text"), str):
-                  parts.append(part["text"])
-          answer = "\n".join(parts).strip()
+                  event_parts.append(part["text"])
+          answer = "\n".join(event_parts).strip()
+          export_status = "not-attempted"
+          export_raw = ""
+          if session_id:
+              exported = subprocess.run(
+                  ["opencode", "export", session_id, "--sanitize"],
+                  capture_output=True, text=True, timeout=90
+              )
+              export_status = str(exported.returncode)
+              export_raw = exported.stdout or ""
+              if exported.returncode == 0:
+                  try:
+                      transcript = json.loads(exported.stdout)
+                      transcript_parts = []
+                      for message in transcript.get("messages", []):
+                          info = message.get("info") or {}
+                          role = info.get("role") or message.get("role")
+                          if role != "assistant":
+                              continue
+                          for part in message.get("parts", []):
+                              if part.get("type") == "text" and not part.get("synthetic") and not part.get("ignored"):
+                                  value = part.get("text")
+                                  if isinstance(value, str) and value.strip():
+                                      transcript_parts.append(value)
+                      transcript_answer = "\n".join(transcript_parts).strip()
+                      if transcript_answer:
+                          answer = transcript_answer
+                  except (json.JSONDecodeError, AttributeError, TypeError):
+                      export_status = "invalid-json"
+          combined = raw + "\n" + export_raw + "\n" + answer
+          if (secret and secret in combined) or re.search(r"(?i)nvapi-[A-Za-z0-9_-]{12,}|gh[pousr]_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}", combined):
+              print("::error::Diagnostic output resembled a credential; output suppressed.")
+              sys.exit(1)
           if not answer:
-              print("::error::The agent did not return a final text response.")
+              kinds = sorted({str(event.get("type")) for event in events})
+              error_names = sorted({
+                  str((event.get("error") or {}).get("name"))
+                  for event in events if isinstance(event.get("error"), dict)
+              })
+              direct_status = "not-tested"
+              try:
+                  payload = json.dumps({
+                      "model": os.environ["MODEL_ID"],
+                      "messages": [{"role": "user", "content": "Reply with a brief confirmation that the model is reachable."}],
+                      "max_tokens": 64,
+                      "temperature": 0.1,
+                      "stream": False
+                  }).encode()
+                  request = urllib.request.Request(
+                      "https://integrate.api.nvidia.com/v1/chat/completions",
+                      data=payload,
+                      headers={"Authorization": "Bearer " + secret, "Content-Type": "application/json"}
+                  )
+                  with urllib.request.urlopen(request, timeout=90) as response:
+                      direct = json.loads(response.read().decode("utf-8"))
+                      choices = direct.get("choices", [])
+                      message = choices[0].get("message", {}) if choices else {}
+                      direct_text = message.get("content", "")
+                      direct_status = "HTTP " + str(response.status) + (" with text" if isinstance(direct_text, str) and direct_text.strip() else " without text")
+              except urllib.error.HTTPError as error:
+                  direct_status = "HTTP " + str(error.code)
+              except Exception as error:
+                  direct_status = type(error).__name__
+              print("::error::No final assistant text. session=" + (session_id or "missing") + "; event_types=" + ",".join(kinds) + "; error_events=" + ",".join(error_names) + "; session_export=" + export_status + "; direct_nim=" + direct_status)
               sys.exit(1)
           report = "# " + os.environ["AGENT_NAME"] + "\n\nModel: " + os.environ["MODEL_ID"] + "\n\n" + answer + "\n"
           pathlib.Path(os.environ["RUNNER_TEMP"], "agent-report.md").write_text(report, encoding="utf-8")
           path.unlink(missing_ok=True)
-          print("Agent returned a response. Full response is retained as a short-lived workflow artifact.")
+          print("Agent returned a response. Session export was used when the CLI JSON stream was incomplete; full response is retained as a short-lived artifact.")
           PY
           worktree_status="$(git status --porcelain=v1 --untracked-files=all)"
           if [ -n "$worktree_status" ]; then
