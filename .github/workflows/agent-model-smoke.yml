@@ -222,36 +222,41 @@ jobs:
           latest_finish = "missing"
           unfinished_tools = set()
           if session_id:
-              exported = subprocess.run(
-                  ["opencode", "export", session_id, "--sanitize"],
-                  capture_output=True, text=True, timeout=60
-              )
-              export_status = str(exported.returncode)
-              export_raw = exported.stdout or ""
-              if exported.returncode == 0:
-                  try:
-                      transcript = json.loads(export_raw)
-                      answer = extract_final_assistant_text(transcript)
-                      for message in reversed(transcript.get("messages", [])):
-                          if not isinstance(message, dict):
-                              continue
-                          info = message.get("info") or {}
-                          if not isinstance(info, dict):
-                              info = {}
-                          role = info.get("role") or message.get("role")
-                          if role != "assistant":
-                              continue
-                          latest_finish = info.get("finish") or message.get("finish") or "missing"
-                          for part in message.get("parts", []):
-                              if not isinstance(part, dict) or part.get("type") != "tool":
+              try:
+                  exported = subprocess.run(
+                      ["opencode", "export", session_id, "--sanitize"],
+                      capture_output=True, text=True, timeout=60
+                  )
+                  export_status = str(exported.returncode)
+                  export_raw = exported.stdout or ""
+                  if exported.returncode == 0:
+                      try:
+                          transcript = json.loads(export_raw)
+                          answer = extract_final_assistant_text(transcript)
+                          for message in reversed(transcript.get("messages", [])):
+                              if not isinstance(message, dict):
                                   continue
-                              state = part.get("state") or {}
-                              status = state.get("status", "unknown") if isinstance(state, dict) else "unknown"
-                              if status != "completed":
-                                  unfinished_tools.add(str(part.get("tool", "unknown")) + ":" + str(status))
-                          break
-                  except (json.JSONDecodeError, AttributeError, TypeError):
-                      export_status = "invalid-json"
+                              info = message.get("info") or {}
+                              if not isinstance(info, dict):
+                                  info = {}
+                              role = info.get("role") or message.get("role")
+                              if role != "assistant":
+                                  continue
+                              latest_finish = info.get("finish") or message.get("finish") or "missing"
+                              for part in message.get("parts", []):
+                                  if not isinstance(part, dict) or part.get("type") != "tool":
+                                      continue
+                                  state = part.get("state") or {}
+                                  status = state.get("status", "unknown") if isinstance(state, dict) else "unknown"
+                                  if status != "completed":
+                                      unfinished_tools.add(str(part.get("tool", "unknown")) + ":" + str(status))
+                              break
+                      except (json.JSONDecodeError, AttributeError, TypeError):
+                          export_status = "invalid-json"
+              except subprocess.TimeoutExpired:
+                  export_status = "timeout"
+              except OSError as error:
+                  export_status = type(error).__name__
 
           combined = raw + "\n" + export_raw + "\n" + stderr_raw + "\n" + answer
           if (secret and secret in combined) or re.search(r"(?i)nvapi-[A-Za-z0-9_-]{12,}|gh[pousr]_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}", combined):
