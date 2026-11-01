@@ -132,6 +132,7 @@ Comprehensive guides for development and extension:
 - `docs/ENGINE_INTEGRATION.md` — Phase 2 adapter contracts and WASM binding
 - `docs/LOCALIZATION.md` — 8-language translations and Arabic RTL handling
 - `docs/SEO.md` — Meta tags, structured JSON-LD, and noindex rules
+- `docs/PRODUCT_EXPERIENCE_STANDARD.md` — Product-page anatomy, tool-specific content, SEO accuracy, privacy rules, and quality gates
 - `docs/IMPLEMENTATION_STATUS.md` — Verified feature checklist
 
 Every registered tool has a localized usage guide at `/:lang/tools/:slug/how-to`. The guide captures the rendered tool workspace at runtime and adds numbered orange annotations; automated browser coverage checks all 36 guides.
