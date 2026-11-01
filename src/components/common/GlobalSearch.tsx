@@ -20,13 +20,23 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({ isOpen, onOpen, onCl
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (isOpen) {
-      setTimeout(() => inputRef.current?.focus(), 50);
-      setQuery('');
-      setSelectedIndex(0);
-    }
+    if (!isOpen) return;
+
+    const previouslyFocused = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    setQuery('');
+    setSelectedIndex(0);
+    const frame = window.requestAnimationFrame(() => inputRef.current?.focus());
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      document.body.style.overflow = previousOverflow;
+      previouslyFocused?.focus();
+    };
   }, [isOpen]);
 
   // Global hotkey Ctrl+K / Cmd+K
@@ -162,6 +172,7 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({ isOpen, onOpen, onCl
   }, [searchResults, locale, navigate, onClose]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.target !== inputRef.current) return;
     if (e.key === 'ArrowDown') {
       e.preventDefault();
       setSelectedIndex((prev) => (prev + 1) % (flatItems.length || 1));
@@ -176,6 +187,26 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({ isOpen, onOpen, onCl
     }
   };
 
+  const handleDialogKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === 'Tab' && dialogRef.current) {
+      const focusable = Array.from(dialogRef.current.querySelectorAll<HTMLElement>(
+        'button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])',
+      ));
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (first && last) {
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    }
+    handleKeyDown(e);
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -184,9 +215,13 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({ isOpen, onOpen, onCl
       onClick={onClose}
     >
       <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label={t('nav.search')}
         className="w-full max-w-2xl rounded-2xl bg-white border border-stone-200 shadow-2xl shadow-stone-900/20 overflow-hidden flex flex-col max-h-[80vh]"
         onClick={(e) => e.stopPropagation()}
-        onKeyDown={handleKeyDown}
+        onKeyDown={handleDialogKeyDown}
       >
         {/* Search Input Bar */}
         <div className="flex items-center px-4 py-3.5 border-b border-stone-200 gap-3 bg-stone-50/70">
@@ -194,6 +229,10 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({ isOpen, onOpen, onCl
           <input
             ref={inputRef}
             type="text"
+            aria-label={t('nav.search')}
+            aria-autocomplete="list"
+            aria-controls={flatItems.length ? 'utilora-search-results' : undefined}
+            aria-activedescendant={flatItems[selectedIndex] ? 'utilora-search-option-' + flatItems[selectedIndex].id : undefined}
             value={query}
             onChange={(e) => {
               setQuery(e.target.value);
@@ -231,12 +270,15 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({ isOpen, onOpen, onCl
                   {t('hero.explorePopular')}
                 </div>
               )}
-              <div className="space-y-1">
+              <div id="utilora-search-results" role="listbox" aria-label={t('nav.search')} className="space-y-1">
                 {flatItems.map((item, index) => {
                   const isSelected = index === selectedIndex;
                   return (
                     <button
                       key={item.id}
+                      id={'utilora-search-option-' + item.id}
+                      role="option"
+                      aria-selected={isSelected}
                       onClick={item.action}
                       onMouseEnter={() => setSelectedIndex(index)}
                       className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-left transition-all ${

@@ -6,7 +6,8 @@ This checklist records repository implementation separately from production depl
 - [x] TypeScript check and Vite production build passed in GitHub Actions run #18.
 - [x] Sitemap/robots output generated and validated in that build.
 - [x] Static HTML prerendering generated 528 localized routes; CI checks sample route bodies, canonical URLs, RTL direction, preview noindex, and 404 output.
-- [ ] Responsive visual QA completed on mobile and desktop.
+- [x] Automated responsive route audit covers all 36 tool routes at 360px, 768px, and 1280px, plus all eight locale routes at 360px. This is automated Chromium viewport coverage, not physical-device QA.
+- [ ] Manual visual QA on real mobile and desktop devices completed.
 - [x] Cloudflare Pages project connected; preview build and asset deployment succeeded (537 files uploaded).
 - [ ] Direct HTTP/browser verification of localized routes, canonical tags, and 404 status still pending.
 - [x] Production deployment from `main` explicitly disabled pending approval.
@@ -16,7 +17,7 @@ This checklist records repository implementation separately from production depl
 - [ ] Application startup and production compilation successfully re-verified.
 - [x] React 19 and TypeScript project structure exists; TypeScript strict mode is not enabled yet.
 - [~] Brand tokens use navy and gold; full visual consistency across all component surfaces remains to be audited.
-- [ ] Premium responsive visual identity requires visual QA at mobile and desktop breakpoints.
+- [x] Responsive viewport regression coverage is enforced in Playwright at mobile, tablet, and desktop widths; real-device visual QA remains separate.
 - [x] Home page is complete with Hero, 6 categories, popular tools, featured workspaces, how it works, trust, articles, and community sections.
 - [x] Six category pages exist (`image`, `pdf`, `text`, `developer`, `website-domain`, `video`).
 - [x] All 36 tool definitions exist in `src/registry/tools.registry.ts`.

@@ -34,7 +34,7 @@ MD5 is not exposed by the current browser-native hash workspace. It requires a s
 
 ## Still preview-only
 
-The five website/domain tools (domain age, RDAP, DNS, website status, HTTP headers) and six video tools remain preview-only. Their interfaces must stay marked as previews until their processing paths, input validation, safety controls, error handling, and downloadable outputs are implemented and tested.
+The five Website & Domain tools are functional and connected to public read-only services: Domain Age Checker and RDAP Lookup use RDAP, DNS Lookup uses DNS-over-HTTPS, and Website Status / HTTP Headers use credential-free browser-originated HEAD requests. These browser probes are subject to public-service availability and CORS limitations; a CORS-blocked result must remain unknown rather than being labeled offline. The six video workspaces remain preview-only until their processing paths, input validation, safety controls, error handling, and downloadable outputs are implemented and tested.
 
 ## Engine architecture for remaining tools
 
