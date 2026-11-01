@@ -15,9 +15,10 @@ test('global search exposes dialog semantics, traps focus, and restores its trig
   await input.fill('json');
   const options = dialog.getByRole('option');
   await expect(options).toHaveCount(4);
+  const clearButton = dialog.getByRole('button', { name: 'Clear query' });
 
   await page.keyboard.press('Shift+Tab');
-  await expect(options.last()).toBeFocused();
+  await expect(clearButton).toBeFocused();
   await page.keyboard.press('Tab');
   await expect(input).toBeFocused();
 
