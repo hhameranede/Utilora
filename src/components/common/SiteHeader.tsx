@@ -45,12 +45,14 @@ export const SiteHeader: React.FC = () => {
                 onMouseEnter={() => setIsCategoryMenuOpen(true)}
                 onMouseLeave={() => setIsCategoryMenuOpen(false)}
                 onKeyDown={(event) => { if (event.key === 'Escape') setIsCategoryMenuOpen(false); }}
+                onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setIsCategoryMenuOpen(false); }}
               >
                 <button
                   type="button"
                   onClick={() => setIsCategoryMenuOpen((open) => !open)}
                   aria-haspopup="true"
                   aria-expanded={isCategoryMenuOpen}
+                  aria-controls="utilora-category-menu"
                   className={`flex items-center gap-1 transition-colors hover:text-orange-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-700 focus-visible:ring-offset-4 rounded-md ${route.type === 'categories-index' || route.type === 'category' ? 'text-orange-700 font-semibold' : ''}`}
                 >
                   <span>{t('nav.categories')}</span>
@@ -58,7 +60,7 @@ export const SiteHeader: React.FC = () => {
                 </button>
 
                 {isCategoryMenuOpen && (
-                  <div className="absolute start-0 mt-2 w-72 rounded-2xl bg-white border border-stone-200 shadow-xl shadow-stone-200/50 p-2 z-50">
+                  <div id="utilora-category-menu" className="absolute start-0 mt-2 w-72 rounded-2xl bg-white border border-stone-200 shadow-xl shadow-stone-200/50 p-2 z-50">
                     <Link routeType="categories-index" onClick={() => setIsCategoryMenuOpen(false)} className="mb-1 flex items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-orange-800 hover:bg-orange-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-700">
                       <span>{t('nav.categories')}</span><span aria-hidden="true">→</span>
                     </Link>
@@ -118,10 +120,12 @@ export const SiteHeader: React.FC = () => {
 
             {/* Mobile Menu Toggle Button */}
             <button
+              type="button"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="md:hidden p-2 rounded-xl border border-stone-200 text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition-colors"
               aria-label={t("nav.toggleNavigation")}
               aria-expanded={isMobileMenuOpen}
+              aria-controls="utilora-mobile-navigation"
             >
               {isMobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
             </button>
@@ -134,7 +138,7 @@ export const SiteHeader: React.FC = () => {
 
       {/* Mobile Drawer Menu */}
       {isMobileMenuOpen && (
-        <div className="fixed inset-0 top-16 z-30 bg-white md:hidden overflow-y-auto p-4 border-b border-stone-200 animate-fadeIn">
+        <div id="utilora-mobile-navigation" role="navigation" aria-label={t('nav.toggleNavigation')} className="fixed inset-0 top-16 z-30 bg-white md:hidden overflow-y-auto p-4 border-b border-stone-200 animate-fadeIn">
           <div className="space-y-4">
             {/* Quick search input */}
             <button
