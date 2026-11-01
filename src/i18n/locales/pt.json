@@ -13,17 +13,18 @@
     "searchShort": "Pesquisar",
     "devTemplates": "Laboratório de Modelos",
     "allTools": "Todas as ferramentas",
-    "switchLanguage": "Mudar idioma"
+    "switchLanguage": "Mudar idioma",
+    "toggleNavigation": "Abrir ou fechar o menu de navegação"
   },
   "hero": {
     "badge": "Plataforma Global de Ferramentas Digitais",
     "title": "Cada tarefa digital. Um só lugar.",
     "subtitle": "Utilitários online potentes, rápidos e gratuitos para imagens, documentos, texto, código, sites e vídeos.",
     "searchPlaceholder": "Pesquise por nome de ferramenta, formato ou tarefa...",
-    "privacyBadge": "Privacidade máxima · Processamento no navegador · Sem necessidade de conta",
+    "privacyBadge": "Arquivos e textos são processados no navegador · Consultas web contatam serviços públicos · Sem conta",
     "browseCategories": "Explorar Categorias",
     "explorePopular": "Ferramentas Populares",
-    "statsTools": "36 Ferramentas",
+    "statsTools": "36 ferramentas · 35 prontas",
     "statsCategories": "6 Categorias",
     "statsGlobal": "8 Idiomas"
   },
@@ -53,13 +54,20 @@
     "relatedTools": "Ferramentas relacionadas",
     "relatedArticles": "Guias recomendados",
     "privacyStatement": "Privacidade e execução local",
-    "privacyStatementDesc": "Desenvolvido com foco no processamento local. Seus arquivos permanecem seguros no seu dispositivo.",
+    "privacyStatementDesc": "As operações com arquivos e texto são executadas no navegador. Verificações de sites e domínios enviam o host ou a URL informada ao serviço público relevante ou ao site de destino. Ferramentas em prévia ainda não estão operacionais.",
     "supportedFormats": "Formatos suportados",
     "sampleData": "Dados de demonstração",
     "demoOnly": "Modo de Demonstração",
     "pageNotFound": "Página não encontrada",
     "pageNotFoundDesc": "O recurso solicitado não existe ou foi movido.",
-    "returnHome": "Voltar ao início"
+    "returnHome": "Voltar ao início",
+    "popular": "Popular",
+    "featured": "Em destaque",
+    "supported": "Compatível",
+    "previewOnly": "Somente prévia",
+    "publicLookup": "Consulta pública de rede",
+    "runsLocally": "Executado no navegador",
+    "readGuide": "Ler guia"
   },
   "home": {
     "categoriesHeading": "Navegue por Categoria",
@@ -75,11 +83,12 @@
     "step2Title": "2. Configure seus dados",
     "step2Desc": "Ajuste opções em interfaces dedicadas e intuitivas.",
     "step3Title": "3. Processamento no seu navegador",
-    "step3Desc": "Sem servidores intermediários salvando seus dados.",
+    "step3Desc": "Tarefas com arquivos e texto são executadas no navegador. Verificações de sites contatam os serviços públicos relevantes com o host ou a URL informada.",
     "trustHeading": "Construído sobre confiança",
     "trustDesc": "Ferramentas digitais gratuitas, sem anúncios invasivos e sem cadastros.",
     "articlesPreviewHeading": "Artigos e Destaques",
-    "articlesPreviewSub": "Publicações técnicas sobre padrões e arquivos digitais."
+    "articlesPreviewSub": "Publicações técnicas sobre padrões e arquivos digitais.",
+    "privacyKicker": "Como seus dados são tratados"
   },
   "templates": {
     "dropzonePrompt": "Arraste e solte seu arquivo aqui, ou clique para selecionar",
@@ -161,6 +170,25 @@
     "acceptableUse": "Uso Aceitável",
     "about": "Sobre a UTILORA",
     "contact": "Contato",
-    "cookieNotice": "Sem cookies de rastreamento. Rápido e privado."
+    "cookieNotice": "Sem cookies de rastreamento. Rápido e privado.",
+    "platform": "Plataforma",
+    "legal": "Legal",
+    "moreCategories": "Mais categorias"
+  },
+  "tools": {
+    "description": "Explore as 36 ferramentas. Pesquise por nome, descrição ou formato compatível, ou filtre por categoria. Ferramentas em prévia são identificadas claramente.",
+    "searchPlaceholder": "Pesquisar ferramentas, tarefas ou formatos...",
+    "scrollHint": "Deslize os filtros de categoria para ver todas as opções."
+  },
+  "category": {
+    "featuredWorkspace": "Espaço em destaque",
+    "allTools": "Todas as ferramentas de",
+    "chooseWorkspace": "Escolha uma ferramenta para abrir seu espaço de trabalho.",
+    "searchPlaceholder": "Filtrar ferramentas desta categoria...",
+    "relatedCategories": "Categorias relacionadas"
+  },
+  "search": {
+    "navigate": "Navegar",
+    "select": "Selecionar"
   }
 }
