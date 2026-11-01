@@ -28,7 +28,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, className = '', varian
         className={`group p-3.5 rounded-xl bg-white hover:bg-orange-50/40 border border-stone-200/80 hover:border-orange-300 transition-all flex items-center justify-between gap-3 shadow-xs hover:shadow-sm ${className}`}
       >
         <div className="flex items-center gap-3 min-w-0">
-          <div className="w-8 h-8 rounded-lg bg-orange-50 group-hover:bg-orange-500 flex items-center justify-center text-orange-600 group-hover:text-white shrink-0 transition-colors">
+          <div className="w-8 h-8 rounded-lg bg-orange-50 group-hover:bg-orange-700 flex items-center justify-center text-orange-600 group-hover:text-white shrink-0 transition-colors">
             <Icon name={tool.icon} size={16} />
           </div>
           <div className="min-w-0">
@@ -54,7 +54,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, className = '', varian
       <div>
         {/* Header Icon + Metadata in Zero-Pill Unboxed Text */}
         <div className="flex items-center justify-between gap-2 mb-3.5">
-          <div className="w-10 h-10 rounded-xl bg-orange-50 group-hover:bg-orange-500 border border-orange-100 flex items-center justify-center text-orange-600 group-hover:text-white transition-all shadow-xs">
+          <div className="w-10 h-10 rounded-xl bg-orange-50 group-hover:bg-orange-700 border border-orange-100 flex items-center justify-center text-orange-600 group-hover:text-white transition-all shadow-xs">
             <Icon name={tool.icon} size={19} />
           </div>
 
