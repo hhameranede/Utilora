@@ -56,9 +56,9 @@ OpenCode lists exactly eight project agents from `.opencode/agents/`:
 - `qa-engineer` — independent QA
 - `security-auditor` — independent security review
 
-OpenCode discovers project-local skills from `.opencode/skills/<name>/SKILL.md` and loads their full instructions on demand through its native `skill` tool. UTILORA now contains **exactly 50 skills: 9 first-party project skills and 41 carefully selected upstream skills**. The machine-readable provenance, pinned upstream commits, licences, and agent mapping live in `.opencode/skills/manifest.json`. See `docs/agent-team/SKILLS-CATALOG.md` for the role-by-role catalogue and `docs/agent-team/THIRD_PARTY_NOTICES.md` for the full third-party licence notices.
+OpenCode discovers project-local skills from `.opencode/skills/<name>/SKILL.md` and loads their full instructions on demand through its native `skill` tool. UTILORA now contains **exactly 50 skills: 9 first-party project skills and 41 carefully selected upstream skills**. The machine-readable provenance, pinned upstream commits, and licences live in `.opencode/skills/manifest.json`. See `docs/agent-team/SKILLS-CATALOG.md` for the catalogue and `docs/agent-team/THIRD_PARTY_NOTICES.md` for the full third-party licence notices.
 
-Every agent has an explicit `permission.skill` allow-list in its own frontmatter. The wildcard rule denies access by default, and only the skill IDs assigned to that role are allowed. Old or unrelated skill IDs are not retained. Loading a skill does not grant extra shell, edit, MCP, GitHub, Cloudflare, or deployment permissions; the agent's normal tool permissions remain in force.
+All eight agents can access all discovered skills. Skills are optional and self-selected: agents may use any skill they judge useful, or none. There are no per-agent allow-lists or mandatory skill calls. Loading a skill does not grant extra shell, edit, MCP, GitHub, Cloudflare, or deployment permissions; the agent's normal tool permissions remain in force.
 
 Useful verification commands:
 ```bash
@@ -71,7 +71,7 @@ npm run e2e
 npm run build
 ```
 
-CI installs OpenCode and runs CLI discovery checks for all eight agents and all 50 skills, plus deterministic checks for model routing, upstream commit pins, licences, and role permissions. The UTILORA-native model smoke workflow can be launched manually or runs when the agent configuration changes; it verifies the live NVIDIA catalogue, performs real inference, then makes each agent load its assigned skill, inspect repository evidence, and return a role-specific report. It writes sanitized per-agent reports and diagnostics as workflow artifacts. A green discovery check alone is not proof of model execution.
+CI installs OpenCode and runs CLI discovery checks for all eight agents and all 50 skills, plus deterministic checks for model routing, upstream commit pins, licences, and role permissions. The UTILORA-native model smoke workflow can be launched manually or runs when the agent configuration changes; it verifies the live NVIDIA catalogue, performs real inference, then asks each agent for a concise role-specific response without requiring a skill call, fixed evidence count, or rigid report format. It writes sanitized per-agent reports and diagnostics as workflow artifacts. A green discovery check alone is not proof of model execution.
 
 ## Important limitations
 
