@@ -66,11 +66,23 @@ export const TemplateETextEditor: React.FC<TemplateETextEditorProps> = ({
     }
   };
 
-  const handleCopy = () => {
-    if (typeof navigator !== 'undefined' && navigator.clipboard) {
-      navigator.clipboard.writeText(text);
+  const handleCopy = async () => {
+    if (!text) {
+      setResultMessage('There is no text to copy.');
+      setResultError(true);
+      return;
+    }
+    try {
+      if (!navigator.clipboard?.writeText) throw new Error('Clipboard access is unavailable in this browser.');
+      await navigator.clipboard.writeText(text);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      setResultError(false);
+      setResultMessage('Copied to clipboard.');
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setCopied(false);
+      setResultMessage('Clipboard access is blocked by this browser. Select and copy the text manually.');
+      setResultError(true);
     }
   };
 
