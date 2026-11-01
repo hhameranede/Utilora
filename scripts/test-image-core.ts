@@ -318,6 +318,31 @@ await run('executes all six image tool adapters and returns truthful output meta
     converterMock.restore();
   }
 
+  const hugeFile = { name: 'huge.png', type: 'image/png', size: 50 * 1024 * 1024 + 1 } as File;
+
+  const oversizedCompressorMock = installBrowserMocks();
+  try {
+    const rejected = await ImageCompressorAdapter.execute({ file: hugeFile }, { quality: 70 });
+    assert.equal(rejected.success, false);
+    assert.match(rejected.error?.message ?? '', /50 MB limit/);
+    assert.equal(oversizedCompressorMock.bitmaps.length, 0);
+  } finally {
+    oversizedCompressorMock.restore();
+  }
+
+  const oversizedResizerMock = installBrowserMocks();
+  try {
+    const rejected = await ImageResizerAdapter.execute(
+      { file: hugeFile },
+      { mode: 'pixels', targetWidth: 2, targetHeight: 1, maintainAspectRatio: false },
+    );
+    assert.equal(rejected.success, false);
+    assert.match(rejected.error?.message ?? '', /50 MB limit/);
+    assert.equal(oversizedResizerMock.bitmaps.length, 0);
+  } finally {
+    oversizedResizerMock.restore();
+  }
+
   const compressorMock = installBrowserMocks();
   try {
     const compressed = await ImageCompressorAdapter.execute({ file }, { quality: 70, maxDimension: 2 });
