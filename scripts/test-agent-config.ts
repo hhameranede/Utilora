@@ -7,7 +7,7 @@ type McpServer = { type?: string; url?: string; command?: string[]; enabled?: bo
 type SkillRecord = {
   name: string;
   path: string;
-  assignedTo: string[];
+  suggestedFor: string[];
   source: {
     type: string;
     repository: string;
@@ -23,7 +23,7 @@ type SkillManifest = {
   projectSpecificCount: number;
   curatedExternalCount: number;
   agents: string[];
-  assignmentsByAgent: Record<string, string[]>;
+  suggestionsByRole: Record<string, string[]>;
   modelAssignments: Record<string, string>;
   skills: SkillRecord[];
 };
@@ -107,15 +107,15 @@ function hasNonEmptyField(lines: string[], field: string): boolean {
 }
 function parseSkillPermissions(lines: string[], label: string): Map<string, string> {
   const skillIndex = lines.findIndex((line) => line.trim() === 'skill:');
-  assert.notEqual(skillIndex, -1, 'Missing per-agent skill permissions in ' + label);
+  assert.notEqual(skillIndex, -1, 'Missing skill permission declaration in ' + label);
   const permissions = new Map<string, string>();
   for (let i = skillIndex + 1; i < lines.length && lines[i].startsWith('    '); i += 1) {
     const match = lines[i].match(/^    "([^"]+)": (allow|deny|ask)$/);
     assert.ok(match, 'Invalid skill permission line in ' + label + ': ' + lines[i]);
-    assert.ok(!permissions.has(match[1]), 'Duplicate permission in ' + label);
     permissions.set(match[1], match[2]);
   }
-  assert.equal(permissions.get('*'), 'deny', 'Unlisted skills must be denied for ' + label);
+  assert.equal(permissions.get('*'), 'allow', 'All skills must remain optional and available to ' + label);
+  assert.equal(permissions.size, 1, 'Per-agent skill restrictions are not allowed in ' + label);
   return permissions;
 }
 
@@ -175,8 +175,8 @@ const licenseFiles: Record<string, string> = {
 for (const skill of manifest.skills) {
   assert.match(skill.name, /^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Invalid skill ID: ' + skill.name);
   assert.equal(skill.path, join('.opencode', 'skills', skill.name, 'SKILL.md'), 'Manifest path mismatch: ' + skill.name);
-  assert.ok(skill.assignedTo.length > 0, 'Skill is not assigned: ' + skill.name);
-  assert.equal(new Set(skill.assignedTo).size, skill.assignedTo.length, 'Duplicate agent assignment: ' + skill.name);
+  assert.ok(skill.suggestedFor.length > 0, 'Skill is not assigned: ' + skill.name);
+  assert.equal(new Set(skill.suggestedFor).size, skill.suggestedFor.length, 'Duplicate agent assignment: ' + skill.name);
 
   const skillPath = join(root, skill.path);
   const raw = readFileSync(skillPath, 'utf8');
@@ -202,9 +202,9 @@ for (const skill of manifest.skills) {
     assert.equal(skill.source.license, 'Project');
   }
 
-  for (const agent of skill.assignedTo) {
+  for (const agent of skill.suggestedFor) {
     assert.ok(expectedAgents.includes(agent as (typeof expectedAgents)[number]), 'Unknown assigned agent: ' + agent);
-    assert.ok(manifest.assignmentsByAgent[agent]?.includes(skill.name), 'Reverse assignment missing: ' + skill.name);
+    assert.ok(manifest.suggestionsByRole[agent]?.includes(skill.name), 'Reverse assignment missing: ' + skill.name);
   }
 }
 
@@ -221,20 +221,13 @@ for (const agentFile of agentFiles) {
     'Agent model alias is not registered for ' + agent,
   );
 
-  const permissions = parseSkillPermissions(lines, agentFile);
-  const allowed = [...permissions.entries()]
-    .filter(([name, effect]) => name !== '*' && effect === 'allow')
-    .map(([name]) => name)
-    .sort();
-  const expected = [...(manifest.assignmentsByAgent[agent] ?? [])].sort();
-  assert.deepEqual(allowed, expected, 'Skill allow-list differs from manifest for ' + agent);
-  assert.equal(permissions.size, expected.length + 1, 'Unexpected permission for ' + agent);
+  parseSkillPermissions(lines, agentFile);
 }
 
 for (const agent of expectedAgents) {
-  const assigned = manifest.skills.filter((skill) => skill.assignedTo.includes(agent)).map((skill) => skill.name).sort();
+  const assigned = manifest.skills.filter((skill) => skill.suggestedFor.includes(agent)).map((skill) => skill.name).sort();
   assert.deepEqual(
-    [...(manifest.assignmentsByAgent[agent] ?? [])].sort(),
+    [...(manifest.suggestionsByRole[agent] ?? [])].sort(),
     assigned,
     'Manifest reverse index mismatch for ' + agent,
   );
@@ -274,7 +267,7 @@ if (process.env.OPENCODE_RUNTIME_TEST === '1') {
     assert.equal(resolved.name, agent, 'OpenCode resolved the wrong agent');
     assert.ok(Array.isArray(resolved.permission), 'OpenCode did not expose resolved permissions for ' + agent);
 
-    const allowedAll = manifest.skills.filter((skill) => skill.assignedTo.includes(agent)).map((skill) => skill.name);
+    const allowedAll = manifest.skills.filter((skill) => skill.suggestedFor.includes(agent)).map((skill) => skill.name);
     const skillRules = resolved.permission.filter((rule) => rule.permission === 'skill');
     assert.ok(
       skillRules.some((rule) => rule.pattern === '*' && rule.action === 'deny'),
@@ -287,7 +280,7 @@ if (process.env.OPENCODE_RUNTIME_TEST === '1') {
       );
     }
 
-    const denied = manifest.skills.filter((skill) => !skill.assignedTo.includes(agent)).map((skill) => skill.name);
+    const denied = manifest.skills.filter((skill) => !skill.suggestedFor.includes(agent)).map((skill) => skill.name);
     for (const name of denied) {
       assert.ok(
         !skillRules.some((rule) => rule.pattern === name && rule.action === 'allow'),
@@ -302,6 +295,6 @@ if (process.env.OPENCODE_RUNTIME_TEST === '1') {
   // Per-agent availability is checked above using the resolved, effective skill permission rules.
   assert.ok(skills.stdout.trimStart().startsWith('['), 'OpenCode skill diagnostic did not return its JSON list');
   assert.ok(skills.stdout.includes('"name":'), 'OpenCode skill diagnostic returned no skill entries');
-  console.log('OpenCode resolved all eight agents and their scoped skill permissions.');
+  console.log('OpenCode resolved all eight agents with optional unrestricted skill access.');
 }
-console.log('Agent configuration verified: 8 model-specialized agents, exactly 50 skills (9 first-party + 41 upstream), 6 NVIDIA NIM models, and ' + Object.keys(config.mcp).length + ' MCP servers.');
+console.log('Agent configuration verified: 8 model-specialized agents, exactly 50 optional skills (9 first-party + 41 upstream), 6 NVIDIA NIM models, and ' + Object.keys(config.mcp).length + ' MCP servers.');
