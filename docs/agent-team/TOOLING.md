@@ -25,10 +25,10 @@ From the UTILORA repository root, OpenCode reads `opencode.json`, `.opencode/age
 
 1. In OpenCode, run `/connect`.
 2. Select **NVIDIA** and enter your NVIDIA API key in the terminal prompt.
-3. Run `/models` and select a model. A candidate to benchmark first is `nvidia/nemotron-3-super-120b-a12b`; do not assume it is the best model for every role.
+3. The project config exposes six NVIDIA NIM models through the `nvidia-nim` provider. Agent-specific defaults are assigned in `.opencode/agents/*.md`; use `opencode models` to inspect the configured catalogue.
 4. Never paste the key into a chat, source file, issue, PR, or log.
 
-For future GitHub Actions automation, add the provider key only through repository Settings → Secrets and variables → Actions as `NVIDIA_API_KEY`. This PR does not execute AI calls and no secret is required for its tests.
+For CI, Softnexa remains the source of the existing `NVIDIA_API_KEY` secret. Its workflow forwards the secret to the reusable workflow in UTILORA; the key is not duplicated in UTILORA, printed, or written to repository files. Do not create another key unless the live model-access test proves that the existing one is insufficient.
 
 ## Authenticate optional account integrations
 
@@ -46,14 +46,15 @@ Do not commit local credential files or tokens. OpenCode stores authentication o
 
 ## Use the agents
 
-OpenCode lists project agents from `.opencode/agents/`. The project lead can delegate tasks to:
-- `implementation-engineer`
-- `qa-engineer`
-- `security-auditor`
-- `seo-auditor`
-- `ux-reviewer`
-- `analytics-reviewer`
-- `release-reviewer`
+OpenCode lists exactly eight project agents from `.opencode/agents/`:
+- `project-lead` — Nemotron Ultra
+- `problem-analyst` — DeepSeek
+- `implementation-engineer` — MiniMax
+- `fast-task-engineer` — GLM
+- `visual-reviewer` — Nemotron Super VL
+- `long-horizon-engineer` — Laguna
+- `qa-engineer` — independent QA
+- `security-auditor` — independent security review
 
 OpenCode discovers project-local skills from `.opencode/skills/<name>/SKILL.md` and loads their full instructions on demand through its native `skill` tool. UTILORA now contains **exactly 50 skills: 9 first-party project skills and 41 carefully selected upstream skills**. The machine-readable provenance, pinned upstream commits, licences, and agent mapping live in `.opencode/skills/manifest.json`. See `docs/agent-team/SKILLS-CATALOG.md` for the role-by-role catalogue and `docs/agent-team/THIRD_PARTY_NOTICES.md` for the full third-party licence notices.
 
@@ -70,7 +71,7 @@ npm run e2e
 npm run build
 ```
 
-CI installs OpenCode and runs the CLI discovery checks for all eight agents and all 50 skills, in addition to deterministic checks for the catalogue, upstream commit pins, licences, and role permissions. This proves that the CLI can discover the configured agents and skills; a model-backed task for each agent still requires an authenticated provider/model and is not simulated by static checks.
+CI installs OpenCode and runs CLI discovery checks for all eight agents and all 50 skills, plus deterministic checks for model routing, upstream commit pins, licences, and role permissions. The separate Softnexa-triggered model smoke test verifies the live NVIDIA catalogue, then makes each agent load its assigned skill, inspect repository files, and return a role-specific report. A green discovery check alone is not proof of model execution.
 
 ## Important limitations
 
