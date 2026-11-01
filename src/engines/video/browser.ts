@@ -89,7 +89,7 @@ async function loadVideo(file: File): Promise<LoadedVideo> {
   };
 }
 
-async function readFiniteDuration(video: HTMLVideoElement): Promise<number> {
+export async function readFiniteDuration(video: HTMLVideoElement): Promise<number> {
   if (Number.isFinite(video.duration) && video.duration > 0) return video.duration;
 
   if (video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) {
