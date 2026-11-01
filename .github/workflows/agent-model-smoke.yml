@@ -382,6 +382,88 @@ jobs:
           PY
             exit "$opencode_status"
           fi
+          PRECHECK="$RUNNER_TEMP/opencode-precheck.json" python3 - <<'PY'
+          import json, os, pathlib, re
+          raw = pathlib.Path(os.environ["RAW_REPORT"]).read_text(encoding="utf-8", errors="replace")
+          events = []
+          for line in raw.splitlines():
+              try:
+                  item = json.loads(line)
+                  if isinstance(item, dict) and isinstance(item.get("type"), str):
+                      events.append(item)
+              except json.JSONDecodeError:
+                  continue
+          skill = os.environ["SKILL_NAME"]
+          skill_calls = 0
+          read_calls = 0
+          text_parts = []
+          session_id = ""
+          labels = ["ROLE", "MODEL", "SKILL_LOADED", "EVIDENCE", "FINDING", "LIMITATION"]
+          for event in events:
+              session_id = session_id or event.get("sessionID") or (event.get("part") or {}).get("sessionID", "")
+              part = event.get("part") or {}
+              if event.get("type") == "tool_use":
+                  tool = part.get("tool")
+                  state = part.get("state") or {}
+                  if tool == "skill" and skill in json.dumps(state.get("input") or {}, ensure_ascii=False):
+                      skill_calls += 1
+                  if tool in {"read", "grep", "glob", "list", "bash"} and state.get("status") == "completed":
+                      read_calls += 1
+              elif event.get("type") == "text":
+                  value = part.get("text")
+                  if isinstance(value, str):
+                      text_parts.append(value)
+          final_text = "\n".join(text_parts)
+          missing = [
+              label for label in labels
+              if not re.search(r"(?im)^\\s*(?:#{1,6}\\s*)?(?:\\*\\*)?" + label + r"(?:\\*\\*)?\\s*:", final_text)
+          ]
+          precheck = {
+              "session_id": session_id,
+              "skill_calls": skill_calls,
+              "read_calls": read_calls,
+              "text_chars": len(final_text.strip()),
+              "missing_labels": missing,
+          }
+          pathlib.Path(os.environ["PRECHECK"]).write_text(json.dumps(precheck), encoding="utf-8")
+          print("OpenCode completion check: skill_calls=%d, evidence_calls=%d, text_chars=%d, missing_labels=%d" % (skill_calls, read_calls, len(final_text.strip()), len(missing)))
+          PY
+          needs_followup="$(python3 -c 'import json,sys; d=json.load(open(sys.argv[1])); print("yes" if d["skill_calls"] < 1 or d["read_calls"] < 2 or d["text_chars"] < 100 or d["missing_labels"] else "no")' "$RUNNER_TEMP/opencode-precheck.json")"
+          if [ "$needs_followup" = "yes" ]; then
+            session_id="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1])).get("session_id",""))' "$RUNNER_TEMP/opencode-precheck.json")"
+            if [ -z "$session_id" ]; then
+              echo "::error::OpenCode returned no resumable session ID; the agent could not complete its report."
+              exit 1
+            fi
+            FOLLOWUP_PROMPT="$(cat <<EOF
+          Continue this same UTILORA read-only smoke-test session. Do not restart or repeat completed work unnecessarily.
+          Before writing the final report, check the actual tool events already completed.
+          If you have not invoked the native skill tool for exactly "$SKILL_NAME", invoke it now.
+          If you have fewer than two completed evidence-inspection calls, inspect the missing repository evidence now.
+          Do not edit files, run mutating commands, inspect environment variables, read .env files, or call external services.
+          Then return only six separate labeled lines, in this exact order:
+          ROLE: ...
+          MODEL: $MODEL_ID
+          SKILL_LOADED: $SKILL_NAME and one rule learned from it
+          EVIDENCE: at least two actual paths inspected, or the attached screenshot and viewport where applicable
+          FINDING: one concrete, evidence-backed conclusion
+          LIMITATION: what remains unverified
+          Do not claim any action or evidence unless it appears in the session's actual tool history.
+          EOF
+          )"
+            echo "The first response was incomplete; requesting one bounded continuation in the same session."
+            set +e
+            if [ "$AGENT_NAME" = "visual-reviewer" ]; then
+              opencode run --dir "$TARGET_DIR" --session "$session_id" --agent "$AGENT_NAME" --model "$MODEL_ROUTE" --format json "$FOLLOWUP_PROMPT" >> "$RAW_REPORT" 2>> "$RUNNER_TEMP/opencode-stderr.txt"
+            else
+              opencode run --dir "$TARGET_DIR" --session "$session_id" --agent "$AGENT_NAME" --model "$MODEL_ROUTE" --format json "$FOLLOWUP_PROMPT" >> "$RAW_REPORT" 2>> "$RUNNER_TEMP/opencode-stderr.txt"
+            fi
+            followup_status=$?
+            set -e
+            if [ "$followup_status" -ne 0 ]; then
+              echo "::warning::Bounded OpenCode continuation returned exit code $followup_status; strict validation remains enabled."
+            fi
+          fi
           python3 - <<'PY'
           import json, os, pathlib, re, sys
           raw_path = pathlib.Path(os.environ["RAW_REPORT"])
