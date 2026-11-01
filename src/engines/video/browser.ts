@@ -128,7 +128,7 @@ export async function inspectVideoMetadata(file: File): Promise<VideoMetadataVie
     return {
       durationSeconds,
       dimensions: { width, height },
-      aspectRatio: Math.round((width / height) * 1000) / 1000 + ':1',
+      aspectRatio: (width / ratioDivisor) + ':' + (height / ratioDivisor),
       frameRate: null,
       videoCodec: null,
       audioCodec: null,
