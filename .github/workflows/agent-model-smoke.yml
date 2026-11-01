@@ -129,15 +129,20 @@ jobs:
           Answer naturally and concisely.
           EOF
           )"
+          set +e
           if [ "$AGENT_NAME" = "visual-reviewer" ]; then
-            opencode run --dir "$GITHUB_WORKSPACE" --agent "$AGENT_NAME" --model "$MODEL_ROUTE" --file "$SCREENSHOT" --format json "$PROMPT" > "$RUNNER_TEMP/agent-output.jsonl" 2> "$RUNNER_TEMP/opencode-stderr.txt"
+            timeout --signal=TERM --kill-after=15s 7m opencode run --dir "$GITHUB_WORKSPACE" --agent "$AGENT_NAME" --model "$MODEL_ROUTE" --file "$SCREENSHOT" --format json "$PROMPT" > "$RUNNER_TEMP/agent-output.jsonl" 2> "$RUNNER_TEMP/opencode-stderr.txt"
           else
-            opencode run --dir "$GITHUB_WORKSPACE" --agent "$AGENT_NAME" --model "$MODEL_ROUTE" --format json "$PROMPT" > "$RUNNER_TEMP/agent-output.jsonl" 2> "$RUNNER_TEMP/opencode-stderr.txt"
+            timeout --signal=TERM --kill-after=15s 7m opencode run --dir "$GITHUB_WORKSPACE" --agent "$AGENT_NAME" --model "$MODEL_ROUTE" --format json "$PROMPT" > "$RUNNER_TEMP/agent-output.jsonl" 2> "$RUNNER_TEMP/opencode-stderr.txt"
           fi
+          opencode_exit=$?
+          set -e
+          export OPENCODE_EXIT_CODE="$opencode_exit"
           python3 - <<'PY'
           import json, os, pathlib, re, subprocess, sys, urllib.error, urllib.request
           path = pathlib.Path(os.environ["RUNNER_TEMP"]) / "agent-output.jsonl"
           raw = path.read_text(encoding="utf-8", errors="replace")
+          opencode_exit = int(os.environ.get("OPENCODE_EXIT_CODE", "0"))
           secret = os.environ.get("NVIDIA_API_KEY", "")
           events = []
           event_parts = []
@@ -215,7 +220,10 @@ jobs:
                   direct_status = "HTTP " + str(error.code)
               except Exception as error:
                   direct_status = type(error).__name__
-              print("::error::No final assistant text. session=" + (session_id or "missing") + "; event_types=" + ",".join(kinds) + "; error_events=" + ",".join(error_names) + "; session_export=" + export_status + "; direct_nim=" + direct_status)
+              print("::error::No final assistant text. session=" + (session_id or "missing") + "; event_types=" + ",".join(kinds) + "; error_events=" + ",".join(error_names) + "; session_export=" + export_status + "; direct_nim=" + direct_status + "; opencode_exit=" + str(opencode_exit))
+              sys.exit(1)
+          if opencode_exit != 0:
+              print("::error::OpenCode ended with exit code " + str(opencode_exit) + "; its output is not accepted as a complete agent response.")
               sys.exit(1)
           report = "# " + os.environ["AGENT_NAME"] + "\n\nModel: " + os.environ["MODEL_ID"] + "\n\n" + answer + "\n"
           pathlib.Path(os.environ["RUNNER_TEMP"], "agent-report.md").write_text(report, encoding="utf-8")
