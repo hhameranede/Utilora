@@ -30,6 +30,9 @@ await run('converts text cases', () => {
   assert.equal(convertTextCase('hello WORLD', 'upper'), 'HELLO WORLD');
   assert.equal(convertTextCase('hello world', 'snake'), 'hello_world');
   assert.equal(convertTextCase('hello world', 'camel'), 'helloWorld');
+  assert.equal(convertTextCase('hello-world / utilora', 'title'), 'Hello-World / Utilora');
+  assert.equal(convertTextCase("don't stop — BELIEVE", 'title'), "Don't Stop — Believe");
+  assert.equal(convertTextCase('hello. world! next', 'sentence'), 'Hello. World! Next');
 });
 
 await run('removes duplicate lines with case and whitespace rules', () => {
