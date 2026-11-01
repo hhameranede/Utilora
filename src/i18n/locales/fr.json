@@ -268,5 +268,30 @@
   },
   "categories": {
     "description": "Explorez les outils disponibles par catégorie. Chaque espace regroupe des utilitaires associés accessibles dans le navigateur."
+  },
+  "guide": {
+    "titlePrefix": "Mode d’emploi de",
+    "description": "Un guide visuel étape par étape de l’interface réelle de {tool} dans UTILORA, avec des flèches annotées.",
+    "breadcrumb": "Mode d’emploi",
+    "kicker": "Guide visuel de l’outil",
+    "maxSize": "Taille max.",
+    "previewNotice": "Remarque : cet outil est encore en aperçu. Ce guide présente l’interface actuelle et ne signifie pas que le traitement est activé.",
+    "screenshotTitle": "Capture de l’interface réelle d’UTILORA",
+    "screenshotCaption": "Générée directement depuis l’espace de travail affiché",
+    "screenshotAlt": "Capture réelle de l’espace de travail {tool} avec des flèches explicatives",
+    "captureUnavailable": "La capture automatique n’est pas disponible dans ce navigateur",
+    "liveWorkspace": "Voici l’espace de travail réel ; vous pouvez toujours suivre les étapes ci-dessous.",
+    "captureLoading": "Capture de l’interface et préparation des annotations…",
+    "readyTitle": "Prêt à essayer l’outil ?",
+    "readyBody": "Ouvrez l’espace de travail et suivez les mêmes étapes.",
+    "openTool": "Ouvrir l’outil",
+    "workspacePreview": "Aperçu de l’espace de travail",
+    "formatsShown": "les formats indiqués dans l’outil",
+    "inputArea": "Zone de saisie",
+    "settingsArea": "Paramètres et options",
+    "resultArea": "Zone de résultat",
+    "step1Desc": "Ajoutez le fichier, le texte, le domaine ou toute autre donnée demandée.",
+    "step2Desc": "Choisissez les commandes ou paramètres disponibles pour cette tâche.",
+    "step3Desc": "Lancez l’action, vérifiez le résultat, puis enregistrez-le ou copiez-le si possible."
   }
 }
