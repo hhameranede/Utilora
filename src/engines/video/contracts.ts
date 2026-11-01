@@ -7,26 +7,16 @@ export interface VideoCompressorInput {
   file: File;
 }
 export interface VideoCompressorOptions {
-  crf: number; // 18 - 32
+  quality: 'high' | 'balanced' | 'small';
   preset: 'ultrafast' | 'fast' | 'medium';
   targetResolution?: 'original' | '1080p' | '720p' | '480p';
-  codec?: 'h264' | 'vp9';
 }
 export interface VideoCompressorOutput {
   blob: Blob;
   originalSize: number;
   compressedSize: number;
+  filename: string;
 }
-
-export const VideoCompressorAdapter: ToolAdapter<VideoCompressorInput, VideoCompressorOptions, VideoCompressorOutput> = {
-  id: 'video-compressor',
-  name: 'Video Compressor Adapter',
-  isConnected: false,
-  async execute() {
-    // TODO: Connect FFmpeg.wasm in Phase 2
-    throw new Error('Engine not connected.');
-  },
-};
 
 // ==========================================
 // 32. Video to Audio
@@ -42,16 +32,6 @@ export interface VideoToAudioOutput {
   blob: Blob;
   filename: string;
 }
-
-export const VideoToAudioAdapter: ToolAdapter<VideoToAudioInput, VideoToAudioOptions, VideoToAudioOutput> = {
-  id: 'video-to-audio',
-  name: 'Video to Audio Adapter',
-  isConnected: false,
-  async execute() {
-    // TODO: Connect Web Audio API / FFmpeg demuxer in Phase 2
-    throw new Error('Engine not connected.');
-  },
-};
 
 // ==========================================
 // 33. Video Metadata Viewer
@@ -106,17 +86,8 @@ export interface VideoTrimmerOptions {
 export interface VideoTrimmerOutput {
   blob: Blob;
   durationSeconds: number;
+  filename: string;
 }
-
-export const VideoTrimmerAdapter: ToolAdapter<VideoTrimmerInput, VideoTrimmerOptions, VideoTrimmerOutput> = {
-  id: 'video-trimmer',
-  name: 'Video Trimmer Adapter',
-  isConnected: false,
-  async execute() {
-    // TODO: Connect WebCodecs / FFmpeg.wasm in Phase 2
-    throw new Error('Engine not connected.');
-  },
-};
 
 // ==========================================
 // 36. Thumbnail Extractor
