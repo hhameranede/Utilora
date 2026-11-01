@@ -109,7 +109,7 @@ test('HTTP headers checker shows exposed response headers and CORS visibility li
   await page.getByRole('button', { name: 'Inspect headers' }).click();
 
   await expect(page.getByRole('status')).toContainText('Observed HTTP response');
-  await expect(page.getByText('strict-transport-security')).toBeVisible();
-  await expect(page.getByText('content-security-policy')).toBeVisible();
+  await expect(page.getByText('strict-transport-security').first()).toBeVisible();
+  await expect(page.getByText('content-security-policy').first()).toBeVisible();
   await expect(page.getByText('Seen', { exact: true })).toHaveCount(4);
 });
