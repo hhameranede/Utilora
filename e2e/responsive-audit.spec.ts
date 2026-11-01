@@ -49,10 +49,12 @@ async function expectNoHorizontalOverflow(page: import('@playwright/test').Page,
       .slice(0, 12),
   }));
 
+  // Allow a single CSS pixel for fractional layout rounding at breakpoint boundaries.
+  // Any larger page-level overflow still fails the responsive audit.
   expect(
     Math.max(measurements.documentWidth, measurements.bodyWidth),
     route + ' overflowed at ' + viewport + 'px: ' + JSON.stringify(measurements),
-  ).toBeLessThanOrEqual(measurements.viewportWidth);
+  ).toBeLessThanOrEqual(measurements.viewportWidth + 1);
 }
 
 test('all 36 tool pages fit mobile, tablet and desktop without page-level horizontal scrolling', async ({ page }) => {
