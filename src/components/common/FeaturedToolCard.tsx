@@ -25,21 +25,21 @@ export const FeaturedToolCard: React.FC<FeaturedToolCardProps> = ({ tool, classN
     >
       <div>
         <div className="flex items-center justify-between gap-3 mb-6">
-          <div className="w-12 h-12 rounded-2xl bg-orange-50 border border-orange-100 flex items-center justify-center text-orange-600 shadow-xs">
+          <div className="w-12 h-12 rounded-2xl bg-orange-50 border border-orange-100 flex items-center justify-center text-orange-700 shadow-xs">
             <Icon name={tool.icon} size={24} />
           </div>
 
-          <div className="flex items-center gap-2 text-xs text-stone-400">
+          <div className="flex items-center gap-2 text-xs text-stone-500">
             <span className="font-medium text-stone-600">{categoryTitle}</span>
             <span aria-hidden="true" className="text-stone-300">·</span>
-            <span className="flex items-center gap-1 text-orange-600 font-medium">
+            <span className="flex items-center gap-1 text-orange-700 font-medium">
               <Sparkles size={12} />
               <span>{t('common.featured')}</span>
             </span>
           </div>
         </div>
 
-        <h3 className="text-lg sm:text-xl font-bold text-stone-900 group-hover:text-orange-600 transition-colors mb-2">
+        <h3 className="text-lg sm:text-xl font-bold text-stone-900 group-hover:text-orange-700 transition-colors mb-2">
           {name}
         </h3>
 
@@ -60,7 +60,7 @@ export const FeaturedToolCard: React.FC<FeaturedToolCardProps> = ({ tool, classN
       </div>
 
       <div className="pt-5 border-t border-stone-100 flex items-center justify-between">
-        <span className="text-xs text-stone-400 font-mono">
+        <span className="text-xs text-stone-500 font-mono">
           {tool.status !== 'functional' ? t('common.previewOnly') : tool.category === 'website-domain' ? t('common.publicLookup') : t('common.runsLocally')}
         </span>
 
