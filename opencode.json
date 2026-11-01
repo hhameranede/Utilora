@@ -108,6 +108,10 @@
         "nemotron-super-vl": {
           "id": "nvidia/nemotron-3.5-super-vl-120b-a12b",
           "name": "Nemotron 3.5 Super VL 120B",
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          },
           "limit": {
             "context": 262144,
             "output": 16384
