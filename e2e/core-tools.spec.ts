@@ -1,10 +1,6 @@
 import { expect, test } from '@playwright/test';
+import { readFile } from 'node:fs/promises';
 import { PDFDocument } from 'pdf-lib';
-
-const onePixelPng = Buffer.from(
-  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/pL8AAAAASUVORK5CYII=',
-  'base64',
-);
 
 async function makePng(page: import('@playwright/test').Page, width = 8, height = 4): Promise<Buffer> {
   const bytes = await page.evaluate(async ({ width, height }) => {
@@ -62,6 +58,11 @@ test('image converter accepts a local image and exposes an actual downloadable r
   const download = await downloadPromise;
   expect(download.suggestedFilename()).toBe('pixel-image-converter.webp');
   expect(await download.failure()).toBeNull();
+  const imagePath = await download.path();
+  expect(imagePath).not.toBeNull();
+  const imageBytes = await readFile(imagePath!);
+  expect(imageBytes.toString('ascii', 0, 4)).toBe('RIFF');
+  expect(imageBytes.toString('ascii', 8, 12)).toBe('WEBP');
 });
 
 test('PDF merge orders files and creates a real PDF output', async ({ page }) => {
@@ -80,6 +81,31 @@ test('PDF merge orders files and creates a real PDF output', async ({ page }) =>
   const pdfDownload = await pdfDownloadPromise;
   expect(pdfDownload.suggestedFilename()).toBe('merged-document.pdf');
   expect(await pdfDownload.failure()).toBeNull();
+  const pdfPath = await pdfDownload.path();
+  expect(pdfPath).not.toBeNull();
+  const downloadedPdf = await PDFDocument.load(await readFile(pdfPath!));
+  expect(downloadedPdf.getPageCount()).toBe(2);
+});
+
+test('PDF.js renders a page to JPG and releases the browser render task', async ({ page }) => {
+  await page.goto('/en/tools/pdf-to-jpg');
+  const pdf = await makePdf('render-input.pdf');
+  await page.locator('input[type="file"]').setInputFiles(pdf);
+
+  await expect(page.getByText('Selected files (1)')).toBeVisible();
+  await page.getByRole('button', { name: 'Convert pages to images' }).click();
+  await expect(page.getByText('render-input-page-1.jpg')).toBeVisible();
+
+  const downloadPromise = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Download render-input-page-1.jpg' }).click();
+  const download = await downloadPromise;
+  expect(download.suggestedFilename()).toBe('render-input-page-1.jpg');
+  expect(await download.failure()).toBeNull();
+  const imagePath = await download.path();
+  expect(imagePath).not.toBeNull();
+  const imageBytes = await readFile(imagePath!);
+  expect(imageBytes[0]).toBe(0xff);
+  expect(imageBytes[1]).toBe(0xd8);
 });
 
 test('JSON formatter formats valid input and reports invalid JSON without false success', async ({ page }) => {
