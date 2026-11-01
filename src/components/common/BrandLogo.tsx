@@ -1,11 +1,14 @@
 import React from 'react';
+import { useI18n } from '../../i18n';
 
 interface BrandLogoProps {
   compact?: boolean;
 }
 
-export const BrandLogo: React.FC<BrandLogoProps> = ({ compact = false }) => (
-  <span className="inline-flex items-center gap-2.5" aria-label="UTILORA — Every Digital Task. One Place.">
+export const BrandLogo: React.FC<BrandLogoProps> = ({ compact = false }) => {
+  const { t } = useI18n();
+  return (
+  <span className="inline-flex items-center gap-2.5" aria-label={`${t("brand.name")} — ${t("brand.slogan")}`}>
     <svg aria-hidden="true" viewBox="0 0 64 64" className="h-9 w-9 sm:h-10 sm:w-10 shrink-0">
       <rect x="3" y="3" width="58" height="58" rx="17" fill="#ffffff" stroke="#e7e5e4" strokeWidth="2" />
       <rect x="10" y="10" width="44" height="44" rx="13" fill="#fafaf9" stroke="#f5f5f4" strokeWidth="1.5" />
@@ -14,7 +17,8 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({ compact = false }) => (
     </svg>
     <span className="flex min-w-0 flex-col leading-none">
       <span className="text-base sm:text-lg font-extrabold tracking-[0.16em] text-stone-900">UTILORA</span>
-      {!compact && <span className="mt-1 text-[9px] sm:text-[10px] font-semibold uppercase tracking-[0.13em] text-orange-700">Every Digital Task. One Place.</span>}
+      {!compact && <span className="mt-1 text-[9px] sm:text-[10px] font-semibold uppercase tracking-[0.13em] text-orange-700">{t('brand.slogan')}</span>}
     </span>
   </span>
-);
+  );
+};
