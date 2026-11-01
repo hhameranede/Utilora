@@ -19,7 +19,7 @@ export function getTextMetrics(text: string): TextMetrics {
   const letters = characters.filter((char) => /\p{L}/u.test(char)).length;
   const digits = characters.filter((char) => /\p{N}/u.test(char)).length;
   const spaces = characters.filter((char) => /\s/u.test(char)).length;
-  const punctuation = characters.filter((char) => /[\p{P}\p{S}]/u.test(char)).length;
+  const punctuation = characters.filter((char) => /\p{P}/u.test(char)).length;
   const paragraphs = text.trim() ? text.trim().split(/\n\s*\n/u).length : 0;
 
   return {
