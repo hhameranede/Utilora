@@ -43,11 +43,23 @@ export const TemplateGCodeEditor: React.FC<TemplateGCodeEditorProps> = ({
     }
   };
 
-  const handleCopy = () => {
-    if (typeof navigator !== 'undefined' && navigator.clipboard) {
-      navigator.clipboard.writeText(code);
+  const handleCopy = async () => {
+    if (!code) {
+      setResultMessage('There is no JSON content to copy.');
+      setResultError(true);
+      return;
+    }
+    try {
+      if (!navigator.clipboard?.writeText) throw new Error('Clipboard access is unavailable in this browser.');
+      await navigator.clipboard.writeText(code);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      setResultError(false);
+      setResultMessage('Copied to clipboard.');
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setCopied(false);
+      setResultMessage('Clipboard access is blocked by this browser. Select and copy the JSON manually.');
+      setResultError(true);
     }
   };
 
