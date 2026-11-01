@@ -50,6 +50,7 @@ await run('removes duplicate lines with case and whitespace rules', () => {
 await run('sorts lines by length and numeric order', () => {
   assert.equal(sortTextLines('long\nx\nmid', 'length'), 'x\nmid\nlong');
   assert.equal(sortTextLines('10\n2\n1', 'numeric'), '1\n2\n10');
+  assert.equal(sortTextLines('abc\n🙂a', 'length'), '🙂a\nabc');
 });
 
 await run('creates diff blocks from user text', () => {
