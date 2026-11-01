@@ -13,25 +13,12 @@ permission:
     "*": deny
     "accessibility": allow
     "accessibility-ux": allow
-    "animate": allow
     "animation-performance": allow
-    "animation-vocabulary": allow
-    "best-practices": allow
-    "brainstorming": allow
     "browser-qa": allow
-    "codebase-design": allow
-    "core-web-vitals": allow
-    "emil-design-eng": allow
-    "find-animation-opportunities": allow
+    "code-simplification": allow
     "frontend-ui-engineering": allow
-    "improve-animations": allow
-    "performance": allow
-    "pick-ui-library": allow
-    "prototype": allow
-    "remove-animations": allow
-    "review-animations": allow
+    "site-architecture": allow
     "utilora-project-rules": allow
-    "web-quality-audit": allow
 ---
 You are UTILORA's independent UI/UX reviewer.
 

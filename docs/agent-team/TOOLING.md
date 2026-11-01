@@ -55,13 +55,11 @@ OpenCode lists project agents from `.opencode/agents/`. The project lead can del
 - `analytics-reviewer`
 - `release-reviewer`
 
-Skills are discovered on demand from `.opencode/skills/<name>/SKILL.md`. The repository contains **100 pinned external skills** plus **9 first-party UTILORA skills**; see `docs/agent-team/SKILLS-CATALOG.md` and `skills-catalog.json` for provenance, licences, and role assignments.
+OpenCode discovers project-local skills from `.opencode/skills/<name>/SKILL.md` and loads their full instructions on demand through its native `skill` tool. UTILORA now contains **exactly 50 skills: 9 first-party project skills and 41 carefully selected upstream skills**. The machine-readable provenance, pinned upstream commits, licences, and agent mapping live in `.opencode/skills/manifest.json`. See `docs/agent-team/SKILLS-CATALOG.md` for the role-by-role catalogue and `docs/agent-team/THIRD_PARTY_NOTICES.md` for the full third-party licence notices.
 
-Each specialist has a per-agent `permission.skill` allow-list. Skills not explicitly assigned to that role are hidden from it. The project lead has cross-functional planning and coordination skills. Skill instructions never grant additional shell, edit, MCP, GitHub, Cloudflare, or deployment permissions.
+Every agent has an explicit `permission.skill` allow-list in its own frontmatter. The wildcard rule denies access by default, and only the skill IDs assigned to that role are allowed. Old or unrelated skill IDs are not retained. Loading a skill does not grant extra shell, edit, MCP, GitHub, Cloudflare, or deployment permissions; the agent's normal tool permissions remain in force.
 
-Validate discovery with `opencode agent list` and `opencode debug skill`. CI runs these OpenCode CLI discovery checks in addition to the static catalogue and permission tests. This verifies that OpenCode can load the definitions; a real model-backed task for each agent still requires an authenticated provider/model.
-
-Useful commands:
+Useful verification commands:
 ```bash
 opencode agent list
 opencode debug skill
@@ -71,6 +69,8 @@ npm run lint
 npm run e2e
 npm run build
 ```
+
+CI installs OpenCode and runs the CLI discovery checks for all eight agents and all 50 skills, in addition to deterministic checks for the catalogue, upstream commit pins, licences, and role permissions. This proves that the CLI can discover the configured agents and skills; a model-backed task for each agent still requires an authenticated provider/model and is not simulated by static checks.
 
 ## Important limitations
 

@@ -19,6 +19,10 @@ This document defines the intended architecture and safety boundaries. It does n
 | Product/User Reviewer | Test the experience as a first-time visitor, including failure and empty states | Task-based observations |
 | Release & Reliability Engineer | Validate release readiness, monitor deployment and coordinate rollback | Green gates, deployment health and rollback evidence |
 
+## Skill library
+
+UTILORA uses exactly **50 reusable skills**: 9 first-party project skills and 41 curated upstream skills. Skills are shared on disk, pinned to their upstream commit, and assigned through least-privilege per-agent allow-lists. See the [skill catalogue](SKILLS-CATALOG.md), [machine-readable manifest](../../.opencode/skills/manifest.json), and [third-party notices](THIRD_PARTY_NOTICES.md).
+
 ## Candidate model pool
 
 Model IDs and availability must be verified against the provider catalog and API before use. Do not hard-code a model based only on its display name.

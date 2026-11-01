@@ -7,38 +7,27 @@ permission:
   external_directory: deny
   skill:
     "*": deny
-    "brainstorming": allow
+    "api-and-interface-design": allow
     "code-review": allow
     "codebase-design": allow
-    "competitor-profiling": allow
+    "content-strategy": allow
     "context-engineering": allow
-    "customer-research": allow
     "dispatching-parallel-agents": allow
     "documentation-and-adrs": allow
     "domain-modeling": allow
-    "doubt-driven-development": allow
-    "executing-plans": allow
-    "finishing-a-development-branch": allow
     "handoff": allow
     "improve-codebase-architecture": allow
-    "launch": allow
-    "marketing-ideas": allow
-    "marketing-plan": allow
     "planning-and-task-breakdown": allow
     "pr": allow
-    "product-marketing": allow
-    "receiving-code-review": allow
+    "programmatic-seo": allow
     "release-safety": allow
-    "requesting-code-review": allow
     "research": allow
     "research-sources": allow
-    "safe-implementation": allow
+    "retro": allow
+    "site-architecture": allow
     "source-driven-development": allow
     "spec-driven-development": allow
-    "subagent-driven-development": allow
-    "to-spec": allow
-    "to-tickets": allow
-    "triage": allow
+    "using-agent-skills": allow
     "utilora-project-rules": allow
     "verification-before-completion": allow
     "writing-plans": allow

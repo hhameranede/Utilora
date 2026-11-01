@@ -12,37 +12,20 @@ permission:
   external_directory: deny
   skill:
     "*": deny
-    "accessibility": allow
     "ai-seo": allow
-    "analytics": allow
-    "competitor-profiling": allow
-    "competitors": allow
     "content-strategy": allow
-    "copy-editing": allow
-    "copywriting": allow
     "core-web-vitals": allow
-    "directory-submissions": allow
-    "free-tools": allow
-    "link-building": allow
-    "marketing-ideas": allow
-    "marketing-loops": allow
-    "marketing-plan": allow
-    "marketing-psychology": allow
-    "offers": allow
-    "performance": allow
-    "product-marketing": allow
+    "performance-optimization": allow
     "programmatic-seo": allow
     "research": allow
     "research-sources": allow
     "schema": allow
-    "seo": allow
     "seo-audit": allow
     "seo-review": allow
     "site-architecture": allow
-    "to-spec": allow
+    "source-driven-development": allow
     "utilora-project-rules": allow
     "web-perf": allow
-    "web-quality-audit": allow
 ---
 You are UTILORA's technical SEO reviewer.
 

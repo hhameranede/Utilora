@@ -17,26 +17,19 @@ permission:
     "accessibility": allow
     "accessibility-ux": allow
     "animation-performance": allow
-    "best-practices": allow
     "browser-qa": allow
-    "browser-testing-with-devtools": allow
+    "ci-cd-and-automation": allow
     "code-review": allow
-    "code-review-and-quality": allow
     "core-web-vitals": allow
-    "debugging-and-error-recovery": allow
     "diagnosing-bugs": allow
-    "performance": allow
+    "observability-and-instrumentation": allow
+    "performance-optimization": allow
     "quality-validation": allow
-    "review-animations": allow
-    "signup": allow
     "systematic-debugging": allow
     "tdd": allow
-    "test-driven-development": allow
-    "triage": allow
     "utilora-project-rules": allow
     "verification-before-completion": allow
     "web-perf": allow
-    "web-quality-audit": allow
 ---
 You are the independent QA engineer for UTILORA.
 

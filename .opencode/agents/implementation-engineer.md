@@ -19,46 +19,28 @@ permission:
   external_directory: deny
   skill:
     "*": deny
-    "agents-sdk": allow
-    "animate": allow
+    "animation-performance": allow
     "api-and-interface-design": allow
-    "brainstorming": allow
-    "cf-cli": allow
-    "cloudflare": allow
     "code-review": allow
     "code-simplification": allow
     "codebase-design": allow
-    "constraint-driven-development": allow
     "context-engineering": allow
-    "debugging-and-error-recovery": allow
-    "deprecation-and-migration": allow
     "diagnosing-bugs": allow
+    "documentation-and-adrs": allow
     "domain-modeling": allow
-    "durable-objects": allow
-    "executing-plans": allow
     "frontend-ui-engineering": allow
     "git-workflow-and-versioning": allow
-    "implement": allow
-    "implement-spec": allow
     "improve-codebase-architecture": allow
     "incremental-implementation": allow
     "performance-optimization": allow
-    "pick-ui-library": allow
-    "quality-validation": allow
     "safe-implementation": allow
+    "schema": allow
+    "security-and-hardening": allow
     "source-driven-development": allow
     "spec-driven-development": allow
-    "subagent-driven-development": allow
     "systematic-debugging": allow
     "tdd": allow
-    "test-driven-development": allow
-    "using-git-worktrees": allow
     "utilora-project-rules": allow
-    "verification-before-completion": allow
-    "web-perf": allow
-    "workers-best-practices": allow
-    "workers-profiling": allow
-    "wrangler": allow
 ---
 You are UTILORA's implementation engineer.
 

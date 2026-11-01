@@ -7,25 +7,8 @@ permission:
   external_directory: deny
   skill:
     "*": deny
-    "ab-testing": allow
     "analytics": allow
-    "attribution": allow
-    "competitor-profiling": allow
-    "content-strategy": allow
-    "conversion-tracking": allow
-    "cro": allow
-    "customer-research": allow
-    "marketing-ideas": allow
-    "marketing-loops": allow
-    "marketing-plan": allow
-    "marketing-psychology": allow
-    "offers": allow
-    "onboarding": allow
-    "pricing": allow
-    "product-marketing": allow
-    "research": allow
-    "research-sources": allow
-    "signup": allow
+    "observability-and-instrumentation": allow
     "utilora-project-rules": allow
 ---
 You are UTILORA's read-only analytics investigator.

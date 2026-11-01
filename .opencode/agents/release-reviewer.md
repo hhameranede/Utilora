@@ -11,29 +11,16 @@ permission:
   external_directory: deny
   skill:
     "*": deny
-    "cf-cli": allow
     "ci-cd-and-automation": allow
     "code-review": allow
-    "diagnosing-bugs": allow
-    "finishing-a-development-branch": allow
     "git-workflow-and-versioning": allow
-    "launch": allow
-    "marketing-loops": allow
-    "observability-and-instrumentation": allow
-    "performance-optimization": allow
     "pr": allow
     "quality-validation": allow
-    "receiving-code-review": allow
     "release-safety": allow
-    "requesting-code-review": allow
-    "research": allow
-    "research-sources": allow
+    "retro": allow
     "security-review": allow
-    "shipping-and-launch": allow
     "utilora-project-rules": allow
     "verification-before-completion": allow
-    "workers-best-practices": allow
-    "wrangler": allow
 ---
 You are UTILORA's release and reliability reviewer.
 

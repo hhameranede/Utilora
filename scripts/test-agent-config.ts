@@ -5,12 +5,26 @@ import { spawnSync } from 'node:child_process';
 
 type McpServer = { type?: string; url?: string; command?: string[]; enabled?: boolean };
 type SkillRecord = {
-  id: string; source: string; path: string; revision: string; license: string;
-  assigned_agents: string[]; upstream_url: string;
+  name: string;
+  path: string;
+  assignedTo: string[];
+  source: {
+    type: string;
+    repository: string;
+    commit: string;
+    path: string;
+    license: string;
+    copyright: string;
+  };
 };
-type SkillCatalog = {
-  schema_version: number; project: string; external_skill_count: number;
-  internal_skill_count: number; total_skill_count: number; skills: SkillRecord[];
+type SkillManifest = {
+  version: number;
+  totalSkillCount: number;
+  projectSpecificCount: number;
+  curatedExternalCount: number;
+  agents: string[];
+  assignmentsByAgent: Record<string, string[]>;
+  skills: SkillRecord[];
 };
 
 const root = process.cwd();
@@ -77,77 +91,108 @@ const agentFiles = readdirSync(agentDir).filter((name) => name.endsWith('.md'));
 assert.equal(agentFiles.length, expectedAgents.length, 'Expected exactly eight agent definitions');
 for (const agent of expectedAgents) assert.ok(agentFiles.includes(agent + '.md'), 'Missing agent ' + agent);
 
-const catalog = JSON.parse(readFileSync(join(root, 'docs', 'agent-team', 'skills-catalog.json'), 'utf8')) as SkillCatalog;
-assert.equal(catalog.schema_version, 1);
-assert.equal(catalog.project, 'UTILORA');
-assert.equal(catalog.external_skill_count, 100);
-assert.equal(catalog.skills.length, 100);
-assert.equal(catalog.internal_skill_count, 9);
-assert.equal(catalog.total_skill_count, 109);
-
-const externalIds = catalog.skills.map((skill) => skill.id);
-assert.equal(new Set(externalIds).size, 100, 'External skill IDs must be unique');
 const skillsDir = join(root, '.opencode', 'skills');
-const skillDirs = readdirSync(skillsDir).filter((name) => statSync(join(skillsDir, name)).isDirectory());
-assert.equal(skillDirs.length, catalog.total_skill_count);
+const skillDirs = readdirSync(skillsDir)
+  .filter((name) => statSync(join(skillsDir, name)).isDirectory())
+  .sort();
+assert.equal(skillDirs.length, 50, 'UTILORA must contain exactly 50 skill directories');
 
-for (const skill of catalog.skills) {
-  assert.match(skill.id, /^[a-z0-9]+(-[a-z0-9]+)*$/);
-  assert.ok(skill.id.length <= 64);
-  assert.ok(skillDirs.includes(skill.id), 'Missing installed skill folder: ' + skill.id);
-  assert.match(skill.revision, /^[a-f0-9]{40}$/);
-  assert.ok(['MIT', 'Apache-2.0'].includes(skill.license), 'Unapproved licence for ' + skill.id);
-  assert.ok(skill.assigned_agents.length > 0, 'No agent assigned to ' + skill.id);
-  assert.ok(skill.assigned_agents.every((agent) => expectedAgents.includes(agent as (typeof expectedAgents)[number])));
-  assert.equal(skill.upstream_url, 'https://github.com/' + skill.source + '/blob/' + skill.revision + '/' + skill.path);
-  const lines = readFrontmatter(join(skillsDir, skill.id, 'SKILL.md'), skill.id);
-  const declaredName = lines.find((line) => line.startsWith('name:'))?.slice(5).trim().replace(/^["']|["']$/g, '');
-  assert.equal(declaredName, skill.id);
-  const description = lines.find((line) => line.startsWith('description:'))?.slice(12).trim();
-  assert.ok(description && description.length > 0 && description.length <= 1024, 'Invalid description in ' + skill.id);
-  assert.ok(lines.some((line) => line.trim() === 'source: "github.com/' + skill.source + '/' + skill.path + '"'));
-  assert.ok(lines.some((line) => line.trim() === 'revision: "' + skill.revision + '"'));
-}
+const manifestPath = join(skillsDir, 'manifest.json');
+const manifest = JSON.parse(readFileSync(manifestPath, 'utf8')) as SkillManifest;
+assert.equal(manifest.version, 1);
+assert.equal(manifest.totalSkillCount, 50);
+assert.equal(manifest.projectSpecificCount, 9);
+assert.equal(manifest.curatedExternalCount, 41);
+assert.equal(manifest.skills.length, 50);
+assert.deepEqual([...manifest.agents].sort(), [...expectedAgents].sort());
 
-const internalSkills = [
-  'accessibility-ux', 'browser-qa', 'quality-validation', 'release-safety',
-  'research-sources', 'safe-implementation', 'security-review', 'seo-review',
-  'utilora-project-rules',
-];
-for (const name of internalSkills) {
-  assert.ok(skillDirs.includes(name), 'Missing first-party skill: ' + name);
-  const lines = readFrontmatter(join(skillsDir, name, 'SKILL.md'), name);
-  assert.equal(lines.find((line) => line.startsWith('name:'))?.slice(5).trim(), name);
-  assert.ok(hasNonEmptyField(lines, 'description'));
-}
+const skillNames = manifest.skills.map((skill) => skill.name).sort();
+assert.equal(new Set(skillNames).size, 50, 'Skill IDs must be unique');
+assert.deepEqual(skillNames, skillDirs, 'Manifest and installed skill directories must match exactly');
 
-const expectedInternalAssignments: Record<string, string[]> = {
-  'project-lead': ['utilora-project-rules', 'research-sources', 'release-safety', 'safe-implementation'],
-  'implementation-engineer': ['utilora-project-rules', 'safe-implementation', 'quality-validation'],
-  'qa-engineer': ['utilora-project-rules', 'browser-qa', 'quality-validation', 'accessibility-ux'],
-  'security-auditor': ['utilora-project-rules', 'security-review', 'research-sources'],
-  'seo-auditor': ['utilora-project-rules', 'seo-review', 'research-sources'],
-  'ux-reviewer': ['utilora-project-rules', 'accessibility-ux', 'browser-qa'],
-  'analytics-reviewer': ['utilora-project-rules', 'research-sources'],
-  'release-reviewer': ['utilora-project-rules', 'release-safety', 'quality-validation', 'security-review', 'research-sources'],
+const projectSkills = manifest.skills.filter((skill) => skill.source.type === 'project');
+const externalSkills = manifest.skills.filter((skill) => skill.source.type === 'external');
+assert.equal(projectSkills.length, 9);
+assert.equal(externalSkills.length, 41);
+
+const licenseFiles: Record<string, string> = {
+  'mattpocock/skills': 'mattpocock-skills-MIT.txt',
+  'obra/superpowers': 'obra-superpowers-MIT.txt',
+  'addyosmani/agent-skills': 'addyosmani-agent-skills-MIT.txt',
+  'coreyhaines31/marketingskills': 'coreyhaines31-marketingskills-MIT.txt',
+  'addyosmani/web-quality-skills': 'addyosmani-web-quality-skills-MIT.txt',
+  'cloudflare/skills': 'cloudflare-skills-Apache-2.0.txt',
+  'cloudflare/security-audit-skill': 'cloudflare-security-audit-MIT.txt',
+  'emilkowalski/skills': 'emilkowalski-skills-MIT.txt',
 };
-for (const agent of expectedAgents) {
-  const file = agent + '.md';
-  const lines = readFrontmatter(join(agentDir, file), file);
-  assert.ok(hasNonEmptyField(lines, 'description'));
+
+for (const skill of manifest.skills) {
+  assert.match(skill.name, /^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Invalid skill ID: ' + skill.name);
+  assert.equal(skill.path, join('.opencode', 'skills', skill.name, 'SKILL.md'), 'Manifest path mismatch: ' + skill.name);
+  assert.ok(skill.assignedTo.length > 0, 'Skill is not assigned: ' + skill.name);
+  assert.equal(new Set(skill.assignedTo).size, skill.assignedTo.length, 'Duplicate agent assignment: ' + skill.name);
+
+  const skillPath = join(root, skill.path);
+  const raw = readFileSync(skillPath, 'utf8');
+  const lines = readFrontmatter(skillPath, skill.name);
+  const declaredName = lines.find((line) => line.startsWith('name:'))?.slice(5).trim().replace(/^["']|["']$/g, '');
+  assert.equal(declaredName, skill.name, 'Skill folder and frontmatter names differ: ' + skill.name);
+  const description = lines.find((line) => line.startsWith('description:'))?.slice(12).trim();
+  assert.ok(description && description.length > 0 && description.length <= 1024, 'Invalid description in ' + skill.name);
+
+  if (skill.source.type === 'external') {
+    assert.match(skill.source.commit, /^[a-f0-9]{40}$/, 'External skill revision is not pinned: ' + skill.name);
+    assert.ok(skill.source.repository && skill.source.path && skill.source.copyright, 'Incomplete provenance: ' + skill.name);
+    assert.ok(['MIT', 'Apache-2.0'].includes(skill.source.license), 'Unapproved licence: ' + skill.name);
+    assert.ok(lines.some((line) => line.trim() === 'license: ' + skill.source.license), 'Missing licence frontmatter: ' + skill.name);
+    const provenance = 'Third-party source: https://github.com/' + skill.source.repository + '/blob/' + skill.source.commit + '/' + skill.source.path;
+    assert.ok(raw.includes(provenance), 'Missing immutable source attribution: ' + skill.name);
+    const noticeFile = licenseFiles[skill.source.repository];
+    assert.ok(noticeFile, 'No licence notice mapped for ' + skill.source.repository);
+    const noticeText = readFileSync(join(root, 'docs', 'agent-team', 'third-party-licenses', noticeFile), 'utf8');
+    assert.ok(noticeText.length > 500, 'Missing complete upstream licence text: ' + noticeFile);
+  } else {
+    assert.equal(skill.source.type, 'project');
+    assert.equal(skill.source.license, 'Project');
+  }
+
+  for (const agent of skill.assignedTo) {
+    assert.ok(expectedAgents.includes(agent as (typeof expectedAgents)[number]), 'Unknown assigned agent: ' + agent);
+    assert.ok(manifest.assignmentsByAgent[agent]?.includes(skill.name), 'Reverse assignment missing: ' + skill.name);
+  }
+}
+
+for (const agentFile of agentFiles) {
+  const agent = agentFile.replace(/\.md$/, '');
+  const lines = readFrontmatter(join(agentDir, agentFile), agentFile);
+  assert.ok(hasNonEmptyField(lines, 'description'), 'Missing description in ' + agentFile);
   const mode = lines.find((line) => line.startsWith('mode:'))?.slice(5).trim();
-  assert.ok(mode === 'primary' || mode === 'subagent');
-  const permissions = parseSkillPermissions(lines, file);
-  const external = catalog.skills.filter((skill) => skill.assigned_agents.includes(agent)).map((skill) => skill.id);
-  const expected = [...new Set([...expectedInternalAssignments[agent], ...external])].sort();
-  const actual = [...permissions.entries()].filter(([name, effect]) => name !== '*' && effect === 'allow').map(([name]) => name).sort();
-  assert.deepEqual(actual, expected, 'Skill allow-list differs from catalogue for ' + agent);
+  assert.ok(mode === 'primary' || mode === 'subagent', 'Invalid mode in ' + agentFile);
+
+  const permissions = parseSkillPermissions(lines, agentFile);
+  const allowed = [...permissions.entries()]
+    .filter(([name, effect]) => name !== '*' && effect === 'allow')
+    .map(([name]) => name)
+    .sort();
+  const expected = [...(manifest.assignmentsByAgent[agent] ?? [])].sort();
+  assert.deepEqual(allowed, expected, 'Skill allow-list differs from manifest for ' + agent);
+  assert.equal(permissions.size, expected.length + 1, 'Unexpected permission for ' + agent);
+}
+
+for (const agent of expectedAgents) {
+  const assigned = manifest.skills.filter((skill) => skill.assignedTo.includes(agent)).map((skill) => skill.name).sort();
+  assert.deepEqual(
+    [...(manifest.assignmentsByAgent[agent] ?? [])].sort(),
+    assigned,
+    'Manifest reverse index mismatch for ' + agent,
+  );
 }
 
 const publicConfigFiles = [
   'opencode.json',
   ...agentFiles.map((name) => join('.opencode', 'agents', name)),
   ...skillDirs.map((name) => join('.opencode', 'skills', name, 'SKILL.md')),
+  manifestPath,
 ];
 const joined = publicConfigFiles.map((file) => readFileSync(join(root, file), 'utf8')).join('\n');
 assert.doesNotMatch(joined, /nvapi-[A-Za-z0-9_-]{20,}/);
@@ -160,8 +205,12 @@ if (process.env.OPENCODE_RUNTIME_TEST === '1') {
   const resolvedProjectConfig = JSON.parse(resolvedConfigCommand.stdout) as { default_agent?: string };
   assert.equal(resolvedProjectConfig.default_agent, 'project-lead', 'OpenCode did not load project-lead as the default agent');
 
-  // OpenCode resolves each allowed skill to a scoped project path in the effective agent permissions.
-  // Verify each role independently instead of assuming debug skill uses the project default agent.
+  const agentCommand = spawnSync('opencode', ['agent', 'list'], { encoding: 'utf8', timeout: 45_000 });
+  assert.equal(agentCommand.status, 0, 'OpenCode agent listing failed: ' + (agentCommand.stderr || agentCommand.stdout));
+  const agentOutput = agentCommand.stdout + '\n' + agentCommand.stderr;
+  for (const agent of expectedAgents) assert.ok(agentOutput.includes(agent), 'OpenCode did not discover ' + agent);
+
+  // Resolve each agent independently and validate the effective skill permission rules.
   for (const agent of expectedAgents) {
     const debug = spawnSync('opencode', ['debug', 'agent', agent], { encoding: 'utf8', timeout: 45_000 });
     assert.equal(debug.status, 0, 'OpenCode could not resolve agent ' + agent + ': ' + (debug.stderr || debug.stdout));
@@ -173,33 +222,34 @@ if (process.env.OPENCODE_RUNTIME_TEST === '1') {
     assert.equal(resolved.name, agent, 'OpenCode resolved the wrong agent');
     assert.ok(Array.isArray(resolved.permission), 'OpenCode did not expose resolved permissions for ' + agent);
 
-    const allowedExternal = catalog.skills.filter((skill) => skill.assigned_agents.includes(agent)).map((skill) => skill.id);
-    const allowedAll = [...new Set([...expectedInternalAssignments[agent], ...allowedExternal])];
+    const allowedAll = manifest.skills.filter((skill) => skill.assignedTo.includes(agent)).map((skill) => skill.name);
     const skillRules = resolved.permission.filter((rule) => rule.permission === 'skill');
     assert.ok(
       skillRules.some((rule) => rule.pattern === '*' && rule.action === 'deny'),
-      'OpenCode must deny every unlisted skill for ' + agent,
+      'OpenCode must deny unlisted skills for ' + agent,
     );
     for (const name of allowedAll) {
-      const exactAllow = skillRules.some((rule) => rule.pattern === name && rule.action === 'allow');
-      assert.ok(exactAllow, 'OpenCode did not allow assigned skill ' + name + ' for ' + agent);
+      assert.ok(
+        skillRules.some((rule) => rule.pattern === name && rule.action === 'allow'),
+        'OpenCode did not allow assigned skill ' + name + ' for ' + agent,
+      );
     }
 
-    const deniedExternal = catalog.skills.filter((skill) => !skill.assigned_agents.includes(agent)).map((skill) => skill.id);
-    for (const name of deniedExternal) {
-      const exactAllow = skillRules.some((rule) => rule.pattern === name && rule.action === 'allow');
-      assert.ok(!exactAllow, 'OpenCode explicitly allowed unassigned skill ' + name + ' for ' + agent);
+    const denied = manifest.skills.filter((skill) => !skill.assignedTo.includes(agent)).map((skill) => skill.name);
+    for (const name of denied) {
+      assert.ok(
+        !skillRules.some((rule) => rule.pattern === name && rule.action === 'allow'),
+        'OpenCode explicitly allowed unassigned skill ' + name + ' for ' + agent,
+      );
     }
   }
 
-  // Confirm the native skill diagnostic command itself starts and returns valid JSON.
   const skills = spawnSync('opencode', ['debug', 'skill'], { encoding: 'utf8', timeout: 45_000 });
   assert.equal(skills.status, 0, 'OpenCode skill diagnostic failed: ' + (skills.stderr || skills.stdout));
-  // The command emits full skill contents; CI log/output limits may truncate the JSON body.
-  // Per-agent availability is already checked through the resolved permission rules above.
+  // The command emits full skill contents; CI output limits may truncate its JSON body.
+  // Per-agent availability is checked above using the resolved, effective skill permission rules.
   assert.ok(skills.stdout.trimStart().startsWith('['), 'OpenCode skill diagnostic did not return its JSON list');
   assert.ok(skills.stdout.includes('"name":'), 'OpenCode skill diagnostic returned no skill entries');
-
   console.log('OpenCode resolved all eight agents and their scoped skill permissions.');
 }
-console.log('Agent configuration verified: 8 agents, 100 external + 9 first-party skills, and 6 MCP servers.');
+console.log('Agent configuration verified: 8 agents, exactly 50 skills (9 first-party + 41 upstream), and ' + Object.keys(config.mcp).length + ' MCP servers.');
