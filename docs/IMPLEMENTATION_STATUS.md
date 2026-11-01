@@ -41,7 +41,7 @@ This checklist records repository implementation separately from production depl
 - [x] Text and developer tools: all 13 utilities run in the browser using native browser APIs.
 - [x] The 25 connected tools execute locally; the remaining 11 website/domain and video workspaces remain preview-only instead of claiming completed processing.
 - [x] The CI workflow is configured to run text/developer, PDF, and image-engine smoke-test commands; image coverage now includes all six image adapters and common invalid-input/resource-cleanup paths.
-- [ ] PDF.js rendered-page execution and all 25 tool workspaces still need browser-based integration/E2E coverage.
+- [~] Playwright E2E coverage now exercises image conversion and download, drag-based cropping, PDF merge and download, JSON formatting/validation errors, title-case conversion, and Arabic RTL layout at a 390px viewport. It does not yet cover every connected tool or PDF.js page rendering.
 - [x] No database has been added.
 - [x] No external advertising scripts have been added (AdSlot/AffiliateSlot hidden by default).
 - [x] README and architecture documentation exist in `docs/`.
