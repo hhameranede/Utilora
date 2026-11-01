@@ -327,8 +327,8 @@ jobs:
           PROMPT="$(cat <<EOF
           This is a controlled, read-only model-backed smoke test of UTILORA's specialist team.
           You are agent: $AGENT_NAME. Your assigned skill is: $SKILL_NAME.
-          First, invoke the native skill tool and load exactly your assigned skill.
-          Then inspect README.md and your own .opencode/agents/$AGENT_NAME.md file using read-only tools.
+          FIRST: load exactly your assigned skill using the native skill tool. Use the exact @skill trigger @$SKILL_NAME so OpenCode can resolve it, then confirm the tool call completed.
+          SECOND: inspect README.md and your own .opencode/agents/$AGENT_NAME.md file using read-only tools.
           For role-specific evidence:
           - visual-reviewer: inspect the attached real homepage screenshot and report layout, contrast, hierarchy, responsiveness and RTL limitations.
           - qa-engineer: inspect existing test scripts and identify one concrete regression test relevant to the repository.
@@ -395,6 +395,7 @@ jobs:
                   continue
           skill = os.environ["SKILL_NAME"]
           skill_calls = 0
+          skill_failures = []
           read_calls = 0
           text_parts = []
           session_id = ""
@@ -406,8 +407,11 @@ jobs:
                   tool = part.get("tool")
                   state = part.get("state") or {}
                   if tool == "skill" and skill in json.dumps(state.get("input") or {}, ensure_ascii=False):
-                      skill_calls += 1
-                  if tool in {"read", "grep", "glob", "list", "bash"} and state.get("status") == "completed":
+                      if state.get("status") == "completed":
+                          skill_calls += 1
+                      else:
+                          skill_failures.append(str(state.get("status", "unknown")))
+                  if tool in {"read", "grep", "glob", "list"} and state.get("status") == "completed":
                       read_calls += 1
               elif event.get("type") == "text":
                   value = part.get("text")
@@ -421,12 +425,13 @@ jobs:
           precheck = {
               "session_id": session_id,
               "skill_calls": skill_calls,
+              "skill_failures": skill_failures,
               "read_calls": read_calls,
               "text_chars": len(final_text.strip()),
               "missing_labels": missing,
           }
           pathlib.Path(os.environ["PRECHECK"]).write_text(json.dumps(precheck), encoding="utf-8")
-          print("OpenCode completion check: skill_calls=%d, evidence_calls=%d, text_chars=%d, missing_labels=%d" % (skill_calls, read_calls, len(final_text.strip()), len(missing)))
+          print("OpenCode completion check: completed_skill_calls=%d, failed_skill_attempts=%d, evidence_reads=%d, text_chars=%d, missing_labels=%d" % (skill_calls, len(skill_failures), read_calls, len(final_text.strip()), len(missing)))
           PY
           needs_followup="$(python3 -c 'import json,sys; d=json.load(open(sys.argv[1])); print("yes" if d["skill_calls"] < 1 or d["read_calls"] < 2 or d["text_chars"] < 100 or d["missing_labels"] else "no")' "$RUNNER_TEMP/opencode-precheck.json")"
           if [ "$needs_followup" = "yes" ]; then
@@ -438,7 +443,7 @@ jobs:
             FOLLOWUP_PROMPT="$(cat <<EOF
           Continue this same UTILORA read-only smoke-test session. Do not restart or repeat completed work unnecessarily.
           Before writing the final report, check the actual tool events already completed.
-          If you have not invoked the native skill tool for exactly "$SKILL_NAME", invoke it now.
+          If the native skill call for exactly "$SKILL_NAME" did not complete successfully, invoke it now using the exact @skill trigger @$SKILL_NAME.
           If you have fewer than two completed evidence-inspection calls, inspect the missing repository evidence now.
           Do not edit files, run mutating commands, inspect environment variables, read .env files, or call external services.
           Then return only six separate labeled lines, in this exact order:
@@ -481,8 +486,9 @@ jobs:
                   "- Model: " + os.environ["MODEL_ID"] + "\n"
                   "- Assigned skill: " + os.environ["SKILL_NAME"] + "\n"
                   "- Parsed event count: " + str(len(events or [])) + "\n"
-                  "- Skill tool calls: " + str(skill_count) + "\n"
-                  "- Completed read/tool calls: " + str(read_count) + "\n"
+                  "- Successfully completed skill calls: " + str(skill_count) + "\n"
+                  "- Failed/denied skill attempts: " + ", ".join(skill_failures) + "\n"
+                  "- Completed evidence reads: " + str(read_count) + "\n"
                   "- Assistant text events: " + str(text_count) + "\n"
                   "- Assistant text characters: " + str(text_length) + "\n"
                   "- Tool names observed: " + ", ".join(sorted(set(tool_names))) + "\n"
@@ -511,6 +517,7 @@ jobs:
           agent = os.environ["AGENT_NAME"]
           skill = os.environ["SKILL_NAME"]
           skill_calls = []
+          skill_failures = []
           read_calls = []
           text_parts = []
           tool_names = []
@@ -525,8 +532,11 @@ jobs:
                   if isinstance(tool, str):
                       tool_names.append(tool)
                   if tool == "skill" and skill in json.dumps(inputs, ensure_ascii=False):
-                      skill_calls.append(event)
-                  if tool in {"read", "grep", "glob", "list", "bash"} and state.get("status") == "completed":
+                      if state.get("status") == "completed":
+                          skill_calls.append(event)
+                      else:
+                          skill_failures.append(str(state.get("status", "unknown")))
+                  if tool in {"read", "grep", "glob", "list"} and state.get("status") == "completed":
                       read_calls.append(event)
               elif event_type == "text":
                   value = part.get("text")
@@ -555,7 +565,11 @@ jobs:
           if not events or not final_text or len(final_text) < 100:
               fail("OpenCode did not return a sufficiently complete assistant report for " + agent + ".", events, len(skill_calls), len(read_calls), len(text_parts), len(final_text))
           if not skill_calls or len(read_calls) < 2:
-              fail("The agent did not prove its assigned skill load and evidence inspection for " + agent + ".", events, len(skill_calls), len(read_calls), len(text_parts), len(final_text))
+              fail(
+                  "The agent did not successfully load its assigned native skill and inspect at least two repository sources for "
+                  + agent + "; failed skill attempt statuses: " + ", ".join(skill_failures) + ".",
+                  events, len(skill_calls), len(read_calls), len(text_parts), len(final_text)
+              )
           if missing_headings:
               fail(
                   "The assistant report is missing required labeled sections for " + agent + ": "
@@ -579,9 +593,10 @@ jobs:
           raw_path.unlink(missing_ok=True)
           print("PASS: " + agent + " used " + model + ", loaded " + skill + ", and inspected repository evidence.")
           PY
-          git -C "$TARGET_DIR" diff --exit-code
-          if [ -n "$(git -C "$TARGET_DIR" status --porcelain)" ]; then
+          worktree_status="$(git -C "$TARGET_DIR" status --porcelain=v1 --untracked-files=all)"
+          if [ -n "$worktree_status" ]; then
             echo "::error::The read-only agent modified the UTILORA checkout."
+            printf '%s\n' "$worktree_status" | sed -E 's/^.../Unexpected worktree path: /' | head -n 20
             exit 1
           fi
           echo "| $AGENT_NAME | PASS | $MODEL_ID | $SKILL_NAME |" >> "$GITHUB_STEP_SUMMARY"
