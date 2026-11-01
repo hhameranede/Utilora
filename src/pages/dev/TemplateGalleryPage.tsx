@@ -163,7 +163,7 @@ export const TemplateGalleryPage: React.FC = () => {
       name: 'Domain Lookup Workspace (Registration Intelligence)',
       useCase: 'Used for querying domain age, RDAP ownership data, and registrar status codes.',
       associatedTools: ['domain-age-checker', 'rdap-lookup'],
-      render: () => <TemplateJDomainLookup toolName="Domain RDAP Demo" />,
+      render: () => <TemplateJDomainLookup toolName="Domain RDAP Demo" toolSlug="rdap-lookup" />,
     },
     {
       id: 'template-k',
@@ -179,7 +179,7 @@ export const TemplateGalleryPage: React.FC = () => {
       name: 'Website Diagnostics Workspace (HTTP Probe)',
       useCase: 'Used for auditing server uptime, response latency, and HTTP security headers.',
       associatedTools: ['website-status-checker', 'http-headers-checker'],
-      render: () => <TemplateLWebsiteDiagnostics toolName="HTTP Diagnostic Demo" />,
+      render: () => <TemplateLWebsiteDiagnostics toolName="HTTP Diagnostic Demo" toolSlug="website-status-checker" />,
     },
     {
       id: 'template-m',

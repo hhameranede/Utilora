@@ -9,7 +9,7 @@ test('domain normalization canonicalizes case, trailing dots, and IDNs', () => {
 
 test('domain validation rejects URLs, paths, IP literals, and local names', () => {
   for (const value of ['https://example.com', 'example.com/path', '127.0.0.1', 'localhost', 'printer.local', 'bad host', 'example.com:443']) {
-    assert.throws(() => normalizeDomain(value), undefined, value);
+    assert.throws(() => normalizeDomain(value));
   }
 });
 
@@ -20,7 +20,7 @@ test('website URL normalization permits standard HTTP(S) origins only', () => {
     'ftp://example.com', 'https://user:pass@example.com', 'http://127.0.0.1',
     'http://localhost', 'https://example.com:8443', 'https://example.com/path with spaces',
   ]) {
-    assert.throws(() => normalizeWebsiteUrl(value), undefined, value);
+    assert.throws(() => normalizeWebsiteUrl(value));
   }
 });
 
