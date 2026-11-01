@@ -160,7 +160,9 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
             <div className="mt-6 flex flex-wrap gap-2">
               <span className="inline-flex items-center gap-2 rounded-full border border-stone-200 bg-white px-3 py-2 text-xs font-medium text-stone-700">
                 <CheckCircle2 size={14} className="text-orange-600" />
-                {locale === 'ar' ? 'مجانية' : 'Free to use'}
+                {isFunctional
+                  ? (locale === 'ar' ? 'مجانية' : 'Free to use')
+                  : (locale === 'ar' ? 'معاينة مجانية' : 'Free preview')}
               </span>
               <span className="inline-flex items-center gap-2 rounded-full border border-stone-200 bg-white px-3 py-2 text-xs font-medium text-stone-700">
                 <ShieldCheck size={14} className="text-orange-600" />
