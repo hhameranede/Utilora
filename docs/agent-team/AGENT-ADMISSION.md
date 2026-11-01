@@ -2,46 +2,51 @@
 
 Last updated: 2026-11-01
 
-This register separates historical baseline evidence from the current corrected validation. A PASS from an older run is not treated as proof that a later run succeeded.
+## Admission gate
 
-## Current staged admission
+No agent currently has active repository-task admission based on the latest verification cycle. Previous passes from older runs are historical only and must not be reused as current admission evidence.
 
-| Agent | Admission state | Evidence / scope |
-|---|---|---|
-| Fast Task Engineer | ADMITTED — bounded scope | Passed its baseline smoke job in run [41353774664](https://github.com/hhameranede/Utilora/actions/runs/41353774664). The latest full rerun had not completed this job at the last captured snapshot. It may continue only small, low-risk, explicitly scoped work on isolated branches with tests and PR hand-off. |
-| Project Lead | TEMPORARILY SUSPENDED | Passed the earlier baseline, but run [41355360006](https://github.com/hhameranede/Utilora/actions/runs/41355360006) failed final-report validation despite a native skill call and two evidence calls. Resume coordination/delegation after corrected validation passes. Edit permission remains denied. |
-| Long-Horizon Engineer | TEMPORARILY SUSPENDED | Passed the earlier baseline, but the repeat run returned a 416-character response without the required report structure. Resume multi-file implementation only after corrected validation passes. |
-| Problem Analyst | RECOVERY REQUIRED | Repeat run returned a short response without the required report structure. |
-| Implementation Engineer | RECOVERY REQUIRED | Full smoke encountered NVIDIA HTTP 429; isolated recovery reached real MiniMax inference and recorded a native skill call plus evidence reads, but its final report was incomplete. |
-| Visual Reviewer | RECOVERY REQUIRED | Isolated recovery recorded evidence reads but no native accessibility-ux skill-tool call; the earlier full smoke also hit a repository-state false failure caused by recovery artifacts. |
-| Independent QA | PENDING | No completed PASS/FAIL result was present in the last captured full smoke snapshot. |
-| Security Auditor | PENDING | Job was queued in the last captured full smoke snapshot; no result was inferred. |
+The corrected full smoke run and dedicated recovery workflows have been triggered on the active branch. Admission remains paused until each role has a completed, successful run proving:
+- its exact configured model route is used and responds to a real inference;
+- its assigned native skill-tool call completed successfully (a denied/error tool event is not a pass);
+- at least two real repository evidence reads completed;
+- a complete, labeled, evidence-based final report was returned;
+- the agent respected its read-only/limited role and left the checkout unchanged.
 
-## Dedicated recovery workflows
+## Last completed full smoke evidence
+
+Run [41356136034](https://github.com/hhameranede/Utilora/actions/runs/41356136034) did not admit the team:
+- Project Lead and Problem Analyst returned no usable final report text.
+- Implementation Engineer returned a report without the required labeled sections despite successful model inference and completed skill/evidence calls.
+- Several matrix jobs were still queued or running when sampled; they were not counted as passes.
+- Earlier reports exposed false-positive acceptance: a skill invocation marked as denied/error could be counted as successful merely because the tool was attempted.
+
+## Corrections now in the active branch
+
+- Smoke and recovery validators count a skill load only when the native tool event has status `completed`.
+- Evidence counts include completed repository reads (`read`, `grep`, `glob`, `list`), not arbitrary shell commands.
+- Agent prompts explicitly use the `@skill-id` trigger and may request one bounded continuation to produce the final report.
+- Recovery outputs are isolated under the runner temporary directory and uploaded from that directory.
+- Worktree validation now prints changed paths before failing, so harness-generated mutations can be distinguished from agent edits.
+- Nemotron Super VL is explicitly configured for text and image input; the configuration test locks this capability in.
+- Visual Reviewer acceptance now requires screenshot/viewport-specific evidence and rejects a report that says image input was unavailable.
+- The Visual Reviewer recovery workflow uses the same shared read-only recovery harness as the other roles.
+
+## Per-agent recovery paths
 
 | Agent | Workflow |
 |---|---|
-| Project Lead | [Project Lead recovery](https://github.com/hhameranede/Utilora/actions/workflows/agent-recovery-project-lead.yml) |
-| Problem Analyst | [Problem Analyst recovery](https://github.com/hhameranede/Utilora/actions/workflows/agent-recovery-problem-analyst.yml) |
-| Implementation Engineer | [Implementation Engineer recovery](https://github.com/hhameranede/Utilora/actions/workflows/agent-recovery-implementation-engineer.yml) |
-| Visual Reviewer | [Visual Reviewer recovery](https://github.com/hhameranede/Utilora/actions/workflows/agent-recovery-visual-reviewer.yml) |
-| Long-Horizon Engineer | [Long-Horizon Engineer recovery](https://github.com/hhameranede/Utilora/actions/workflows/agent-recovery-long-horizon-engineer.yml) |
+| Project Lead | [Isolated recovery](https://github.com/hhameranede/Utilora/actions/workflows/agent-recovery-project-lead.yml) |
+| Problem Analyst | [Isolated recovery](https://github.com/hhameranede/Utilora/actions/workflows/agent-recovery-problem-analyst.yml) |
+| Implementation Engineer | [Isolated recovery](https://github.com/hhameranede/Utilora/actions/workflows/agent-recovery-implementation-engineer.yml) |
+| Visual Reviewer | [Isolated recovery](https://github.com/hhameranede/Utilora/actions/workflows/agent-recovery-visual-reviewer.yml) |
+| Long-Horizon Engineer | [Isolated recovery](https://github.com/hhameranede/Utilora/actions/workflows/agent-recovery-long-horizon-engineer.yml) |
 
-Each recovery workflow calls the shared read-only assessment, checks the model catalogue and a real inference response, resolves the selected OpenCode agent/model route, verifies the assigned native skill call and evidence-inspection calls, and uploads only a sanitized report or diagnostic. The recovery report directory is outside the Git checkout so the workflow cannot mistake its own artifact for an agent edit.
-
-## Corrective changes in the current branch
-
-- Main model smoke retries transient NVIDIA HTTP 429/500/502/503/504 and transport failures with bounded backoff; persistent provider failures still fail.
-- Agent prompts require six exact, separately labeled sections: ROLE, MODEL, SKILL_LOADED, EVIDENCE, FINDING, LIMITATION.
-- Report validation requires all six labels, the assigned native skill tool, and at least two completed evidence/tool calls. It accepts common Markdown wrappers without accepting missing sections.
-- Recovery reports and diagnostics are stored under the runner temporary directory; only those files are uploaded.
-- Visual Reviewer instructions explicitly require loading accessibility-ux through the native skill tool before review.
-- Recovery workflows now exist for each role that had an observed report/skill failure in the repeat run.
+Fast Task Engineer, QA Engineer, and Security Auditor are evaluated by the full smoke matrix. Create a dedicated recovery workflow for any one of them if its latest completed result is FAIL.
 
 ## Global restrictions
 
-- The full eight-agent autonomous charter remains gated on all eight agents passing current, verifiable validation.
-- No always-on 24/7 orchestrator is claimed to be active until its scheduler, event handling, cost controls, alerting, and recovery are deployed and observed.
-- Agents must work on isolated task branches and leave a PR/review trail.
-- No direct push to main, automatic merge, production deploy, or secret exposure.
-- Strategic decisions require documented options, trade-offs, dissent, decision owner, and validation evidence.
+- The full eight-agent autonomous charter remains gated on all eight agents passing the corrected workflow.
+- No always-on 24/7 orchestrator is claimed active until its scheduler, event handling, cost controls, alerting, and recovery are deployed and observed.
+- No direct push to `main`, automatic merge, production deployment, or raw secret exposure.
+- All engineering work remains branch-scoped and PR-based. Strategic decisions require documented options, trade-offs, dissent, and validation evidence.
