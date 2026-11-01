@@ -288,7 +288,7 @@ jobs:
         run: |
           set -euo pipefail
           cd "$TARGET_DIR"
-          npm install --no-audit --no-fund
+          npm install --no-save --no-package-lock --no-audit --no-fund
           npx playwright install chromium
           npm run dev -- --host 127.0.0.1 > "$RUNNER_TEMP/utilora-vite.log" 2>&1 &
           echo $! > "$RUNNER_TEMP/utilora-vite.pid"
