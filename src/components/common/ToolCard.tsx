@@ -85,7 +85,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, className = '', varian
       {/* Footer State: Formats or Engine preview reminder */}
       <div className="pt-3 border-t border-stone-100 flex items-center justify-between text-xs text-stone-500">
         <span className="truncate">
-          {tool.status !== 'functional' ? t('common.previewOnly') : tool.category === 'website-domain' ? t('common.publicLookup') : t('common.runsLocally')}
+          {tool.status !== 'functional' ? t('common.previewOnly') : tool.acceptedFormats ? tool.acceptedFormats.slice(0, 3).join(', ') : tool.category === 'website-domain' ? t('common.publicLookup') : t('common.runsLocally')}
         </span>
         <div className="flex items-center gap-1 text-orange-700 font-semibold group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5 transition-transform">
           <span>{t('common.openTool')}</span>
