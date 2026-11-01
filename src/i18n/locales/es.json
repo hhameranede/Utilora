@@ -268,5 +268,30 @@
   },
   "categories": {
     "description": "Explora las herramientas disponibles por categoría. Cada grupo reúne utilidades relacionadas que funcionan en el navegador."
+  },
+  "guide": {
+    "titlePrefix": "Cómo usar",
+    "description": "Guía visual paso a paso de la interfaz real de {tool} en UTILORA, con flechas explicativas.",
+    "breadcrumb": "Cómo usar",
+    "kicker": "Guía visual de la herramienta",
+    "maxSize": "Tamaño máx.",
+    "previewNotice": "Nota: esta herramienta sigue en vista previa. Esta guía explica la interfaz actual y no significa que el procesamiento esté activado.",
+    "screenshotTitle": "Captura de la interfaz real de UTILORA",
+    "screenshotCaption": "Generada directamente desde el espacio de trabajo mostrado",
+    "screenshotAlt": "Captura real del espacio de trabajo de {tool} con flechas explicativas",
+    "captureUnavailable": "La captura automática no está disponible en este navegador",
+    "liveWorkspace": "Este es el espacio de trabajo real; aún puedes seguir los pasos de abajo.",
+    "captureLoading": "Capturando la interfaz y preparando las anotaciones…",
+    "readyTitle": "¿Listo para probar la herramienta?",
+    "readyBody": "Abre el espacio de trabajo y sigue los mismos pasos.",
+    "openTool": "Abrir herramienta",
+    "workspacePreview": "Vista previa del espacio de trabajo",
+    "formatsShown": "los formatos indicados en la herramienta",
+    "inputArea": "Área de entrada",
+    "settingsArea": "Ajustes y opciones",
+    "resultArea": "Área de resultados",
+    "step1Desc": "Añade el archivo, texto, dominio u otro dato que solicite el espacio de trabajo.",
+    "step2Desc": "Elige los controles o ajustes disponibles para la tarea.",
+    "step3Desc": "Ejecuta la acción disponible, revisa el resultado y guárdalo o cópialo cuando sea posible."
   }
 }
