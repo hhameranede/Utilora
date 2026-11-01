@@ -144,14 +144,33 @@
       "utilora-project-rules"
     ],
     "long-horizon-engineer": [
+      "animation-performance",
+      "api-and-interface-design",
+      "code-review",
+      "code-simplification",
+      "codebase-design",
+      "context-engineering",
+      "diagnosing-bugs",
       "dispatching-parallel-agents",
       "documentation-and-adrs",
       "domain-modeling",
+      "frontend-ui-engineering",
+      "git-workflow-and-versioning",
       "handoff",
       "improve-codebase-architecture",
+      "incremental-implementation",
+      "performance-optimization",
       "planning-and-task-breakdown",
       "retro",
+      "safe-implementation",
+      "schema",
+      "security-and-hardening",
       "site-architecture",
+      "source-driven-development",
+      "spec-driven-development",
+      "systematic-debugging",
+      "tdd",
+      "utilora-project-rules",
       "writing-plans"
     ]
   },
@@ -224,6 +243,7 @@
       "path": ".opencode/skills/animation-performance/SKILL.md",
       "assignedTo": [
         "implementation-engineer",
+        "long-horizon-engineer",
         "qa-engineer",
         "visual-reviewer"
       ],
@@ -241,6 +261,7 @@
       "path": ".opencode/skills/api-and-interface-design/SKILL.md",
       "assignedTo": [
         "implementation-engineer",
+        "long-horizon-engineer",
         "project-lead",
         "security-auditor"
       ],
@@ -290,6 +311,7 @@
       "path": ".opencode/skills/code-review/SKILL.md",
       "assignedTo": [
         "implementation-engineer",
+        "long-horizon-engineer",
         "problem-analyst",
         "project-lead",
         "qa-engineer"
@@ -309,6 +331,7 @@
       "assignedTo": [
         "fast-task-engineer",
         "implementation-engineer",
+        "long-horizon-engineer",
         "visual-reviewer"
       ],
       "source": {
@@ -325,6 +348,7 @@
       "path": ".opencode/skills/codebase-design/SKILL.md",
       "assignedTo": [
         "implementation-engineer",
+        "long-horizon-engineer",
         "project-lead"
       ],
       "source": {
@@ -358,6 +382,7 @@
       "path": ".opencode/skills/context-engineering/SKILL.md",
       "assignedTo": [
         "implementation-engineer",
+        "long-horizon-engineer",
         "project-lead"
       ],
       "source": {
@@ -390,6 +415,7 @@
       "path": ".opencode/skills/diagnosing-bugs/SKILL.md",
       "assignedTo": [
         "implementation-engineer",
+        "long-horizon-engineer",
         "qa-engineer"
       ],
       "source": {
@@ -457,6 +483,7 @@
       "assignedTo": [
         "fast-task-engineer",
         "implementation-engineer",
+        "long-horizon-engineer",
         "visual-reviewer"
       ],
       "source": {
@@ -473,6 +500,7 @@
       "path": ".opencode/skills/git-workflow-and-versioning/SKILL.md",
       "assignedTo": [
         "implementation-engineer",
+        "long-horizon-engineer",
         "problem-analyst"
       ],
       "source": {
@@ -522,7 +550,8 @@
       "path": ".opencode/skills/incremental-implementation/SKILL.md",
       "assignedTo": [
         "fast-task-engineer",
-        "implementation-engineer"
+        "implementation-engineer",
+        "long-horizon-engineer"
       ],
       "source": {
         "type": "external",
@@ -555,6 +584,7 @@
       "path": ".opencode/skills/performance-optimization/SKILL.md",
       "assignedTo": [
         "implementation-engineer",
+        "long-horizon-engineer",
         "problem-analyst",
         "qa-engineer"
       ],
@@ -703,7 +733,8 @@
       "name": "safe-implementation",
       "path": ".opencode/skills/safe-implementation/SKILL.md",
       "assignedTo": [
-        "implementation-engineer"
+        "implementation-engineer",
+        "long-horizon-engineer"
       ],
       "source": {
         "type": "project",
@@ -720,6 +751,7 @@
       "assignedTo": [
         "fast-task-engineer",
         "implementation-engineer",
+        "long-horizon-engineer",
         "problem-analyst"
       ],
       "source": {
@@ -736,6 +768,7 @@
       "path": ".opencode/skills/security-and-hardening/SKILL.md",
       "assignedTo": [
         "implementation-engineer",
+        "long-horizon-engineer",
         "security-auditor"
       ],
       "source": {
@@ -832,6 +865,7 @@
       "assignedTo": [
         "fast-task-engineer",
         "implementation-engineer",
+        "long-horizon-engineer",
         "problem-analyst",
         "project-lead",
         "security-auditor"
@@ -850,6 +884,7 @@
       "path": ".opencode/skills/spec-driven-development/SKILL.md",
       "assignedTo": [
         "implementation-engineer",
+        "long-horizon-engineer",
         "project-lead"
       ],
       "source": {
@@ -866,6 +901,7 @@
       "path": ".opencode/skills/systematic-debugging/SKILL.md",
       "assignedTo": [
         "implementation-engineer",
+        "long-horizon-engineer",
         "qa-engineer"
       ],
       "source": {
@@ -882,6 +918,7 @@
       "path": ".opencode/skills/tdd/SKILL.md",
       "assignedTo": [
         "implementation-engineer",
+        "long-horizon-engineer",
         "qa-engineer"
       ],
       "source": {
@@ -915,6 +952,7 @@
       "assignedTo": [
         "fast-task-engineer",
         "implementation-engineer",
+        "long-horizon-engineer",
         "problem-analyst",
         "project-lead",
         "qa-engineer",
