@@ -213,7 +213,7 @@ for (const agentFile of agentFiles) {
   const agentInstructions = readFileSync(join(agentDir, agentFile), 'utf8');
   assert.doesNotMatch(
     agentInstructions,
-    /\\b(?:must|required to|always)\\b.{0,100}\\b(?:skill|@[a-z0-9-]+)\\b|\\bbefore every\\b.{0,100}\\bskill\\b/i,
+    /\b(?:must|required to|always)\b.{0,100}\b(?:skill|@[a-z0-9-]+)\b|\bbefore every\b.{0,100}\bskill\b/i,
     'Agent instructions must not force a particular skill or skill call: ' + agentFile,
   );
   const lines = readFrontmatter(join(agentDir, agentFile), agentFile);
