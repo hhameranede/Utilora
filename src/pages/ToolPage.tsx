@@ -176,13 +176,17 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
               </span>
               <span className="inline-flex items-center gap-2 rounded-full border border-stone-200 bg-white px-3 py-2 text-xs font-medium text-stone-700">
                 <ShieldCheck size={14} className="text-orange-600" />
-                {isNetworkLookup
-                  ? (locale === 'ar' ? 'استعلامات عامة' : 'Public lookups')
-                  : (locale === 'ar' ? 'معالجة داخل المتصفح' : 'Browser-based processing')}
+                {!isFunctional
+                  ? (locale === 'ar' ? 'معاينة فقط' : 'Preview only')
+                  : isNetworkLookup
+                    ? (locale === 'ar' ? 'استعلامات عامة' : 'Public lookups')
+                    : (locale === 'ar' ? 'معالجة داخل المتصفح' : 'Browser-based processing')}
               </span>
               <span className="inline-flex items-center gap-2 rounded-full border border-stone-200 bg-white px-3 py-2 text-xs font-medium text-stone-700">
                 <Sparkles size={14} className="text-orange-600" />
-                {locale === 'ar' ? 'بدون تثبيت برنامج' : 'No installation'}
+                {isFunctional
+                  ? (locale === 'ar' ? 'بدون تثبيت برنامج' : 'No installation')
+                  : (locale === 'ar' ? 'التنزيل غير متاح بعد' : 'Not available yet')}
               </span>
             </div>
           </div>
