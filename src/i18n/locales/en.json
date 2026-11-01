@@ -13,17 +13,18 @@
     "searchShort": "Search",
     "devTemplates": "Template Lab",
     "allTools": "All Tools",
-    "switchLanguage": "Switch Language"
+    "switchLanguage": "Switch Language",
+    "toggleNavigation": "Toggle navigation menu"
   },
   "hero": {
     "badge": "Global Digital Tools Platform",
     "title": "Every Digital Task. One Place.",
     "subtitle": "Powerful, simple, and free online utilities for your images, documents, text, code, websites, and videos.",
     "searchPlaceholder": "Search by tool name, format, or task (e.g., compress, json, pdf)...",
-    "privacyBadge": "Privacy-First Architecture · In-Browser Processing Design · No Account Required",
+    "privacyBadge": "File and text tools run in your browser · Website lookups contact public services · No account required",
     "browseCategories": "Explore Categories",
     "explorePopular": "Popular Utilities",
-    "statsTools": "36 Planned Utilities",
+    "statsTools": "36 tools · 35 ready",
     "statsCategories": "6 Core Categories",
     "statsGlobal": "8 Global Languages"
   },
@@ -53,13 +54,20 @@
     "relatedTools": "Related Utilities",
     "relatedArticles": "Guides & Reference",
     "privacyStatement": "Privacy & Data Architecture",
-    "privacyStatementDesc": "Designed with a zero-storage, local-first processing architecture. When connected to future engines, files remain strictly in your browser.",
+    "privacyStatementDesc": "File and text operations run in your browser. Website and domain checks send the hostname or URL you enter to the relevant public service or target website. Preview-only tools are not yet operational.",
     "supportedFormats": "Supported Formats & Constraints",
     "sampleData": "Sample Preview Data",
     "demoOnly": "Visual Preview Mode",
     "pageNotFound": "Page Not Found",
     "pageNotFoundDesc": "The page or utility you requested does not exist or has been moved.",
-    "returnHome": "Return to Homepage"
+    "returnHome": "Return to Homepage",
+    "popular": "Popular",
+    "featured": "Featured",
+    "supported": "Supported",
+    "previewOnly": "Preview only",
+    "publicLookup": "Public network lookup",
+    "runsLocally": "Runs in your browser",
+    "readGuide": "Read guide"
   },
   "home": {
     "categoriesHeading": "Explore By Category",
@@ -75,11 +83,12 @@
     "step2Title": "2. Configure in a Dedicated Workspace",
     "step2Desc": "Interact with specialized workspaces tailored for images, documents, text diffing, or developer payloads.",
     "step3Title": "3. Local Execution Without Intermediaries",
-    "step3Desc": "Engineered for client-side processing, eliminating unnecessary server hops and keeping data private.",
+    "step3Desc": "File and text tasks run in your browser. Website and domain checks contact the relevant public services using the hostname or URL you submit.",
     "trustHeading": "Built on Trust & Modern Standards",
     "trustDesc": "We believe digital tools should be rapid, ad-free, account-free, and respectful of your confidentiality.",
     "articlesPreviewHeading": "Latest Guides & Editorial",
-    "articlesPreviewSub": "Deep dives into compression mathematics, PDF architecture, and developer standards."
+    "articlesPreviewSub": "Deep dives into compression mathematics, PDF architecture, and developer standards.",
+    "privacyKicker": "How your data is handled"
   },
   "templates": {
     "dropzonePrompt": "Drag and drop your file here, or browse",
@@ -161,6 +170,25 @@
     "acceptableUse": "Acceptable Use",
     "about": "About UTILORA",
     "contact": "Contact & Support",
-    "cookieNotice": "Zero tracking cookies. Fast, respectful, client-first design."
+    "cookieNotice": "Zero tracking cookies. Fast, respectful, client-first design.",
+    "platform": "Platform",
+    "legal": "Legal",
+    "moreCategories": "More categories"
+  },
+  "tools": {
+    "description": "Explore all 36 utilities. Search across tool names, descriptions and supported formats, or filter by category. Preview-only tools are clearly marked.",
+    "searchPlaceholder": "Search tools, tasks or file formats...",
+    "scrollHint": "Swipe or scroll the category filters to see all options."
+  },
+  "category": {
+    "featuredWorkspace": "Featured workspace",
+    "allTools": "All tools in",
+    "chooseWorkspace": "Choose a tool below to open its workspace.",
+    "searchPlaceholder": "Filter tools in this category...",
+    "relatedCategories": "Related categories"
+  },
+  "search": {
+    "navigate": "Navigate",
+    "select": "Select"
   }
 }
