@@ -194,7 +194,7 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
           <div className="flex flex-wrap gap-2 lg:justify-end">
             <a
               href="#tool-workspace"
-              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-orange-500 px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
+              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-orange-700 px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-orange-800 focus:outline-none focus:ring-2 focus:ring-orange-700 focus:ring-offset-2"
             >
               {locale === 'ar' ? 'ابدأ الاستخدام' : 'Open the tool'}
               <ArrowRight size={16} />
