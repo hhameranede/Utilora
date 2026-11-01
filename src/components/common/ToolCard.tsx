@@ -28,11 +28,11 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, className = '', varian
         className={`group p-3.5 rounded-xl bg-white hover:bg-orange-50/40 border border-stone-200/80 hover:border-orange-300 transition-all flex items-center justify-between gap-3 shadow-xs hover:shadow-sm ${className}`}
       >
         <div className="flex items-center gap-3 min-w-0">
-          <div className="w-8 h-8 rounded-lg bg-orange-50 group-hover:bg-orange-700 flex items-center justify-center text-orange-600 group-hover:text-white shrink-0 transition-colors">
+          <div className="w-8 h-8 rounded-lg bg-orange-50 group-hover:bg-orange-700 flex items-center justify-center text-orange-700 group-hover:text-white shrink-0 transition-colors">
             <Icon name={tool.icon} size={16} />
           </div>
           <div className="min-w-0">
-            <h4 className="text-xs font-semibold text-stone-900 group-hover:text-orange-600 truncate">
+            <h4 className="text-xs font-semibold text-stone-900 group-hover:text-orange-700 truncate">
               {name}
             </h4>
             <span className="text-xs text-stone-500 truncate block">
@@ -40,7 +40,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, className = '', varian
             </span>
           </div>
         </div>
-        <ArrowUpRight size={14} className="text-stone-400 group-hover:text-orange-600 shrink-0 transition-colors" />
+        <ArrowUpRight size={14} className="text-stone-500 group-hover:text-orange-700 shrink-0 transition-colors" />
       </Link>
     );
   }
@@ -54,12 +54,12 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, className = '', varian
       <div>
         {/* Header Icon + Metadata in Zero-Pill Unboxed Text */}
         <div className="flex items-center justify-between gap-2 mb-3.5">
-          <div className="w-10 h-10 rounded-xl bg-orange-50 group-hover:bg-orange-700 border border-orange-100 flex items-center justify-center text-orange-600 group-hover:text-white transition-all shadow-xs">
+          <div className="w-10 h-10 rounded-xl bg-orange-50 group-hover:bg-orange-700 border border-orange-100 flex items-center justify-center text-orange-700 group-hover:text-white transition-all shadow-xs">
             <Icon name={tool.icon} size={19} />
           </div>
 
           <div className="flex items-center gap-1.5 text-xs text-stone-500">
-            <span className="font-medium text-stone-500 group-hover:text-orange-600 transition-colors">
+            <span className="font-medium text-stone-500 group-hover:text-orange-700 transition-colors">
               {categoryTitle}
             </span>
             {tool.isPopular && (
@@ -72,7 +72,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, className = '', varian
         </div>
 
         {/* Title */}
-        <h3 className="text-sm font-semibold text-stone-900 group-hover:text-orange-600 transition-colors mb-1.5">
+        <h3 className="text-sm font-semibold text-stone-900 group-hover:text-orange-700 transition-colors mb-1.5">
           {name}
         </h3>
 
