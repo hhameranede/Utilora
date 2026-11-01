@@ -9,6 +9,7 @@ on:
     branches:
       - main
       - "fix/**"
+      - "feat/**"
   pull_request:
     branches:
       - main
@@ -33,6 +34,9 @@ jobs:
 
       - name: Type check
         run: npm run lint
+
+      - name: Test standalone product content
+        run: npm run test:products
 
       - name: Test local browser engines
         run: npm run test:core

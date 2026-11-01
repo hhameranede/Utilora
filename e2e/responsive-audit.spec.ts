@@ -66,7 +66,7 @@ test('all 36 tool pages fit mobile, tablet and desktop without page-level horizo
       const route = '/en/tools/' + slug;
       await page.goto(route, { waitUntil: 'domcontentloaded' });
       await expect(page.getByRole('heading', { level: 1 }), route + ' should render its heading').toBeVisible();
-      await expect(page.locator('body')).toContainText(status === 'functional' ? 'Functional' : 'Preview only');
+      await expect(page.locator('body')).toContainText(status === 'functional' ? 'Ready to use' : 'Preview only');
       await expectNoHorizontalOverflow(page, route, viewport.width);
     }
   }
