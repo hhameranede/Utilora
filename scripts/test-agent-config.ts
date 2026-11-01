@@ -210,6 +210,12 @@ for (const skill of manifest.skills) {
 
 for (const agentFile of agentFiles) {
   const agent = agentFile.replace(/\.md$/, '');
+  const agentInstructions = readFileSync(join(agentDir, agentFile), 'utf8');
+  assert.doesNotMatch(
+    agentInstructions,
+    /\\b(?:must|required to|always)\\b.{0,100}\\b(?:skill|@[a-z0-9-]+)\\b|\\bbefore every\\b.{0,100}\\bskill\\b/i,
+    'Agent instructions must not force a particular skill or skill call: ' + agentFile,
+  );
   const lines = readFrontmatter(join(agentDir, agentFile), agentFile);
   assert.ok(hasNonEmptyField(lines, 'description'), 'Missing description in ' + agentFile);
   const mode = lines.find((line) => line.startsWith('mode:'))?.slice(5).trim();
