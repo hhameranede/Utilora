@@ -10,7 +10,7 @@ import { RelatedArticles } from '../components/common/RelatedArticles';
 import { FAQAccordion } from '../components/common/FAQAccordion';
 import { Icon } from '../components/common/Icon';
 import { Head } from '../seo/Head';
-import { Search, Filter, ShieldCheck, ArrowRight } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { Link } from '../router';
 import { matchesSearch } from '../utils/search';
 
@@ -172,7 +172,7 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ categorySlug }) => {
         </section>
 
         {/* Relevant Educational Guides */}
-        <RelatedArticles title={`Guides & Reading for ${title}`} />
+        <RelatedArticles title={`${t('common.relatedArticles')} · ${title}`} />
 
         {/* FAQs Section */}
         <section className="space-y-6 pt-10 border-t border-stone-200/80">
@@ -185,7 +185,7 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ categorySlug }) => {
         {/* Related Categories */}
         <section className="space-y-6 pt-10 border-t border-stone-200/80">
           <h3 className="text-xl font-bold text-stone-900">
-            Related Categories
+            {t('category.relatedCategories')}
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             {relatedCategories.map((c) => (
