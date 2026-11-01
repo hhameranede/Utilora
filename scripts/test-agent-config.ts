@@ -155,11 +155,10 @@ assert.doesNotMatch(joined, /gh[pousr]_[A-Za-z0-9]{20,}/);
 assert.doesNotMatch(joined, /github_pat_[A-Za-z0-9_]{20,}/);
 
 if (process.env.OPENCODE_RUNTIME_TEST === '1') {
-  const agents = spawnSync('opencode', ['agent', 'list'], { encoding: 'utf8', timeout: 45_000 });
-  assert.equal(agents.status, 0, 'OpenCode agent discovery failed: ' + (agents.stderr || agents.stdout));
-  const agentOutput = agents.stdout + '\n' + agents.stderr;
-  console.log('OpenCode agent list output:\n' + agentOutput);
-  for (const agent of expectedAgents) assert.ok(agentOutput.includes(agent), 'OpenCode did not discover agent ' + agent);
+  const resolvedConfigCommand = spawnSync('opencode', ['debug', 'config'], { encoding: 'utf8', timeout: 45_000 });
+  assert.equal(resolvedConfigCommand.status, 0, 'OpenCode could not resolve project config: ' + (resolvedConfigCommand.stderr || resolvedConfigCommand.stdout));
+  const resolvedProjectConfig = JSON.parse(resolvedConfigCommand.stdout) as { default_agent?: string };
+  assert.equal(resolvedProjectConfig.default_agent, 'project-lead', 'OpenCode did not load project-lead as the default agent');
 
   // OpenCode resolves each allowed skill to a scoped project path in the effective agent permissions.
   // Verify each role independently instead of assuming debug skill uses the project default agent.
