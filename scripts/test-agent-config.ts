@@ -255,7 +255,7 @@ if (process.env.OPENCODE_RUNTIME_TEST === '1') {
   const agentOutput = agentCommand.stdout + '\n' + agentCommand.stderr;
   for (const agent of expectedAgents) assert.ok(agentOutput.includes(agent), 'OpenCode did not discover ' + agent);
 
-  // Resolve each agent independently and validate the effective skill permission rules.
+  // Resolve each agent independently and confirm skills are optional for every role.
   for (const agent of expectedAgents) {
     const debug = spawnSync('opencode', ['debug', 'agent', agent], { encoding: 'utf8', timeout: 45_000 });
     assert.equal(debug.status, 0, 'OpenCode could not resolve agent ' + agent + ': ' + (debug.stderr || debug.stdout));
@@ -267,26 +267,11 @@ if (process.env.OPENCODE_RUNTIME_TEST === '1') {
     assert.equal(resolved.name, agent, 'OpenCode resolved the wrong agent');
     assert.ok(Array.isArray(resolved.permission), 'OpenCode did not expose resolved permissions for ' + agent);
 
-    const allowedAll = manifest.skills.filter((skill) => skill.suggestedFor.includes(agent)).map((skill) => skill.name);
     const skillRules = resolved.permission.filter((rule) => rule.permission === 'skill');
     assert.ok(
-      skillRules.some((rule) => rule.pattern === '*' && rule.action === 'deny'),
-      'OpenCode must deny unlisted skills for ' + agent,
+      skillRules.some((rule) => rule.pattern === '*' && rule.action === 'allow'),
+      'OpenCode must leave all skills optional and available to ' + agent,
     );
-    for (const name of allowedAll) {
-      assert.ok(
-        skillRules.some((rule) => rule.pattern === name && rule.action === 'allow'),
-        'OpenCode did not allow assigned skill ' + name + ' for ' + agent,
-      );
-    }
-
-    const denied = manifest.skills.filter((skill) => !skill.suggestedFor.includes(agent)).map((skill) => skill.name);
-    for (const name of denied) {
-      assert.ok(
-        !skillRules.some((rule) => rule.pattern === name && rule.action === 'allow'),
-        'OpenCode explicitly allowed unassigned skill ' + name + ' for ' + agent,
-      );
-    }
   }
 
   const skills = spawnSync('opencode', ['debug', 'skill'], { encoding: 'utf8', timeout: 45_000 });
