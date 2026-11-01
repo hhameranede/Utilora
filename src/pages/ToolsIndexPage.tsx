@@ -7,6 +7,7 @@ import { Breadcrumbs } from '../components/common/Breadcrumbs';
 import { Head } from '../seo/Head';
 import { Search, Filter } from 'lucide-react';
 import { CategoryId } from '../registry/tool-types';
+import { matchesSearch } from '../utils/search';
 
 export const ToolsIndexPage: React.FC = () => {
   const { locale, t } = useI18n();
@@ -15,11 +16,8 @@ export const ToolsIndexPage: React.FC = () => {
 
   const filteredTools = TOOLS_LIST.filter((tool) => {
     const matchesCategory = selectedCategory === 'all' || tool.category === selectedCategory;
-    const name = (tool.localizedName[locale] || tool.localizedName.en).toLowerCase();
-    const desc = (tool.localizedDescription[locale] || tool.localizedDescription.en).toLowerCase();
-    const q = searchQuery.toLowerCase();
-    const matchesSearch = !q || name.includes(q) || desc.includes(q) || tool.slug.includes(q);
-    return matchesCategory && matchesSearch;
+    const matchesQuery = matchesSearch(searchQuery, tool.localizedName, tool.localizedDescription, tool.slug, tool.acceptedFormats);
+    return matchesCategory && matchesQuery;
   });
 
   return (
@@ -40,7 +38,7 @@ export const ToolsIndexPage: React.FC = () => {
             {t('nav.allTools')} (36)
           </h1>
           <p className="text-sm text-stone-600 mt-2 max-w-2xl leading-relaxed">
-            Every utility engineered for speed, privacy, and simplicity. Filter by specialized category or search directly.
+            {t('tools.description')}
           </p>
         </div>
 
@@ -50,9 +48,10 @@ export const ToolsIndexPage: React.FC = () => {
           <div className="flex items-center gap-1.5 overflow-x-auto w-full md:w-auto p-1 bg-stone-100 rounded-xl">
             <button
               onClick={() => setSelectedCategory('all')}
+              aria-pressed={selectedCategory === 'all'}
               className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors shrink-0 ${
                 selectedCategory === 'all'
-                  ? 'bg-orange-500 text-white font-semibold shadow-xs'
+                  ? 'bg-orange-700 text-white font-semibold shadow-xs'
                   : 'text-stone-600 hover:text-stone-900'
               }`}
             >
@@ -62,9 +61,10 @@ export const ToolsIndexPage: React.FC = () => {
               <button
                 key={cat.id}
                 onClick={() => setSelectedCategory(cat.id)}
+                aria-pressed={selectedCategory === cat.id}
                 className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors shrink-0 ${
                   selectedCategory === cat.id
-                    ? 'bg-orange-500 text-white font-semibold shadow-xs'
+                    ? 'bg-orange-700 text-white font-semibold shadow-xs'
                     : 'text-stone-600 hover:text-stone-900'
                 }`}
               >
@@ -75,16 +75,18 @@ export const ToolsIndexPage: React.FC = () => {
 
           {/* Search Field */}
           <div className="relative w-full md:w-72">
-            <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-orange-500" />
+            <Search size={14} className="absolute start-3.5 top-1/2 -translate-y-1/2 text-orange-500" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by name or keyword..."
-              className="w-full pl-9 pr-3 py-2 rounded-xl bg-white border border-stone-200 text-xs text-stone-900 placeholder-stone-400 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 shadow-xs transition-all"
+              placeholder={t('tools.searchPlaceholder')}
+              className="w-full ps-9 pe-3 py-2 rounded-xl bg-white border border-stone-200 text-xs text-stone-900 placeholder-stone-400 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 shadow-xs transition-all"
             />
           </div>
         </div>
+
+        <p className="-mt-6 text-xs text-stone-500">{t('tools.scrollHint')}</p>
 
         {/* Tool Cards Grid */}
         {filteredTools.length === 0 ? (
