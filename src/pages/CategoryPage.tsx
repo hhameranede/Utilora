@@ -37,27 +37,51 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ categorySlug }) => {
   const description = category.localizedDescription[locale] || category.localizedDescription.en;
 
   const categoryFaqs = [
-    {
-      question: {
-        en: `Are ${title} completely free to use?`,
-        ar: `هل جميع ${title} مجانية بالكامل؟`,
-      },
-      answer: {
-        en: `Yes. All utilities in the ${title} category are built to be accessible to everyone without paywalls, subscriptions, or hidden charges.`,
-        ar: `نعم. جميع الأدوات في قسم ${title} مصممة لتكون متاحة للجميع بدون رسوم أو اشتراكات مخفية.`,
-      },
+  {
+    "question": {
+      "en": "Are all ${title} tools free to use?",
+      "ar": "هل أدوات ${title} مجانية؟",
+      "fr": "Les outils ${title} sont-ils gratuits ?",
+      "es": "¿Las herramientas de ${title} son gratuitas?",
+      "pt": "As ferramentas de ${title} são gratuitas?",
+      "hi": "क्या ${title} के टूल मुफ़्त हैं?",
+      "zh": "${title} 工具可以免费使用吗？",
+      "bn": "${title} টুলগুলো কি বিনামূল্যে?"
     },
-    {
-      question: {
-        en: `How are files in ${title} processed?`,
-        ar: `كيف يتم التعامل مع الملفات ومعالجتها في ${title}؟`,
-      },
-      answer: {
-        en: `UTILORA follows a local-first architecture. When processing engines are connected, file manipulations are executed within your browser sandbox via WebAssembly and client APIs.`,
-        ar: `تعتمد يوتيلورا على معمارية معالجة محلية؛ عند ربط المحركات المستقبلية تظل الملفات في متصفحك عبر تقنيات WebAssembly دون رفعها لسيرفرات وسيطة.`,
-      },
+    "answer": {
+      "en": "Available tools can be used without a subscription. A tool marked as a preview is not yet operational; its page explains that limitation.",
+      "ar": "يمكن استخدام الأدوات المتاحة دون اشتراك. أما الأداة التي تحمل علامة «معاينة» فهي غير مكتملة بعد، وتوضح صفحتها ذلك.",
+      "fr": "Les outils disponibles sont accessibles sans abonnement. Un outil marqué « Aperçu » n’est pas encore opérationnel ; sa page précise cette limite.",
+      "es": "Las herramientas disponibles se pueden usar sin suscripción. Una herramienta marcada como «Vista previa» aún no funciona y su página lo indica.",
+      "pt": "As ferramentas disponíveis podem ser usadas sem assinatura. Uma ferramenta marcada como «Prévia» ainda não está operacional; a página explica essa limitação.",
+      "hi": "उपलब्ध टूल बिना सदस्यता के उपयोग किए जा सकते हैं। «पूर्वावलोकन» चिह्नित टूल अभी काम नहीं करता; उसका पृष्ठ यह सीमा बताता है।",
+      "zh": "可用工具无需订阅即可使用。标记为“预览”的工具尚未投入使用，其页面会说明这一限制。",
+      "bn": "উপলব্ধ টুলগুলো সাবস্ক্রিপশন ছাড়াই ব্যবহার করা যায়। “প্রিভিউ” চিহ্নিত টুলটি এখনো কার্যকর নয়; তার পৃষ্ঠায় সীমাবদ্ধতা জানানো আছে।"
+    }
+  },
+  {
+    "question": {
+      "en": "What happens to my files or lookup requests?",
+      "ar": "ماذا يحدث لملفاتي أو طلبات الاستعلام؟",
+      "fr": "Que deviennent mes fichiers ou mes requêtes ?",
+      "es": "¿Qué ocurre con mis archivos o consultas?",
+      "pt": "O que acontece com meus arquivos ou consultas?",
+      "hi": "मेरी फ़ाइलों या खोज अनुरोधों के साथ क्या होता है?",
+      "zh": "我的文件或查询请求会如何处理？",
+      "bn": "আমার ফাইল বা অনুসন্ধানের অনুরোধের সঙ্গে কী ঘটে？"
     },
-  ];
+    "answer": {
+      "en": "File and text operations run in your browser. Website and domain checks send the hostname or URL you submit to the relevant public service or target website.",
+      "ar": "تُنفّذ عمليات الملفات والنصوص داخل متصفحك. أما فحوصات المواقع والنطاقات فترسل اسم النطاق أو الرابط الذي أدخلته إلى الخدمة العامة المعنية أو الموقع المستهدف.",
+      "fr": "Les opérations sur les fichiers et le texte s’exécutent dans votre navigateur. Les vérifications web et de domaine transmettent le nom d’hôte ou l’URL saisi au service public concerné ou au site cible.",
+      "es": "Las operaciones con archivos y texto se ejecutan en tu navegador. Las comprobaciones web y de dominios envían el nombre de host o la URL al servicio público correspondiente o al sitio de destino.",
+      "pt": "As operações com arquivos e texto são executadas no navegador. As verificações de sites e domínios enviam o host ou a URL ao serviço público relevante ou ao site de destino.",
+      "hi": "फ़ाइल और टेक्स्ट के काम आपके ब्राउज़र में होते हैं। वेबसाइट और डोमेन जाँच आपके दिए गए होस्टनाम या URL को संबंधित सार्वजनिक सेवा या लक्षित वेबसाइट पर भेजती है।",
+      "zh": "文件和文本操作在浏览器中运行。网站和域名检查会将您提交的主机名或 URL 发送给相关公共服务或目标网站。",
+      "bn": "ফাইল ও টেক্সটের কাজ আপনার ব্রাউজারে সম্পন্ন হয়। ওয়েবসাইট ও ডোমেইন পরীক্ষা করতে আপনার দেওয়া হোস্টনেম বা URL সংশ্লিষ্ট পাবলিক সার্ভিস বা লক্ষ্য ওয়েবসাইটে পাঠানো হয়。"
+    }
+  }
+];
 
   return (
     <>
