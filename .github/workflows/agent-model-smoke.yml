@@ -129,16 +129,19 @@ jobs:
           grep -Fq "$AGENT_NAME" "$RUNNER_TEMP/opencode-agents.txt"
           opencode debug agent "$AGENT_NAME" > "$RUNNER_TEMP/resolved-agent.json"
           python3 - <<'PY'
-          import json, os, pathlib, sys
+          import json, os, pathlib, re, sys
           data = json.loads(pathlib.Path(os.environ["RUNNER_TEMP"], "resolved-agent.json").read_text())
-          expected = os.environ["MODEL_ROUTE"]
           if data.get("name") != os.environ["AGENT_NAME"]:
               print("::error::OpenCode resolved a different agent than requested.")
               sys.exit(1)
-          if data.get("model") != expected:
-              print("::error::Agent model route does not match the configured NVIDIA model.")
+          agent_file = pathlib.Path(os.environ["TARGET_DIR"], ".opencode", "agents", os.environ["AGENT_NAME"] + ".md")
+          frontmatter = agent_file.read_text(encoding="utf-8").split("---", 2)[1]
+          match = re.search(r"^model:\\s*(\\S+)\\s*$", frontmatter, re.MULTILINE)
+          expected = os.environ["MODEL_ROUTE"]
+          if not match or match.group(1) != expected:
+              print("::error::The agent frontmatter does not match the assigned NVIDIA route.")
               sys.exit(1)
-          print("OpenCode resolved " + data["name"] + " with " + expected)
+          print("OpenCode resolved " + data["name"] + "; assigned route: " + expected)
           PY
 
       - name: Prepare a real visual sample
