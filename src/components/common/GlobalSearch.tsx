@@ -216,9 +216,10 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({ isOpen, onOpen, onCl
     >
       <div
         ref={dialogRef}
+        id="utilora-global-search"
         role="dialog"
         aria-modal="true"
-        aria-label={t('nav.search')}
+        aria-label={t('nav.searchShort')}
         className="w-full max-w-2xl rounded-2xl bg-white border border-stone-200 shadow-2xl shadow-stone-900/20 overflow-hidden flex flex-col max-h-[80vh]"
         onClick={(e) => e.stopPropagation()}
         onKeyDown={handleDialogKeyDown}
@@ -229,7 +230,7 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({ isOpen, onOpen, onCl
           <input
             ref={inputRef}
             type="text"
-            aria-label={t('nav.search')}
+            aria-label={t('nav.searchShort')}
             aria-autocomplete="list"
             aria-controls={flatItems.length ? 'utilora-search-results' : undefined}
             aria-activedescendant={flatItems[selectedIndex] ? 'utilora-search-option-' + flatItems[selectedIndex].id : undefined}
@@ -270,7 +271,7 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({ isOpen, onOpen, onCl
                   {t('hero.explorePopular')}
                 </div>
               )}
-              <div id="utilora-search-results" role="listbox" aria-label={t('nav.search')} className="space-y-1">
+              <div id="utilora-search-results" role="listbox" aria-label={t('nav.searchShort')} className="space-y-1">
                 {flatItems.map((item, index) => {
                   const isSelected = index === selectedIndex;
                   return (
