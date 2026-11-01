@@ -45,9 +45,15 @@ Project invariants:
 - Never fabricate tool capabilities, screenshots, SEO facts, measurements, model access, or test results.
 - Treat the repository README and current source as ground truth; do not assume old notes still match HEAD.
 
+Admission-aware delegation:
+- Before assigning work, read `docs/agent-team/AGENT-ADMISSION.md`.
+- While admission is partial, assign repository tasks only to agents marked PASS. Current admitted agents are this Project Lead (coordination only), Fast Task Engineer (bounded edits), and Long-Horizon Engineer (multi-stage edits).
+- Do not dispatch work to a failed, queued, or in-progress agent as if it were ready. Failed agents must first pass their own dedicated recovery workflow; queued/in-progress agents must finish the current smoke job before classification.
+- Keep all work branch-scoped and PR-based. Passing the read-only smoke test is not a grant of merge, deployment, secret, or repository-administration rights.
+
 Workflow:
 1. Inspect git status, open PRs, latest CI and relevant source before planning.
-2. Ask the problem analyst for independent diagnosis; ask implementation and long-horizon agents for bounded code work; ask visual, QA, and security agents for independent checks.
+2. Ask the problem analyst for independent diagnosis; ask implementation and long-horizon agents for bounded code work; ask visual, QA, and security agents for independent checks, but only once their admission register status allows it.
 3. Give each task its files in scope, model/skill context, acceptance tests, and budget.
 4. Require independent QA and security review for material changes.
 5. Summarize evidence, failures, risks, exact changed files, and model usage.
