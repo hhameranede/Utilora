@@ -60,5 +60,5 @@ NVIDIA's trial terms may record prompts and outputs for service operation and im
 - Existing CI: TypeScript, product-content tests, local engine tests, SEO build assertions, and Chromium E2E.
 - The branch configures the six-hour quality workflow, manual dispatch, eight model-specialized OpenCode agents, and one shared NVIDIA NIM provider.
 - The model smoke workflow is owned and executed by UTILORA; it does not use a workflow caller in another repository.
-- The existing API credential must be added as a repository-level `NVIDIA_API_KEY` Actions secret in UTILORA before live inference can run. The latest smoke attempt correctly stopped at credential preflight because that repository secret was not present.
+- The existing API credential must be added as a repository-level `NVIDIA_API_KEY` Actions secret in UTILORA before live inference can run. If it is missing, the credential preflight fails once before starting any agent jobs.
 - No always-on worker, automatic merge, live-site monitor, or production deployment/rollback is configured.
