@@ -4,43 +4,40 @@
 
 Operate as a disciplined, evidence-driven engineering team for the public `hhameranede/Utilora` repository. Improve reliability, accessibility, privacy, performance, SEO, and tool correctness without changing the approved product identity (warm white, stone gray, orange; Arabic RTL; restrained motion).
 
-This document defines the intended architecture and safety boundaries. It does not claim that model credentials, external integrations, continuous agents, or production deployment have already been configured.
+The repository now configures one NVIDIA NIM provider with six model IDs using the shared `NVIDIA_API_KEY` environment variable. A live workflow in the Softnexa repository forwards its existing secret to a reusable UTILORA workflow for actual inference tests. Public model-catalog availability does not guarantee that this particular key has access; the workflow result is the source of truth. No continuous 24/7 worker or production deployment is implied.
 
 ## Agent roles
 
-| Role | Responsibility | Required evidence |
+| Agent | Model | Responsibility |
 |---|---|---|
-| Orchestrator / Planner | Break down findings, assign bounded tasks, track state and avoid duplicate work | Issue/PR plan and explicit acceptance criteria |
-| Software Engineer | Implement small, reviewable code changes | Diff, type-check and relevant tests |
-| QA Engineer | Reproduce bugs and test user journeys across tools/locales | Reproduction steps, test results, artifacts |
-| UI/UX Reviewer | Review responsive layouts, accessibility, RTL and consistency | Screenshots or reproducible browser evidence |
-| SEO Reviewer | Inspect metadata, canonical/hreflang, indexability, sitemap and content quality | URL samples and build assertions |
-| Security & Privacy Reviewer | Inspect dependencies, input handling, secrets exposure, permissions and data flows | Findings with severity and remediation |
-| Product/User Reviewer | Test the experience as a first-time visitor, including failure and empty states | Task-based observations |
-| Release & Reliability Engineer | Validate release readiness, monitor deployment and coordinate rollback | Green gates, deployment health and rollback evidence |
+| Project Lead | NVIDIA Nemotron 3 Ultra 550B | Planning, delegation and coordination |
+| Problem Analyst | DeepSeek V4.1 Flash | Root-cause analysis, solution review, SEO/analytics/release evidence |
+| Implementation Engineer | MiniMax M3.1 Flash | Standard code implementation and repairs |
+| Fast Task Engineer | GLM 5.3 Flash | Small, bounded, low-risk engineering tasks |
+| Visual Reviewer | Nemotron 3.5 Super VL 120B | Screenshot-based UI, responsive and RTL review |
+| Long-Horizon Engineer | Poolside Laguna XS 2.1 | Multi-stage coding and architecture tasks |
+| QA Engineer | DeepSeek V4.1 Flash | Independent reproduction, regression and end-to-end testing |
+| Security Auditor | NVIDIA Nemotron 3 Ultra 550B | Independent read-only security and privacy review |
+
+SEO, analytics and release-review skills remain in the 50-skill library and are assigned to the Problem Analyst and other relevant agents; they are capabilities, not separate extra workers.
 
 ## Skill library
 
 UTILORA uses exactly **50 reusable skills**: 9 first-party project skills and 41 curated upstream skills. Skills are shared on disk, pinned to their upstream commit, and assigned through least-privilege per-agent allow-lists. See the [skill catalogue](SKILLS-CATALOG.md), [machine-readable manifest](../../.opencode/skills/manifest.json), and [third-party notices](THIRD_PARTY_NOTICES.md).
 
-## Candidate model pool
+## Shared NVIDIA model provider
 
-Model IDs and availability must be verified against the provider catalog and API before use. Do not hard-code a model based only on its display name.
+All six configured models use NVIDIA's OpenAI-compatible NIM endpoint `https://integrate.api.nvidia.com/v1` and one secret, `NVIDIA_API_KEY`. Model aliases and exact upstream IDs are defined in `opencode.json`. The model assignments are fixed in each agent's frontmatter and mirrored in the skill manifest.
 
-- NVIDIA Nemotron Ultra: candidate planner / complex reasoning.
-- DeepSeek V4 Flash family: candidate analysis and code review.
-- MiniMax M3.1 Flash: candidate implementation and agentic coding.
-- GLM Flash family: candidate fast, bounded tasks.
-- Nemotron Super VL: candidate visual and multimodal review.
-- Poolside Laguna: candidate longer coding tasks.
+NVIDIA advertises free trial endpoints for these models, but quota, account entitlement, throttling and service availability can vary. The Softnexa-triggered workflow first checks the live `/v1/models` catalogue and then performs one small inference for each agent. Results—not the public catalogue alone—determine which models the existing key can actually use. Do not assume that all eight roles imply eight different models: QA shares DeepSeek and Security shares Nemotron Ultra, but remain separate agents with independent instructions and permissions.
 
-These are candidates, not benchmark winners. Before assigning production work, run the same representative UTILORA tasks against available models and compare correctness, test pass rate, tool-call reliability, security, latency, token usage, and provider limits.
+NVIDIA's trial terms may record prompts and outputs for service operation and improvement. Never send credentials, personal data, user uploads, or confidential production content through the trial endpoint.
 
 ## Execution phases
 
 1. **Foundation:** scheduled repository quality checks, manual dispatch, documented roles and least-privilege permissions.
 2. **Observability:** add live-site checks and deployment status checks after confirming the canonical production URL and Cloudflare project.
-3. **Model gateway:** add a server-side adapter for NVIDIA's OpenAI-compatible API; credentials only in GitHub Actions Secrets or Cloudflare Secrets. Never commit keys or print them in logs.
+3. **Model verification:** use the existing Softnexa NVIDIA key through a reusable workflow; verify catalog availability and one inference request per assigned agent. Never copy the key into source or log values.
 4. **Bounded agents:** read-only audit first; then branch-scoped code changes and pull requests. Each task has a timeout, budget, allowed paths, and acceptance tests.
 5. **Release automation:** only after deployment provider, health endpoint, rollback method and protection rules are verified.
 
@@ -61,5 +58,7 @@ These are candidates, not benchmark winners. Before assigning production work, r
 
 - Repository visibility: public (verified 2026-11-01).
 - Existing CI: TypeScript, product-content tests, local engine tests, SEO build assertions, and Chromium E2E.
-- This foundation adds a six-hour scheduled run and manual dispatch to that existing CI.
-- No AI model key, model gateway, live-site monitor, automatic merge, or production rollback is configured by this change.
+- The branch configures the six-hour quality workflow, manual dispatch, eight model-specialized OpenCode agents, and one shared NVIDIA NIM provider.
+- The Softnexa caller workflow uses the existing `NVIDIA_API_KEY` secret via reusable-workflow secret forwarding; no key value is committed.
+- Actual model inference and per-agent execution are pending the live Softnexa Actions run.
+- No always-on worker, automatic merge, live-site monitor, or production deployment/rollback is configured.
