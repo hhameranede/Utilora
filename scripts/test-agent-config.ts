@@ -15,10 +15,11 @@ type SkillCatalog = {
 
 const root = process.cwd();
 const config = JSON.parse(readFileSync(join(root, 'opencode.json'), 'utf8')) as {
-  $schema?: string; mcp?: Record<string, McpServer>;
+  $schema?: string; default_agent?: string; mcp?: Record<string, McpServer>;
 };
 assert.equal(config.$schema, 'https://opencode.ai/config.json');
 assert.ok(config.mcp);
+assert.equal(config.default_agent, 'project-lead', 'Project lead must be the default primary agent');
 
 const expectedRemote: Record<string, string> = {
   context7: 'https://mcp.context7.com/mcp',
@@ -159,12 +160,21 @@ if (process.env.OPENCODE_RUNTIME_TEST === '1') {
   const agentOutput = agents.stdout + '\n' + agents.stderr;
   for (const agent of expectedAgents) assert.ok(agentOutput.includes(agent), 'OpenCode did not discover agent ' + agent);
 
+  const debugAgent = spawnSync('opencode', ['debug', 'agent', 'project-lead'], { encoding: 'utf8', timeout: 45_000 });
+  assert.equal(debugAgent.status, 0, 'OpenCode could not resolve project-lead: ' + (debugAgent.stderr || debugAgent.stdout));
+  console.log('Resolved project-lead config:\n' + debugAgent.stdout.slice(0, 8000));
+
   const skills = spawnSync('opencode', ['debug', 'skill'], { encoding: 'utf8', timeout: 45_000 });
   assert.equal(skills.status, 0, 'OpenCode skill discovery failed: ' + (skills.stderr || skills.stdout));
   const skillOutput = skills.stdout + '\n' + skills.stderr;
   console.log('OpenCode debug skill output:\n' + skillOutput.slice(0, 20000));
-  for (const name of [...externalIds, ...internalSkills]) {
-    assert.ok(skillOutput.includes(name), 'OpenCode did not discover skill ' + name + '\nCLI output:\n' + skillOutput.slice(0, 12000));
+  const leadAllowed = catalog.skills.filter((skill) => skill.assigned_agents.includes('project-lead')).map((skill) => skill.id);
+  for (const name of [...leadAllowed, ...expectedInternalAssignments['project-lead']]) {
+    assert.ok(skillOutput.includes(name), 'OpenCode did not advertise project-lead skill ' + name + '\nCLI output:\n' + skillOutput.slice(0, 12000));
+  }
+  const notAssigned = catalog.skills.filter((skill) => !skill.assigned_agents.includes('project-lead')).map((skill) => skill.id);
+  for (const name of notAssigned) {
+    assert.ok(!skillOutput.includes('"name": "' + name + '"'), 'Project lead must not see unassigned skill ' + name);
   }
   console.log('OpenCode CLI discovery verified for all eight agents and 109 skills.');
 }

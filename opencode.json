@@ -62,5 +62,6 @@
     "cloudflare-docs_*": "allow",
     "cloudflare-api_*": "ask",
     "posthog_*": "ask"
-  }
+  },
+  "default_agent": "project-lead"
 }
