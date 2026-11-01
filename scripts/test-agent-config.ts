@@ -158,6 +158,7 @@ if (process.env.OPENCODE_RUNTIME_TEST === '1') {
   const agents = spawnSync('opencode', ['agent', 'list'], { encoding: 'utf8', timeout: 45_000 });
   assert.equal(agents.status, 0, 'OpenCode agent discovery failed: ' + (agents.stderr || agents.stdout));
   const agentOutput = agents.stdout + '\n' + agents.stderr;
+  console.log('OpenCode agent list output:\n' + agentOutput);
   for (const agent of expectedAgents) assert.ok(agentOutput.includes(agent), 'OpenCode did not discover agent ' + agent);
 
   // OpenCode resolves each allowed skill to a scoped project path in the effective agent permissions.
