@@ -54,7 +54,7 @@ test('JSON formatter formats valid input and reports invalid JSON without false 
   await expect(editor).toHaveValue('{
   "hello": "world",
   "count": 2
-}');
+}'.replace(/\\n/g, '\n'));
 
   await editor.fill('{broken}');
   await page.getByRole('button', { name: 'Format JSON' }).click();
