@@ -114,7 +114,7 @@ jobs:
           AGENT_NAME: ${{ matrix.agent }}
         run: |
           set -euo pipefail
-          python3 - <<'PY' >> "$GITHUB_ENV"
+          OPENCODE_CONFIG_CONTENT="$(python3 - <<'PY'
           import json, os
           agent = os.environ["AGENT_NAME"]
           denied = [
@@ -132,8 +132,11 @@ jobs:
                   ]
               }
           }
-          print("OPENCODE_CONFIG_CONTENT=" + json.dumps(overlay, separators=(",", ":")))
+          print(json.dumps(overlay, separators=(",", ":")))
           PY
+          )"
+          echo "OPENCODE_CONFIG_CONTENT=$OPENCODE_CONFIG_CONTENT" >> "$GITHUB_ENV"
+          export OPENCODE_CONFIG_CONTENT
           opencode debug agent "$AGENT_NAME" > "$RUNNER_TEMP/agent-smoke-config.json"
           python3 - <<'PY'
           import json, os, pathlib, sys
@@ -181,7 +184,7 @@ jobs:
           if [ "$AGENT_NAME" = "visual-reviewer" ]; then
             timeout --signal=TERM --kill-after=15s 7m opencode --log-level DEBUG run --dir "$GITHUB_WORKSPACE" --agent "$AGENT_NAME" --model "$MODEL_ROUTE" --file "$SCREENSHOT" --format json "$PROMPT" > "$RUNNER_TEMP/agent-output.jsonl" 2> "$RUNNER_TEMP/opencode-stderr.txt"
           else
-            timeout --signal=TERM --kill-after=15s 7m opencode run --dir "$GITHUB_WORKSPACE" --agent "$AGENT_NAME" --model "$MODEL_ROUTE" --format json "$PROMPT" > "$RUNNER_TEMP/agent-output.jsonl" 2> "$RUNNER_TEMP/opencode-stderr.txt"
+            timeout --signal=TERM --kill-after=15s 7m opencode --log-level DEBUG run --dir "$GITHUB_WORKSPACE" --agent "$AGENT_NAME" --model "$MODEL_ROUTE" --format json "$PROMPT" > "$RUNNER_TEMP/agent-output.jsonl" 2> "$RUNNER_TEMP/opencode-stderr.txt"
           fi
           opencode_exit=$?
           set -e
