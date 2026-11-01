@@ -1,0 +1,33 @@
+name: UTILORA recovery · Long-Horizon Engineer
+
+on:
+  workflow_dispatch:
+    inputs:
+      utilora_ref:
+        description: Optional immutable UTILORA commit to test; defaults to this workflow revision.
+        required: false
+        type: string
+        default: ""
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/agent-recovery-long-horizon-engineer.yml"
+      - ".github/workflows/_agent-recovery-reusable.yml"
+      - ".opencode/agents/long-horizon-engineer.md"
+      - ".opencode/skills/systematic-debugging/**"
+
+permissions:
+  contents: read
+
+jobs:
+  recovery:
+    uses: ./.github/workflows/_agent-recovery-reusable.yml
+    with:
+      utilora_ref: ${{ inputs.utilora_ref || github.sha }}
+      agent_name: "long-horizon-engineer"
+      model_alias: "laguna-xs-2-1"
+      model_id: "poolside/laguna-xs-2.1"
+      skill_name: "systematic-debugging"
+      diagnosis_focus: >-
+        The previous full smoke run recorded a native systematic-debugging skill call and three completed evidence calls, but the 416-character assistant response omitted the required report labels. Return the full six-section report, a phased low-risk plan, and the strongest limitation grounded in inspected repository evidence.
+    secrets: inherit
