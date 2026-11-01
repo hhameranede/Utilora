@@ -89,7 +89,7 @@ async function loadVideo(file: File): Promise<LoadedVideo> {
   };
 }
 
-export async function readFiniteDuration(video: HTMLVideoElement): Promise<number> {
+export async function readFiniteDuration(video: HTMLVideoElement, restorePosition = true): Promise<number> {
   if (Number.isFinite(video.duration) && video.duration > 0) return video.duration;
 
   if (video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) {
@@ -137,12 +137,15 @@ export async function readFiniteDuration(video: HTMLVideoElement): Promise<numbe
         reject(value);
         return;
       }
-      // The duration probe seeks to the end; restore the user's preview position.
-      try {
-        const restoreTime = Math.min(initialTime, value);
-        if (Math.abs(video.currentTime - restoreTime) > 0.01) video.currentTime = restoreTime;
-      } catch {
-        // The caller will perform an explicit seek before using a frame.
+      // Interactive previews preserve their playhead. Extraction callers can
+      // opt out and seek directly from the duration probe to the requested frame.
+      if (restorePosition) {
+        try {
+          const restoreTime = Math.min(initialTime, value);
+          if (Math.abs(video.currentTime - restoreTime) > 0.01) video.currentTime = restoreTime;
+        } catch {
+          // The caller can still perform an explicit seek before using a frame.
+        }
       }
       resolve(value);
     };
@@ -308,7 +311,7 @@ export async function extractVideoThumbnail(
   const loaded = await loadVideo(file);
   try {
     const { video } = loaded;
-    const duration = await readFiniteDuration(video);
+    const duration = await readFiniteDuration(video, false);
     const width = video.videoWidth;
     const height = video.videoHeight;
     if (!width || !height || !Number.isFinite(duration) || duration <= 0) {
@@ -316,9 +319,12 @@ export async function extractVideoThumbnail(
     }
 
     const timestampSeconds = Math.min(options.timestampSeconds, Math.max(0, duration - 0.04));
-    await waitForFrameData(video);
     if (Math.abs(video.currentTime - timestampSeconds) > 0.02) {
+      // A seeked event confirms that the requested frame has been decoded.
+      // Do not wait for loadeddata here: that one-time event may already have fired.
       await seekTo(video, timestampSeconds);
+    } else {
+      await waitForFrameData(video);
     }
 
     const scale = Math.min(1, Math.sqrt(MAX_THUMBNAIL_PIXELS / (width * height)));
