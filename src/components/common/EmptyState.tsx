@@ -47,6 +47,7 @@ export const ErrorState: React.FC<{ title: string; message?: string; onRetry?: (
   onRetry,
   className = '',
 }) => {
+  const { t } = useI18n();
   return (
     <div className={`p-6 rounded-2xl border border-red-200 bg-red-50/40 text-center ${className}`}>
       <AlertTriangle size={24} className="text-red-500 mx-auto mb-2" />
