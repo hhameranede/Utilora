@@ -329,7 +329,7 @@
     "renderedPageImages": "Rendered {count} page image(s).",
     "errorProcessing": "PDF processing failed.",
     "page": "page",
-    "pages": "pages",
+    "pages": "page(s)",
     "containsFormFields": "Contains fillable form fields",
     "noFillableForms": "No fillable form fields detected",
     "privacyNotice": "PDF processing runs locally in your browser. Files are not uploaded. Large documents may use significant device memory."
