@@ -13,17 +13,18 @@
     "searchShort": "Recherche",
     "devTemplates": "Lab Modèles",
     "allTools": "Tous les outils",
-    "switchLanguage": "Changer de langue"
+    "switchLanguage": "Changer de langue",
+    "toggleNavigation": "Ouvrir ou fermer le menu"
   },
   "hero": {
     "badge": "Plateforme Mondiale d'Outils Numériques",
     "title": "Chaque tâche numérique. Un seul endroit.",
     "subtitle": "Utilitaires en ligne puissants, rapides et gratuits pour vos images, documents, textes, codes, sites web et vidéos.",
     "searchPlaceholder": "Rechercher par nom d'outil, format ou tâche...",
-    "privacyBadge": "Architecture respectueuse de la vie privée · Traitement local dans le navigateur",
+    "privacyBadge": "Fichiers et textes traités dans le navigateur · Les recherches web contactent des services publics · Sans compte",
     "browseCategories": "Explorer les catégories",
     "explorePopular": "Outils populaires",
-    "statsTools": "36 Outils Prévus",
+    "statsTools": "36 outils · 35 disponibles",
     "statsCategories": "6 Catégories Clés",
     "statsGlobal": "8 Langues Mondiales"
   },
@@ -53,13 +54,20 @@
     "relatedTools": "Outils associés",
     "relatedArticles": "Guides associés",
     "privacyStatement": "Garantie de confidentialité",
-    "privacyStatementDesc": "Conçu avec une architecture locale sans stockage serveur. Vos fichiers restent sur votre machine.",
+    "privacyStatementDesc": "Les opérations sur les fichiers et le texte s’exécutent dans votre navigateur. Les vérifications de sites et de domaines transmettent le nom d’hôte ou l’URL saisi au service public concerné ou au site cible. Les outils en aperçu ne sont pas encore opérationnels.",
     "supportedFormats": "Formats pris en charge",
     "sampleData": "Données d'exemple",
     "demoOnly": "Mode Aperçu",
     "pageNotFound": "Page introuvable",
     "pageNotFoundDesc": "L'outil ou la page demandée n'existe pas.",
-    "returnHome": "Retour à l'accueil"
+    "returnHome": "Retour à l'accueil",
+    "popular": "Populaire",
+    "featured": "À la une",
+    "supported": "Pris en charge",
+    "previewOnly": "Aperçu uniquement",
+    "publicLookup": "Recherche réseau publique",
+    "runsLocally": "S’exécute dans le navigateur",
+    "readGuide": "Lire le guide"
   },
   "home": {
     "categoriesHeading": "Explorer par catégorie",
@@ -75,11 +83,12 @@
     "step2Title": "2. Configurez votre espace",
     "step2Desc": "Interagissez avec des interfaces optimisées pour chaque type de média.",
     "step3Title": "3. Traitement local sans intermédiaire",
-    "step3Desc": "Conçu pour s'exécuter dans le navigateur sans transfert serveur.",
+    "step3Desc": "Les tâches sur les fichiers et le texte s’exécutent dans le navigateur. Les vérifications web contactent les services publics concernés avec le nom d’hôte ou l’URL fourni.",
     "trustHeading": "Fondé sur la confiance",
     "trustDesc": "Des outils numériques gratuits, rapides, sans compte et sans publicité.",
     "articlesPreviewHeading": "Derniers guides & analyses",
-    "articlesPreviewSub": "Articles techniques sur la compression et les standards du web."
+    "articlesPreviewSub": "Articles techniques sur la compression et les standards du web.",
+    "privacyKicker": "Traitement de vos données"
   },
   "templates": {
     "dropzonePrompt": "Glissez-déposez votre fichier ici, ou parcourez",
@@ -161,6 +170,25 @@
     "acceptableUse": "Usage acceptable",
     "about": "À propos d'UTILORA",
     "contact": "Contact",
-    "cookieNotice": "Aucun cookie de pistage. Conception rapide et respectueuse."
+    "cookieNotice": "Aucun cookie de pistage. Conception rapide et respectueuse.",
+    "platform": "Plateforme",
+    "legal": "Informations légales",
+    "moreCategories": "Autres catégories"
+  },
+  "tools": {
+    "description": "Explorez les 36 utilitaires. Recherchez par nom, description ou format pris en charge, ou filtrez par catégorie. Les outils en aperçu sont clairement signalés.",
+    "searchPlaceholder": "Rechercher un outil, une tâche ou un format...",
+    "scrollHint": "Faites défiler les filtres de catégories pour voir toutes les options."
+  },
+  "category": {
+    "featuredWorkspace": "Espace de travail à la une",
+    "allTools": "Tous les outils de",
+    "chooseWorkspace": "Choisissez un outil pour ouvrir son espace de travail.",
+    "searchPlaceholder": "Filtrer les outils de cette catégorie...",
+    "relatedCategories": "Catégories associées"
+  },
+  "search": {
+    "navigate": "Naviguer",
+    "select": "Sélectionner"
   }
 }
