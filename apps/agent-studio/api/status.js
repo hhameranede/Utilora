@@ -16,7 +16,7 @@ const noStore = (res) => {
 
 function getConfig() {
   return {
-    url: process.env.SUPABASE_URL?.replace(/\\/$/, ""),
+    url: String(process.env.SUPABASE_URL || "").replace(/\/+$/, ""),
     key: process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY,
     githubToken: process.env.UTILORA_GITHUB_TOKEN,
     callbackUrl: process.env.AGENT_CHAT_CALLBACK_URL
