@@ -244,7 +244,7 @@ async function runOpenCode(prompt) {
   const sessionId = findSessionId(stdout);
   if (!sessionId) throw new Error("OpenCode did not provide a session ID. Exit=" + exitCode);
 
-  const exported = await execFile("opencode", ["export", sessionId, "--sanitize"], {
+  const exported = await execFile("opencode", ["export", sessionId], {
     cwd: workspace,
     env,
     timeout: 60 * 1000,
