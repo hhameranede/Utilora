@@ -2,6 +2,31 @@ import {
   AGENTS, db, getConfig, getRoom, getRoomSnapshot, json, parseRoomSlug, requireOwner
 } from "../_lib/server.js";
 
+function safeGitHubMessage(value) {
+  return String(value || "GitHub returned no error message.")
+    .replace(/Bearer\s+\S+/gi, "Bearer [redacted]")
+    .replace(/gh[pousr]_[A-Za-z0-9]{20,}/gi, "[redacted GitHub token]")
+    .replace(/github_pat_[A-Za-z0-9_]{20,}/gi, "[redacted GitHub token]")
+    .replace(/[\r\n]+/g, " ")
+    .slice(0, 320);
+}
+
+function explainDispatchFailure(status, message) {
+  if (status === 401) return "تحقق من صلاحية الرمز UTILORA_GITHUB_TOKEN؛ قد يكون منتهيًا أو ملغى.";
+  if (status === 403 && /rate limit|secondary rate limit/i.test(message)) {
+    return "تجاوزت طلبات GitHub الحد المسموح مؤقتًا؛ انتظر قليلًا ثم أعد المحاولة.";
+  }
+  if (status === 403) {
+    return "الاحتمال الأقوى أن الرمز يفتقد صلاحية المستودع Actions: Read and write. في Fine-grained token اختر hhameranede/Utilora ثم Repository permissions → Actions → Read and write.";
+  }
+  if (status === 404) return "تحقق من أن الرمز يملك وصولًا إلى hhameranede/Utilora وأن ملف .github/workflows/agent-chat-execution.yml موجود على main.";
+  if (status === 422) return "GitHub رفض بيانات التشغيل؛ تحقق من inputs ووجود workflow_dispatch في ملف Workflow.";
+  if (status === 429) return "GitHub يقيّد الطلبات مؤقتًا؛ أعد المحاولة بعد فترة قصيرة.";
+  if (status >= 500) return "حدث خطأ مؤقت لدى GitHub؛ أعد المحاولة لاحقًا.";
+  return "افحص صلاحية الرمز وإعدادات GitHub Actions في المستودع.";
+}
+
+
 export async function onRequest(context) {
   const access = await requireOwner(context);
   if (access.response) return access.response;
@@ -100,6 +125,7 @@ export async function onRequest(context) {
     const dispatchUrl = "https://api.github.com/repos/" + config.repository +
       "/actions/workflows/" + encodeURIComponent(config.workflow) + "/dispatches";
     let dispatch = null;
+    let networkFailure = "";
     try {
       dispatch = await fetch(dispatchUrl, {
         method: "POST",
@@ -119,24 +145,46 @@ export async function onRequest(context) {
         }),
         signal: AbortSignal.timeout(10000)
       });
-    } catch {
+    } catch (error) {
       dispatch = null;
+      networkFailure = error?.name === "TimeoutError" || error?.name === "AbortError"
+        ? "انتهت مهلة الاتصال بـGitHub قبل تأكيد تشغيل المهمة."
+        : "تعذّر الاتصال بـGitHub لإرسال أمر التشغيل.";
     }
 
     if (!dispatch?.ok) {
+      const githubPayload = dispatch ? await dispatch.json().catch(() => ({})) : {};
+      const status = dispatch?.status || 0;
+      const githubMessage = safeGitHubMessage(githubPayload?.message || networkFailure || "لم يصل رد من GitHub.");
+      const guidance = status ? explainDispatchFailure(status, githubMessage) : networkFailure;
+      const requestId = dispatch?.headers?.get("x-github-request-id") || "";
+      const dispatchError = [
+        "فشل تشغيل GitHub Actions" + (status ? " (HTTP " + status + ")" : ""),
+        githubMessage,
+        guidance,
+        requestId ? "GitHub Request ID: " + requestId : ""
+      ].filter(Boolean).join(" — ").slice(0, 900);
+
       await db(config, "team_chat_runs?id=eq." + encodeURIComponent(run.id), "PATCH", {
         status: "failed",
         stage: "تعذّر تشغيل GitHub Actions",
-        error: "workflow_dispatch_failed",
+        error: dispatchError,
         finished_at: new Date().toISOString()
       });
       await db(config, "team_chat_agent_runs?run_id=eq." + encodeURIComponent(run.id), "PATCH", {
         status: "failed",
         status_text: "تعذّر بدء التشغيل",
-        progress: 100
+        progress: 100,
+        error: dispatchError
+      });
+      console.error("[Agent Studio] GitHub workflow dispatch rejected", {
+        diagnostic_id: diagnosticId,
+        http_status: status || null,
+        github_request_id: requestId || null,
+        github_message: githubMessage
       });
       return json({
-        error: "تم حفظ الرسالة، لكن GitHub Actions رفض تشغيل الوكيل (HTTP " + (dispatch?.status || "network") + "). تحقق من صلاحيات Actions للرمز الموجود في Cloudflare.",
+        error: "تم حفظ رسالتك لكن تعذّر تشغيل الوكلاء. " + dispatchError,
         diagnostic_id: diagnosticId
       }, 502);
     }
