@@ -1,4 +1,6 @@
 import "./style.css";
+import "./bounty-hunter.css";
+import { renderBountyHunter, bindBountyHunter } from "./bounty-hunter.js";
 
 const AGENTS = [
   { id: "project-lead", name: "Project Lead", role: "قائد الفريق", model: "Nemotron Ultra", initials: "PL", tone: "gold" },
@@ -99,6 +101,7 @@ function renderRunDiagnostics() {
 }
 
 function viewContent() {
+  if (state.view === "bounties") return renderBountyHunter();
   if (state.view === "agents") {
     return '<section class="info-view"><div class="view-kicker">TEAM DIRECTORY</div><h2>فريق UTILORA</h2><p>ثمانية وكلاء متخصصين يعملون كفريق واحد. حالة كل وكيل ستظهر هنا عند اكتمال ربط محرك التشغيل.</p><div class="agent-directory">' + state.agents.map(renderAgent).join("") + '</div></section>';
   }
@@ -215,14 +218,14 @@ function render() {
   const selectedAgent = state.room.startsWith("agent-") ? AGENTS.find((agent) => agent.id === state.room.slice(6)) : null;
   const activeLabel = state.view === "chat"
     ? (selectedAgent ? "محادثة خاصة · " + selectedAgent.role : "غرفة الفريق الجماعية")
-    : state.view === "agents" ? "الوكلاء" : state.view === "activity" ? "سجل النشاط" : "الأمان والخصوصية";
+    : state.view === "agents" ? "الوكلاء" : state.view === "activity" ? "سجل النشاط" : state.view === "bounties" ? "رادار المكافآت" : "الأمان والخصوصية";
   const dbReady = state.backend.database;
   const dispatchReady = state.backend.dispatcher;
   $("#app").innerHTML = '<div class="studio-shell">' +
     '<aside class="sidebar"><div class="brand"><div class="brand-mark">U</div><div><div class="brand-name">UTILORA</div><div class="brand-sub">AGENT STUDIO</div></div></div>' +
     '<div class="private-label">' + icon("lock", 13) + '<span>مساحة خاصة</span><i></i></div>' +
     '<div class="nav-label">WORKSPACE</div><nav class="side-nav">' +
-    navButton("chat", "الغرفة الجماعية") + navButton("agents", "الوكلاء") + navButton("activity", "سجل النشاط") +
+    navButton("chat", "الغرفة الجماعية") + navButton("agents", "الوكلاء") + navButton("activity", "سجل النشاط") + navButton("bounties", "رادار المكافآت") +
     '</nav><div class="nav-label agent-rooms-label">PRIVATE AGENT CHATS</div><nav class="side-nav agent-room-nav">' +
     state.agents.map(renderRoomButton).join("") +
     '</nav><div class="nav-label security-nav-label">CONTROL</div><nav class="side-nav">' + navButton("security", "الأمان والخصوصية") + '</nav>' +
@@ -237,6 +240,22 @@ function render() {
     '<aside class="team-panel"><div class="team-panel-head"><div><div class="view-kicker">YOUR AI TEAM</div><h2>هيكل القيادة</h2></div><span class="team-count">08</span></div><div class="hierarchy-card"><div class="hierarchy-level owner-level"><span>1</span><div><strong>أنت · Owner</strong><small>القائد الأعلى وصاحب القرار النهائي</small></div><b>ROOT</b></div><div class="hierarchy-connector"></div><div class="hierarchy-level lead-level"><span>2</span><div><strong>Project Lead</strong><small>تنسيق الفريق وتوزيع المهام ورفع التوصيات</small></div><b>LEAD</b></div><div class="hierarchy-connector"></div><div class="hierarchy-note"><strong>3 · الوكلاء المتخصصون</strong><small>يشاركون عند الحاجة، يختلفون عند وجود سبب، ولا يتجاوزون صلاحياتهم.</small></div></div><div class="team-summary"><div class="summary-number">' + state.agents.filter((a) => a.status === "running").length + '<small>/ 8</small></div><div><strong>وكلاء نشطون</strong><span>حالة الاتصال الحالية</span></div></div><div class="team-list">' + state.agents.map(renderAgent).join("") + '</div><div class="team-footer"><div class="footer-line"><span></span></div><p>' + (dispatchReady ? "محرك تشغيل الفريق متصل" : "ربط محرك التشغيل لم يكتمل بعد") + '</p><button class="refresh-button" id="refresh-button" type="button">' + icon("refresh", 15) + ' تحديث الحالة</button></div></aside>' +
     '</div>';
   bindEvents();
+  if (state.view === "bounties") {
+    bindBountyHunter({ onAnalyze: (item) => {
+      state.view = "chat";
+      state.room = "main";
+      state.messages = [];
+      state.events = [];
+      state.latestRun = null;
+      render();
+      const input = $("#message-input");
+      if (input) {
+        input.value = "حلّل هذه الفرصة المرشحة فقط ولا تعتبرها ممولة أو قابلة للمطالبة قبل التحقق من المصدر والقواعد: " + item.title + "\\nالمستودع: " + (item.repository || "غير محدد") + "\\nالرابط: " + item.url + "\\nالمقتطف: " + (item.body || "لا يوجد") + "\\nالمطلوب: Project Lead ينسق مع محلل المشكلات ومهندس التنفيذ وضمان الجودة ومراجع الأمان. تحقق من أهلية الجزائر والعمر، وهل يسمح المصدر بمساهمة الوكلاء. لا تفتح PR ولا ترسل تقريراً ولا تتواصل مع الجهة. أعطني تقييم أهلية ومخاطر وخطة تنفيذ فقط.";
+        input.focus();
+      }
+      sendMessage();
+    } });
+  }
   const nextFeed = $("#chat-feed");
   if (nextFeed) {
     nextFeed.scrollTop = keepFeedAtBottom
