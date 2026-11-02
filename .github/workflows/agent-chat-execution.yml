@@ -28,7 +28,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  AGENT_CHAT_API_URL: https://hfokwvgrqbzzunkhflhq.supabase.co/functions/v1/agent-studio-callback
+  AGENT_CHAT_API_URL: https://paleenigjkmjwinkblfv.supabase.co/functions/v1/agent-studio-callback
   AGENT_CHAT_MODE: ${{ inputs.mode }}
   AGENT_CHAT_TARGET_AGENT: ${{ inputs.target_agent }}
 
