@@ -21,6 +21,7 @@ async function checkGitHubWorkflow(config) {
     const response = await fetch(url, {
       headers: {
         Authorization: "Bearer " + config.githubToken,
+        "User-Agent": "UTILORA-Agent-Studio/1.0",
         Accept: "application/vnd.github+json",
         "X-GitHub-Api-Version": "2022-11-28"
       },

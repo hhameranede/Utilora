@@ -14,6 +14,7 @@ async function githubApi(config, path, method = "GET", body) {
     method,
     headers: {
       Authorization: "Bearer " + config.githubToken,
+      "User-Agent": "UTILORA-Agent-Studio/1.0",
       Accept: "application/vnd.github+json",
       "X-GitHub-Api-Version": "2022-11-28",
       ...(body === undefined ? {} : { "Content-Type": "application/json" })
