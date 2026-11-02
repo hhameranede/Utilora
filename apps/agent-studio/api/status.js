@@ -9,68 +9,81 @@ const AGENTS = [
   "project-lead"
 ];
 
-export default async function handler(req, res) {
+const noStore = (res) => {
   res.setHeader("Cache-Control", "private, no-store, max-age=0");
   res.setHeader("Vary", "Cookie, Authorization");
+};
 
+function getConfig() {
+  return {
+    url: process.env.SUPABASE_URL?.replace(/\\/$/, ""),
+    key: process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY,
+    githubToken: process.env.UTILORA_GITHUB_TOKEN,
+    callbackUrl: process.env.AGENT_CHAT_CALLBACK_URL
+  };
+}
+
+async function db(config, path) {
+  const headers = { apikey: config.key, Accept: "application/json" };
+  if (!String(config.key).startsWith("sb_secret_")) {
+    headers.Authorization = "Bearer " + config.key;
+  }
+  const response = await fetch(config.url + "/rest/v1/" + path, { headers });
+  if (!response.ok) throw new Error("Database operation failed.");
+  return response.json();
+}
+
+export default async function handler(req, res) {
+  noStore(res);
   if (req.method !== "GET") {
     res.setHeader("Allow", "GET");
     return res.status(405).json({ error: "Method not allowed." });
   }
 
-  const supabaseUrl = process.env.SUPABASE_URL;
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  const githubToken = process.env.UTILORA_GITHUB_TOKEN;
-  const callbackUrl = process.env.AGENT_CHAT_CALLBACK_URL;
-
+  const config = getConfig();
   const integrations = {
-    database: Boolean(supabaseUrl && serviceKey),
-    dispatcher: Boolean(githubToken),
-    callback: Boolean(callbackUrl)
+    database: Boolean(config.url && config.key),
+    dispatcher: Boolean(config.githubToken),
+    callback: Boolean(config.callbackUrl)
   };
 
   let agents = AGENTS.map((agent_id) => ({
-    agent_id,
-    status: "unknown",
-    statusText: "بانتظار الربط",
-    progress: 0
+    agent_id, status: "unknown", status_text: "بانتظار الربط", progress: 0
   }));
+  let run = null;
+  let events = [];
 
   if (integrations.database) {
     try {
-      const base = supabaseUrl.replace(/\/$/, "");
-      const headers = {
-        apikey: serviceKey,
-        Authorization: "Bearer " + serviceKey
-      };
-      const runsResponse = await fetch(
-        base + "/rest/v1/team_chat_runs?select=id,status,created_at&order=created_at.desc&limit=1",
-        { headers }
+      const runs = await db(
+        config,
+        "team_chat_runs?select=id,status,stage,progress,created_at,started_at,finished_at,error&order=created_at.desc&limit=1"
       );
-      if (runsResponse.ok) {
-        const runs = await runsResponse.json();
-        if (runs[0]?.id) {
-          const agentResponse = await fetch(
-            base + "/rest/v1/team_chat_agent_runs?run_id=eq." + encodeURIComponent(runs[0].id) +
-              "&select=agent_id,status,status_text,progress",
-            { headers }
-          );
-          if (agentResponse.ok) {
-            const rows = await agentResponse.json();
-            agents = agents.map((agent) => {
-              const live = rows.find((row) => row.agent_id === agent.agent_id);
-              return live ? {
-                agent_id: live.agent_id,
-                status: live.status,
-                statusText: live.status_text,
-                progress: live.progress
-              } : agent;
-            });
-          }
-        }
+      run = runs[0] || null;
+      if (run?.id) {
+        const [rows, eventRows] = await Promise.all([
+          db(config, "team_chat_agent_runs?run_id=eq." + encodeURIComponent(run.id) +
+            "&select=agent_id,status,status_text,progress,response,error,started_at,finished_at"),
+          db(config, "team_chat_events?run_id=eq." + encodeURIComponent(run.id) +
+            "&select=id,agent_id,event_type,message,metadata,created_at&order=created_at.desc&limit=40")
+        ]);
+        agents = agents.map((agent) => {
+          const live = rows.find((row) => row.agent_id === agent.agent_id);
+          return live ? {
+            agent_id: live.agent_id,
+            status: live.status,
+            status_text: live.status_text,
+            progress: live.progress,
+            response: live.response || null,
+            error: live.error || null,
+            started_at: live.started_at || null,
+            finished_at: live.finished_at || null
+          } : agent;
+        });
+        events = Array.isArray(eventRows) ? eventRows : [];
       }
     } catch {
-      // Never expose connection strings, keys, or provider error details to the browser.
+      integrations.database = false;
     }
   }
 
@@ -78,6 +91,8 @@ export default async function handler(req, res) {
     private: true,
     auth: "vercel-protected",
     integrations,
+    run,
+    events,
     agents
   });
 }
