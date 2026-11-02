@@ -1,4 +1,4 @@
-import { getConfig, json, requireOwner } from "../_lib/server.js";
+import { json, requireOwner } from "../_lib/server.js";
 
 export async function onRequest(context) {
   if (context.request.method !== "GET") {
