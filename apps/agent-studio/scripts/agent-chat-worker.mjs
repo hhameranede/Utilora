@@ -258,7 +258,6 @@ async function main() {
   required(RUN_ID, "AGENT_CHAT_RUN_ID");
   required(AGENT_NAME, "AGENT_NAME");
   required(MODEL_ALIAS, "MODEL_ALIAS");
-  required(process.env.NVIDIA_API_KEY, "NVIDIA_API_KEY");
 
   await api("callback", {
     run_id: RUN_ID,
@@ -271,6 +270,9 @@ async function main() {
   });
 
   try {
+    // Report missing provider credentials through the authenticated callback
+    // instead of leaving the room stuck in a running state.
+    required(process.env.NVIDIA_API_KEY, "NVIDIA_API_KEY");
     const context = await api("read", { run_id: RUN_ID, agent_id: AGENT_NAME });
     const answer = await runOpenCode(buildPrompt(context));
     if (answer === "NO_PARTICIPATION") {
