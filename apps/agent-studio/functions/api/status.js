@@ -117,7 +117,7 @@ export async function onRequest(context) {
 
   return json({
     private: true,
-    auth: "cloudflare-access",
+    auth: "supabase-auth-session",
     identity: { email: access.identity.email },
     integrations,
     room: roomSlug,
