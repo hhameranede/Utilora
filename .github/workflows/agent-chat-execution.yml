@@ -18,7 +18,6 @@ concurrency:
 
 env:
   AGENT_CHAT_API_URL: https://hfokwvgrqbzzunkhflhq.supabase.co/functions/v1/agent-studio-callback
-  SUPABASE_PUBLISHABLE_KEY: sb_publishable_qBQGarHCRp_31m3eJefnZA_iBH3dABY
 
 jobs:
   specialists:
