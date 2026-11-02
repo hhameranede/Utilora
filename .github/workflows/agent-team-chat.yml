@@ -136,6 +136,24 @@ jobs:
           echo "OPENCODE_CONFIG_CONTENT=$OPENCODE_CONFIG_CONTENT" >> "$GITHUB_ENV"
           export OPENCODE_CONFIG_CONTENT
           opencode debug agent "$AGENT_NAME" > "$RUNNER_TEMP/agent-config.json"
+          python3 - <<'PY'
+          import json, os, pathlib, sys
+          config = json.loads(pathlib.Path(os.environ["RUNNER_TEMP"], "agent-config.json").read_text())
+          rules = config.get("permission")
+          if not isinstance(rules, list):
+              print("::error::Cannot verify effective OpenCode permissions.")
+              sys.exit(1)
+          denied = {item.get("permission") for item in rules if isinstance(item, dict) and item.get("action") == "deny"}
+          allowed = {item.get("permission") for item in rules if isinstance(item, dict) and item.get("action") == "allow"}
+          missing_deny = {"edit", "bash", "task", "todowrite", "webfetch", "websearch", "external_directory"} - denied
+          missing_allow = {"read", "glob", "grep", "list"} - allowed
+          if missing_deny or missing_allow:
+              print("::error::Read-only permission overlay failed verification.")
+              print("Missing denies: " + ",".join(sorted(missing_deny)))
+              print("Missing allows: " + ",".join(sorted(missing_allow)))
+              sys.exit(1)
+          print("Verified: specialist has repository read access and no write, shell, delegation or external-web permissions.")
+          PY
 
       - name: Ask specialist
         env:
@@ -300,6 +318,24 @@ jobs:
           echo "OPENCODE_CONFIG_CONTENT=$OPENCODE_CONFIG_CONTENT" >> "$GITHUB_ENV"
           export OPENCODE_CONFIG_CONTENT
           opencode debug agent project-lead > "$RUNNER_TEMP/project-lead-config.json"
+          python3 - <<'PY'
+          import json, os, pathlib, sys
+          config = json.loads(pathlib.Path(os.environ["RUNNER_TEMP"], "project-lead-config.json").read_text())
+          rules = config.get("permission")
+          if not isinstance(rules, list):
+              print("::error::Cannot verify effective Project Lead permissions.")
+              sys.exit(1)
+          denied = {item.get("permission") for item in rules if isinstance(item, dict) and item.get("action") == "deny"}
+          allowed = {item.get("permission") for item in rules if isinstance(item, dict) and item.get("action") == "allow"}
+          missing_deny = {"edit", "bash", "task", "todowrite", "webfetch", "websearch", "external_directory"} - denied
+          missing_allow = {"read", "glob", "grep", "list"} - allowed
+          if missing_deny or missing_allow:
+              print("::error::Read-only Project Lead overlay failed verification.")
+              print("Missing denies: " + ",".join(sorted(missing_deny)))
+              print("Missing allows: " + ",".join(sorted(missing_allow)))
+              sys.exit(1)
+          print("Verified: Project Lead synthesis is read-only and cannot delegate.")
+          PY
 
       - name: Synthesize the team discussion
         continue-on-error: true
