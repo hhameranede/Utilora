@@ -5,7 +5,7 @@ import { CATEGORIES_LIST } from '../registry/categories.registry';
 import { ToolCard } from '../components/common/ToolCard';
 import { Breadcrumbs } from '../components/common/Breadcrumbs';
 import { Head } from '../seo/Head';
-import { Search, Filter } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { matchesSearch } from '../utils/search';
 
 export const ToolsIndexPage: React.FC = () => {
@@ -29,7 +29,7 @@ export const ToolsIndexPage: React.FC = () => {
         isIndexable={true}
       />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 sm:space-y-8">
         <Breadcrumbs items={[{ label: t('nav.tools') }]} />
 
         <div>
@@ -42,16 +42,16 @@ export const ToolsIndexPage: React.FC = () => {
         </div>
 
         {/* Filter Controls Bar */}
-        <div className="p-4 rounded-2xl bg-white border border-stone-200/90 shadow-xs flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="p-3 sm:p-4 rounded-2xl bg-white border border-stone-200/90 shadow-xs flex flex-col md:flex-row items-center justify-between gap-3 sm:gap-4">
           {/* Category Filter Tabs */}
-          <div className="flex items-center gap-1.5 overflow-x-auto w-full md:w-auto p-1 bg-stone-100 rounded-xl">
+          <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto p-1.5 bg-stone-50 border border-stone-200 rounded-2xl [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             <button
               onClick={() => setSelectedCategory('all')}
               aria-pressed={selectedCategory === 'all'}
-              className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors shrink-0 ${
+              className={`px-3.5 py-2 text-xs font-semibold rounded-xl border transition-all shrink-0 whitespace-nowrap ${
                 selectedCategory === 'all'
-                  ? 'bg-orange-700 text-white font-semibold shadow-xs'
-                  : 'text-stone-600 hover:text-stone-900'
+                  ? 'border-orange-700 bg-orange-700 text-white shadow-sm'
+                  : 'border-stone-200 bg-white text-stone-700 shadow-xs hover:border-orange-300 hover:bg-orange-50 hover:text-orange-800'
               }`}
             >
               {t('common.all')} (36)
@@ -80,12 +80,12 @@ export const ToolsIndexPage: React.FC = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={t('tools.searchPlaceholder')}
-              className="w-full ps-9 pe-3 py-2 rounded-xl bg-white border border-stone-200 text-xs text-stone-900 placeholder-stone-500 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 shadow-xs transition-all"
+              className="w-full ps-9 pe-3 py-2.5 rounded-xl bg-white border border-stone-200 text-sm text-stone-900 placeholder-stone-500 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 shadow-xs transition-all"
             />
           </div>
         </div>
 
-        <p className="-mt-6 text-xs text-stone-500">{t('tools.scrollHint')}</p>
+        <p className="-mt-3 text-[11px] text-stone-400 md:hidden">{t('tools.scrollHint')}</p>
 
         {/* Tool Cards Grid */}
         {filteredTools.length === 0 ? (
@@ -93,7 +93,7 @@ export const ToolsIndexPage: React.FC = () => {
             {t('common.noResults')}
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {filteredTools.map((tool) => (
               <ToolCard key={tool.id} tool={tool} />
             ))}
