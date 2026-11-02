@@ -72,7 +72,7 @@ test('PDF file reorder and remove controls meet a 40px touch target and have acc
 
 test('technical guides contain topic-specific copy instead of repeated generic compression text', async ({ page }) => {
   const articles = [
-    { slug: 'png-vs-webp-compression-performance', terms: ['lossless', 'transparency', 'quality settings'] },
+    { slug: 'png-vs-webp-compression-performance', terms: ['lossless', 'transparency', 'quality setting'] },
     { slug: 'understanding-pdf-linearization-and-page-trees', terms: ['page tree', 'linearized PDF', 'cross-reference'] },
     { slug: 'rfc-8259-json-strict-parsing-and-validation', terms: ['RFC 8259', 'safe-integer', 'schema validation'] },
     { slug: 'dns-records-propagation-doh-inspection', terms: ['DNS', 'TTL', 'DNS over HTTPS'] },
