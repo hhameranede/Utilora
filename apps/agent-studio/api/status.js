@@ -15,6 +15,27 @@ const REQUIRED_ROOMS = [
   "agent-project-lead"
 ];
 
+function getServerKeyIssue(config) {
+  const key = String(config.key || "");
+  if (!key) return "مفتاح Supabase الخادمي غير مضبوط في Vercel.";
+  if (key.startsWith("sb_secret_")) return "";
+  if (key.startsWith("sb_publishable_")) {
+    return "مفتاح Supabase في Vercel من نوع Publishable وليس Secret. استبدل SUPABASE_SECRET_KEY بمفتاح Secret يبدأ بـ sb_secret_ ثم أعد النشر.";
+  }
+  const parts = key.split(".");
+  if (parts.length === 3 && parts[1]) {
+    try {
+      const payload = JSON.parse(Buffer.from(parts[1], "base64url").toString("utf8"));
+      const expectedRef = config.url ? new URL(config.url).hostname.split(".")[0] : "";
+      if (payload.role === "service_role" && (!payload.ref || payload.ref === expectedRef)) return "";
+      if (payload.role === "anon") return "مفتاح Supabase مضبوط كـ anon وليس service_role. استخدم مفتاح الخادم في Vercel.";
+    } catch {
+      // Invalid legacy key; fail closed.
+    }
+  }
+  return "قيمة SUPABASE_SECRET_KEY ليست مفتاح Supabase خادمياً صالحاً.";
+}
+
 function getConfig() {
   return {
     url: process.env.SUPABASE_URL?.replace(/\/$/, ""),
@@ -133,7 +154,8 @@ export default async function handler(req, res) {
   if (!roomSlug) return res.status(404).json({ error: "غرفة المحادثة غير موجودة." });
 
   const integrations = {
-    database: Boolean(config.url && config.key),
+    database: Boolean(config.url && !getServerKeyIssue(config)),
+    databaseError: getServerKeyIssue(config) || null,
     dispatcher: Boolean(config.githubToken),
     callback: Boolean(config.callbackUrl),
     checked: false
