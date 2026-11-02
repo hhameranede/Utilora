@@ -3,22 +3,87 @@ const AGENT_IDS = new Set([
   "visual-reviewer", "long-horizon-engineer", "qa-engineer",
   "security-auditor", "project-lead"
 ]);
+const REQUIRED_ROOMS = [
+  "main",
+  "agent-problem-analyst",
+  "agent-implementation-engineer",
+  "agent-fast-task-engineer",
+  "agent-visual-reviewer",
+  "agent-long-horizon-engineer",
+  "agent-qa-engineer",
+  "agent-security-auditor",
+  "agent-project-lead"
+];
 
 function getConfig() {
   return {
     url: process.env.SUPABASE_URL?.replace(/\/$/, ""),
     key: process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY,
     githubToken: process.env.UTILORA_GITHUB_TOKEN,
-    callbackUrl: process.env.AGENT_CHAT_CALLBACK_URL
+    repository: process.env.UTILORA_GITHUB_REPOSITORY || "hhameranede/Utilora",
+    workflow: process.env.UTILORA_AGENT_WORKFLOW_FILE || "agent-chat-execution.yml",
+    callbackUrl: process.env.AGENT_CHAT_CALLBACK_URL,
+    siteUrl: process.env.SITE_URL || "https://utilora-chat.vercel.app"
   };
 }
 
 async function db(config, path) {
   const headers = { apikey: config.key, Accept: "application/json" };
   if (!String(config.key).startsWith("sb_secret_")) headers.Authorization = "Bearer " + config.key;
-  const response = await fetch(config.url + "/rest/v1/" + path, { headers });
+  const response = await fetch(config.url + "/rest/v1/" + path, {
+    headers,
+    signal: AbortSignal.timeout(6000)
+  });
   if (!response.ok) throw new Error("Database operation failed.");
   return response.json();
+}
+
+async function checkDatabase(config) {
+  if (!config.url || !config.key) return false;
+  const rows = await db(config, "team_chat_rooms?select=slug");
+  const available = new Set((Array.isArray(rows) ? rows : []).map((row) => row.slug));
+  return REQUIRED_ROOMS.every((slug) => available.has(slug));
+}
+
+async function checkGitHubWorkflow(config) {
+  if (!config.githubToken) return false;
+  const workflowPath = ".github/workflows/" + config.workflow;
+  const url = "https://api.github.com/repos/" + config.repository +
+    "/actions/workflows/" + encodeURIComponent(config.workflow);
+  try {
+    const response = await fetch(url, {
+      headers: {
+        Authorization: "Bearer " + config.githubToken,
+        Accept: "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28"
+      },
+      signal: AbortSignal.timeout(6000)
+    });
+    if (!response.ok) return false;
+    const workflow = await response.json();
+    return workflow.state === "active" && workflow.path === workflowPath;
+  } catch {
+    return false;
+  }
+}
+
+async function checkCallback(config) {
+  if (!config.callbackUrl) return false;
+  try {
+    const origin = new URL(config.siteUrl).origin;
+    const response = await fetch(config.callbackUrl, {
+      method: "OPTIONS",
+      headers: {
+        Origin: origin,
+        "Access-Control-Request-Method": "POST",
+        "Access-Control-Request-Headers": "authorization,content-type"
+      },
+      signal: AbortSignal.timeout(6000)
+    });
+    return response.ok && response.headers.get("access-control-allow-origin") === origin;
+  } catch {
+    return false;
+  }
 }
 
 function parseRoom(value) {
@@ -37,13 +102,29 @@ export default async function handler(req, res) {
   }
 
   const config = getConfig();
+  const roomSlug = parseRoom(req.query?.room);
+  if (!roomSlug) return res.status(404).json({ error: "غرفة المحادثة غير موجودة." });
+
   const integrations = {
     database: Boolean(config.url && config.key),
     dispatcher: Boolean(config.githubToken),
-    callback: Boolean(config.callbackUrl)
+    callback: Boolean(config.callbackUrl),
+    checked: false
   };
-  const roomSlug = parseRoom(req.query?.room);
-  if (!roomSlug) return res.status(404).json({ error: "غرفة المحادثة غير موجودة." });
+
+  // Do the slower, external integration checks on page load or manual refresh,
+  // not on every seven-second progress poll.
+  if (req.query?.health === "1") {
+    const [database, dispatcher, callback] = await Promise.all([
+      checkDatabase(config).catch(() => false),
+      checkGitHubWorkflow(config),
+      checkCallback(config)
+    ]);
+    integrations.database = database;
+    integrations.dispatcher = dispatcher;
+    integrations.callback = callback;
+    integrations.checked = true;
+  }
 
   let agents = [];
   let run = null;
@@ -51,24 +132,26 @@ export default async function handler(req, res) {
   if (integrations.database) {
     try {
       const rooms = await db(config, "team_chat_rooms?slug=eq." + encodeURIComponent(roomSlug) + "&select=id,slug,title&limit=1");
-      if (rooms[0]) {
-        const runs = await db(config, "team_chat_runs?room_id=eq." + encodeURIComponent(rooms[0].id) +
-          "&select=id,status,stage,progress,created_at,started_at,finished_at,error&order=created_at.desc&limit=1");
-        run = runs[0] || null;
-        if (run?.id) {
-          const runId = encodeURIComponent(run.id);
-          const [rows, eventRows] = await Promise.all([
-            db(config, "team_chat_agent_runs?run_id=eq." + runId +
-              "&select=agent_id,status,status_text,progress,response,error,started_at,finished_at"),
-            db(config, "team_chat_events?run_id=eq." + runId +
-              "&select=id,agent_id,event_type,message,metadata,created_at&order=created_at.desc&limit=40")
-          ]);
-          agents = Array.isArray(rows) ? rows : [];
-          events = Array.isArray(eventRows) ? eventRows : [];
-        }
+      if (!rooms[0]) throw new Error("Chat room is missing.");
+      const runs = await db(config, "team_chat_runs?room_id=eq." + encodeURIComponent(rooms[0].id) +
+        "&select=id,status,stage,progress,created_at,started_at,finished_at,error&order=created_at.desc&limit=1");
+      run = runs[0] || null;
+      if (run?.id) {
+        const runId = encodeURIComponent(run.id);
+        const [rows, eventRows] = await Promise.all([
+          db(config, "team_chat_agent_runs?run_id=eq." + runId +
+            "&select=agent_id,status,status_text,progress,response,error,started_at,finished_at"),
+          db(config, "team_chat_events?run_id=eq." + runId +
+            "&select=id,agent_id,event_type,message,metadata,created_at&order=created_at.desc&limit=40")
+        ]);
+        agents = Array.isArray(rows) ? rows : [];
+        events = Array.isArray(eventRows) ? eventRows : [];
       }
     } catch {
       integrations.database = false;
+      run = null;
+      agents = [];
+      events = [];
     }
   }
 
