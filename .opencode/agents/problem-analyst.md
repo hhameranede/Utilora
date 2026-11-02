@@ -1,6 +1,6 @@
 ---
 description: Investigates complex problems, reviews proposed solutions, and gives evidence-based cross-domain recommendations.
-mode: all
+mode: subagent
 model: nvidia/deepseek-ai/deepseek-v4.1-flash
 permission:
   edit: deny
