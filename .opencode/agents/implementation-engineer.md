@@ -1,7 +1,7 @@
 ---
 description: Implements focused, reviewable UTILORA code changes and repairs.
-mode: subagent
-model: nvidia-nim/minimax-m3-1-flash
+mode: all
+model: nvidia/minimaxai/minimax-m3.1-flash
 permission:
   edit: allow
   bash:
