@@ -4,7 +4,7 @@ import {
 
 function safeGitHubMessage(value) {
   return String(value || "GitHub returned no error message.")
-    .replace(/Bearer\s+[A-Za-z0-9._~+\\/-]+=*/gi, "Bearer [redacted]")
+    .replace(/Bearer\s+\S+/gi, "Bearer [redacted]")
     .replace(/gh[pousr]_[A-Za-z0-9]{20,}/gi, "[redacted GitHub token]")
     .replace(/github_pat_[A-Za-z0-9_]{20,}/gi, "[redacted GitHub token]")
     .replace(/[\r\n]+/g, " ")
