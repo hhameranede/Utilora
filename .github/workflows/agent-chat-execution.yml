@@ -44,19 +44,19 @@ jobs:
       matrix:
         include:
           - agent: problem-analyst
-            model: nvidia/deepseek-ai/deepseek-v4.1-flash
+            model: nvidia-nim/deepseek-v4-1-flash
           - agent: implementation-engineer
-            model: nvidia/minimaxai/minimax-m3.1-flash
+            model: nvidia-nim/minimax-m3-1-flash
           - agent: fast-task-engineer
-            model: nvidia/z-ai/glm-5.3-flash
+            model: nvidia-nim/glm-5-3-flash
           - agent: visual-reviewer
-            model: nvidia/nvidia/nemotron-3.5-super-vl-120b-a12b
+            model: nvidia-nim/nemotron-super-vl
           - agent: long-horizon-engineer
-            model: nvidia/poolside/laguna-xs-2.1
+            model: nvidia-nim/laguna-xs-2-1
           - agent: qa-engineer
-            model: nvidia/deepseek-ai/deepseek-v4.1-flash
+            model: nvidia-nim/deepseek-v4-1-flash
           - agent: security-auditor
-            model: nvidia/nvidia/nemotron-3-ultra-550b-a55b
+            model: nvidia-nim/nemotron-ultra
     env:
       NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
       AGENT_CHAT_RUN_ID: ${{ inputs.run_id }}
@@ -92,7 +92,7 @@ jobs:
       NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
       AGENT_CHAT_RUN_ID: ${{ inputs.run_id }}
       AGENT_NAME: project-lead
-      MODEL_ALIAS: nvidia/nvidia/nemotron-3-ultra-550b-a55b
+      MODEL_ALIAS: nvidia-nim/nemotron-ultra
     steps:
       - name: Check out UTILORA
         uses: actions/checkout@v4
