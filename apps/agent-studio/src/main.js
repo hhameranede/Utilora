@@ -245,6 +245,9 @@ async function loadStatus(options = {}) {
     const data = await response.json();
     const integrations = data.integrations || {};
     state.backend.database = Boolean(integrations.database);
+    if (integrations.checked && integrations.databaseError) {
+      state.error = String(integrations.databaseError);
+    }
     if (integrations.checked) {
       state.backend.dispatcher = Boolean(integrations.dispatcher);
       state.backend.callback = Boolean(integrations.callback);
@@ -267,7 +270,7 @@ async function loadStatus(options = {}) {
         });
       }
     }
-    state.error = "";
+    if (!integrations.databaseError) state.error = "";
     if (state.backend.database) await loadHistory();
   } catch (error) {
     if (!silent) state.error = error.message || "تعذّر الاتصال بالخادم.";
