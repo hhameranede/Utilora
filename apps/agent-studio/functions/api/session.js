@@ -6,6 +6,5 @@ export async function onRequest(context) {
   }
   const access = await requireOwner(context);
   if (access.response) return access.response;
-  const config = getConfig(context.env);
   return json({ authenticated: true, email: access.identity.email });
 }
