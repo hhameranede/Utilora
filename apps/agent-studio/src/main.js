@@ -45,16 +45,19 @@ function icon(name, size = 18) {
 }
 
 function agentStatus(agent) {
-  if (agent.status === "running") return '<span class="status-dot running"></span> يعمل الآن';
-  if (agent.status === "completed") return '<span class="status-dot completed"></span> أكمل المهمة';
-  if (agent.status === "failed") return '<span class="status-dot failed"></span> تعذّر التشغيل';
-  return '<span class="status-dot idle"></span> بانتظار المهمة';
+  const fallback = agent.status === "running" ? "يعمل الآن" :
+    agent.status === "completed" ? "اكتملت المهمة" :
+    agent.status === "failed" ? "تعذّر التشغيل" : "بانتظار المهمة";
+  const status = agent.status === "running" ? "running" :
+    agent.status === "completed" ? "completed" :
+    agent.status === "failed" ? "failed" : "idle";
+  return '<span class="status-dot ' + status + '"></span> ' + escapeHtml(agent.statusText || fallback);
 }
 
 function renderAgent(agent) {
   return '<div class="agent-row">' +
     '<div class="agent-avatar ' + agent.tone + '">' + escapeHtml(agent.initials) + '</div>' +
-    '<div class="agent-meta"><div class="agent-name">' + escapeHtml(agent.name) + '</div><div class="agent-role">' + escapeHtml(agent.role) + '</div><div class="agent-state">' + agentStatus(agent) + '</div></div>' +
+    '<div class="agent-meta"><div class="agent-name">' + escapeHtml(agent.name) + '</div><div class="agent-role">' + escapeHtml(agent.role) + '</div><div class="agent-state">' + agentStatus(agent) + '</div><div class="agent-progress"><i style="width:' + Math.max(0, Math.min(100, Number(agent.progress) || 0)) + '%"></i></div></div>' +
     '<button class="agent-more" type="button" aria-label="تفاصيل ' + escapeHtml(agent.name) + '" data-agent="' + agent.id + '">' + icon("dots", 17) + '</button>' +
     '</div>';
 }
@@ -114,7 +117,7 @@ function render() {
     '<main class="main-panel"><header class="topbar"><div class="topbar-title"><div class="mobile-mark">U</div><div><div class="breadcrumb">UTILORA <span>/</span> ' + escapeHtml(activeLabel) + '</div><h1>' + escapeHtml(activeLabel) + '</h1></div></div><div class="topbar-actions"><div class="connection-pill ' + (dbReady ? "is-online" : "is-pending") + '"><span></span>' + (dbReady ? "قاعدة البيانات متصلة" : "بانتظار ربط الخادم") + '</div><div class="avatar-small">A</div></div></header>' +
     '<div class="main-content">' +
     (state.error ? '<div class="alert-banner" role="alert">' + escapeHtml(state.error) + '<button type="button" id="dismiss-error" aria-label="إغلاق">×</button></div>' : "") +
-    (state.view === "chat" ? '<div class="room-banner"><div class="room-banner-icon">' + icon("lock", 18) + '</div><div><strong>غرفة UTILORA الخاصة</strong><span>هذه المساحة متاحة لمالك المشروع فقط. الوكلاء يتصلون عبر قنوات خلفية موثوقة.</span></div><div class="room-banner-status"><span></span> خاصة</div></div>' : "") +
+    (state.view === "chat" ? '<div class="room-banner"><div class="room-banner-icon">' + icon("lock", 18) + '</div><div class="room-banner-copy"><strong>غرفة UTILORA الخاصة</strong><span>' + escapeHtml(state.latestRun?.stage || "جاهزون لاستقبال المهمة") + '</span><div class="room-progress"><i style="width:' + Math.max(0, Math.min(100, Number(state.latestRun?.progress) || 0)) + '%"></i></div></div><div class="room-banner-status"><span></span>' + (state.latestRun?.status === "running" ? "قيد التنفيذ" : state.latestRun?.status === "completed" ? "مكتملة" : state.latestRun?.status === "failed" ? "تحتاج مراجعة" : "خاصة") + '</div></div>' : "") +
     viewContent() +
     '</div></main>' +
     '<aside class="team-panel"><div class="team-panel-head"><div><div class="view-kicker">YOUR AI TEAM</div><h2>فريق العمل</h2></div><span class="team-count">08</span></div><div class="team-summary"><div class="summary-number">' + state.agents.filter((a) => a.status === "running").length + '<small>/ 8</small></div><div><strong>وكلاء نشطون</strong><span>حالة الاتصال الحالية</span></div></div><div class="team-list">' + state.agents.map(renderAgent).join("") + '</div><div class="team-footer"><div class="footer-line"><span></span></div><p>' + (dispatchReady ? "محرك تشغيل الفريق متصل" : "ربط محرك التشغيل لم يكتمل بعد") + '</p><button class="refresh-button" id="refresh-button" type="button">' + icon("refresh", 15) + ' تحديث الحالة</button></div></aside>' +
