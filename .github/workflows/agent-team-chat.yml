@@ -9,7 +9,7 @@ permissions:
   issues: write
 
 concurrency:
-  group: utilora-agent-chat-issue-\${{ github.event.issue.number }}
+  group: utilora-agent-chat-issue-${{ github.event.issue.number }}
   cancel-in-progress: false
 
 jobs:
@@ -18,7 +18,7 @@ jobs:
       github.event.issue.pull_request == null &&
       github.event.comment.user.login == github.repository_owner &&
       startsWith(github.event.comment.body, '/team ')
-    name: "\${{ matrix.agent }}"
+    name: "${{ matrix.agent }}"
     runs-on: ubuntu-latest
     timeout-minutes: 11
     strategy:
@@ -61,10 +61,10 @@ jobs:
       - name: Load recent chat context in a token-isolated step
         uses: actions/github-script@v7
         env:
-          ISSUE_NUMBER: \${{ github.event.issue.number }}
-          CURRENT_COMMENT_ID: \${{ github.event.comment.id }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          CURRENT_COMMENT_ID: ${{ github.event.comment.id }}
         with:
-          github-token: \${{ github.token }}
+          github-token: ${{ github.token }}
           script: |
             const fs = require("fs");
             const issue_number = Number(process.env.ISSUE_NUMBER);
@@ -89,8 +89,8 @@ jobs:
 
       - name: Prepare request and role-specific safety policy
         env:
-          TEAM_COMMENT: \${{ github.event.comment.body }}
-          AGENT_NAME: \${{ matrix.agent }}
+          TEAM_COMMENT: ${{ github.event.comment.body }}
+          AGENT_NAME: ${{ matrix.agent }}
         run: |
           set -euo pipefail
           mkdir -p .agent-chat
@@ -139,9 +139,9 @@ jobs:
 
       - name: Ask specialist
         env:
-          NVIDIA_API_KEY: \${{ secrets.NVIDIA_API_KEY }}
-          AGENT_NAME: \${{ matrix.agent }}
-          MODEL: \${{ matrix.model }}
+          NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+          AGENT_NAME: ${{ matrix.agent }}
+          MODEL: ${{ matrix.model }}
         run: |
           set -euo pipefail
           set +x
@@ -196,7 +196,7 @@ jobs:
           secret = os.environ.get("NVIDIA_API_KEY", "")
           combined = raw + "\n" + debug + "\n" + export_text + "\n" + answer
           if (secret and secret in combined) or re.search(r"(?i)nvapi-[A-Za-z0-9_-]{12,}|gh[pousr]_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}", combined):
-              pathlib.Path(temp, "agent-answer.md").write_text(
+              pathlib.Path(temp, os.environ["AGENT_NAME"] + ".md").write_text(
                   "The specialist response was suppressed because credential-like output was detected.\n",
                   encoding="utf-8"
               )
@@ -207,7 +207,7 @@ jobs:
               f"OpenCode exit={os.environ.get('OPENCODE_EXIT_CODE')}; "
               f"session export={export_status}; finish={finish}."
           )
-          pathlib.Path(temp, "agent-answer.md").write_text(report + "\n", encoding="utf-8")
+          pathlib.Path(temp, os.environ["AGENT_NAME"] + ".md").write_text(report + "\n", encoding="utf-8")
           print(f"Captured {os.environ['AGENT_NAME']} response; finish={finish}; export={export_status}.")
           if int(os.environ.get("OPENCODE_EXIT_CODE", "1")) != 0 or finish != "stop" or not answer.strip():
               sys.exit(1)
@@ -217,8 +217,8 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: utilora-agent-chat-\${{ matrix.agent }}
-          path: \${{ runner.temp }}/agent-answer.md
+          name: utilora-agent-chat-${{ matrix.agent }}
+          path: ${{ runner.temp }}/${{ matrix.agent }}.md
           if-no-files-found: ignore
           retention-days: 3
 
@@ -304,7 +304,7 @@ jobs:
       - name: Synthesize the team discussion
         continue-on-error: true
         env:
-          NVIDIA_API_KEY: \${{ secrets.NVIDIA_API_KEY }}
+          NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
         run: |
           set -euo pipefail
           set +x
@@ -361,7 +361,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: utilora-agent-chat-final-answer
-          path: \${{ runner.temp }}/team-answer.md
+          path: ${{ runner.temp }}/team-answer.md
           if-no-files-found: ignore
           retention-days: 3
 
@@ -369,10 +369,10 @@ jobs:
         if: always()
         uses: actions/github-script@v7
         env:
-          ISSUE_NUMBER: \${{ github.event.issue.number }}
-          TEAM_RUN_URL: \${{ github.server_url }}/\${{ github.repository }}/actions/runs/\${{ github.run_id }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          TEAM_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         with:
-          github-token: \${{ github.token }}
+          github-token: ${{ github.token }}
           script: |
             const fs = require("fs");
             const path = process.env.RUNNER_TEMP + "/team-answer.md";
