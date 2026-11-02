@@ -37,6 +37,7 @@ function normalizeChatText(value) {
     .toLocaleLowerCase()
     .replace(/[\u064B-\u065F\u0670\u0640]/g, "")
     .replace(/[أإآ]/g, "ا")
+    .replace(/ة/g, "ه")
     .replace(/[.,!?؟،؛:]+/g, " ")
     .replace(/\s+/g, " ")
     .trim();
@@ -84,7 +85,7 @@ function selectGroupAgents(content) {
     /خطه|تخطيط|استراتيجي|خارطه|اولويات|مستقبل|توسع|roadmap|strategy|long term|priorities|planning/
   ]);
   const implementation = matches([
-    /برمج|كود|ملف|اصلح|صلح|عدل|نفذ|انشئ|ابن|طور|دمج|انشر|deploy|implement|build|code|github|cloudflare|supabase|worker|api|sql|function|component|fix|change|update|create/
+    /برمج|كود|ملف|اصلاح|اصلح|صلح|تعديل|عدل|تنفيذ|نفذ|انشاء|انشئ|بناء|ابن|تطوير|طور|دمج|انشر|deploy|implement|build|code|github|cloudflare|supabase|worker|api|sql|function|component|fix|change|update|create/
   ]);
 
   if (security) {
