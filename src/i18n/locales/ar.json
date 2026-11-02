@@ -356,6 +356,7 @@
     "resolution": "الدقة",
     "imageType": "نوع الصورة",
     "memoryLimit": "حتى 40 صفحة PDF في كل تحويل لحماية ذاكرة الجهاز.",
-    "rotated": "تم تدويرها"
+    "rotated": "تم تدويرها",
+    "allKeyword": "الكل"
   }
 }
