@@ -32,7 +32,7 @@ export const SiteHeader: React.FC = () => {
             <nav className="hidden md:flex items-center gap-6 text-xs font-medium text-stone-600">
               <Link
                 routeType="tools-index"
-                className={`transition-colors hover:text-orange-700 ${
+                className={`inline-flex min-h-10 items-center py-2 transition-colors hover:text-orange-700 ${
                   route.type === 'tools-index' || route.type === 'tool' || route.type === 'tool-guide' ? 'text-orange-700 font-semibold' : ''
                 }`}
               >
@@ -53,7 +53,7 @@ export const SiteHeader: React.FC = () => {
                   aria-haspopup="true"
                   aria-expanded={isCategoryMenuOpen}
                   aria-controls="utilora-category-menu"
-                  className={`flex items-center gap-1 transition-colors hover:text-orange-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-700 focus-visible:ring-offset-4 rounded-md ${route.type === 'categories-index' || route.type === 'category' ? 'text-orange-700 font-semibold' : ''}`}
+                  className={`inline-flex min-h-10 items-center gap-1 px-1 py-2 transition-colors hover:text-orange-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-700 focus-visible:ring-offset-4 rounded-md ${route.type === 'categories-index' || route.type === 'category' ? 'text-orange-700 font-semibold' : ''}`}
                 >
                   <span>{t('nav.categories')}</span>
                   <ChevronDown size={12} aria-hidden="true" className={`transition-transform text-stone-500 ${isCategoryMenuOpen ? 'rotate-180 text-orange-700' : ''}`} />
@@ -78,7 +78,7 @@ export const SiteHeader: React.FC = () => {
 
               <Link
                 routeType="articles-index"
-                className={`transition-colors hover:text-orange-700 ${
+                className={`inline-flex min-h-10 items-center py-2 transition-colors hover:text-orange-700 ${
                   route.type.startsWith('article') ? 'text-orange-700 font-semibold' : ''
                 }`}
               >
@@ -87,7 +87,7 @@ export const SiteHeader: React.FC = () => {
 
               <Link
                 routeType="about"
-                className={`transition-colors hover:text-orange-700 ${
+                className={`inline-flex min-h-10 items-center py-2 transition-colors hover:text-orange-700 ${
                   route.type === 'about' ? 'text-orange-700 font-semibold' : ''
                 }`}
               >
