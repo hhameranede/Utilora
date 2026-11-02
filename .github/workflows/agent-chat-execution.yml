@@ -44,7 +44,7 @@ env:
 
 jobs:
   specialists:
-    if: ${{ inputs.dispatch_probe != 'true' && ((inputs.mode == 'private' && matrix.agent == inputs.target_agent) || (inputs.mode == 'group' && contains(format(',{0},', inputs.target_agents), format(',{0},', matrix.agent)))) }}
+    if: ${{ inputs.dispatch_probe != 'true' }}
     name: ${{ matrix.agent }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -74,26 +74,26 @@ jobs:
       MODEL_ALIAS: ${{ matrix.model }}
     steps:
       - name: Check out UTILORA
-        if: ${{ inputs.mode == 'group' || matrix.agent == inputs.target_agent }}
+        if: ${{ (inputs.mode == 'private' && matrix.agent == inputs.target_agent) || (inputs.mode == 'group' && contains(format(',{0},', inputs.target_agents), format(',{0},', matrix.agent)) ) }}
         uses: actions/checkout@v4
         with:
           persist-credentials: false
 
       - name: Set up Node.js 22
-        if: ${{ inputs.mode == 'group' || matrix.agent == inputs.target_agent }}
+        if: ${{ (inputs.mode == 'private' && matrix.agent == inputs.target_agent) || (inputs.mode == 'group' && contains(format(',{0},', inputs.target_agents), format(',{0},', matrix.agent)) ) }}
         uses: actions/setup-node@v4
         with:
           node-version: 22
 
       - name: Install OpenCode
-        if: ${{ inputs.mode == 'group' || matrix.agent == inputs.target_agent }}
+        if: ${{ (inputs.mode == 'private' && matrix.agent == inputs.target_agent) || (inputs.mode == 'group' && contains(format(',{0},', inputs.target_agents), format(',{0},', matrix.agent)) ) }}
         run: |
           set -euo pipefail
           npm install --global opencode-ai@1.19.5
           opencode --version
 
       - name: Run specialist in read-only mode
-        if: ${{ inputs.mode == 'group' || matrix.agent == inputs.target_agent }}
+        if: ${{ (inputs.mode == 'private' && matrix.agent == inputs.target_agent) || (inputs.mode == 'group' && contains(format(',{0},', inputs.target_agents), format(',{0},', matrix.agent)) ) }}
         run: node apps/agent-studio/scripts/agent-chat-worker.mjs
 
   project-lead:
