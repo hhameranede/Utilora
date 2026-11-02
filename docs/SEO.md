@@ -20,10 +20,10 @@ Sample article preview pages are marked `noindex, nofollow` by their page metada
 
 The sitemap is generated from `src/seo/sitemap.ts` by `scripts/generate-seo-files.ts` and runs before the Vite production build.
 
-Set `SITE_URL` to the verified production origin:
+Set `SITE_URL` to the verified canonical production origin:
 
 ```bash
-SITE_URL=https://your-real-domain.example npm run build
+SITE_URL=https://utilora.l.cd npm run build
 ```
 
 The value must be an origin only: HTTP(S) scheme and hostname, without a path, query, fragment, username, or password. The script generates:
@@ -38,10 +38,10 @@ When `SITE_URL` is omitted, the build does not guess a domain: stale sitemap out
 - Page title and description.
 - Canonical URL and hreflang alternate links.
 - Open Graph and Twitter metadata.
-- Robots directives for indexable and preview pages.
+- Robots directives for preview and unfinished pages.
 - JSON-LD structured data.
 
-The document `lang` is updated for each locale, and Arabic routes set `dir="rtl"`. Canonical URLs and JSON-LD use the active browser origin; they do not assume a hard-coded production domain.
+The document `lang` is updated for each locale, and Arabic routes set `dir="rtl"`. Canonical, hreflang, Open Graph, and JSON-LD URLs all use the build-time `SITE_URL` origin so that the `pages.dev` service hostname and the verified custom domain do not produce competing canonical URLs. Local development falls back to the current browser origin when `SITE_URL` is not configured.
 
 ## Static route HTML and Cloudflare Pages
 
@@ -49,20 +49,10 @@ The production build runs `scripts/prerender-routes.tsx` after Vite and renders 
 
 Each route is emitted as `dist/<route>.html`. Cloudflare Pages maps an extensionless request such as `/en/tools` to `dist/en/tools.html`. Do not emit both `dist/en/tools.html` and `dist/en/tools/index.html`: Pages maps those to different extensionless and trailing-slash URLs, which would expose duplicate copies while the canonical tag points to only one. The build creates a top-level `dist/404.html`; Cloudflare Pages uses that file for unmatched requests and does not apply its automatic SPA fallback when a top-level 404 page exists.
 
-For a Cloudflare Pages deployment, use `npm run build` as the build command, `dist` as the output directory, and set `SITE_URL` to the verified production origin in the production build environment. The root `/` remains the Vite root document; SEO-critical localized routes are prerendered.
+For a Cloudflare Pages deployment, use `npm run build` as the build command, `dist` as the output directory, and set `SITE_URL=https://utilora.l.cd` for the production build environment. The project hostname `https://utilora-cn6.pages.dev` remains a Cloudflare service alias and must not be used as the production canonical origin. Cloudflare preview deployments add `X-Robots-Tag: noindex`; their metadata should still reference the production canonical origin.
 
-**Live deployment verification remains pending:** CI output validation is not proof that deployed route status, canonical redirects, or production HTML are correct. Verify these paths in a normal browser before enabling production deployments or attaching a custom domain.
+## Cloudflare Pages custom domain
 
-## Cloudflare Pages preview environment
+The verified custom domain for the existing `utilora` Pages project is `https://utilora.l.cd`. It is attached to the same project as `utilora-cn6.pages.dev`; no separate hosting project or DNS migration is required. Before the next production build, update the Pages `SITE_URL` environment variable from `https://utilora-cn6.pages.dev` to `https://utilora.l.cd` so the generated sitemap, robots directive, prerendered HTML, social cards, and runtime metadata all use the canonical domain.
 
-The repository is connected to the Cloudflare Pages project `utilora`.
-- Build command: `npm run build`
-- Output directory: `dist`
-- Node.js build version: `22`
-- Project hostname: `https://utilora-cn6.pages.dev`
-- `SITE_URL` is configured to that Pages hostname for preview and production builds until a verified custom domain is attached.
-- The `main` branch is designated as production, but production deployments are disabled. Only `fix/seo-branding-hardening-2026-10-31` is allowed to create preview deployments.
-
-The first Cloudflare Pages preview deployment completed successfully from `fix/seo-branding-hardening-2026-10-31`. Cloudflare build logs confirm that the production build generated 528 localized route documents using `https://utilora-cn6.pages.dev`, and the deployment uploaded 537 files successfully. The preview URL is public and Cloudflare Pages adds `X-Robots-Tag: noindex` to preview deployments by default. Production deployments remain disabled.
-
-Live HTTP verification of `/ar`, `/en/tools`, and an unknown route is still pending: external HTTP probing from the current execution environment could not resolve the preview hostname. Verify these paths in a normal browser before enabling production deployments or attaching a custom domain.
+**Live HTTP verification remains separate from a successful build:** before merging a production-domain configuration change, check the deployed root, localized routes, sitemap, robots file, canonical tags, and HTTPS response in a normal browser. CI output validation is not proof that deployed route status or production HTML is correct.
