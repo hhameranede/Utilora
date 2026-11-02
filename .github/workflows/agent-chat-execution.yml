@@ -7,6 +7,17 @@ on:
         description: Private Agent Studio run identifier
         required: true
         type: string
+      mode:
+        description: Group council or one-to-one private room
+        required: true
+        type: choice
+        options:
+          - group
+          - private
+      target_agent:
+        description: Specialist selected by the private room
+        required: true
+        type: string
 
 permissions:
   contents: read
@@ -18,10 +29,13 @@ concurrency:
 
 env:
   AGENT_CHAT_API_URL: https://hfokwvgrqbzzunkhflhq.supabase.co/functions/v1/agent-studio-callback
+  AGENT_CHAT_MODE: ${{ inputs.mode }}
+  AGENT_CHAT_TARGET_AGENT: ${{ inputs.target_agent }}
 
 jobs:
   specialists:
     name: ${{ matrix.agent }}
+    if: ${{ inputs.mode == 'group' || matrix.agent == inputs.target_agent }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     strategy:
@@ -69,8 +83,8 @@ jobs:
         run: node apps/agent-studio/scripts/agent-chat-worker.mjs
 
   project-lead:
-    name: Project Lead synthesis
-    if: always()
+    name: Project Lead
+    if: always() && (inputs.mode == 'group' || inputs.target_agent == 'project-lead')
     needs: specialists
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -96,5 +110,5 @@ jobs:
           npm install --global opencode-ai@1.19.5
           opencode --version
 
-      - name: Synthesize specialist reports
+      - name: Respond as Project Lead
         run: node apps/agent-studio/scripts/agent-chat-worker.mjs
