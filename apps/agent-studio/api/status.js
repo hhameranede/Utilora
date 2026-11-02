@@ -28,14 +28,41 @@ function getConfig() {
 }
 
 async function db(config, path) {
-  const headers = { apikey: config.key, Accept: "application/json" };
-  if (!String(config.key).startsWith("sb_secret_")) headers.Authorization = "Bearer " + config.key;
-  const response = await fetch(config.url + "/rest/v1/" + path, {
-    headers,
-    signal: AbortSignal.timeout(6000)
-  });
-  if (!response.ok) throw new Error("Database operation failed.");
-  return response.json();
+  const headers = {
+    apikey: config.key,
+    Authorization: "Bearer " + config.key,
+    Accept: "application/json"
+  };
+  let lastError;
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    try {
+      const response = await fetch(config.url + "/rest/v1/" + path, {
+        headers,
+        signal: AbortSignal.timeout(20000)
+      });
+      if (!response.ok) {
+        const error = new Error("Database operation failed.");
+        error.status = response.status;
+        console.error("[Agent Studio] Supabase health check failed", { route: path.split("?")[0], status: response.status });
+        if (attempt === 0 && (response.status === 429 || response.status >= 500)) {
+          await new Promise((resolve) => setTimeout(resolve, 350));
+          lastError = error;
+          continue;
+        }
+        throw error;
+      }
+      return response.json();
+    } catch (error) {
+      lastError = error;
+      const retryable = error?.name === "AbortError" || error?.name === "TimeoutError" || !error?.status;
+      if (attempt === 0 && retryable) {
+        await new Promise((resolve) => setTimeout(resolve, 350));
+        continue;
+      }
+      throw error;
+    }
+  }
+  throw lastError || new Error("Database operation failed.");
 }
 
 async function checkDatabase(config) {
