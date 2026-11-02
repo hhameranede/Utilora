@@ -1,0 +1,10 @@
+title = "UTILORA Gitleaks configuration"
+
+[[allowlists]]
+description = "Supabase publishable keys are explicitly public API identifiers, not secrets"
+paths = [
+  '''\.github/workflows/agent-chat-execution\.yml$''',
+]
+regexes = [
+  '''sb_publishable_[A-Za-z0-9_-]+''',
+]
