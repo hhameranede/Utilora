@@ -17,7 +17,7 @@ test('every engine contract reference resolves to an exported symbol', async () 
 
   for (const tool of TOOLS_LIST) {
     const [sourcePath, symbolName] = tool.engineContractRef.split('#');
-    assert.ok(sourcePath && symbolName, `${tool.slug} must define a file#symbol engine contract reference`);
+    assert.ok(sourcePath && symbolName, tool.slug + ' must define a file#symbol engine contract reference');
 
     let source = sourceCache.get(sourcePath);
     if (!source) {
@@ -25,7 +25,13 @@ test('every engine contract reference resolves to an exported symbol', async () 
       sourceCache.set(sourcePath, source);
     }
 
-    const escapedSymbol = symbolName.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\test('Category Registry contains exactly 6 categories', () => {');
+    const exportPrefixes = ['export const ', 'export function ', 'export class ', 'export interface ', 'export type '];
+    const isExported = exportPrefixes.some((prefix) => source!.includes(prefix + symbolName));
+    assert.ok(isExported, tool.slug + ' points to missing export ' + symbolName + ' in ' + sourcePath);
+  }
+});
+
+test('Category Registry contains exactly 6 categories', () => {');
     const exportedSymbol = new RegExp(`\\\\bexport\\\\s+(?:const|function|class|interface|type)\\\\s+${escapedSymbol}\\\\b`);
     assert.match(
       source,
