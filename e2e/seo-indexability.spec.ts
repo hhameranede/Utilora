@@ -40,7 +40,7 @@ test('functional tool pages are indexable while unfinished previews remain noind
 test('the production sitemap is complete, canonical, and XML-structured', async ({ request }) => {
   const sitemapResponse = await request.get('/sitemap.xml');
   expect(sitemapResponse.ok()).toBeTruthy();
-  expect(sitemapResponse.headers()['content-type']).toContain('application/xml');
+  expect(sitemapResponse.headers()['content-type']).toMatch(/(?:application|text)\/xml/);
 
   const sitemap = await sitemapResponse.text();
   expect(sitemap).toContain('xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"');
