@@ -16,14 +16,29 @@ export interface PageMetadataConfig {
   schemaData?: Record<string, unknown>;
 }
 
+/**
+ * Resolve one canonical site origin for every SEO surface.
+ * Production builds inject SITE_URL at build time; browser-origin fallback is
+ * retained only for local development when SITE_URL is intentionally absent.
+ */
+function getSiteOrigin(): string {
+  const configuredOrigin =
+    typeof __UTILORA_SITE_ORIGIN__ !== 'undefined'
+      ? __UTILORA_SITE_ORIGIN__.trim()
+      : '';
+
+  if (configuredOrigin) return configuredOrigin.replace(/\/+$/, '');
+  return typeof window !== 'undefined' ? window.location.origin : '';
+}
+
 export function buildCanonicalUrl(locale: SupportedLocale, routeType: RouteType, slug?: string): string {
-  const origin = typeof window !== 'undefined' ? window.location.origin : '';
+  const origin = getSiteOrigin();
   const path = buildRoutePath(locale, routeType, slug);
   return origin ? `${origin}${path}` : path;
 }
 
 export function generateHreflangLinks(routeType: RouteType, slug?: string): Array<{ lang: string; url: string }> {
-  const origin = typeof window !== 'undefined' ? window.location.origin : '';
+  const origin = getSiteOrigin();
   return SUPPORTED_LANGUAGES.map((lang) => {
     const path = buildRoutePath(lang.code, routeType, slug);
     return { lang: lang.code, url: origin ? `${origin}${path}` : path };
@@ -38,7 +53,7 @@ export function applyDocumentMetadata(config: PageMetadataConfig) {
   document.documentElement.dir = config.locale === 'ar' ? 'rtl' : 'ltr';
   document.title = config.title;
 
-  const siteOrigin = typeof window !== 'undefined' ? window.location.origin : undefined;
+  const siteOrigin = getSiteOrigin();
 
   // 2. Helper to set or create meta tag
   const setMeta = (nameAttr: 'name' | 'property', attrValue: string, content: string) => {
@@ -98,7 +113,7 @@ export function applyDocumentMetadata(config: PageMetadataConfig) {
     setLink('alternate', url, { hreflang: lang });
   });
   // x-default hreflang pointing to English
-  const origin = typeof window !== 'undefined' ? window.location.origin : '';
+  const origin = getSiteOrigin();
   const englishPath = buildRoutePath('en', config.routeType, config.slug);
   setLink('alternate', origin ? `${origin}${englishPath}` : englishPath, {
     hreflang: 'x-default',

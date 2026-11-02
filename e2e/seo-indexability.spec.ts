@@ -14,7 +14,18 @@ test('functional tool pages are indexable while unfinished previews remain noind
 
   await page.goto('/en/tools/json-formatter');
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'index, follow');
-  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', /\/en\/tools\/json-formatter$/);
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    'href',
+    'https://utilora.invalid/en/tools/json-formatter',
+  );
+  await expect(page.locator('link[rel="alternate"][hreflang="ar"]')).toHaveAttribute(
+    'href',
+    'https://utilora.invalid/ar/tools/json-formatter',
+  );
+  await expect(page.locator('meta[property="og:url"]')).toHaveAttribute(
+    'content',
+    'https://utilora.invalid/en/tools/json-formatter',
+  );
 
   await page.goto('/en/tools/video-compressor');
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'index, follow');
