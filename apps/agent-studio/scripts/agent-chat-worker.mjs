@@ -34,7 +34,6 @@ async function api(action, payload = {}) {
   const response = await fetch(API_URL, {
     method: "POST",
     headers: {
-      apikey: required(process.env.SUPABASE_PUBLISHABLE_KEY, "Supabase publishable key"),
       Authorization: "Bearer " + token,
       "Content-Type": "application/json",
       Accept: "application/json"
