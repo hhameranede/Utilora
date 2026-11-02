@@ -35,6 +35,7 @@ export const ArticleDetailPage: React.FC<ArticleDetailPageProps> = ({ articleSlu
   const title = article.title[locale] || article.title.en;
   const excerpt = article.excerpt[locale] || article.excerpt.en;
   const bodyContent = getArticleContent(article.slug, locale);
+  const displayContentHeadings = bodyContent?.sections.map((section) => section.heading) || article.contentHeadings;
 
   const handleShare = () => {
     if (typeof navigator !== 'undefined' && navigator.clipboard) {
@@ -146,7 +147,7 @@ export const ArticleDetailPage: React.FC<ArticleDetailPageProps> = ({ articleSlu
             {bodyContent?.sections.map((section, index) => (
               <section key={index} id={`section-${index + 1}`} className="space-y-4">
                 <h2 className="text-xl sm:text-2xl font-bold text-stone-900">
-                  {article.contentHeadings[index] || title}
+                  {displayContentHeadings[index] || title}
                 </h2>
                 {section.paragraphs.map((paragraph, paragraphIndex) => (
                   <p key={paragraphIndex}>{paragraph}</p>
@@ -182,7 +183,7 @@ export const ArticleDetailPage: React.FC<ArticleDetailPageProps> = ({ articleSlu
                 {t('articles.tableOfContents')}
               </h3>
               <nav className="space-y-2 text-xs">
-                {article.contentHeadings.map((heading, i) => (
+                {displayContentHeadings.map((heading, i) => (
                   <a
                     key={i}
                     href={`#section-${i + 1}`}

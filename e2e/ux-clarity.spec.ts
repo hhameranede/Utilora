@@ -88,3 +88,18 @@ test('technical guides contain topic-specific copy instead of repeated generic c
     }
   }
 });
+
+test('Arabic technical guide headings and body are localized instead of mixing English section titles', async ({ page }) => {
+  const articles = [
+    { slug: 'png-vs-webp-compression-performance', firstHeading: 'تطور الرسومات النقطية' },
+    { slug: 'understanding-pdf-linearization-and-page-trees', firstHeading: 'بنية فهرس مستند PDF' },
+    { slug: 'rfc-8259-json-strict-parsing-and-validation', firstHeading: 'صياغة JSON وفق RFC 8259' },
+    { slug: 'dns-records-propagation-doh-inspection', firstHeading: 'التسلسل الهرمي' },
+  ];
+
+  for (const article of articles) {
+    await page.goto('/ar/articles/' + article.slug);
+    await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
+    await expect(page.locator('main h2').first()).toContainText(article.firstHeading);
+  }
+});
