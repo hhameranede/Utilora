@@ -333,6 +333,14 @@ async function sendMessage() {
   } catch (error) {
     state.error = error.message || "فشل إرسال الرسالة.";
     render();
+    // Keep the unsent draft visible so a failed request never looks like a lost message.
+    const restoredInput = $("#message-input");
+    if (restoredInput) {
+      restoredInput.value = content;
+      restoredInput.style.height = "auto";
+      restoredInput.style.height = Math.min(restoredInput.scrollHeight, 160) + "px";
+      restoredInput.focus();
+    }
   } finally {
     state.sending = false;
     const nextButton = $("#send-button");
