@@ -16,8 +16,11 @@ function explainDispatchFailure(status, message) {
   if (status === 403 && /rate limit|secondary rate limit/i.test(message)) {
     return "تجاوزت طلبات GitHub الحد المسموح مؤقتًا؛ انتظر قليلًا ثم أعد المحاولة.";
   }
+  if (status === 403 && /resource not accessible by personal access token/i.test(message)) {
+    return "GitHub رفض نوع/تفويض الرمز لهذا الطلب رغم ظهور صلاحية Actions. سنعرض ترويسة الصلاحيات المطلوبة ومعرّف طلب GitHub حتى نحدد هل نحتاج رمزًا كلاسيكيًا أو تصحيح تفويض المستودع.";
+  }
   if (status === 403) {
-    return "الاحتمال الأقوى أن الرمز يفتقد صلاحية المستودع Actions: Read and write. في Fine-grained token اختر hhameranede/Utilora ثم Repository permissions → Actions → Read and write.";
+    return "GitHub رفض الطلب. لا تفترض أن المشكلة Actions فقط؛ استخدم رسالة GitHub وترويسة الصلاحيات ومعرّف الطلب أدناه لتحديد السبب.";
   }
   if (status === 404) return "تحقق من أن الرمز يملك وصولًا إلى hhameranede/Utilora وأن ملف .github/workflows/agent-chat-execution.yml موجود على main.";
   if (status === 422) return "GitHub رفض بيانات التشغيل؛ تحقق من inputs ووجود workflow_dispatch في ملف Workflow.";
@@ -153,17 +156,29 @@ export async function onRequest(context) {
     }
 
     if (!dispatch?.ok) {
-      const githubPayload = dispatch ? await dispatch.json().catch(() => ({})) : {};
+      const rawResponse = dispatch ? await dispatch.text().catch(() => "") : "";
+      let githubPayload = null;
+      try {
+        githubPayload = rawResponse ? JSON.parse(rawResponse) : null;
+      } catch {
+        githubPayload = null;
+      }
       const status = dispatch?.status || 0;
-      const githubMessage = safeGitHubMessage(githubPayload?.message || networkFailure || "لم يصل رد من GitHub.");
+      const githubMessage = safeGitHubMessage(
+        githubPayload?.message || rawResponse || networkFailure || "GitHub returned an empty response body."
+      );
       const guidance = status ? explainDispatchFailure(status, githubMessage) : networkFailure;
       const requestId = dispatch?.headers?.get("x-github-request-id") || "";
+      const acceptedPermissions = dispatch?.headers?.get("x-accepted-github-permissions") || "";
+      const rateLimitRemaining = dispatch?.headers?.get("x-ratelimit-remaining") || "";
       const dispatchError = [
         "فشل تشغيل GitHub Actions" + (status ? " (HTTP " + status + ")" : ""),
         githubMessage,
         guidance,
+        acceptedPermissions ? "GitHub required permissions: " + acceptedPermissions : "",
+        rateLimitRemaining ? "GitHub rate limit remaining: " + rateLimitRemaining : "",
         requestId ? "GitHub Request ID: " + requestId : ""
-      ].filter(Boolean).join(" — ").slice(0, 900);
+      ].filter(Boolean).join(" — ").slice(0, 1200);
 
       await db(config, "team_chat_runs?id=eq." + encodeURIComponent(run.id), "PATCH", {
         status: "failed",
