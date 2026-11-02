@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { PDFDocument } from 'pdf-lib';
 
 const localizedMergeWorkspace = [
   {
@@ -300,8 +301,6 @@ for (const copy of localizedPdfOptions) {
   });
 }
 
-
-import { PDFDocument } from 'pdf-lib';
 
 async function makeSinglePagePdf(name: string): Promise<{ name: string; mimeType: string; buffer: Buffer }> {
   const pdf = await PDFDocument.create();
