@@ -1,5 +1,5 @@
 import {
-  allowLoginAttempt, createOwnerSessionCookie, getConfig, json
+  allowLoginAttempt, assertServerKey, createOwnerSessionCookie, getConfig, json
 } from "../_lib/server.js";
 
 export async function onRequest(context) {
@@ -12,8 +12,10 @@ export async function onRequest(context) {
 
 
   const config = getConfig(context.env);
-  if (!config.url || !config.publishableKey || !config.sessionSecret || config.sessionSecret.length < 32) {
-    return json({ error: "إعداد تسجيل الدخول غير مكتمل على Cloudflare." }, 503);
+  try {
+    assertServerKey(config);
+  } catch {
+    return json({ error: "أضف SUPABASE_SECRET_KEY إلى أسرار Cloudflare أولًا." }, 503);
   }
 
   const ip = request.headers.get("CF-Connecting-IP") || "unknown";
@@ -39,7 +41,7 @@ export async function onRequest(context) {
     const authResponse = await fetch(config.url + "/auth/v1/token?grant_type=password", {
       method: "POST",
       headers: {
-        apikey: config.publishableKey,
+        apikey: config.key,
         "Content-Type": "application/json",
         Accept: "application/json"
       },
