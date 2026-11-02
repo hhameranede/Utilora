@@ -16,6 +16,29 @@ const json = (res, status, value) => {
   return res.status(status).json(value);
 };
 
+function getServerKeyIssue(config) {
+  const key = String(config.key || "");
+  if (!key) return "مفتاح Supabase الخادمي غير مضبوط في Vercel.";
+  if (key.startsWith("sb_secret_")) return "";
+  if (key.startsWith("sb_publishable_")) {
+    return "مفتاح Supabase في Vercel من نوع Publishable وليس Secret. استبدل قيمة SUPABASE_SECRET_KEY بمفتاح Secret يبدأ بـ sb_secret_ من إعدادات API Keys في Supabase، ثم أعد النشر. لا ترسل المفتاح في الدردشة.";
+  }
+  const parts = key.split(".");
+  if (parts.length === 3 && parts[1]) {
+    try {
+      const payload = JSON.parse(Buffer.from(parts[1], "base64url").toString("utf8"));
+      const expectedRef = config.url ? new URL(config.url).hostname.split(".")[0] : "";
+      if (payload.role === "service_role" && (!payload.ref || payload.ref === expectedRef)) return "";
+      if (payload.role === "anon") {
+        return "مفتاح Supabase في Vercel هو anon وليس service_role. استخدم Secret Key خادمياً أو مفتاح service_role القديم داخل متغير Vercel فقط.";
+      }
+    } catch {
+      // Invalid or unsupported legacy key; fail closed below.
+    }
+  }
+  return "قيمة SUPABASE_SECRET_KEY ليست مفتاح Supabase خادمياً صالحاً. تحقق من نوع المفتاح في إعدادات Supabase ثم أعد النشر.";
+}
+
 function getConfig() {
   return {
     url: process.env.SUPABASE_URL?.replace(/\/$/, ""),
@@ -124,7 +147,9 @@ export default async function handler(req, res) {
   const config = getConfig();
 
   if (req.method === "GET") {
-    if (!config.url || !config.key) return json(res, 503, { error: "ربط قاعدة بيانات مساحة الفريق لم يكتمل بعد." });
+    if (!config.url) return json(res, 503, { error: "عنوان قاعدة بيانات مساحة الفريق غير مضبوط في Vercel." });
+    const keyIssue = getServerKeyIssue(config);
+    if (keyIssue) return json(res, 503, { error: keyIssue });
     try {
       const descriptor = parseRoomSlug(req.query?.room);
       if (!descriptor) return json(res, 404, { error: "غرفة المحادثة غير موجودة." });
@@ -146,7 +171,9 @@ export default async function handler(req, res) {
   if (!origin || origin !== new URL(config.siteUrl).origin) {
     return json(res, 403, { error: "مصدر الطلب غير مصرح به." });
   }
-  if (!config.url || !config.key) return json(res, 503, { error: "ربط قاعدة بيانات المحادثة غير مكتمل." });
+  if (!config.url) return json(res, 503, { error: "عنوان قاعدة بيانات المحادثة غير مضبوط في Vercel." });
+  const keyIssue = getServerKeyIssue(config);
+  if (keyIssue) return json(res, 503, { error: keyIssue });
   if (!config.githubToken) return json(res, 503, { error: "ربط تشغيل الوكلاء عبر GitHub Actions غير مكتمل." });
 
   try {
