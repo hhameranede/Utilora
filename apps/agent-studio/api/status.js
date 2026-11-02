@@ -38,7 +38,7 @@ async function db(config, path) {
     try {
       const response = await fetch(config.url + "/rest/v1/" + path, {
         headers,
-        signal: AbortSignal.timeout(20000)
+        signal: AbortSignal.timeout(4500)
       });
       if (!response.ok) {
         const error = new Error("Database operation failed.");
