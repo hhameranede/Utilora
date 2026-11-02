@@ -1114,7 +1114,7 @@ export const TOOLS_REGISTRY: Record<string, ToolDefinition> = {
     icon: 'Calendar',
     template: 'template-j-domain-lookup',
     status: 'functional',
-    engineContractRef: 'src/engines/diagnostics/contracts.ts#DomainAgeCheckerAdapter',
+    engineContractRef: 'src/engines/diagnostics/browser.ts#DomainAgeCheckerAdapter',
     isPopular: true,
     localizedName: {
       en: 'Domain Age Checker',
@@ -1157,7 +1157,7 @@ export const TOOLS_REGISTRY: Record<string, ToolDefinition> = {
     icon: 'Search',
     template: 'template-j-domain-lookup',
     status: 'functional',
-    engineContractRef: 'src/engines/diagnostics/contracts.ts#RdapLookupAdapter',
+    engineContractRef: 'src/engines/diagnostics/browser.ts#RdapLookupAdapter',
     localizedName: {
       en: 'RDAP Lookup',
       ar: 'استعلام بروتوكول RDAP (بديل WHOIS الحديث)',
@@ -1199,7 +1199,7 @@ export const TOOLS_REGISTRY: Record<string, ToolDefinition> = {
     icon: 'Network',
     template: 'template-k-dns-lookup',
     status: 'functional',
-    engineContractRef: 'src/engines/diagnostics/contracts.ts#DnsLookupAdapter',
+    engineContractRef: 'src/engines/diagnostics/browser.ts#DnsLookupAdapter',
     isPopular: true,
     isFeatured: true,
     localizedName: {
@@ -1243,7 +1243,7 @@ export const TOOLS_REGISTRY: Record<string, ToolDefinition> = {
     icon: 'Activity',
     template: 'template-l-website-diagnostics',
     status: 'functional',
-    engineContractRef: 'src/engines/diagnostics/contracts.ts#WebsiteStatusCheckerAdapter',
+    engineContractRef: 'src/engines/diagnostics/browser.ts#WebsiteStatusCheckerAdapter',
     isPopular: true,
     localizedName: {
       en: 'Website Status Checker',
@@ -1286,7 +1286,7 @@ export const TOOLS_REGISTRY: Record<string, ToolDefinition> = {
     icon: 'Sliders',
     template: 'template-l-website-diagnostics',
     status: 'functional',
-    engineContractRef: 'src/engines/diagnostics/contracts.ts#HttpHeadersCheckerAdapter',
+    engineContractRef: 'src/engines/diagnostics/browser.ts#HttpHeadersCheckerAdapter',
     localizedName: {
       en: 'HTTP Headers Checker',
       ar: 'فاحص ترويسات HTTP والأمان',
@@ -1422,7 +1422,7 @@ export const TOOLS_REGISTRY: Record<string, ToolDefinition> = {
     icon: 'FileSpreadsheet',
     template: 'template-o-media-metadata',
     status: 'functional',
-    engineContractRef: 'src/engines/video/contracts.ts#VideoMetadataViewerAdapter',
+    engineContractRef: 'src/engines/video/browser.ts#VideoMetadataViewerAdapter',
     acceptedFormats: ['.mp4', '.webm', '.mov'],
     maxFileSize: '500 MB',
     localizedName: {
