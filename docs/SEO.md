@@ -30,6 +30,8 @@ The value must be an origin only: HTTP(S) scheme and hostname, without a path, q
 - `public/sitemap.xml`, with localized URLs and eight-language hreflang alternate links plus `x-default`.
 - `public/robots.txt`, allowing public routes, disallowing `/dev/`, and referencing the generated sitemap when `SITE_URL` is set.
 
+The current sitemap contains 680 unique, indexable URLs across eight locales. It remains a single XML sitemap because its URL count and file size are comfortably below protocol limits. Each URL includes reciprocal `hreflang` links for all supported locales plus `x-default`. Preview-only tools, sample articles, internal routes, and not-found URLs are excluded. Do not add `lastmod` values unless the build can supply a reliable last-modified date for each route.
+
 When `SITE_URL` is omitted, the build does not guess a domain: stale sitemap output is removed, a robots file is still generated without a sitemap directive, and a warning is printed. The Vite HTML transform also removes social-image tags that would otherwise contain an unresolved domain placeholder. Configure the real domain in the production build environment.
 
 ## Runtime metadata
@@ -41,7 +43,7 @@ When `SITE_URL` is omitted, the build does not guess a domain: stale sitemap out
 - Robots directives for preview and unfinished pages.
 - JSON-LD structured data.
 
-The document `lang` is updated for each locale, and Arabic routes set `dir="rtl"`. Canonical, hreflang, Open Graph, and JSON-LD URLs all use the build-time `SITE_URL` origin so that the `pages.dev` service hostname and the verified custom domain do not produce competing canonical URLs. Local development falls back to the current browser origin when `SITE_URL` is not configured.
+The document `lang` is updated for each locale, and Arabic routes set `dir="rtl"`. Canonical, hreflang, Open Graph, and JSON-LD URLs all use the build-time `SITE_URL` origin so that the `pages.dev` service hostname and the verified custom domain do not produce competing canonical URLs. Local development falls back to the current browser origin when `SITE_URL` is not configured. Not-found routes remain `noindex, nofollow` and intentionally omit canonical, hreflang, Open Graph URL, and JSON-LD signals rather than pointing at the localized homepage.
 
 ## Static route HTML and Cloudflare Pages
 
@@ -53,6 +55,6 @@ For a Cloudflare Pages deployment, use `npm run build` as the build command, `di
 
 ## Cloudflare Pages custom domain
 
-The verified custom domain for the existing `utilora` Pages project is `https://utilora.l.cd`. It is attached to the same project as `utilora-cn6.pages.dev`; no separate hosting project or DNS migration is required. Before the next production build, update the Pages `SITE_URL` environment variable from `https://utilora-cn6.pages.dev` to `https://utilora.l.cd` so the generated sitemap, robots directive, prerendered HTML, social cards, and runtime metadata all use the canonical domain.
+The verified custom domain for the existing `utilora` Pages project is `https://utilora.l.cd`. It is attached to the same project as `utilora-cn6.pages.dev`; no separate hosting project or DNS migration is required. The current Cloudflare production and preview build configurations have both been verified to use `SITE_URL=https://utilora.l.cd`. Preserve this setting for future builds so the generated sitemap, robots directive, prerendered HTML, social cards, and runtime metadata continue to use the canonical domain.
 
-**Live HTTP verification remains separate from a successful build:** before merging a production-domain configuration change, check the deployed root, localized routes, sitemap, robots file, canonical tags, and HTTPS response in a normal browser. CI output validation is not proof that deployed route status or production HTML is correct.
+**Live HTTP verification remains separate from a successful build:** after each production deployment, check the deployed root, localized routes, sitemap, robots file, canonical tags, 404 behavior, and HTTPS response in a normal browser. CI output validation is not proof that deployed route status or production HTML is correct.
