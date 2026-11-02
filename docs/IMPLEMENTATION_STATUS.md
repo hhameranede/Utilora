@@ -58,3 +58,10 @@ This checklist separates repository implementation from CI verification, deploym
 - [x] The current quality branch `fix/white-gray-orange-and-accurate-status-2026-11-01` is explicitly included in preview deployments.
 - [x] Production deployments remain disabled for `main`; this task does not enable them.
 - [ ] The new branch preview deployment has completed and its localized routes have passed live HTTP/browser checks.
+
+
+## PostHog analytics instrumentation
+- [x] Optional PostHog browser SDK integration is initialized once from Vite environment variables.
+- [x] SPA pageviews follow history changes; custom events record tool, usage-guide, and category page views with only route slug and locale.
+- [x] Autocapture and page-leave capture are disabled; session replay remains disabled in the PostHog project. User-entered text, uploaded file names, and file contents are never attached to custom analytics events.
+- [ ] Configure `VITE_POSTHOG_PROJECT_TOKEN` and `VITE_POSTHOG_HOST` in the Cloudflare Pages build environments, then verify the first events in PostHog.

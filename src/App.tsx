@@ -3,8 +3,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React from 'react';
-import { I18nProvider } from './i18n';
+import React, { useEffect } from 'react';
+import posthog from 'posthog-js';
+import { I18nProvider, useI18n } from './i18n';
 import { RouterProvider, useRouter } from './router';
 import { parseRoute } from './router/matcher';
 import { SiteHeader } from './components/common/SiteHeader';
@@ -28,6 +29,19 @@ import { NotFoundPage } from './pages/NotFoundPage';
 
 const AppContent: React.FC = () => {
   const { route } = useRouter();
+  const { locale } = useI18n();
+
+  useEffect(() => {
+    if (!import.meta.env.VITE_POSTHOG_PROJECT_TOKEN) return;
+
+    if (route.type === 'tool' && route.toolSlug) {
+      posthog.capture('tool_page_viewed', { tool_slug: route.toolSlug, locale });
+    } else if (route.type === 'tool-guide' && route.toolSlug) {
+      posthog.capture('tool_guide_viewed', { tool_slug: route.toolSlug, locale });
+    } else if (route.type === 'category' && route.categorySlug) {
+      posthog.capture('category_page_viewed', { category_slug: route.categorySlug, locale });
+    }
+  }, [route.type, route.toolSlug, route.categorySlug, locale]);
 
   const renderCurrentView = () => {
     switch (route.type) {
