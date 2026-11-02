@@ -356,6 +356,7 @@
     "resolution": "分辨率",
     "imageType": "图像类型",
     "memoryLimit": "为保护设备内存，每次最多转换 40 个 PDF 页面。",
-    "rotated": "已旋转"
+    "rotated": "已旋转",
+    "allKeyword": "全部"
   }
 }
