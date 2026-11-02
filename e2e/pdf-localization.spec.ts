@@ -299,3 +299,35 @@ for (const copy of localizedPdfOptions) {
     }
   });
 }
+
+
+import { PDFDocument } from 'pdf-lib';
+
+async function makeSinglePagePdf(name: string): Promise<{ name: string; mimeType: string; buffer: Buffer }> {
+  const pdf = await PDFDocument.create();
+  const page = pdf.addPage([300, 400]);
+  page.drawText(name, { x: 24, y: 350, size: 16 });
+  return { name, mimeType: 'application/pdf', buffer: Buffer.from(await pdf.save()) };
+}
+
+const localizedRotateAllKeywords = [
+  { locale: 'en', keyword: 'all', label: 'Pages to rotate', action: 'Rotate pages', success: 'PDF page rotation saved.' },
+  { locale: 'ar', keyword: 'الكل', label: 'الصفحات المراد تدويرها', action: 'تدوير الصفحات', success: 'تم حفظ تدوير صفحات PDF.' },
+  { locale: 'fr', keyword: 'tout', label: 'Pages à faire pivoter', action: 'Faire pivoter les pages', success: 'La rotation des pages PDF a été enregistrée.' },
+  { locale: 'es', keyword: 'todas', label: 'Páginas que girar', action: 'Girar páginas', success: 'Se ha guardado el giro de las páginas PDF.' },
+  { locale: 'pt', keyword: 'todas', label: 'Páginas para girar', action: 'Girar páginas', success: 'A rotação das páginas do PDF foi salva.' },
+  { locale: 'hi', keyword: 'सभी', label: 'घुमाने के लिए पृष्ठ', action: 'पृष्ठ घुमाएँ', success: 'PDF पृष्ठों का घुमाव सहेजा गया।' },
+  { locale: 'zh', keyword: '全部', label: '要旋转的页面', action: '旋转页面', success: 'PDF 页面旋转已保存。' },
+  { locale: 'bn', keyword: 'সব', label: 'যে পৃষ্ঠাগুলো ঘোরাবেন', action: 'পৃষ্ঠা ঘোরান', success: 'PDF পৃষ্ঠার ঘোরানো সংরক্ষণ করা হয়েছে।' },
+] as const;
+
+for (const copy of localizedRotateAllKeywords) {
+  test(`PDF rotation accepts the localized all-pages keyword for ${copy.locale}`, async ({ page }) => {
+    await page.goto(`/${copy.locale}/tools/rotate-pdf`);
+    await page.locator('input[type="file"]').setInputFiles(await makeSinglePagePdf('all-pages.pdf'));
+    await page.getByLabel(copy.label).fill(copy.keyword);
+    await page.getByRole('button', { name: copy.action }).click();
+    await expect(page.getByRole('status')).toContainText(copy.success);
+    await expect(page.getByText('all-pages-rotated.pdf')).toBeVisible();
+  });
+}
