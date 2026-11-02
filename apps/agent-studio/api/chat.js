@@ -18,7 +18,7 @@ const json = (res, status, value) => {
 function getConfig() {
   return {
     url: process.env.SUPABASE_URL?.replace(/\/$/, ""),
-    key: process.env.SUPABASE_SERVICE_ROLE_KEY,
+    key: process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY,
     githubToken: process.env.UTILORA_GITHUB_TOKEN,
     repository: process.env.UTILORA_GITHUB_REPOSITORY || "hhameranede/Utilora",
     ref: process.env.UTILORA_AGENT_WORKFLOW_REF || "main",
@@ -27,14 +27,15 @@ function getConfig() {
 }
 
 async function db(config, path, method = "GET", body) {
+  const headers = {
+    apikey: config.key,
+    "Content-Type": "application/json",
+    Prefer: "return=representation"
+  };
+  if (!String(config.key).startsWith("sb_secret_")) headers.Authorization = "Bearer " + config.key;
   const response = await fetch(config.url + "/rest/v1/" + path, {
     method,
-    headers: {
-      apikey: config.key,
-      Authorization: "Bearer " + config.key,
-      "Content-Type": "application/json",
-      Prefer: "return=representation"
-    },
+    headers,
     ...(body === undefined ? {} : { body: JSON.stringify(body) })
   });
   const text = await response.text();
