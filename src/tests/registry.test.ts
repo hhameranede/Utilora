@@ -31,16 +31,6 @@ test('every engine contract reference resolves to an exported symbol', async () 
   }
 });
 
-test('Category Registry contains exactly 6 categories', () => {');
-    const exportedSymbol = new RegExp(`\\\\bexport\\\\s+(?:const|function|class|interface|type)\\\\s+${escapedSymbol}\\\\b`);
-    assert.match(
-      source,
-      exportedSymbol,
-      `${tool.slug} points to missing export ${symbolName} in ${sourcePath}`,
-    );
-  }
-});
-
 test('Category Registry contains exactly 6 categories', () => {
   assert.equal(CATEGORIES_LIST.length, 6, 'Expected exactly 6 categories in registry');
 });
