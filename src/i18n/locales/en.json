@@ -356,6 +356,7 @@
     "resolution": "Resolution",
     "imageType": "Image type",
     "memoryLimit": "Up to 40 PDF pages per conversion to protect device memory.",
-    "rotated": "rotated"
+    "rotated": "rotated",
+    "allKeyword": "all"
   }
 }
