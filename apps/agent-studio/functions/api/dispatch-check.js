@@ -2,10 +2,10 @@ import { getConfig, json, requireOwner } from "../_lib/server.js";
 
 function safeGitHubMessage(value) {
   return String(value || "GitHub returned an empty response body.")
-    .replace(/Bearer\\s+\\S+/gi, "Bearer [redacted]")
+    .replace(/Bearer\s+\S+/gi, "Bearer [redacted]")
     .replace(/gh[pousr]_[A-Za-z0-9]{20,}/gi, "[redacted GitHub token]")
     .replace(/github_pat_[A-Za-z0-9_]{20,}/gi, "[redacted GitHub token]")
-    .replace(/[\\r\\n]+/g, " ")
+    .replace(/[\r\n]+/g, " ")
     .slice(0, 320);
 }
 
