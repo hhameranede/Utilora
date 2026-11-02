@@ -231,3 +231,20 @@ button { color: inherit; }
 @media (prefers-reduced-motion: reduce) {
   *,*::before,*::after { animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important; }
 }
+
+/* Live run details and activity stream */
+.agent-progress,.room-progress{height:3px;border-radius:20px;background:rgba(255,255,255,.07);overflow:hidden}
+.agent-progress{margin-top:7px;width:100%;max-width:150px}
+.agent-progress i,.room-progress i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#b98b45,#f0cf91);transition:width .35s ease}
+.room-banner-copy{min-width:0;flex:1;display:grid;gap:5px}
+.room-banner-copy span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.room-progress{width:100%;max-width:260px;margin-top:3px}
+.activity-timeline{display:grid;gap:0;margin-top:24px;border-right:1px solid rgba(232,184,108,.22);padding-right:18px}
+.activity-event{display:flex;gap:12px;position:relative;padding:0 0 20px;min-width:0}
+.activity-marker{position:absolute;right:-23px;top:5px;width:8px;height:8px;border-radius:50%;background:#d8ad68;box-shadow:0 0 0 4px rgba(216,173,104,.11)}
+.activity-event-main{min-width:0;flex:1;padding:11px 13px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.055);border-radius:10px}
+.activity-event-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.activity-event-head strong{font-size:12px;color:#e7c48a;direction:ltr;text-align:right}
+.activity-event-head time{font-size:10px;color:#7b818c;white-space:nowrap}
+.activity-event p{margin:7px 0 0;color:#b7bbc2;font-size:12px;line-height:1.8;overflow-wrap:anywhere}
+@media(max-width:760px){.activity-event-main{padding:10px}.activity-event p{font-size:11px}.agent-progress{max-width:105px}}
