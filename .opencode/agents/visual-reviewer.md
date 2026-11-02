@@ -1,6 +1,6 @@
 ---
 description: Inspects rendered UTILORA interfaces and screenshots for layout, hierarchy, accessibility, and RTL problems.
-mode: all
+mode: subagent
 model: nvidia/nvidia/nemotron-3.5-super-vl-120b-a12b
 permission:
   edit: deny
