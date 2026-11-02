@@ -57,6 +57,8 @@ async function verifyGitHubWorkflow(req: Request) {
   const workflowRef = String(payload.workflow_ref || "");
   if (
     payload.repository !== "hhameranede/Utilora" ||
+    Number(payload.repository_id) !== 1441109405 ||
+    payload.actor !== "hhameranede" ||
     payload.ref !== "refs/heads/main" ||
     payload.event_name !== "workflow_dispatch" ||
     !workflowRef.endsWith("/.github/workflows/agent-chat-execution.yml@refs/heads/main")
