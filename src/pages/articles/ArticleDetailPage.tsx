@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useI18n } from '../../i18n';
 import { SAMPLE_ARTICLES } from '../../data/articles.data';
+import { getArticleContent } from '../../data/article-content.data';
 import { Breadcrumbs } from '../../components/common/Breadcrumbs';
 import { Head } from '../../seo/Head';
 import { Link } from '../../router';
@@ -33,6 +34,8 @@ export const ArticleDetailPage: React.FC<ArticleDetailPageProps> = ({ articleSlu
   if (!article) return <NotFoundPage />;
   const title = article.title[locale] || article.title.en;
   const excerpt = article.excerpt[locale] || article.excerpt.en;
+  const bodyContent = getArticleContent(article.slug, locale);
+  const displayContentHeadings = bodyContent?.sections.map((section) => section.heading) || article.contentHeadings;
 
   const handleShare = () => {
     if (typeof navigator !== 'undefined' && navigator.clipboard) {
@@ -128,113 +131,48 @@ export const ArticleDetailPage: React.FC<ArticleDetailPageProps> = ({ articleSlu
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
           {/* Main Article Body (8 cols) */}
           <div className="lg:col-span-8 space-y-8 text-stone-700 leading-relaxed text-sm sm:text-base">
-            <section id="section-1" className="space-y-4">
-              <h2 className="text-xl sm:text-2xl font-bold text-stone-900">
-                {article.contentHeadings[0]}
-              </h2>
-              <p>
-                Modern digital workflows require formats that balance minimal network transfer overhead with crisp visual fidelity across high-DPI displays. While legacy containers rely on fixed Huffman trees, modern codecs incorporate predictive spatial modeling to compress entropy without losing high-frequency detail.
+            {locale !== 'en' && locale !== 'ar' && (
+              <p className="rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 text-xs leading-5 text-stone-600">
+                {({
+                  fr: 'Le contenu technique complet de cet article est actuellement disponible en anglais.',
+                  es: 'El contenido técnico completo de este artículo está disponible actualmente en inglés.',
+                  pt: 'O conteúdo técnico completo deste artigo está disponível atualmente em inglês.',
+                  hi: 'इस लेख की पूरी तकनीकी सामग्री फिलहाल अंग्रेज़ी में उपलब्ध है।',
+                  zh: '本文的完整技术内容目前以英文提供。',
+                  bn: 'এই নিবন্ধের সম্পূর্ণ প্রযুক্তিগত বিষয়বস্তু বর্তমানে ইংরেজিতে উপলব্ধ।',
+                } as Record<string, string>)[locale] || 'The full technical article is currently available in English.'}
               </p>
-              <p>
-                In client-side web environments, evaluating image and document operations means accounting for thread memory pressure, WebAssembly initialization latency, and hardware acceleration support.
-              </p>
-            </section>
+            )}
 
-            {/* Informational Callout */}
-            <div className="p-5 rounded-2xl bg-orange-50/70 border border-orange-200/80 space-y-2">
-              <div className="flex items-center gap-2 text-xs font-semibold text-orange-700">
-                <Info size={15} />
-                <span>Client Runtime Note</span>
-              </div>
-              <p className="text-xs text-stone-700 leading-relaxed">
-                UTILORA executes compression transforms directly inside Web Workers, preventing interface freezing on main render threads. All processing happens locally on device silicon.
-              </p>
-            </div>
+            {bodyContent?.sections.map((section, index) => (
+              <section key={index} id={`section-${index + 1}`} className="space-y-4">
+                <h2 className="text-xl sm:text-2xl font-bold text-stone-900">
+                  {displayContentHeadings[index] || title}
+                </h2>
+                {section.paragraphs.map((paragraph, paragraphIndex) => (
+                  <p key={paragraphIndex}>{paragraph}</p>
+                ))}
+              </section>
+            ))}
 
-            <section id="section-2" className="space-y-4">
-              <h2 className="text-xl sm:text-2xl font-bold text-stone-900">
-                {article.contentHeadings[1]}
-              </h2>
-              <p>
-                Alpha transparency in 32-bit raster formats has historically produced inflated file payloads. Modern predictive color transforms decompose ARGB channels independently, isolating flat transparent blocks from complex foreground vectors.
-              </p>
+            {bodyContent && (
+              <>
+                <aside className="rounded-2xl border border-orange-200/80 bg-orange-50/70 p-5 space-y-2">
+                  <div className="flex items-center gap-2 text-xs font-semibold text-orange-800">
+                    <Info size={15} />
+                    <span>{locale === 'ar' ? 'ملاحظة عملية' : 'Practical note'}</span>
+                  </div>
+                  <p className="text-sm leading-6 text-stone-700">{bodyContent.note}</p>
+                </aside>
 
-              {/* Code Block Example */}
-              <div className="rounded-2xl bg-stone-900 border border-stone-800 p-4 font-mono text-xs overflow-x-auto space-y-1 shadow-sm">
-                <div className="text-stone-400">// Example Worker initialization pipeline</div>
-                <div className="text-stone-200">
-                  <span className="text-purple-400">const</span> worker = <span className="text-purple-400">new</span> Worker(<span className="text-emerald-400">'/workers/codec.worker.js'</span>, &#123; type: <span className="text-emerald-400">'module'</span> &#125;);
+                <div className="rounded-2xl border border-stone-200 bg-white p-5">
+                  <h3 className="text-sm font-semibold text-stone-900">
+                    {locale === 'ar' ? 'الخلاصة' : 'Key takeaway'}
+                  </h3>
+                  <p className="mt-2 text-sm leading-6 text-stone-700">{bodyContent.takeaway}</p>
                 </div>
-                <div className="text-stone-200">
-                  worker.postMessage(&#123; <span className="text-orange-400">action</span>: <span className="text-emerald-400">'TRANSCODE'</span>, format: <span className="text-emerald-400">'webp'</span>, quality: <span className="text-blue-400">82</span> &#125;);
-                </div>
-              </div>
-            </section>
-
-            <section id="section-3" className="space-y-4">
-              <h2 className="text-xl sm:text-2xl font-bold text-stone-900">
-                {article.contentHeadings[2]}
-              </h2>
-              <p>
-                By profiling CPU cycles on both high-tier desktop workstations and constrained mobile processors, memory footprints remain well below 50MB per document transform.
-              </p>
-
-              {/* Data Table */}
-              <div className="rounded-2xl border border-stone-200 overflow-hidden shadow-xs bg-white">
-                <table className="w-full text-left text-xs font-mono">
-                  <thead className="bg-stone-50 text-stone-600 border-b border-stone-200">
-                    <tr>
-                      <th className="py-2.5 px-4">Container</th>
-                      <th className="py-2.5 px-4">Bandwidth Saving</th>
-                      <th className="py-2.5 px-4">Decode Latency</th>
-                      <th className="py-2.5 px-4">Alpha Support</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-stone-100 text-stone-700">
-                    <tr className="hover:bg-stone-50/70">
-                      <td className="py-2.5 px-4 font-bold text-stone-900">PNG</td>
-                      <td className="py-2.5 px-4">Baseline (0%)</td>
-                      <td className="py-2.5 px-4">4.2 ms</td>
-                      <td className="py-2.5 px-4 text-emerald-600 font-semibold">Lossless 8-bit</td>
-                    </tr>
-                    <tr className="hover:bg-stone-50/70">
-                      <td className="py-2.5 px-4 font-bold text-orange-600">WebP</td>
-                      <td className="py-2.5 px-4 text-emerald-600 font-semibold">-72.4%</td>
-                      <td className="py-2.5 px-4">5.8 ms</td>
-                      <td className="py-2.5 px-4 text-emerald-600 font-semibold">Lossless & Lossy</td>
-                    </tr>
-                    <tr className="hover:bg-stone-50/70">
-                      <td className="py-2.5 px-4 font-bold text-stone-900">AVIF</td>
-                      <td className="py-2.5 px-4 text-emerald-600 font-semibold">-81.1%</td>
-                      <td className="py-2.5 px-4">12.1 ms</td>
-                      <td className="py-2.5 px-4 text-emerald-600 font-semibold">10/12-bit HDR</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </section>
-
-            <section id="section-4" className="space-y-4">
-              <h2 className="text-xl sm:text-2xl font-bold text-stone-900">
-                {article.contentHeadings[3]}
-              </h2>
-              <p>
-                When authoring assets for production web delivery, prioritize progressive fallback sequences that serve WebP to compliant browsers while keeping PNG as a safe legacy fallback.
-              </p>
-            </section>
-
-            {/* Inactive Feedback Strip */}
-            <div className="pt-8 border-t border-stone-200 flex items-center justify-between text-xs text-stone-500">
-              <span>Was this article helpful? (Preview Mode)</span>
-              <div className="flex gap-2">
-                <button disabled className="px-3 py-1 rounded-lg bg-stone-100 border border-stone-200 text-stone-400 cursor-not-allowed">
-                  Yes
-                </button>
-                <button disabled className="px-3 py-1 rounded-lg bg-stone-100 border border-stone-200 text-stone-400 cursor-not-allowed">
-                  No
-                </button>
-              </div>
-            </div>
+              </>
+            )}
           </div>
 
           {/* Sticky Sidebar: Table of Contents & Referenced Tools (4 cols) */}
@@ -245,7 +183,7 @@ export const ArticleDetailPage: React.FC<ArticleDetailPageProps> = ({ articleSlu
                 {t('articles.tableOfContents')}
               </h3>
               <nav className="space-y-2 text-xs">
-                {article.contentHeadings.map((heading, i) => (
+                {displayContentHeadings.map((heading, i) => (
                   <a
                     key={i}
                     href={`#section-${i + 1}`}

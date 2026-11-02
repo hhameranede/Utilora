@@ -67,6 +67,7 @@ export const FeaturedToolCard: React.FC<FeaturedToolCardProps> = ({ tool, classN
         <Link
           routeType="tool"
           slug={tool.slug}
+          scrollTo="tool-workspace"
           className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-orange-700 hover:bg-orange-800 text-white text-sm font-semibold shadow-xs shadow-orange-500/20 transition-all hover:scale-102"
         >
           <span>{t('common.openTool')}</span>
