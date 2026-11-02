@@ -9,8 +9,7 @@ export async function onRequest(context) {
   if (request.headers.get("Origin") !== url.origin) {
     return json({ error: "مصدر الطلب غير مصرح به." }, 403);
   }
-  const length = Number(request.headers.get("Content-Length") || 0);
-  if (length > 8192) return json({ error: "حجم الطلب أكبر من المسموح." }, 413);
+
 
   const config = getConfig(context.env);
   if (!config.url || !config.publishableKey || !config.sessionSecret || config.sessionSecret.length < 32) {
@@ -23,7 +22,14 @@ export async function onRequest(context) {
   }
 
   try {
-    const body = await request.json();
+    const rawBody = await request.text();
+    if (new TextEncoder().encode(rawBody).byteLength > 8192) {
+      return json({ error: "حجم الطلب أكبر من المسموح." }, 413);
+    }
+    let body;
+    try { body = JSON.parse(rawBody); } catch {
+      return json({ error: "صيغة طلب تسجيل الدخول غير صالحة." }, 400);
+    }
     const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
     const password = typeof body.password === "string" ? body.password : "";
     if (email !== config.allowedEmail || !password || password.length > 1024) {
