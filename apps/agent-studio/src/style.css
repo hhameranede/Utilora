@@ -333,3 +333,9 @@ button { color: inherit; }
 .run-diagnostic-agent { display:grid; gap:2px; padding-top:7px; margin-top:7px; border-top:1px solid rgba(225,125,125,.14); }
 .run-diagnostic-agent b { color:#f2cccc; font-size:10px; }
 .run-diagnostic-agent span { color:#d5a5a5; overflow-wrap:anywhere; }
+
+.dispatch-test { margin-top:22px;max-width:460px; }
+.dispatch-test .auth-submit { width:100%;padding:0 14px; }
+.dispatch-check-result { margin:10px 0 0!important;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:11px!important;line-height:1.8;color:#9da3ad!important;overflow-wrap:anywhere; }
+.dispatch-check-result.is-success { border-color:rgba(114,198,154,.25);color:#9fd8b9!important; }
+.dispatch-check-result.is-error { border-color:rgba(225,125,125,.28);color:#efb1b1!important; }
