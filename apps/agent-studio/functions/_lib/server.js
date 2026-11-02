@@ -34,19 +34,15 @@ export function json(data, status = 200, extraHeaders = {}) {
 }
 
 export function getConfig(env) {
-  let url = String(env.SUPABASE_URL || "");
-  while (url.endsWith("/")) url = url.slice(0, -1);
   return {
-    url,
+    url: "https://paleenigjkmjwinkblfv.supabase.co",
     key: String(env.SUPABASE_SECRET_KEY || env.SUPABASE_SERVICE_ROLE_KEY || ""),
-    publishableKey: String(env.SUPABASE_PUBLISHABLE_KEY || env.SUPABASE_ANON_KEY || ""),
-    sessionSecret: String(env.STUDIO_SESSION_SECRET || ""),
-    allowedEmail: String(env.STUDIO_ALLOWED_EMAIL || "hhameranede@gmail.com").trim().toLowerCase(),
+    allowedEmail: "hhameranede@gmail.com",
     githubToken: String(env.UTILORA_GITHUB_TOKEN || ""),
-    repository: String(env.UTILORA_GITHUB_REPOSITORY || "hhameranede/Utilora"),
-    ref: String(env.UTILORA_AGENT_WORKFLOW_REF || "main"),
-    workflow: String(env.UTILORA_AGENT_WORKFLOW_FILE || "agent-chat-execution.yml"),
-    callbackUrl: String(env.AGENT_CHAT_CALLBACK_URL || "https://paleenigjkmjwinkblfv.supabase.co/functions/v1/agent-studio-callback")
+    repository: "hhameranede/Utilora",
+    ref: "main",
+    workflow: "agent-chat-execution.yml",
+    callbackUrl: "https://paleenigjkmjwinkblfv.supabase.co/functions/v1/agent-studio-callback"
   };
 }
 
@@ -63,10 +59,22 @@ function fromBase64Url(value) {
 }
 
 async function sessionKey(secret) {
-  if (secret.length < 32) throw new Error("STUDIO_SESSION_SECRET must contain at least 32 characters.");
-  return crypto.subtle.importKey(
-    "raw", encoder.encode(secret), { name: "HMAC", hash: "SHA-256" }, false, ["sign", "verify"]
+  if (typeof secret !== "string" || secret.length < 32) {
+    throw new Error("A valid Supabase server key is required to derive the session key.");
+  }
+  const material = await crypto.subtle.importKey(
+    "raw", encoder.encode(secret), "HKDF", false, ["deriveKey"]
   );
+  return crypto.subtle.deriveKey({
+    name: "HKDF",
+    hash: "SHA-256",
+    salt: encoder.encode("UTILORA Agent Studio session key v1"),
+    info: encoder.encode("owner-session-hmac-sha256")
+  }, material, {
+    name: "HMAC",
+    hash: "SHA-256",
+    length: 256
+  }, false, ["sign", "verify"]);
 }
 
 function readCookie(request) {
@@ -80,15 +88,13 @@ function readCookie(request) {
 
 export async function createOwnerSessionCookie(email, env) {
   const config = getConfig(env);
-  if (!config.sessionSecret || config.sessionSecret.length < 32) {
-    throw new Error("Session signing secret is not configured.");
-  }
+  assertServerKey(config);
   if (email.toLowerCase() !== config.allowedEmail) throw new Error("Owner account is not allowed.");
   const now = Math.floor(Date.now() / 1000);
   const payload = { email: config.allowedEmail, iat: now, exp: now + SESSION_TTL_SECONDS };
   const encodedPayload = toBase64Url(encoder.encode(JSON.stringify(payload)));
   const signingInput = encoder.encode(encodedPayload);
-  const signature = await crypto.subtle.sign("HMAC", await sessionKey(config.sessionSecret), signingInput);
+  const signature = await crypto.subtle.sign("HMAC", await sessionKey(config.key), signingInput);
   return SESSION_COOKIE + "=" + encodedPayload + "." + toBase64Url(new Uint8Array(signature)) +
     "; Path=/; Max-Age=" + SESSION_TTL_SECONDS + "; Secure; HttpOnly; SameSite=Strict";
 }
@@ -99,8 +105,10 @@ export function clearOwnerSessionCookie() {
 
 export async function requireOwner(context) {
   const config = getConfig(context.env);
-  if (!config.sessionSecret || config.sessionSecret.length < 32) {
-    return { response: json({ error: "لم يكتمل إعداد مفتاح جلسات الدخول على Cloudflare." }, 503) };
+  try {
+    assertServerKey(config);
+  } catch {
+    return { response: json({ error: "لم يكتمل إعداد مفتاح Supabase الخادمي على Cloudflare." }, 503) };
   }
   const token = readCookie(context.request);
   if (!token) return { response: json({ error: "سجّل الدخول للمتابعة." }, 401) };
@@ -111,7 +119,7 @@ export async function requireOwner(context) {
     const payloadBytes = fromBase64Url(parts[0]);
     const signature = fromBase64Url(parts[1]);
     const valid = await crypto.subtle.verify(
-      "HMAC", await sessionKey(config.sessionSecret), signature, encoder.encode(parts[0])
+      "HMAC", await sessionKey(config.key), signature, encoder.encode(parts[0])
     );
     if (!valid) throw new Error("Invalid session signature.");
     const payload = JSON.parse(new TextDecoder().decode(payloadBytes));
@@ -170,14 +178,16 @@ export async function db(config, path, method = "GET", body) {
   let lastError;
   for (let attempt = 0; attempt < 2; attempt += 1) {
     try {
+      const headers = {
+        apikey: config.key,
+        "Content-Type": "application/json",
+        Prefer: "return=representation"
+      };
+      // New sb_secret_* keys belong in apikey only; legacy service_role JWTs also need Authorization.
+      if (!config.key.startsWith("sb_secret_")) headers.Authorization = "Bearer " + config.key;
       const response = await fetch(config.url + "/rest/v1/" + path, {
         method,
-        headers: {
-          apikey: config.key,
-          Authorization: "Bearer " + config.key,
-          "Content-Type": "application/json",
-          Prefer: "return=representation"
-        },
+        headers,
         signal: AbortSignal.timeout(4500),
         ...(body === undefined ? {} : { body: JSON.stringify(body) })
       });
