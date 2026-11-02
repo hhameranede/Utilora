@@ -87,10 +87,10 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, className = '', varian
         <span className="truncate">
           {tool.status !== 'functional' ? t('common.previewOnly') : tool.acceptedFormats ? tool.acceptedFormats.slice(0, 3).join(', ') : tool.category === 'website-domain' ? t('common.publicLookup') : t('common.runsLocally')}
         </span>
-        <div className="flex items-center gap-1 text-orange-700 font-semibold group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5 transition-transform">
+        <span className="inline-flex items-center justify-center gap-1.5 shrink-0 rounded-lg border border-orange-100 bg-orange-50 px-3 py-2 text-orange-800 font-semibold transition-all group-hover:border-orange-700 group-hover:bg-orange-700 group-hover:text-white">
           <span>{t('common.openTool')}</span>
-          <ArrowUpRight size={13} />
-        </div>
+          <ArrowUpRight size={14} />
+        </span>
       </div>
     </Link>
   );

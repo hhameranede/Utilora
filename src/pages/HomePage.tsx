@@ -33,11 +33,11 @@ export const HomePage: React.FC = () => {
         schemaType="WebSite"
       />
 
-      <div className="w-full space-y-16 sm:space-y-20">
+      <div className="w-full space-y-10 sm:space-y-14">
         {/* ========================================== */}
         {/* HERO SECTION                               */}
         {/* ========================================== */}
-        <section className="relative pt-12 sm:pt-20 pb-8 text-center max-w-4xl mx-auto px-4">
+        <section className="relative pt-6 sm:pt-14 pb-4 sm:pb-6 text-center max-w-4xl mx-auto px-4">
           {/* Subtle orange glow behind hero title */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-orange-500/5 rounded-full blur-3xl pointer-events-none" />
 
@@ -46,16 +46,16 @@ export const HomePage: React.FC = () => {
             {t('hero.badge')}
           </div>
 
-          <h1 className="text-4xl sm:text-6xl font-extrabold text-stone-900 tracking-tight leading-[1.1] mb-6">
+          <h1 className="text-3xl sm:text-5xl font-extrabold text-stone-900 tracking-tight leading-[1.1] mb-3">
             {t('hero.title')}
           </h1>
 
-          <p className="text-base sm:text-lg text-stone-600 max-w-2xl mx-auto leading-relaxed mb-10">
+          <p className="text-sm sm:text-lg text-stone-600 max-w-2xl mx-auto leading-relaxed mb-5">
             {t('hero.subtitle')}
           </p>
 
           {/* Hero Search Field */}
-          <div className="max-w-2xl mx-auto relative mb-6">
+          <div className="max-w-2xl mx-auto relative mb-4">
             <div className="relative flex items-center">
               <Search size={18} className="absolute start-4 text-orange-600 pointer-events-none" />
               <input
@@ -63,7 +63,7 @@ export const HomePage: React.FC = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder={t('hero.searchPlaceholder')}
-                className="w-full ps-12 pe-4 py-4 rounded-2xl bg-white border border-stone-200 text-sm sm:text-base text-stone-900 placeholder-stone-500 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 shadow-lg shadow-stone-200/50 transition-all"
+                className="w-full ps-12 pe-4 py-3 rounded-2xl bg-white border border-stone-200 text-sm sm:text-base text-stone-900 placeholder-stone-500 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 shadow-lg shadow-stone-200/50 transition-all"
               />
             </div>
 
@@ -103,7 +103,7 @@ export const HomePage: React.FC = () => {
             <span>{t('hero.privacyBadge')}</span>
           </div>
 
-          <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
             <Link routeType="tools-index" className="inline-flex items-center justify-center rounded-xl bg-orange-700 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-orange-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-700 focus-visible:ring-offset-2">
               {t('nav.allTools')}
             </Link>
@@ -113,7 +113,7 @@ export const HomePage: React.FC = () => {
           </div>
 
           {/* Platform Metrics (Clean unboxed statistics) */}
-          <div className="pt-12 grid grid-cols-3 max-w-lg mx-auto border-t border-stone-200 mt-12 text-center">
+          <div className="pt-5 grid grid-cols-3 max-w-lg mx-auto border-t border-stone-200 mt-5 text-center">
             <div>
               <div className="text-xl sm:text-2xl font-bold font-mono text-stone-900">36</div>
               <div className="text-[11px] text-stone-500 mt-0.5">{t('hero.statsTools')}</div>
@@ -126,6 +126,36 @@ export const HomePage: React.FC = () => {
               <div className="text-xl sm:text-2xl font-bold font-mono text-stone-900">8</div>
               <div className="text-[11px] text-stone-500 mt-0.5">{t('hero.statsGlobal')}</div>
             </div>
+          </div>
+        </section>
+
+        {/* ========================================== */}
+        {/* POPULAR TOOLS SECTION                      */}
+        {/* ========================================== */}
+        <section id="quick-tools" aria-labelledby="quick-tools-heading" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-5 sm:mb-6 gap-3">
+            <div>
+              <h2 id="quick-tools-heading" className="text-xl sm:text-2xl font-bold text-stone-900">
+                {t('home.popularHeading')}
+              </h2>
+              <p className="text-xs sm:text-sm text-stone-500 mt-1">
+                {t('home.popularSub')}
+              </p>
+            </div>
+
+            <Link
+              routeType="tools-index"
+              className="inline-flex items-center justify-center gap-2 self-start rounded-xl bg-orange-700 px-4 py-2.5 text-xs font-bold text-white shadow-sm transition hover:bg-orange-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-700 focus-visible:ring-offset-2 sm:self-auto"
+            >
+              <span>{t('nav.allTools')}</span>
+              <ArrowRight size={14} />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+            {popularTools.slice(0, 6).map((tool) => (
+              <ToolCard key={tool.id} tool={tool} variant="compact" />
+            ))}
           </div>
         </section>
 
@@ -155,36 +185,6 @@ export const HomePage: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {CATEGORIES_LIST.map((cat) => (
               <CategoryCard key={cat.id} category={cat} />
-            ))}
-          </div>
-        </section>
-
-        {/* ========================================== */}
-        {/* POPULAR TOOLS SECTION                      */}
-        {/* ========================================== */}
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-4">
-            <div>
-              <h2 className="text-xl sm:text-2xl font-bold text-stone-900">
-                {t('home.popularHeading')}
-              </h2>
-              <p className="text-xs sm:text-sm text-stone-500 mt-1">
-                {t('home.popularSub')}
-              </p>
-            </div>
-
-            <Link
-              routeType="tools-index"
-              className="text-xs font-semibold text-orange-700 hover:text-orange-700 flex items-center gap-1 group"
-            >
-              <span>{t('nav.allTools')}</span>
-              <ArrowRight size={13} className="group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5 transition-transform" />
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {popularTools.filter((tool) => !featuredTools.some((featured) => featured.id === tool.id)).slice(0, 6).map((tool) => (
-              <ToolCard key={tool.id} tool={tool} />
             ))}
           </div>
         </section>
