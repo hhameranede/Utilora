@@ -88,7 +88,7 @@ export function renderBountyHunter() {
   return renderDashboard();
 }
 
-async function refreshBounties() {
+async function refreshBounties(onAnalyze) {
   state.loading = true;
   state.error = "";
   const button = document.querySelector("#bh-refresh");
@@ -108,13 +108,13 @@ async function refreshBounties() {
     const root = document.querySelector(".bounty-hunter-view");
     if (root) {
       root.outerHTML = renderDashboard();
-      bindBountyHunter();
+      bindBountyHunter({ onAnalyze });
     }
   }
 }
 
 export function bindBountyHunter({ onAnalyze } = {}) {
-  document.querySelector("#bh-refresh")?.addEventListener("click", refreshBounties);
+  document.querySelector("#bh-refresh")?.addEventListener("click", () => refreshBounties(onAnalyze));
   document.querySelectorAll("[data-bh-filter]").forEach((button) => {
     button.addEventListener("click", () => {
       state.filter = button.dataset.bhFilter || "all";
@@ -131,5 +131,5 @@ export function bindBountyHunter({ onAnalyze } = {}) {
       if (item && typeof onAnalyze === "function") onAnalyze(item);
     });
   });
-  if (!state.data && !state.loading) refreshBounties();
+  if (!state.data && !state.loading) refreshBounties(onAnalyze);
 }
