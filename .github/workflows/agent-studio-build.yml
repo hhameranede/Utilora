@@ -1,0 +1,39 @@
+name: Agent Studio build checks
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "apps/agent-studio/**"
+      - ".github/workflows/agent-studio-build.yml"
+  push:
+    branches: [main]
+    paths:
+      - "apps/agent-studio/**"
+      - ".github/workflows/agent-studio-build.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  build-agent-studio:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/agent-studio
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: apps/agent-studio/package.json
+      - name: Install Agent Studio dependencies
+        run: npm install --no-audit --no-fund
+      - name: Check JavaScript syntax
+        run: |
+          node --check src/main.js
+          node --check src/bounty-hunter.js
+          node --check functions/api/bounties.js
+      - name: Build Agent Studio
+        run: npm run build
