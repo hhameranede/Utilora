@@ -1,0 +1,3 @@
+# Public Supabase publishable key false-positive in the original workflow commit.
+# This is not a secret/service-role key; keep all other Gitleaks findings enabled.
+34c2f5d18cfc0c26b431c1fa57f0d000f53a8063:.github/workflows/agent-chat-execution.yml:generic-api-key:21
