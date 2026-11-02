@@ -93,7 +93,7 @@ jobs:
 
   project-lead:
     name: Project Lead
-    if: ${{ inputs.dispatch_probe != 'true' && (inputs.mode == 'group' || inputs.target_agent == 'project-lead') }}
+    if: ${{ always() && inputs.dispatch_probe != 'true' && (inputs.mode == 'group' || inputs.target_agent == 'project-lead') }}
     needs: specialists
     runs-on: ubuntu-latest
     timeout-minutes: 10
