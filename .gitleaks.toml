@@ -4,10 +4,7 @@ title = "UTILORA Gitleaks configuration"
 useDefault = true
 
 [[allowlists]]
-description = "Supabase publishable keys are explicitly public API identifiers, not secrets"
-paths = [
-  '''\.github/workflows/agent-chat-execution\.yml$''',
-]
-regexes = [
-  '''sb_publishable_[A-Za-z0-9_-]+''',
+description = "Allow the one historical commit containing a Supabase publishable (public, non-secret) key. No secret/service-role key is allowlisted."
+commits = [
+  "34c2f5d18cfc0c26b431c1fa57f0d000f53a8063",
 ]
