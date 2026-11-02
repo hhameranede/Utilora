@@ -43,6 +43,17 @@ function renderSources() {
   return filtered.length ? filtered.map(sourceCard).join("") : '<div class="bh-empty">لا توجد جهات ضمن هذا التصنيف.</div>';
 }
 
+function renderActivePrograms() {
+  const programs = state.data?.activePrograms || [];
+  if (!programs.length) return '<div class="bh-empty">لا توجد برامج مباشرة موثقة في هذه المراجعة.</div>';
+  return programs.map((program) =>
+    '<article class="bh-program-card"><div class="bh-opportunity-meta"><span>' + esc(program.category) + '</span><span class="bh-unverified">' + esc(program.status) + '</span></div>' +
+    '<h3>' + esc(program.name) + '</h3><div class="bh-reward">' + esc(program.reward) + '</div>' +
+    '<p>' + esc(program.payout) + '</p><p class="bh-note">' + esc(program.note) + '</p>' +
+    '<a class="bh-link" href="' + esc(program.url) + '" target="_blank" rel="noopener noreferrer">قواعد البرنامج والمكافآت ↗</a></article>'
+  ).join("");
+}
+
 function renderOpportunities() {
   if (state.loading && !state.data) return '<div class="bh-empty">جارٍ البحث في GitHub عن مهام ومكافآت منشورة…</div>';
   if (state.error && !state.data) return '<div class="bh-empty bh-error">' + esc(state.error) + '</div>';
@@ -61,7 +72,9 @@ function renderDashboard() {
     '<div class="view-kicker">AUTONOMOUS REWARD RADAR</div>' +
     '<div class="bh-heading"><div><h2>UTILORA Bounty Hunter</h2><p>رادار خاص لاكتشاف المكافآت الممولة والمهام البرمجية ومشاريع الذكاء الاصطناعي والأمن.</p></div><button class="bh-refresh" id="bh-refresh" type="button" ' + (state.loading ? "disabled" : "") + '>↻ تحديث الرادار</button></div>' +
     '<div class="bh-alert"><strong>شفافية الأهلية:</strong> أنت في الجزائر وعمرك أقل من 18 سنة. لا نرسل مهاماً ولا نعتبر أي منصة متاحة قبل التحقق من العمر والبلد ووسيلة الدفع وشروط استخدام الوكلاء. لا نستخدم حساباً بهوية شخص آخر.</div>' +
-    '<div class="bh-stats"><div><span>مصادر تمت مراجعتها</span><strong>' + sources.length + '</strong></div><div><span>أهلية مشروطة</span><strong>' + eligible + '</strong></div><div><span>موقوفة بسبب العمر</span><strong>' + blocked + '</strong></div><div><span>فرص GitHub المرشحة</span><strong>' + items.length + '</strong></div></div>' +
+    '<div class="bh-stats"><div><span>مصادر تمت مراجعتها</span><strong>' + sources.length + '</strong></div><div><span>أهلية مشروطة</span><strong>' + eligible + '</strong></div><div><span>موقوفة بسبب العمر</span><strong>' + blocked + '</strong></div><div><span>فرص GitHub المرشحة</span><strong>' + items.length + '</strong></div><div><span>برامج مكافآت مباشرة</span><strong>' + (data?.activePrograms?.length || 0) + '</strong></div></div>' +
+    '<div class="bh-section-head"><div><h3>برامج مكافآت مباشرة منشورة</h3><p>صفحات برامج فعلية بمكافآت معلنة؛ ليست وعداً بأهلية الحساب أو قبول اكتشاف.</p></div></div>' +
+    '<div class="bh-program-grid">' + renderActivePrograms() + '</div>' +
     '<div class="bh-section-head"><div><h3>مصادر المكافآت الرسمية</h3><p>قواعد كل جهة، العمر، الجزائر، الدفع، وسماح الأتمتة.</p></div></div>' +
     '<div class="bh-filters">' + FILTERS.map(([id, label]) => '<button type="button" data-bh-filter="' + id + '" class="' + (state.filter === id ? "active" : "") + '">' + label + '</button>').join("") + '</div>' +
     '<div class="bh-source-grid">' + renderSources() + '</div>' +
