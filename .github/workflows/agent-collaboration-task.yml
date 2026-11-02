@@ -1,0 +1,251 @@
+name: UTILORA real team collaboration trial
+
+on:
+  push:
+    branches:
+      - feat/autonomous-agent-foundation-2026-11-01
+  workflow_dispatch:
+
+concurrency:
+  group: utilora-team-trial-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  collaborative-image-workspace-task:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - name: Checkout tested UTILORA branch
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies and OpenCode
+        run: |
+          set -euo pipefail
+          npm install --no-audit --no-fund
+          npm install --global opencode-ai@1.19.5
+          opencode --version
+
+      - name: Install Chromium and start the local preview
+        run: |
+          set -euo pipefail
+          npx playwright install --with-deps chromium
+          mkdir -p .agent-review/before .agent-review/after
+          npm run dev -- --host 127.0.0.1 --port 3000 > "$RUNNER_TEMP/utilora-preview.log" 2>&1 &
+          echo $! > "$RUNNER_TEMP/utilora-preview.pid"
+          ready=0
+          for attempt in $(seq 1 45); do
+            if curl --fail --silent http://127.0.0.1:3000/en/tools/image-converter > /dev/null; then
+              ready=1
+              break
+            fi
+            sleep 2
+          done
+          if [ "$ready" -ne 1 ]; then
+            tail -n 40 "$RUNNER_TEMP/utilora-preview.log"
+            exit 1
+          fi
+          npx playwright screenshot --browser chromium --viewport-size "1440,900" http://127.0.0.1:3000/en/tools/image-converter .agent-review/before/en-desktop.png
+          npx playwright screenshot --browser chromium --viewport-size "390,844" http://127.0.0.1:3000/en/tools/image-converter .agent-review/before/en-mobile.png
+          npx playwright screenshot --browser chromium --viewport-size "1440,900" http://127.0.0.1:3000/ar/tools/image-converter .agent-review/before/ar-desktop.png
+          npx playwright screenshot --browser chromium --viewport-size "390,844" http://127.0.0.1:3000/ar/tools/image-converter .agent-review/before/ar-mobile.png
+
+      - name: Configure safe team permissions
+        run: |
+          set -euo pipefail
+          OPENCODE_CONFIG_CONTENT="$(python3 - <<'PY'
+          import json
+          role_access = {
+              "project-lead": {"edit": "deny", "task": "allow"},
+              "problem-analyst": {"edit": "deny", "task": "deny"},
+              "implementation-engineer": {"edit": "allow", "task": "deny"},
+              "fast-task-engineer": {"edit": "allow", "task": "deny"},
+              "visual-reviewer": {"edit": "deny", "task": "deny"},
+              "long-horizon-engineer": {"edit": "allow", "task": "deny"},
+              "qa-engineer": {"edit": "deny", "task": "deny"},
+              "security-auditor": {"edit": "deny", "task": "deny"}
+          }
+          agents = {
+              name: {
+                  "permission": {
+                      "read": "allow", "glob": "allow", "grep": "allow", "list": "allow",
+                      "todowrite": "allow", "bash": "deny", "external_directory": "deny",
+                      "skill": {"*": "allow"}, **access
+                  }
+              }
+              for name, access in role_access.items()
+          }
+          overlay = {
+              "permission": {
+                  "read": "allow", "glob": "allow", "grep": "allow", "list": "allow",
+                  "todowrite": "allow", "bash": "deny", "edit": "deny",
+                  "external_directory": "deny", "skill": {"*": "allow"}
+              },
+              "agent": agents,
+              "mcp": {
+                  name: {"enabled": False}
+                  for name in ["playwright", "context7", "firecrawl", "cloudflare-docs", "cloudflare-api", "posthog"]
+              }
+          }
+          print(json.dumps(overlay, separators=(",", ":")))
+          PY
+          )"
+          echo "OPENCODE_CONFIG_CONTENT=$OPENCODE_CONFIG_CONTENT" >> "$GITHUB_ENV"
+          export OPENCODE_CONFIG_CONTENT
+          for agent in project-lead problem-analyst implementation-engineer fast-task-engineer visual-reviewer long-horizon-engineer qa-engineer security-auditor; do
+            opencode debug agent "$agent" > "$RUNNER_TEMP/$agent-config.json"
+          done
+          echo "Loaded all eight roles; shell and external MCP execution are disabled for model processes."
+
+      - name: Project Lead coordinates the full team and implements the agreed fix
+        env:
+          NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+        run: |
+          set -euo pipefail
+          set +x
+          test -n "$NVIDIA_API_KEY"
+          export PYTHONDONTWRITEBYTECODE=1
+          PROMPT="$(cat .agent-tasks/image-workspace-localization.md)"
+          PROMPT="$PROMPT
+
+          Runtime boundary: model agents have read/edit/task tools only. Shell and external MCP execution are intentionally disabled so the provider credential is not exposed to tool subprocesses. Use the attached screenshots and repository read tools. Do not claim tests were executed; CI will run the commands independently after the edit. Use all seven specialists for the council and complete the code change."
+          set +e
+          timeout --signal=TERM --kill-after=30s 35m opencode --log-level INFO run --dir "$GITHUB_WORKSPACE" --agent project-lead --model nvidia-nim/nemotron-ultra --file .agent-review/before/en-desktop.png --file .agent-review/before/en-mobile.png --file .agent-review/before/ar-desktop.png --file .agent-review/before/ar-mobile.png --format json "$PROMPT" > "$RUNNER_TEMP/team-events.jsonl" 2> "$RUNNER_TEMP/team-debug.txt"
+          opencode_exit=$?
+          set -e
+          export OPENCODE_EXIT_CODE="$opencode_exit"
+          python3 - <<'PY'
+          import json, os, pathlib, re, subprocess, sys
+          sys.path.insert(0, str(pathlib.Path(os.environ["GITHUB_WORKSPACE"]) / "scripts"))
+          from opencode_smoke import extract_final_assistant_text
+          temp = pathlib.Path(os.environ["RUNNER_TEMP"])
+          raw = (temp / "team-events.jsonl").read_text(encoding="utf-8", errors="replace")
+          debug = (temp / "team-debug.txt").read_text(encoding="utf-8", errors="replace")
+          session = ""
+          for line in raw.splitlines():
+              try:
+                  event = json.loads(line)
+              except json.JSONDecodeError:
+                  continue
+              if isinstance(event, dict):
+                  part = event.get("part") or {}
+                  if isinstance(part, dict):
+                      session = session or event.get("sessionID") or part.get("sessionID", "")
+                  session = session or event.get("sessionID", "")
+          export_status, export_text, answer, finish = "missing-session", "", "", "missing"
+          if session:
+              try:
+                  result = subprocess.run(["opencode", "export", session, "--sanitize"], capture_output=True, text=True, timeout=90)
+                  export_status, export_text = str(result.returncode), result.stdout or ""
+                  if result.returncode == 0:
+                      transcript = json.loads(export_text)
+                      answer = extract_final_assistant_text(transcript)
+                      for message in reversed(transcript.get("messages", [])):
+                          info = message.get("info") or {} if isinstance(message, dict) else {}
+                          if isinstance(info, dict) and (info.get("role") == "assistant" or message.get("role") == "assistant"):
+                              finish = info.get("finish") or message.get("finish") or "missing"
+                              break
+              except Exception as error:
+                  export_status = type(error).__name__
+          combined = raw + "\n" + debug + "\n" + export_text + "\n" + answer
+          secret = os.environ.get("NVIDIA_API_KEY", "")
+          if (secret and secret in combined) or re.search(r"(?i)nvapi-[A-Za-z0-9_-]{12,}|gh[pousr]_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}", combined):
+              print("::error::Credential-like output detected; details suppressed.")
+              sys.exit(1)
+          code = int(os.environ.get("OPENCODE_EXIT_CODE", "1"))
+          report = "# Project Lead report\n\n" + f"- OpenCode exit: {code}\n- Session export: {export_status}\n- Final finish: {finish}\n\n" + (answer.strip() or "No final report.")
+          pathlib.Path(".agent-review/project-lead-report.md").write_text(report + "\n", encoding="utf-8")
+          print(f"Project Lead report captured; finish={finish}; export={export_status}")
+          if code != 0 or not answer.strip() or finish != "stop":
+              sys.exit(1)
+          PY
+
+      - name: Run independent image, type and build checks
+        if: always()
+        run: |
+          set +e
+          npm run lint > .agent-review/verify-lint.log 2>&1
+          lint=$?
+          npm run test:image > .agent-review/verify-image.log 2>&1
+          image=$?
+          SITE_URL=https://utilora.invalid npm run build > .agent-review/verify-build.log 2>&1
+          build=$?
+          printf 'npm run lint: %s\nnpm run test:image: %s\nSITE_URL=https://utilora.invalid npm run build: %s\n' "$lint" "$image" "$build" > .agent-review/verification-summary.txt
+          cat .agent-review/verification-summary.txt
+          if [ "$lint" -ne 0 ] || [ "$image" -ne 0 ] || [ "$build" -ne 0 ]; then exit 1; fi
+
+      - name: Capture post-change desktop and mobile screenshots
+        if: always()
+        run: |
+          set +e
+          npx playwright screenshot --browser chromium --viewport-size "1440,900" http://127.0.0.1:3000/en/tools/image-converter .agent-review/after/en-desktop.png
+          npx playwright screenshot --browser chromium --viewport-size "390,844" http://127.0.0.1:3000/en/tools/image-converter .agent-review/after/en-mobile.png
+          npx playwright screenshot --browser chromium --viewport-size "1440,900" http://127.0.0.1:3000/ar/tools/image-converter .agent-review/after/ar-desktop.png
+          npx playwright screenshot --browser chromium --viewport-size "390,844" http://127.0.0.1:3000/ar/tools/image-converter .agent-review/after/ar-mobile.png
+          exit 0
+
+      - name: Independent QA review after CI checks
+        if: always()
+        env:
+          NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+        run: |
+          set -euo pipefail
+          set +x
+          PROMPT="Independently review the current shared image-workspace localization change. Read the changed source and new regression tests, and inspect .agent-review/verification-summary.txt plus the full verification logs. Do not edit files, use shell, invoke external tools, or claim tests passed unless the supplied logs prove it. Report verified issues, missing coverage, and whether the change meets the task acceptance criteria."
+          timeout --signal=TERM --kill-after=20s 7m opencode run --dir "$GITHUB_WORKSPACE" --agent qa-engineer --model nvidia-nim/deepseek-v4-1-flash --format json "$PROMPT" > "$RUNNER_TEMP/qa-events.jsonl" 2> "$RUNNER_TEMP/qa-debug.txt"
+
+      - name: Independent security review after implementation
+        if: always()
+        env:
+          NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+        run: |
+          set -euo pipefail
+          set +x
+          PROMPT="Independently audit the current image-workspace localization changes and working-tree diff. Read source, translation dictionaries and tests. Verify privacy remains browser-local, no new upload/network path exists, rendering remains safe, and no secrets are introduced. Do not edit files or use shell. Report only evidence-backed findings with severity and exact files."
+          timeout --signal=TERM --kill-after=20s 7m opencode run --dir "$GITHUB_WORKSPACE" --agent security-auditor --model nvidia-nim/nemotron-ultra --format json "$PROMPT" > "$RUNNER_TEMP/security-events.jsonl" 2> "$RUNNER_TEMP/security-debug.txt"
+
+      - name: Independent visual review of post-change screenshots
+        if: always()
+        env:
+          NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+        run: |
+          set -euo pipefail
+          set +x
+          PROMPT="Inspect the four attached REAL post-change screenshots of /en/tools/image-converter and /ar/tools/image-converter at desktop and 390px mobile widths. Compare the relevant before-state screenshots in .agent-review/before if needed. Review hierarchy, clipping, wrapping, RTL, contrast, spacing, keyboard-visible focus where shown, and consistency with UTILORA's warm-white/stone/orange design. Do not infer unseen interactions. Report concrete findings and any uncertainty."
+          timeout --signal=TERM --kill-after=20s 7m opencode run --dir "$GITHUB_WORKSPACE" --agent visual-reviewer --model nvidia-nim/nemotron-super-vl --file .agent-review/after/en-desktop.png --file .agent-review/after/en-mobile.png --file .agent-review/after/ar-desktop.png --file .agent-review/after/ar-mobile.png --format json "$PROMPT" > "$RUNNER_TEMP/visual-events.jsonl" 2> "$RUNNER_TEMP/visual-debug.txt"
+
+      - name: Capture the uncommitted implementation patch
+        if: always()
+        run: |
+          set +e
+          git add -N -- . 2>/dev/null
+          git diff --binary HEAD -- . ':!.agent-review/**' > .agent-review/agent-task.patch
+          git status --short > .agent-review/working-tree-status.txt
+          if [ ! -s .agent-review/agent-task.patch ]; then
+            echo "::warning::No implementation diff was produced."
+          fi
+          set -e
+
+      - name: Upload collaboration evidence and screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: utilora-eight-agent-collaboration
+          path: .agent-review/
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Stop local preview
+        if: always()
+        run: |
+          if [ -f "$RUNNER_TEMP/utilora-preview.pid" ]; then
+            kill "$(cat "$RUNNER_TEMP/utilora-preview.pid")" 2>/dev/null || true
+          fi
