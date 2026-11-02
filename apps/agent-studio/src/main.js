@@ -171,7 +171,13 @@ function bindEvents() {
   document.querySelectorAll("[data-view]").forEach((button) => {
     button.addEventListener("click", async () => {
       state.view = button.dataset.view;
-      if (state.view === "chat") state.room = "main";
+      if (state.view === "chat" && state.room !== "main") {
+        state.room = "main";
+        resetAgentStatuses();
+        state.messages = [];
+        state.events = [];
+        state.latestRun = null;
+      }
       state.error = "";
       render();
       if (state.view === "chat") await loadStatus();
