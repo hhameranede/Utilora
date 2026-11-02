@@ -38,18 +38,16 @@ async function checkGitHubWorkflow(config) {
 async function checkCallback(config) {
   if (!config.callbackUrl) return false;
   try {
-    // Supabase callback remains server-to-server; retain the known CORS health probe origin for fallback compatibility.
-    const probeOrigin = "https://utilora-chat.vercel.app";
+    // The callback is invoked server-to-server by GitHub Actions; browser CORS is not required.
     const response = await fetch(config.callbackUrl, {
       method: "OPTIONS",
       headers: {
-        Origin: probeOrigin,
         "Access-Control-Request-Method": "POST",
         "Access-Control-Request-Headers": "authorization,content-type"
       },
       signal: AbortSignal.timeout(6000)
     });
-    return response.ok && response.headers.get("access-control-allow-origin") === probeOrigin;
+    return response.ok;
   } catch {
     return false;
   }
@@ -64,8 +62,8 @@ export async function onRequest(context) {
 
   const config = getConfig(context.env);
   const url = new URL(request.url);
-  const roomSlug = parseRoomSlug(url.searchParams.get("room"));
-  if (!roomSlug) return json({ error: "غرفة المحادثة غير موجودة." }, 404);
+  const room = parseRoomSlug(url.searchParams.get("room"));
+  if (!room) return json({ error: "غرفة المحادثة غير موجودة." }, 404);
 
   const integrations = {
     database: Boolean(config.url && config.key && !config.key.startsWith("sb_publishable_")),
@@ -90,7 +88,7 @@ export async function onRequest(context) {
   if (integrations.database) {
     try {
       const rooms = await db(config,
-        "team_chat_rooms?slug=eq." + encodeURIComponent(roomSlug) + "&select=id,slug,title&limit=1");
+        "team_chat_rooms?slug=eq." + encodeURIComponent(room.slug) + "&select=id,slug,title&limit=1");
       if (!rooms?.[0]) throw new Error("Chat room is missing.");
       const runs = await db(config,
         "team_chat_runs?room_id=eq." + encodeURIComponent(rooms[0].id) +
@@ -120,7 +118,7 @@ export async function onRequest(context) {
     auth: "supabase-auth-session",
     identity: { email: access.identity.email },
     integrations,
-    room: roomSlug,
+    room: room.slug,
     run,
     events,
     agents
