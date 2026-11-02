@@ -33,29 +33,29 @@ export const HomePage: React.FC = () => {
         schemaType="WebSite"
       />
 
-      <div className="w-full space-y-10 sm:space-y-14">
+      <div className="w-full space-y-8 sm:space-y-12">
         {/* ========================================== */}
         {/* HERO SECTION                               */}
         {/* ========================================== */}
-        <section className="relative pt-6 sm:pt-14 pb-4 sm:pb-6 text-center max-w-4xl mx-auto px-4">
+        <section className="relative pt-2 sm:pt-10 pb-2 sm:pb-4 text-center max-w-4xl mx-auto px-4">
           {/* Subtle orange glow behind hero title */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-orange-500/5 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 sm:w-96 sm:h-96 bg-orange-500/5 rounded-full blur-3xl pointer-events-none" />
 
           {/* Clean Unboxed Category Kicker */}
-          <div className="text-xs font-mono uppercase tracking-widest text-orange-700 mb-4 font-semibold">
+          <div className="text-[11px] sm:text-xs font-mono uppercase tracking-widest text-orange-700 mb-2 sm:mb-4 font-semibold">
             {t('hero.badge')}
           </div>
 
-          <h1 className="text-3xl sm:text-5xl font-extrabold text-stone-900 tracking-tight leading-[1.1] mb-3">
+          <h1 className="text-2xl sm:text-5xl font-extrabold text-stone-900 tracking-tight leading-[1.1] mb-2 sm:mb-3">
             {t('hero.title')}
           </h1>
 
-          <p className="text-sm sm:text-lg text-stone-600 max-w-2xl mx-auto leading-relaxed mb-5">
+          <p className="text-sm sm:text-lg text-stone-600 max-w-2xl mx-auto leading-relaxed mb-3 sm:mb-5">
             {t('hero.subtitle')}
           </p>
 
           {/* Hero Search Field */}
-          <div className="max-w-2xl mx-auto relative mb-4">
+          <div className="max-w-2xl mx-auto relative mb-3 sm:mb-4">
             <div className="relative flex items-center">
               <Search size={18} className="absolute start-4 text-orange-600 pointer-events-none" />
               <input
@@ -63,7 +63,7 @@ export const HomePage: React.FC = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder={t('hero.searchPlaceholder')}
-                className="w-full ps-12 pe-4 py-3 rounded-2xl bg-white border border-stone-200 text-sm sm:text-base text-stone-900 placeholder-stone-500 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 shadow-lg shadow-stone-200/50 transition-all"
+                className="w-full ps-12 pe-4 py-2.5 sm:py-3 rounded-2xl bg-white border border-stone-200 text-sm sm:text-base text-stone-900 placeholder-stone-500 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 shadow-lg shadow-stone-200/50 transition-all"
               />
             </div>
 
@@ -81,6 +81,7 @@ export const HomePage: React.FC = () => {
                         key={tool.id}
                         routeType="tool"
                         slug={tool.slug}
+                        scrollTo="tool-workspace"
                         className="flex items-center justify-between p-2.5 rounded-xl hover:bg-orange-50/70 text-xs transition-colors"
                       >
                         <span className="font-semibold text-stone-800">
@@ -98,35 +99,21 @@ export const HomePage: React.FC = () => {
           </div>
 
           {/* Privacy & Guarantee Sub-badge (clean typography) */}
-          <div className="flex items-center justify-center gap-2 text-xs text-stone-500">
+          <div className="flex items-center justify-center gap-2 text-[11px] sm:text-xs text-stone-500">
             <Lock size={13} className="text-orange-500" />
             <span>{t('hero.privacyBadge')}</span>
           </div>
 
-          <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
-            <Link routeType="tools-index" className="inline-flex items-center justify-center rounded-xl bg-orange-700 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-orange-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-700 focus-visible:ring-offset-2">
+          <div className="mt-3 sm:mt-4 flex flex-wrap items-center justify-center gap-2.5 sm:gap-3">
+            <Link routeType="tools-index" className="inline-flex min-h-10 items-center justify-center rounded-xl bg-orange-700 px-4 sm:px-5 py-2.5 sm:py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-orange-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-700 focus-visible:ring-offset-2">
               {t('nav.allTools')}
             </Link>
-            <Link routeType="categories-index" className="inline-flex items-center justify-center rounded-xl border border-stone-300 bg-white px-5 py-3 text-sm font-semibold text-stone-700 transition hover:border-orange-400 hover:text-orange-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-700 focus-visible:ring-offset-2">
+            <Link routeType="categories-index" className="inline-flex min-h-10 items-center justify-center rounded-xl border border-stone-300 bg-white px-4 sm:px-5 py-2.5 sm:py-3 text-sm font-semibold text-stone-700 transition hover:border-orange-400 hover:text-orange-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-700 focus-visible:ring-offset-2">
               {t('hero.browseCategories')}
             </Link>
           </div>
 
-          {/* Platform Metrics (Clean unboxed statistics) */}
-          <div className="pt-5 grid grid-cols-3 max-w-lg mx-auto border-t border-stone-200 mt-5 text-center">
-            <div>
-              <div className="text-xl sm:text-2xl font-bold font-mono text-stone-900">36</div>
-              <div className="text-[11px] text-stone-500 mt-0.5">{t('hero.statsTools')}</div>
-            </div>
-            <div>
-              <div className="text-xl sm:text-2xl font-bold font-mono text-orange-700">6</div>
-              <div className="text-[11px] text-stone-500 mt-0.5">{t('hero.statsCategories')}</div>
-            </div>
-            <div>
-              <div className="text-xl sm:text-2xl font-bold font-mono text-stone-900">8</div>
-              <div className="text-[11px] text-stone-500 mt-0.5">{t('hero.statsGlobal')}</div>
-            </div>
-          </div>
+
         </section>
 
         {/* ========================================== */}
@@ -156,6 +143,24 @@ export const HomePage: React.FC = () => {
             {popularTools.slice(0, 6).map((tool) => (
               <ToolCard key={tool.id} tool={tool} variant="compact" />
             ))}
+          </div>
+        </section>
+
+        {/* Platform statistics follow the first usable tools, not the hero. */}
+        <section aria-label="Platform statistics" className="hidden sm:block max-w-2xl mx-auto px-4">
+                    <div className="pt-5 grid grid-cols-3 max-w-lg mx-auto border-t border-stone-200 mt-5 text-center">
+            <div>
+              <div className="text-xl sm:text-2xl font-bold font-mono text-stone-900">36</div>
+              <div className="text-[11px] text-stone-500 mt-0.5">{t('hero.statsTools')}</div>
+            </div>
+            <div>
+              <div className="text-xl sm:text-2xl font-bold font-mono text-orange-700">6</div>
+              <div className="text-[11px] text-stone-500 mt-0.5">{t('hero.statsCategories')}</div>
+            </div>
+            <div>
+              <div className="text-xl sm:text-2xl font-bold font-mono text-stone-900">8</div>
+              <div className="text-[11px] text-stone-500 mt-0.5">{t('hero.statsGlobal')}</div>
+            </div>
           </div>
         </section>
 

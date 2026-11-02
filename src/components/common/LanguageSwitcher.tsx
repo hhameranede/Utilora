@@ -65,10 +65,10 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ variant = 'h
         aria-expanded={isOpen}
         aria-label={t("nav.switchLanguage")}
         aria-haspopup="listbox"
-        className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl border border-stone-200 bg-stone-50 hover:bg-stone-100 hover:border-stone-300 text-xs font-medium text-stone-700 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
+        className="flex items-center gap-1.5 sm:gap-2 px-1.5 sm:px-2.5 py-1.5 rounded-xl border border-stone-200 bg-stone-50 hover:bg-stone-100 hover:border-stone-300 text-xs font-medium text-stone-700 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
       >
         <Globe size={14} className="text-orange-500" />
-        <span>{currentLanguage.nativeName}</span>
+        <span className="max-[359px]:hidden">{currentLanguage.nativeName}</span>
         <ChevronDown size={12} className={`text-stone-400 transition-transform ${isOpen ? 'rotate-180 text-orange-600' : ''}`} />
       </button>
 

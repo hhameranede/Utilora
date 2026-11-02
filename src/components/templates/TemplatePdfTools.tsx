@@ -157,11 +157,11 @@ export const TemplatePdfTools: React.FC<TemplatePdfToolsProps> = ({ toolName, to
                   <div className="flex items-center gap-1 shrink-0">
                     {multiple && (
                       <>
-                        <button type="button" onClick={() => moveFile(index, 'up')} disabled={index === 0} className="p-1.5 rounded-md hover:bg-stone-200 text-stone-500 disabled:opacity-30" title={t('pdfWorkspace.moveFileUp')}><ArrowUp size={14} /></button>
-                        <button type="button" onClick={() => moveFile(index, 'down')} disabled={index === files.length - 1} className="p-1.5 rounded-md hover:bg-stone-200 text-stone-500 disabled:opacity-30" title={t('pdfWorkspace.moveFileDown')}><ArrowDown size={14} /></button>
+                        <button type="button" onClick={() => moveFile(index, 'up')} disabled={index === 0} className="p-1.5 rounded-md hover:bg-stone-200 text-stone-500 disabled:opacity-30" title={t('pdfWorkspace.moveFileUp')} aria-label={t('pdfWorkspace.moveFileUp')}><ArrowUp size={14} /></button>
+                        <button type="button" onClick={() => moveFile(index, 'down')} disabled={index === files.length - 1} className="p-1.5 rounded-md hover:bg-stone-200 text-stone-500 disabled:opacity-30" title={t('pdfWorkspace.moveFileDown')} aria-label={t('pdfWorkspace.moveFileDown')}><ArrowDown size={14} /></button>
                       </>
                     )}
-                    <button type="button" onClick={() => removeFile(index)} className="p-1.5 rounded-md hover:bg-red-50 text-stone-400 hover:text-red-600" title={t('pdfWorkspace.removeFile')}><X size={14} /></button>
+                    <button type="button" onClick={() => removeFile(index)} className="p-1.5 rounded-md hover:bg-red-50 text-stone-400 hover:text-red-600" title={t('pdfWorkspace.removeFile')} aria-label={t('pdfWorkspace.removeFile')}><X size={14} /></button>
                   </div>
                 </li>
               ))}

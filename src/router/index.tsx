@@ -114,6 +114,7 @@ interface LinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
   slug?: string;
   className?: string;
   children: ReactNode;
+  scrollTo?: string;
 }
 
 export const Link: React.FC<LinkProps> = ({
@@ -123,6 +124,7 @@ export const Link: React.FC<LinkProps> = ({
   className,
   children,
   onClick,
+  scrollTo,
   ...rest
 }) => {
   const { locale } = useI18n();
@@ -135,6 +137,11 @@ export const Link: React.FC<LinkProps> = ({
     if (!e.defaultPrevented && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey && href.startsWith('/')) {
       e.preventDefault();
       navigate(href);
+      if (scrollTo && typeof window !== 'undefined') {
+        window.setTimeout(() => {
+          document.getElementById(scrollTo)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
+      }
     }
   };
 
