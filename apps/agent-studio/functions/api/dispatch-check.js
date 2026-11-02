@@ -50,7 +50,7 @@ export async function onRequest(context) {
           run_id: "dispatch-probe-" + crypto.randomUUID(),
           mode: "private",
           target_agent: "__dispatch_probe__",
-          dispatch_probe: true
+          dispatch_probe: "true"
         }
       }),
       signal: AbortSignal.timeout(10000)
