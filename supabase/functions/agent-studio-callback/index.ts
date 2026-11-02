@@ -1,9 +1,9 @@
 import { createRemoteJWKSet, jwtVerify } from "npm:jose@5.10.0";
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Origin": "https://utilora-chat.vercel.app",
   "Access-Control-Allow-Headers": "authorization, apikey, content-type",
-  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
   "Content-Type": "application/json",
   "Cache-Control": "no-store",
 };
@@ -114,10 +114,11 @@ async function readRun(body: any) {
   const prompt = prompts?.[0];
   if (!prompt || prompt.room_id !== run.room_id) return response(404, { error: "Prompt not found." });
 
-  const history = await supabase(
+  const recentHistory = await supabase(
     "team_chat_messages?room_id=eq." + encodeURIComponent(run.room_id) +
-      "&select=role,agent_id,content,created_at&order=created_at.asc&limit=30"
+      "&select=role,agent_id,content,created_at&order=created_at.desc&limit=30"
   );
+  const history = Array.isArray(recentHistory) ? recentHistory.reverse() : [];
   const agentRuns = await supabase(
     "team_chat_agent_runs?run_id=eq." + encodeURIComponent(runId) +
       "&select=agent_id,status,status_text,progress,response,error"
