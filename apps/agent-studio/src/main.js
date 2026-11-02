@@ -54,6 +54,12 @@ function agentStatus(agent) {
   return '<span class="status-dot ' + status + '"></span> ' + escapeHtml(agent.statusText || fallback);
 }
 
+function resetAgentStatuses() {
+  state.agents = AGENTS.map((agent) => ({
+    ...agent, status: "unknown", progress: 0, statusText: "بانتظار المهمة", response: null, error: null
+  }));
+}
+
 function renderAgent(agent) {
   return '<div class="agent-row">' +
     '<div class="agent-avatar ' + agent.tone + '">' + escapeHtml(agent.initials) + '</div>' +
@@ -175,6 +181,7 @@ function bindEvents() {
     button.addEventListener("click", async () => {
       state.room = "agent-" + button.dataset.roomAgent;
       state.view = "chat";
+      resetAgentStatuses();
       state.messages = [];
       state.events = [];
       state.latestRun = null;
@@ -205,6 +212,7 @@ function bindEvents() {
       if (agent) {
         state.room = "agent-" + agent.id;
         state.view = "chat";
+        resetAgentStatuses();
         state.messages = [];
         state.events = [];
         state.latestRun = null;
