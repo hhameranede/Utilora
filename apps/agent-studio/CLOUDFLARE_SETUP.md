@@ -11,10 +11,12 @@ This is a separate private Cloudflare Pages project. It does not modify the publ
 - Build command: `npm run build`
 - Build output: `dist`
 - Pages Functions: `functions/api/*`
+- Production deployments: enabled for changes under `apps/agent-studio/**`
+- Preview deployments: disabled
 
 ## Only two Cloudflare secrets are required
 
-Open Cloudflare Pages → `utilora-agent-studio` → Settings → Variables and Secrets. Add these two values to the Preview environment first, then Production after testing.
+Open Cloudflare Pages → `utilora-agent-studio` → Settings → Variables and Secrets. Add these two values as **Production secrets** before using private APIs. Preview secrets are not needed while preview deployments remain disabled.
 
 | Name | Type | Purpose |
 | --- | --- | --- |
@@ -23,7 +25,7 @@ Open Cloudflare Pages → `utilora-agent-studio` → Settings → Variables and 
 
 That is the complete Cloudflare configuration. The Supabase URL, owner email, repository, workflow name/ref, and callback URL are fixed in the server code; no other Cloudflare variables are needed. The separate Supabase publishable key and a separate session secret are no longer required.
 
-Do not put either secret in source code, browser variables, commits, or chat messages. Never share them in this conversation.
+Until both secrets are added, private API routes deliberately fail closed and the login screen cannot authenticate. Do not enter secrets into chat, source code, browser variables, or commits.
 
 ## Supabase Auth owner account
 
@@ -55,13 +57,11 @@ Cloudflare Access / Zero Trust is not required.
 
 ## Safe rollout
 
-Do not merge or switch production traffic until these tests pass on a non-production Pages deployment:
-
-- Unauthenticated requests to `/api/session`, `/api/status`, and `/api/chat` return 401 (or 503 if the Supabase secret is missing).
-- Wrong email/password is rejected; only the owner account can log in.
-- A valid login sets an HttpOnly, Secure, SameSite cookie.
-- Chat history and status load after login; sending a message dispatches the existing GitHub Actions workflow.
-- Logout clears the cookie and private APIs return 401 again.
-- No secrets appear in browser bundles, responses, or logs.
+- Unauthenticated requests to `/api/session`, `/api/status`, and `/api/chat` must return 401 (or 503 if the Supabase secret is missing).
+- Wrong email/password must be rejected; only the owner account can log in.
+- A valid login must set an HttpOnly, Secure, SameSite cookie.
+- Chat history and status must load after login; sending a message must dispatch the existing GitHub Actions workflow.
+- Logout must clear the cookie and private APIs must return 401 again.
+- No secrets may appear in browser bundles, responses, or logs.
 
 Do not change the public UTILORA deployment or its DNS as part of this setup.
