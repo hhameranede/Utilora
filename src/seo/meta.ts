@@ -102,6 +102,16 @@ export function applyDocumentMetadata(config: PageMetadataConfig) {
   const robotsDirective = config.isIndexable ? 'index, follow' : 'noindex, nofollow';
   setMeta('name', 'robots', robotsDirective);
 
+  // A 404 is not a localized copy of the homepage. Do not attach homepage
+  // canonical, hreflang, Open Graph URL, or Website JSON-LD signals to it.
+  if (config.routeType === 'not-found') {
+    document.querySelector('link[rel="canonical"]')?.remove();
+    document.querySelectorAll('link[rel="alternate"][hreflang]').forEach((element) => element.remove());
+    document.querySelector('meta[property="og:url"]')?.remove();
+    document.querySelector('script#utilora-schema-jsonld')?.remove();
+    return;
+  }
+
   // Canonical link
   const canonicalUrl = buildCanonicalUrl(config.locale, config.routeType, config.slug);
   setLink('canonical', canonicalUrl);
