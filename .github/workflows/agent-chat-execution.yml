@@ -18,6 +18,11 @@ on:
         description: Specialist selected by the private room
         required: true
         type: string
+      target_agents:
+        description: Comma-separated specialist IDs selected for this group request
+        required: false
+        default: "problem-analyst,fast-task-engineer"
+        type: string
       dispatch_probe:
         description: Run a permission check without starting any AI agent
         required: false
@@ -39,13 +44,13 @@ env:
 
 jobs:
   specialists:
-    if: ${{ inputs.dispatch_probe != 'true' }}
+    if: ${{ inputs.dispatch_probe != 'true' && ((inputs.mode == 'private' && matrix.agent == inputs.target_agent) || (inputs.mode == 'group' && contains(format(',{0},', inputs.target_agents), format(',{0},', matrix.agent)))) }}
     name: ${{ matrix.agent }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     strategy:
       fail-fast: false
-      max-parallel: 2
+      max-parallel: 3
       matrix:
         include:
           - agent: problem-analyst
