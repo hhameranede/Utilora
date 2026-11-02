@@ -1,18 +1,19 @@
 name: Utilora quality checks
 
 concurrency:
-  group: utilora-quality-${{ github.ref }}
+  group: utilora-quality-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 on:
   push:
     branches:
       - main
-      - "fix/**"
-      - "feat/**"
   pull_request:
     branches:
       - main
+  schedule:
+    - cron: "17 */6 * * *"
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -32,8 +33,19 @@ jobs:
       - name: Install dependencies
         run: npm install --no-audit --no-fund
 
+      - name: Install OpenCode CLI
+        run: npm install --global opencode-ai@1.19.5
+
       - name: Type check
         run: npm run lint
+
+      - name: Test OpenCode smoke response parsing
+        run: npm run test:opencode-smoke
+
+      - name: Verify agent and MCP configuration and OpenCode discovery
+        run: npm run test:agent-config
+        env:
+          OPENCODE_RUNTIME_TEST: '1'
 
       - name: Test standalone product content
         run: npm run test:products
@@ -106,4 +118,3 @@ jobs:
             playwright-report/
           if-no-files-found: ignore
           retention-days: 7
-

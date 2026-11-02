@@ -1,0 +1,1038 @@
+{
+  "version": 1,
+  "totalSkillCount": 50,
+  "projectSpecificCount": 9,
+  "curatedExternalCount": 41,
+  "agents": [
+    "project-lead",
+    "problem-analyst",
+    "implementation-engineer",
+    "fast-task-engineer",
+    "visual-reviewer",
+    "long-horizon-engineer",
+    "qa-engineer",
+    "security-auditor"
+  ],
+  "skills": [
+    {
+      "name": "accessibility",
+      "path": ".opencode/skills/accessibility/SKILL.md",
+      "source": {
+        "type": "external",
+        "repository": "addyosmani/web-quality-skills",
+        "commit": "afa8da942115f2961fdbfa80807ea0b232ff6c00",
+        "path": "skills/accessibility/SKILL.md",
+        "license": "MIT",
+        "copyright": "Addy Osmani"
+      },
+      "suggestedFor": [
+        "qa-engineer",
+        "visual-reviewer"
+      ]
+    },
+    {
+      "name": "accessibility-ux",
+      "path": ".opencode/skills/accessibility-ux/SKILL.md",
+      "source": {
+        "type": "project",
+        "repository": "hhameranede/Utilora",
+        "commit": "3e58981923cf0ed811cfb6004e4ac8802d6a92cb",
+        "path": ".opencode/skills/accessibility-ux/SKILL.md",
+        "license": "Project",
+        "copyright": "UTILORA project"
+      },
+      "suggestedFor": [
+        "qa-engineer",
+        "visual-reviewer"
+      ]
+    },
+    {
+      "name": "ai-seo",
+      "path": ".opencode/skills/ai-seo/SKILL.md",
+      "source": {
+        "type": "external",
+        "repository": "coreyhaines31/marketingskills",
+        "commit": "88c79f6528a9347420e57ceb1fff9a60de651768",
+        "path": "skills/ai-seo/SKILL.md",
+        "license": "MIT",
+        "copyright": "Corey Haines"
+      },
+      "suggestedFor": [
+        "problem-analyst"
+      ]
+    },
+    {
+      "name": "analytics",
+      "path": ".opencode/skills/analytics/SKILL.md",
+      "source": {
+        "type": "external",
+        "repository": "coreyhaines31/marketingskills",
+        "commit": "88c79f6528a9347420e57ceb1fff9a60de651768",
+        "path": "skills/analytics/SKILL.md",
+        "license": "MIT",
+        "copyright": "Corey Haines"
+      },
+      "suggestedFor": [
+        "fast-task-engineer",
+        "problem-analyst"
+      ]
+    },
+    {
+      "name": "animation-performance",
+      "path": ".opencode/skills/animation-performance/SKILL.md",
+      "source": {
+        "type": "external",
+        "repository": "emilkowalski/skills",
+        "commit": "a81dbca07f2217b7103e510c0f13f8d5b017afc9",
+        "path": "skills/animation-performance/SKILL.md",
+        "license": "MIT",
+        "copyright": "Emil Kowalski"
+      },
+      "suggestedFor": [
+        "implementation-engineer",
+        "long-horizon-engineer",
+        "qa-engineer",
+        "visual-reviewer"
+      ]
+    },
+    {
+      "name": "api-and-interface-design",
+      "path": ".opencode/skills/api-and-interface-design/SKILL.md",
+      "source": {
+        "type": "external",
+        "repository": "addyosmani/agent-skills",
+        "commit": "301b02b12bff98e4688e6984af6556802322bbde",
+        "path": "skills/api-and-interface-design/SKILL.md",
+        "license": "MIT",
+        "copyright": "Addy Osmani"
+      },
+      "suggestedFor": [
+        "implementation-engineer",
+        "long-horizon-engineer",
+        "project-lead",
+        "security-auditor"
+      ]
+    },
+    {
+      "name": "browser-qa",
+      "path": ".opencode/skills/browser-qa/SKILL.md",
+      "source": {
+        "type": "project",
+        "repository": "hhameranede/Utilora",
+        "commit": "3e58981923cf0ed811cfb6004e4ac8802d6a92cb",
+        "path": ".opencode/skills/browser-qa/SKILL.md",
+        "license": "Project",
+        "copyright": "UTILORA project"
+      },
+      "suggestedFor": [
+        "qa-engineer",
+        "visual-reviewer"
+      ]
+    },
+    {
+      "name": "ci-cd-and-automation",
+      "path": ".opencode/skills/ci-cd-and-automation/SKILL.md",
+      "source": {
+        "type": "external",
+        "repository": "addyosmani/agent-skills",
+        "commit": "301b02b12bff98e4688e6984af6556802322bbde",
+        "path": "skills/ci-cd-and-automation/SKILL.md",
+        "license": "MIT",
+        "copyright": "Addy Osmani"
+      },
+      "suggestedFor": [
+        "problem-analyst",
+        "qa-engineer"
+      ]
+    },
+    {
+      "name": "code-review",
+      "path": ".opencode/skills/code-review/SKILL.md",
+      "source": {
+        "type": "external",
+        "repository": "mattpocock/skills",
+        "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+        "path": "skills/engineering/code-review/SKILL.md",
+        "license": "MIT",
+        "copyright": "Matt Pocock"
+      },
+      "suggestedFor": [
+        "implementation-engineer",
+        "long-horizon-engineer",
+        "problem-analyst",
+        "project-lead",
+        "qa-engineer"
+      ]
+    },
+    {
+      "name": "code-simplification",
+      "path": ".opencode/skills/code-simplification/SKILL.md",
+      "source": {
+        "type": "external",
+        "repository": "addyosmani/agent-skills",
+        "commit": "301b02b12bff98e4688e6984af6556802322bbde",
+        "path": "skills/code-simplification/SKILL.md",
+        "license": "MIT",
+        "copyright": "Addy Osmani"
+      },
+      "suggestedFor": [
+        "fast-task-engineer",
+        "implementation-engineer",
+        "long-horizon-engineer",
+        "visual-reviewer"
+      ]
+    },
+    {
+      "name": "codebase-design",
+      "path": ".opencode/skills/codebase-design/SKILL.md",
+      "source": {
+        "type": "external",
+        "repository": "mattpocock/skills",
+        "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+        "path": "skills/engineering/codebase-design/SKILL.md",
+        "license": "MIT",
+        "copyright": "Matt Pocock"
+      },
+      "suggestedFor": [
+        "implementation-engineer",
+        "long-horizon-engineer",
+        "project-lead"
+      ]
+    },
+    {
+      "name": "content-strategy",
+      "path": ".opencode/skills/content-strategy/SKILL.md",
+      "source": {
+        "type": "external",
+        "repository": "coreyhaines31/marketingskills",
+        "commit": "88c79f6528a9347420e57ceb1fff9a60de651768",
+        "path": "skills/content-strategy/SKILL.md",
+        "license": "MIT",
+        "copyright": "Corey Haines"
+      },
+      "suggestedFor": [
+        "fast-task-engineer",
+        "problem-analyst",
+        "project-lead"
+      ]
+    },
+    {
+      "name": "context-engineering",
+      "path": ".opencode/skills/context-engineering/SKILL.md",
+      "source": {
+        "type": "external",
+        "repository": "addyosmani/agent-skills",
+        "commit": "301b02b12bff98e4688e6984af6556802322bbde",
+        "path": "skills/context-engineering/SKILL.md",
+        "license": "MIT",
+        "copyright": "Addy Osmani"
+      },
+      "suggestedFor": [
+        "implementation-engineer",
+        "long-horizon-engineer",
+        "project-lead"
+      ]
+    },
+    {
+      "name": "core-web-vitals",
+      "path": ".opencode/skills/core-web-vitals/SKILL.md",
+      "source": {
+        "type": "external",
+        "repository": "addyosmani/web-quality-skills",
+        "commit": "afa8da942115f2961fdbfa80807ea0b232ff6c00",
+        "path": "skills/core-web-vitals/SKILL.md",
+        "license": "MIT",
+        "copyright": "Addy Osmani"
+      },
+      "suggestedFor": [
+        "problem-analyst",
+        "qa-engineer"
+      ]
+    },
+    {
+      "name": "diagnosing-bugs",
+      "path": ".opencode/skills/diagnosing-bugs/SKILL.md",
+      "source": {
+        "type": "external",
+        "repository": "mattpocock/skills",
+        "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+        "path": "skills/engineering/diagnosing-bugs/SKILL.md",
+        "license": "MIT",
+        "copyright": "Matt Pocock"
+      },
+      "suggestedFor": [
+        "implementation-engineer",
+        "long-horizon-engineer",
+        "qa-engineer"
+      ]
+    },
+    {
+      "name": "dispatching-parallel-agents",
+      "path": ".opencode/skills/dispatching-parallel-agents/SKILL.md",
+      "source": {
+        "type": "external",
+        "repository": "obra/superpowers",
+        "commit": "2ce8aa15d05bd57213e6f746f953aafb7ded7a8b",
+        "path": "skills/dispatching-parallel-agents/SKILL.md",
+        "license": "MIT",
+        "copyright": "Jesse Vincent"
+      },
+      "suggestedFor": [
+        "long-horizon-engineer",
+        "project-lead"
+      ]
+    },
+    {
+      "name": "documentation-and-adrs",
+      "path": ".opencode/skills/documentation-and-adrs/SKILL.md",
+      "source": {
+        "type": "external",
+        "repository": "addyosmani/agent-skills",
+        "commit": "301b02b12bff98e4688e6984af6556802322bbde",
+        "path": "skills/documentation-and-adrs/SKILL.md",
+        "license": "MIT",
+        "copyright": "Addy Osmani"
+      },
+      "suggestedFor": [
+        "implementation-engineer",
+        "long-horizon-engineer",
+        "project-lead"
+      ]
+    },
+    {
+      "name": "domain-modeling",
+      "path": ".opencode/skills/domain-modeling/SKILL.md",
+      "source": {
+        "type": "external",
+        "repository": "mattpocock/skills",
+        "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+        "path": "skills/engineering/domain-modeling/SKILL.md",
+        "license": "MIT",
+        "copyright": "Matt Pocock"
+      },
+      "suggestedFor": [
+        "implementation-engineer",
+        "long-horizon-engineer",
+        "project-lead"
+      ]
+    },
+    {
+      "name": "frontend-ui-engineering",
+      "path": ".opencode/skills/frontend-ui-engineering/SKILL.md",
+      "source": {
+        "type": "external",
+        "repository": "addyosmani/agent-skills",
+        "commit": "301b02b12bff98e4688e6984af6556802322bbde",
+        "path": "skills/frontend-ui-engineering/SKILL.md",
+        "license": "MIT",
+        "copyright": "Addy Osmani"
+      },
+      "suggestedFor": [
+        "fast-task-engineer",
+        "implementation-engineer",
+        "long-horizon-engineer",
+        "visual-reviewer"
+      ]
+    },
+    {
+      "name": "git-workflow-and-versioning",
+      "path": ".opencode/skills/git-workflow-and-versioning/SKILL.md",
+      "source": {
+        "type": "external",
+        "repository": "addyosmani/agent-skills",
+        "commit": "301b02b12bff98e4688e6984af6556802322bbde",
+        "path": "skills/git-workflow-and-versioning/SKILL.md",
+        "license": "MIT",
+        "copyright": "Addy Osmani"
+      },
+      "suggestedFor": [
+        "implementation-engineer",
+        "long-horizon-engineer",
+        "problem-analyst"
+      ]
+    },
+    {
+      "name": "handoff",
+      "path": ".opencode/skills/handoff/SKILL.md",
+      "source": {
+        "type": "external",
+        "repository": "mattpocock/skills",
+        "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+        "path": "skills/productivity/handoff/SKILL.md",
+        "license": "MIT",
+        "copyright": "Matt Pocock"
+      },
+      "suggestedFor": [
+        "long-horizon-engineer",
+        "project-lead"
+      ]
+    },
+    {
+      "name": "improve-codebase-architecture",
+      "path": ".opencode/skills/improve-codebase-architecture/SKILL.md",
+      "source": {
+        "type": "external",
+        "repository": "mattpocock/skills",
+        "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+        "path": "skills/engineering/improve-codebase-architecture/SKILL.md",
+        "license": "MIT",
+        "copyright": "Matt Pocock"
+      },
+      "suggestedFor": [
+        "implementation-engineer",
+        "long-horizon-engineer",
+        "project-lead"
+      ]
+    },
+    {
+      "name": "incremental-implementation",
+      "path": ".opencode/skills/incremental-implementation/SKILL.md",
+      "source": {
+        "type": "external",
+        "repository": "addyosmani/agent-skills",
+        "commit": "301b02b12bff98e4688e6984af6556802322bbde",
+        "path": "skills/incremental-implementation/SKILL.md",
+        "license": "MIT",
+        "copyright": "Addy Osmani"
+      },
+      "suggestedFor": [
+        "fast-task-engineer",
+        "implementation-engineer",
+        "long-horizon-engineer"
+      ]
+    },
+    {
+      "name": "observability-and-instrumentation",
+      "path": ".opencode/skills/observability-and-instrumentation/SKILL.md",
+      "source": {
+        "type": "external",
+        "repository": "addyosmani/agent-skills",
+        "commit": "301b02b12bff98e4688e6984af6556802322bbde",
+        "path": "skills/observability-and-instrumentation/SKILL.md",
+        "license": "MIT",
+        "copyright": "Addy Osmani"
+      },
+      "suggestedFor": [
+        "fast-task-engineer",
+        "problem-analyst",
+        "qa-engineer"
+      ]
+    },
+    {
+      "name": "performance-optimization",
+      "path": ".opencode/skills/performance-optimization/SKILL.md",
+      "source": {
+        "type": "external",
+        "repository": "addyosmani/agent-skills",
+        "commit": "301b02b12bff98e4688e6984af6556802322bbde",
+        "path": "skills/performance-optimization/SKILL.md",
+        "license": "MIT",
+        "copyright": "Addy Osmani"
+      },
+      "suggestedFor": [
+        "implementation-engineer",
+        "long-horizon-engineer",
+        "problem-analyst",
+        "qa-engineer"
+      ]
+    },
+    {
+      "name": "planning-and-task-breakdown",
+      "path": ".opencode/skills/planning-and-task-breakdown/SKILL.md",
+      "source": {
+        "type": "external",
+        "repository": "addyosmani/agent-skills",
+        "commit": "301b02b12bff98e4688e6984af6556802322bbde",
+        "path": "skills/planning-and-task-breakdown/SKILL.md",
+        "license": "MIT",
+        "copyright": "Addy Osmani"
+      },
+      "suggestedFor": [
+        "long-horizon-engineer",
+        "project-lead"
+      ]
+    },
+    {
+      "name": "pr",
+      "path": ".opencode/skills/pr/SKILL.md",
+      "source": {
+        "type": "external",
+        "repository": "mattpocock/skills",
+        "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+        "path": "skills/engineering/pr/SKILL.md",
+        "license": "MIT",
+        "copyright": "Matt Pocock"
+      },
+      "suggestedFor": [
+        "problem-analyst",
+        "project-lead"
+      ]
+    },
+    {
+      "name": "programmatic-seo",
+      "path": ".opencode/skills/programmatic-seo/SKILL.md",
+      "source": {
+        "type": "external",
+        "repository": "coreyhaines31/marketingskills",
+        "commit": "88c79f6528a9347420e57ceb1fff9a60de651768",
+        "path": "skills/programmatic-seo/SKILL.md",
+        "license": "MIT",
+        "copyright": "Corey Haines"
+      },
+      "suggestedFor": [
+        "fast-task-engineer",
+        "problem-analyst",
+        "project-lead"
+      ]
+    },
+    {
+      "name": "quality-validation",
+      "path": ".opencode/skills/quality-validation/SKILL.md",
+      "source": {
+        "type": "project",
+        "repository": "hhameranede/Utilora",
+        "commit": "3e58981923cf0ed811cfb6004e4ac8802d6a92cb",
+        "path": ".opencode/skills/quality-validation/SKILL.md",
+        "license": "Project",
+        "copyright": "UTILORA project"
+      },
+      "suggestedFor": [
+        "problem-analyst",
+        "qa-engineer"
+      ]
+    },
+    {
+      "name": "release-safety",
+      "path": ".opencode/skills/release-safety/SKILL.md",
+      "source": {
+        "type": "project",
+        "repository": "hhameranede/Utilora",
+        "commit": "3e58981923cf0ed811cfb6004e4ac8802d6a92cb",
+        "path": ".opencode/skills/release-safety/SKILL.md",
+        "license": "Project",
+        "copyright": "UTILORA project"
+      },
+      "suggestedFor": [
+        "problem-analyst",
+        "project-lead"
+      ]
+    },
+    {
+      "name": "research",
+      "path": ".opencode/skills/research/SKILL.md",
+      "source": {
+        "type": "external",
+        "repository": "mattpocock/skills",
+        "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+        "path": "skills/engineering/research/SKILL.md",
+        "license": "MIT",
+        "copyright": "Matt Pocock"
+      },
+      "suggestedFor": [
+        "problem-analyst",
+        "project-lead",
+        "security-auditor"
+      ]
+    },
+    {
+      "name": "research-sources",
+      "path": ".opencode/skills/research-sources/SKILL.md",
+      "source": {
+        "type": "project",
+        "repository": "hhameranede/Utilora",
+        "commit": "3e58981923cf0ed811cfb6004e4ac8802d6a92cb",
+        "path": ".opencode/skills/research-sources/SKILL.md",
+        "license": "Project",
+        "copyright": "UTILORA project"
+      },
+      "suggestedFor": [
+        "problem-analyst",
+        "project-lead",
+        "security-auditor"
+      ]
+    },
+    {
+      "name": "retro",
+      "path": ".opencode/skills/retro/SKILL.md",
+      "source": {
+        "type": "external",
+        "repository": "mattpocock/skills",
+        "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+        "path": "skills/engineering/retro/SKILL.md",
+        "license": "MIT",
+        "copyright": "Matt Pocock"
+      },
+      "suggestedFor": [
+        "long-horizon-engineer",
+        "problem-analyst",
+        "project-lead"
+      ]
+    },
+    {
+      "name": "safe-implementation",
+      "path": ".opencode/skills/safe-implementation/SKILL.md",
+      "source": {
+        "type": "project",
+        "repository": "hhameranede/Utilora",
+        "commit": "3e58981923cf0ed811cfb6004e4ac8802d6a92cb",
+        "path": ".opencode/skills/safe-implementation/SKILL.md",
+        "license": "Project",
+        "copyright": "UTILORA project"
+      },
+      "suggestedFor": [
+        "implementation-engineer",
+        "long-horizon-engineer"
+      ]
+    },
+    {
+      "name": "schema",
+      "path": ".opencode/skills/schema/SKILL.md",
+      "source": {
+        "type": "external",
+        "repository": "coreyhaines31/marketingskills",
+        "commit": "88c79f6528a9347420e57ceb1fff9a60de651768",
+        "path": "skills/schema/SKILL.md",
+        "license": "MIT",
+        "copyright": "Corey Haines"
+      },
+      "suggestedFor": [
+        "fast-task-engineer",
+        "implementation-engineer",
+        "long-horizon-engineer",
+        "problem-analyst"
+      ]
+    },
+    {
+      "name": "security-and-hardening",
+      "path": ".opencode/skills/security-and-hardening/SKILL.md",
+      "source": {
+        "type": "external",
+        "repository": "addyosmani/agent-skills",
+        "commit": "301b02b12bff98e4688e6984af6556802322bbde",
+        "path": "skills/security-and-hardening/SKILL.md",
+        "license": "MIT",
+        "copyright": "Addy Osmani"
+      },
+      "suggestedFor": [
+        "implementation-engineer",
+        "long-horizon-engineer",
+        "security-auditor"
+      ]
+    },
+    {
+      "name": "security-audit",
+      "path": ".opencode/skills/security-audit/SKILL.md",
+      "source": {
+        "type": "external",
+        "repository": "cloudflare/security-audit-skill",
+        "commit": "c1c8a8c1471069fb0e188eeaff69b8e8db6564a8",
+        "path": "skills/security-audit/SKILL.md",
+        "license": "MIT",
+        "copyright": "Cloudflare, Inc."
+      },
+      "suggestedFor": [
+        "security-auditor"
+      ]
+    },
+    {
+      "name": "security-review",
+      "path": ".opencode/skills/security-review/SKILL.md",
+      "source": {
+        "type": "project",
+        "repository": "hhameranede/Utilora",
+        "commit": "3e58981923cf0ed811cfb6004e4ac8802d6a92cb",
+        "path": ".opencode/skills/security-review/SKILL.md",
+        "license": "Project",
+        "copyright": "UTILORA project"
+      },
+      "suggestedFor": [
+        "problem-analyst",
+        "security-auditor"
+      ]
+    },
+    {
+      "name": "seo-audit",
+      "path": ".opencode/skills/seo-audit/SKILL.md",
+      "source": {
+        "type": "external",
+        "repository": "coreyhaines31/marketingskills",
+        "commit": "88c79f6528a9347420e57ceb1fff9a60de651768",
+        "path": "skills/seo-audit/SKILL.md",
+        "license": "MIT",
+        "copyright": "Corey Haines"
+      },
+      "suggestedFor": [
+        "problem-analyst"
+      ]
+    },
+    {
+      "name": "seo-review",
+      "path": ".opencode/skills/seo-review/SKILL.md",
+      "source": {
+        "type": "project",
+        "repository": "hhameranede/Utilora",
+        "commit": "3e58981923cf0ed811cfb6004e4ac8802d6a92cb",
+        "path": ".opencode/skills/seo-review/SKILL.md",
+        "license": "Project",
+        "copyright": "UTILORA project"
+      },
+      "suggestedFor": [
+        "problem-analyst"
+      ]
+    },
+    {
+      "name": "site-architecture",
+      "path": ".opencode/skills/site-architecture/SKILL.md",
+      "source": {
+        "type": "external",
+        "repository": "coreyhaines31/marketingskills",
+        "commit": "88c79f6528a9347420e57ceb1fff9a60de651768",
+        "path": "skills/site-architecture/SKILL.md",
+        "license": "MIT",
+        "copyright": "Corey Haines"
+      },
+      "suggestedFor": [
+        "long-horizon-engineer",
+        "problem-analyst",
+        "project-lead",
+        "visual-reviewer"
+      ]
+    },
+    {
+      "name": "source-driven-development",
+      "path": ".opencode/skills/source-driven-development/SKILL.md",
+      "source": {
+        "type": "external",
+        "repository": "addyosmani/agent-skills",
+        "commit": "301b02b12bff98e4688e6984af6556802322bbde",
+        "path": "skills/source-driven-development/SKILL.md",
+        "license": "MIT",
+        "copyright": "Addy Osmani"
+      },
+      "suggestedFor": [
+        "fast-task-engineer",
+        "implementation-engineer",
+        "long-horizon-engineer",
+        "problem-analyst",
+        "project-lead",
+        "security-auditor"
+      ]
+    },
+    {
+      "name": "spec-driven-development",
+      "path": ".opencode/skills/spec-driven-development/SKILL.md",
+      "source": {
+        "type": "external",
+        "repository": "addyosmani/agent-skills",
+        "commit": "301b02b12bff98e4688e6984af6556802322bbde",
+        "path": "skills/spec-driven-development/SKILL.md",
+        "license": "MIT",
+        "copyright": "Addy Osmani"
+      },
+      "suggestedFor": [
+        "implementation-engineer",
+        "long-horizon-engineer",
+        "project-lead"
+      ]
+    },
+    {
+      "name": "systematic-debugging",
+      "path": ".opencode/skills/systematic-debugging/SKILL.md",
+      "source": {
+        "type": "external",
+        "repository": "obra/superpowers",
+        "commit": "2ce8aa15d05bd57213e6f746f953aafb7ded7a8b",
+        "path": "skills/systematic-debugging/SKILL.md",
+        "license": "MIT",
+        "copyright": "Jesse Vincent"
+      },
+      "suggestedFor": [
+        "implementation-engineer",
+        "long-horizon-engineer",
+        "qa-engineer"
+      ]
+    },
+    {
+      "name": "tdd",
+      "path": ".opencode/skills/tdd/SKILL.md",
+      "source": {
+        "type": "external",
+        "repository": "mattpocock/skills",
+        "commit": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+        "path": "skills/engineering/tdd/SKILL.md",
+        "license": "MIT",
+        "copyright": "Matt Pocock"
+      },
+      "suggestedFor": [
+        "implementation-engineer",
+        "long-horizon-engineer",
+        "qa-engineer"
+      ]
+    },
+    {
+      "name": "using-agent-skills",
+      "path": ".opencode/skills/using-agent-skills/SKILL.md",
+      "source": {
+        "type": "external",
+        "repository": "addyosmani/agent-skills",
+        "commit": "301b02b12bff98e4688e6984af6556802322bbde",
+        "path": "skills/using-agent-skills/SKILL.md",
+        "license": "MIT",
+        "copyright": "Addy Osmani"
+      },
+      "suggestedFor": [
+        "project-lead",
+        "security-auditor"
+      ]
+    },
+    {
+      "name": "utilora-project-rules",
+      "path": ".opencode/skills/utilora-project-rules/SKILL.md",
+      "source": {
+        "type": "project",
+        "repository": "hhameranede/Utilora",
+        "commit": "3e58981923cf0ed811cfb6004e4ac8802d6a92cb",
+        "path": ".opencode/skills/utilora-project-rules/SKILL.md",
+        "license": "Project",
+        "copyright": "UTILORA project"
+      },
+      "suggestedFor": [
+        "fast-task-engineer",
+        "implementation-engineer",
+        "long-horizon-engineer",
+        "problem-analyst",
+        "project-lead",
+        "qa-engineer",
+        "security-auditor",
+        "visual-reviewer"
+      ]
+    },
+    {
+      "name": "verification-before-completion",
+      "path": ".opencode/skills/verification-before-completion/SKILL.md",
+      "source": {
+        "type": "external",
+        "repository": "obra/superpowers",
+        "commit": "2ce8aa15d05bd57213e6f746f953aafb7ded7a8b",
+        "path": "skills/verification-before-completion/SKILL.md",
+        "license": "MIT",
+        "copyright": "Jesse Vincent"
+      },
+      "suggestedFor": [
+        "fast-task-engineer",
+        "problem-analyst",
+        "project-lead",
+        "qa-engineer"
+      ]
+    },
+    {
+      "name": "web-perf",
+      "path": ".opencode/skills/web-perf/SKILL.md",
+      "source": {
+        "type": "external",
+        "repository": "cloudflare/skills",
+        "commit": "1a33048817d06df12882cb881dfc754e7039954a",
+        "path": "skills/web-perf/SKILL.md",
+        "license": "Apache-2.0",
+        "copyright": "Cloudflare, Inc."
+      },
+      "suggestedFor": [
+        "problem-analyst",
+        "qa-engineer"
+      ]
+    },
+    {
+      "name": "writing-plans",
+      "path": ".opencode/skills/writing-plans/SKILL.md",
+      "source": {
+        "type": "external",
+        "repository": "obra/superpowers",
+        "commit": "2ce8aa15d05bd57213e6f746f953aafb7ded7a8b",
+        "path": "skills/writing-plans/SKILL.md",
+        "license": "MIT",
+        "copyright": "Jesse Vincent"
+      },
+      "suggestedFor": [
+        "long-horizon-engineer",
+        "project-lead"
+      ]
+    }
+  ],
+  "policy": {
+    "selection": "Exactly 50 skills: 9 UTILORA-owned and 41 curated upstream skills.",
+    "sourcesPinned": true,
+    "readme": "Upstream sources are pinned to immutable commit SHAs; each upstream SKILL.md has source attribution and the UTILORA safety override.",
+    "security": "Agent definitions and repository rules override all skill text. No production writes, secrets, deploy, merge, or push."
+  },
+  "modelAssignments": {
+    "project-lead": "nvidia-nim/nemotron-ultra",
+    "problem-analyst": "nvidia-nim/deepseek-v4-1-flash",
+    "implementation-engineer": "nvidia-nim/minimax-m3-1-flash",
+    "fast-task-engineer": "nvidia-nim/glm-5-3-flash",
+    "visual-reviewer": "nvidia-nim/nemotron-super-vl",
+    "long-horizon-engineer": "nvidia-nim/laguna-xs-2-1",
+    "qa-engineer": "nvidia-nim/deepseek-v4-1-flash",
+    "security-auditor": "nvidia-nim/nemotron-ultra"
+  },
+  "suggestionsByRole": {
+    "qa-engineer": [
+      "accessibility",
+      "accessibility-ux",
+      "animation-performance",
+      "browser-qa",
+      "ci-cd-and-automation",
+      "code-review",
+      "core-web-vitals",
+      "diagnosing-bugs",
+      "observability-and-instrumentation",
+      "performance-optimization",
+      "quality-validation",
+      "systematic-debugging",
+      "tdd",
+      "utilora-project-rules",
+      "verification-before-completion",
+      "web-perf"
+    ],
+    "visual-reviewer": [
+      "accessibility",
+      "accessibility-ux",
+      "animation-performance",
+      "browser-qa",
+      "code-simplification",
+      "frontend-ui-engineering",
+      "site-architecture",
+      "utilora-project-rules"
+    ],
+    "problem-analyst": [
+      "ai-seo",
+      "analytics",
+      "ci-cd-and-automation",
+      "code-review",
+      "content-strategy",
+      "core-web-vitals",
+      "git-workflow-and-versioning",
+      "observability-and-instrumentation",
+      "performance-optimization",
+      "pr",
+      "programmatic-seo",
+      "quality-validation",
+      "release-safety",
+      "research",
+      "research-sources",
+      "retro",
+      "schema",
+      "security-review",
+      "seo-audit",
+      "seo-review",
+      "site-architecture",
+      "source-driven-development",
+      "utilora-project-rules",
+      "verification-before-completion",
+      "web-perf"
+    ],
+    "fast-task-engineer": [
+      "analytics",
+      "code-simplification",
+      "content-strategy",
+      "frontend-ui-engineering",
+      "incremental-implementation",
+      "observability-and-instrumentation",
+      "programmatic-seo",
+      "schema",
+      "source-driven-development",
+      "utilora-project-rules",
+      "verification-before-completion"
+    ],
+    "implementation-engineer": [
+      "animation-performance",
+      "api-and-interface-design",
+      "code-review",
+      "code-simplification",
+      "codebase-design",
+      "context-engineering",
+      "diagnosing-bugs",
+      "documentation-and-adrs",
+      "domain-modeling",
+      "frontend-ui-engineering",
+      "git-workflow-and-versioning",
+      "improve-codebase-architecture",
+      "incremental-implementation",
+      "performance-optimization",
+      "safe-implementation",
+      "schema",
+      "security-and-hardening",
+      "source-driven-development",
+      "spec-driven-development",
+      "systematic-debugging",
+      "tdd",
+      "utilora-project-rules"
+    ],
+    "project-lead": [
+      "api-and-interface-design",
+      "code-review",
+      "codebase-design",
+      "content-strategy",
+      "context-engineering",
+      "dispatching-parallel-agents",
+      "documentation-and-adrs",
+      "domain-modeling",
+      "handoff",
+      "improve-codebase-architecture",
+      "planning-and-task-breakdown",
+      "pr",
+      "programmatic-seo",
+      "release-safety",
+      "research",
+      "research-sources",
+      "retro",
+      "site-architecture",
+      "source-driven-development",
+      "spec-driven-development",
+      "using-agent-skills",
+      "utilora-project-rules",
+      "verification-before-completion",
+      "writing-plans"
+    ],
+    "security-auditor": [
+      "api-and-interface-design",
+      "research",
+      "research-sources",
+      "security-and-hardening",
+      "security-audit",
+      "security-review",
+      "source-driven-development",
+      "using-agent-skills",
+      "utilora-project-rules"
+    ],
+    "long-horizon-engineer": [
+      "animation-performance",
+      "api-and-interface-design",
+      "code-review",
+      "code-simplification",
+      "codebase-design",
+      "context-engineering",
+      "diagnosing-bugs",
+      "dispatching-parallel-agents",
+      "documentation-and-adrs",
+      "domain-modeling",
+      "frontend-ui-engineering",
+      "git-workflow-and-versioning",
+      "handoff",
+      "improve-codebase-architecture",
+      "incremental-implementation",
+      "performance-optimization",
+      "planning-and-task-breakdown",
+      "retro",
+      "safe-implementation",
+      "schema",
+      "security-and-hardening",
+      "site-architecture",
+      "source-driven-development",
+      "spec-driven-development",
+      "systematic-debugging",
+      "tdd",
+      "utilora-project-rules",
+      "writing-plans"
+    ]
+  }
+}
