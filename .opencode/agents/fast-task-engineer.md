@@ -1,6 +1,6 @@
 ---
 description: Handles small, low-risk, well-scoped fixes and quick engineering tasks.
-mode: all
+mode: subagent
 model: nvidia/z-ai/glm-5.3-flash
 permission:
   edit: allow
