@@ -31,25 +31,46 @@ function getConfig() {
 async function db(config, path, method = "GET", body) {
   const headers = {
     apikey: config.key,
+    Authorization: "Bearer " + config.key,
     "Content-Type": "application/json",
     Prefer: "return=representation"
   };
-  if (!String(config.key).startsWith("sb_secret_")) headers.Authorization = "Bearer " + config.key;
-  const response = await fetch(config.url + "/rest/v1/" + path, {
-    method,
-    headers,
-    ...(body === undefined ? {} : { body: JSON.stringify(body) })
-  });
-  const text = await response.text();
-  let data;
-  try { data = text ? JSON.parse(text) : null; } catch { data = null; }
-  if (!response.ok) {
-    const message = response.status === 409 ? "Room already exists." : "Database operation failed.";
-    const error = new Error(message);
-    error.status = response.status;
-    throw error;
+  let lastError;
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    try {
+      const response = await fetch(config.url + "/rest/v1/" + path, {
+        method,
+        headers,
+        signal: AbortSignal.timeout(20000),
+        ...(body === undefined ? {} : { body: JSON.stringify(body) })
+      });
+      const text = await response.text();
+      let data;
+      try { data = text ? JSON.parse(text) : null; } catch { data = null; }
+      if (!response.ok) {
+        const error = new Error(response.status === 409 ? "Room already exists." : "Database operation failed.");
+        error.status = response.status;
+        error.code = data?.code || null;
+        console.error("[Agent Studio] Supabase REST failure", { route: path.split("?")[0], status: response.status, code: error.code });
+        if (attempt === 0 && (response.status === 429 || response.status >= 500)) {
+          await new Promise((resolve) => setTimeout(resolve, 350));
+          lastError = error;
+          continue;
+        }
+        throw error;
+      }
+      return data;
+    } catch (error) {
+      lastError = error;
+      const retryable = error?.name === "AbortError" || error?.name === "TimeoutError" || !error?.status;
+      if (attempt === 0 && retryable) {
+        await new Promise((resolve) => setTimeout(resolve, 350));
+        continue;
+      }
+      throw error;
+    }
   }
-  return data;
+  throw lastError || new Error("Database operation failed.");
 }
 
 function parseRoomSlug(value) {
