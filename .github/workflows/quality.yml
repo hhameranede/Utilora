@@ -47,6 +47,9 @@ jobs:
         env:
           OPENCODE_RUNTIME_TEST: '1'
 
+      - name: Test registry integrity
+        run: npm run test:registry
+
       - name: Test standalone product content
         run: npm run test:products
 
