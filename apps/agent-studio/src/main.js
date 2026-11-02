@@ -13,6 +13,9 @@ const AGENTS = [
 
 const state = {
   view: "chat",
+  authenticated: false,
+  authChecking: true,
+  authError: "",
   messages: [],
   agents: AGENTS.map((agent) => ({ ...agent, status: "unknown", progress: 0, statusText: "بانتظار الربط" })),
   backend: { database: false, dispatcher: false, callback: false, healthChecked: false },
@@ -103,7 +106,7 @@ function viewContent() {
   }
   if (state.view === "security") {
     const securityBadge = (enabled) => '<b class="' + (enabled ? "secure-tag" : "pending-tag") + '">' + (enabled ? "متصل" : "غير مكتمل") + '</b>';
-    return '<section class="info-view"><div class="view-kicker">ACCESS CONTROL</div><h2>الخصوصية والأمان</h2><p>تسجيل الدخول محمي عبر Vercel، وقاعدة البيانات لا تُقرأ إلا من الخادم. مفاتيح الخدمات لا تُرسل إلى المتصفح.</p><div class="security-cards"><div class="security-card"><span class="security-icon">' + icon("lock", 20) + '</span><div><strong>حماية الوصول</strong><small>Vercel Authentication على جميع البيئات · الفريق يحتوي على مالك واحد فقط حالياً</small></div><b class="secure-tag">مفعّل</b></div><div class="security-card"><span class="security-icon">' + icon("shield", 20) + '</span><div><strong>قاعدة البيانات</strong><small>RLS مفعّل، والوصول إلى الجداول محصور بمفتاح خادمي</small></div>' + securityBadge(state.backend.database) + '</div><div class="security-card"><span class="security-icon">' + icon("agents", 20) + '</span><div><strong>تشغيل الوكلاء</strong><small>GitHub Actions + هوية OIDC موثوقة، دون مفاتيح داخل المتصفح</small></div>' + securityBadge(state.backend.dispatcher && state.backend.callback) + '</div></div></section>';
+    return '<section class="info-view"><div class="view-kicker">ACCESS CONTROL</div><h2>الخصوصية والأمان</h2><p>تسجيل الدخول عبر Supabase Auth، ثم جلسة خادمية موقعة داخل Cookie محمية. لا تُرسل مفاتيح الخدمات إلى المتصفح.</p><div class="security-cards"><div class="security-card"><span class="security-icon">' + icon("lock", 20) + '</span><div><strong>حماية الوصول</strong><small>حساب مالك واحد مسموح به · جلسة HttpOnly / Secure / SameSite</small></div><b class="secure-tag">مفعّل</b></div><div class="security-card"><span class="security-icon">' + icon("shield", 20) + '</span><div><strong>قاعدة البيانات</strong><small>RLS مفعّل، والوصول إلى الجداول محصور بمفتاح خادمي</small></div>' + securityBadge(state.backend.database) + '</div><div class="security-card"><span class="security-icon">' + icon("agents", 20) + '</span><div><strong>تشغيل الوكلاء</strong><small>GitHub Actions + هوية OIDC موثوقة، دون مفاتيح داخل المتصفح</small></div>' + securityBadge(state.backend.dispatcher && state.backend.callback) + '</div></div></section>';
   }
   const privateAgentId = state.room.startsWith("agent-") ? state.room.slice(6) : "";
   const privateAgent = AGENTS.find((agent) => agent.id === privateAgentId);
@@ -121,7 +124,81 @@ function viewContent() {
     '</div><div class="composer-wrap"><div class="composer" id="composer"><textarea id="message-input" rows="1" placeholder="' + escapeHtml(privateAgent ? "اكتب إلى " + privateAgent.name + "…" : "اكتب رسالتك إلى مجلس UTILORA…") + '" aria-label="رسالتك"></textarea><div class="composer-tools"><div class="composer-hint">' + icon("lock", 14) + '<span>' + (privateAgent ? "محادثة فردية خاصة" : "الغرفة الجماعية · تدخل تلقائي حسب التخصص") + '</span></div><button class="send-button" id="send-button" type="button" aria-label="إرسال الرسالة">' + icon("send", 18) + '<span>' + (privateAgent ? "إرسال للوكيل" : "إرسال للمجلس") + '</span></button></div></div><div class="composer-foot">Enter للإرسال · Shift + Enter لسطر جديد</div></div></section>';
 }
 
+function renderLogin() {
+  $("#app").innerHTML = '<main class="auth-shell"><section class="auth-card"><div class="auth-brand"><div class="brand-mark">U</div><div><div class="brand-name">UTILORA</div><div class="brand-sub">AGENT STUDIO</div></div></div><div class="auth-lock">' + icon("lock", 25) + '</div><div class="view-kicker">PRIVATE OWNER ACCESS</div><h1>مساحة العمل الخاصة</h1><p class="auth-description">سجّل الدخول بحساب المالك المعتمد للوصول إلى محادثات فريق UTILORA.</p>' +
+    (state.authError ? '<div class="auth-error" role="alert">' + escapeHtml(state.authError) + '</div>' : '') +
+    '<form id="login-form" class="auth-form"><label for="owner-email">البريد الإلكتروني</label><input id="owner-email" type="email" value="hhameranede@gmail.com" readonly autocomplete="username"><label for="owner-password">كلمة المرور</label><input id="owner-password" type="password" required minlength="1" maxlength="1024" autocomplete="current-password" placeholder="كلمة مرور حساب Supabase"><button id="login-button" class="auth-submit" type="submit">تسجيل الدخول</button></form><div class="auth-foot">' + icon("shield", 14) + '<span>الوصول مقيّد بحساب المالك فقط · الجلسة تنتهي بعد 8 ساعات</span></div></section></main>';
+  $("#login-form")?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const password = $("#owner-password")?.value || "";
+    const button = $("#login-button");
+    if (!password || !button) return;
+    button.disabled = true;
+    button.textContent = "جارٍ التحقق…";
+    state.authError = "";
+    try {
+      const response = await fetch("/api/login", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "content-type": "application/json", accept: "application/json" },
+        body: JSON.stringify({ email: "hhameranede@gmail.com", password })
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || "تعذّر تسجيل الدخول.");
+      state.authenticated = true;
+      state.authError = "";
+      render();
+      await loadStatus();
+    } catch (error) {
+      state.authError = error.message || "تعذّر تسجيل الدخول.";
+      renderLogin();
+    }
+  });
+}
+
+async function checkSession() {
+  try {
+    const response = await fetch("/api/session", {
+      credentials: "same-origin",
+      headers: { accept: "application/json" }
+    });
+    if (response.ok) {
+      state.authenticated = true;
+      state.authError = "";
+      return;
+    }
+    const data = await response.json().catch(() => ({}));
+    state.authenticated = false;
+    if (response.status !== 401) state.authError = data.error || "تعذّر التحقق من إعدادات تسجيل الدخول.";
+  } catch {
+    state.authenticated = false;
+    state.authError = "تعذّر الاتصال بخادم تسجيل الدخول.";
+  }
+}
+
+async function logout() {
+  try {
+    await fetch("/api/logout", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: { accept: "application/json" }
+    });
+  } finally {
+    state.authenticated = false;
+    state.authError = "";
+    state.messages = [];
+    state.events = [];
+    state.latestRun = null;
+    state.backend = { database: false, dispatcher: false, callback: false, healthChecked: false };
+    renderLogin();
+  }
+}
+
 function render() {
+  if (!state.authenticated) {
+    renderLogin();
+    return;
+  }
   const previousFeed = $("#chat-feed");
   const keepFeedAtBottom = !previousFeed || previousFeed.scrollHeight - previousFeed.scrollTop - previousFeed.clientHeight < 120;
   const previousFeedScrollTop = previousFeed?.scrollTop || 0;
@@ -140,7 +217,7 @@ function render() {
     state.agents.map(renderRoomButton).join("") +
     '</nav><div class="nav-label security-nav-label">CONTROL</div><nav class="side-nav">' + navButton("security", "الأمان والخصوصية") + '</nav>' +
     '<div class="sidebar-bottom"><div class="owner-card"><div class="owner-avatar">A</div><div><strong>أنت · القائد الأعلى</strong><span>القرار النهائي والصلاحيات الكاملة</span></div><span class="owner-dot"></span></div><div class="version">PRIVATE WORKSPACE <span>·</span> v0.1</div></div></aside>' +
-    '<main class="main-panel"><header class="topbar"><div class="topbar-title"><div class="mobile-mark">U</div><div><div class="breadcrumb">UTILORA <span>/</span> ' + escapeHtml(activeLabel) + '</div><h1>' + escapeHtml(activeLabel) + '</h1></div></div><div class="topbar-actions"><div class="connection-pill ' + (dbReady ? "is-online" : "is-pending") + '"><span></span>' + (dbReady ? "قاعدة البيانات متصلة" : "بانتظار ربط الخادم") + '</div><div class="avatar-small">A</div></div></header>' +
+    '<main class="main-panel"><header class="topbar"><div class="topbar-title"><div class="mobile-mark">U</div><div><div class="breadcrumb">UTILORA <span>/</span> ' + escapeHtml(activeLabel) + '</div><h1>' + escapeHtml(activeLabel) + '</h1></div></div><div class="topbar-actions"><div class="connection-pill ' + (dbReady ? "is-online" : "is-pending") + '"><span></span>' + (dbReady ? "قاعدة البيانات متصلة" : "بانتظار ربط الخادم") + '</div><button class="logout-button" id="logout-button" type="button">تسجيل الخروج</button><div class="avatar-small">A</div></div></header>' +
     '<div class="main-content">' +
     (state.error ? '<div class="alert-banner" role="alert">' + escapeHtml(state.error) + '<button type="button" id="dismiss-error" aria-label="إغلاق">×</button></div>' : "") +
     (state.view === "chat" ? '<div class="room-banner"><div class="room-banner-icon">' + icon("lock", 18) + '</div><div class="room-banner-copy"><strong>' + escapeHtml(selectedAgent ? "محادثة مباشرة مع " + selectedAgent.name : "مجلس UTILORA · قيادة وتخصص") + '</strong><span>' + escapeHtml(state.latestRun?.stage || (selectedAgent ? "الوكيل متاح لمحادثتك الفردية" : "كل وكيل يقرر متى يشارك برأيه")) + '</span><div class="room-progress"><i style="width:' + Math.max(0, Math.min(100, Number(state.latestRun?.progress) || 0)) + '%"></i></div></div><div class="room-banner-status"><span></span>' + (state.latestRun?.status === "running" ? "قيد التنفيذ" : state.latestRun?.status === "completed" ? "اكتملت" : state.latestRun?.status === "failed" ? "تحتاج مراجعة" : "خاصة") + '</div></div>' : "") +
@@ -197,6 +274,7 @@ function bindEvents() {
     });
   });
   $("#dismiss-error")?.addEventListener("click", () => { state.error = ""; render(); });
+  $("#logout-button")?.addEventListener("click", logout);
   $("#refresh-button")?.addEventListener("click", loadStatus);
   document.querySelectorAll("[data-prompt]").forEach((button) => {
     button.addEventListener("click", () => {
@@ -241,6 +319,11 @@ async function loadStatus(options = {}) {
   try {
     const healthQuery = silent ? "" : "&health=1";
     const response = await fetch("/api/status?room=" + encodeURIComponent(state.room) + healthQuery, { credentials: "same-origin", headers: { accept: "application/json" } });
+    if (response.status === 401) {
+      state.authenticated = false;
+      state.authError = "انتهت جلسة الدخول. سجّل الدخول مجددًا.";
+      return;
+    }
     if (!response.ok) throw new Error("تعذّر التحقق من حالة الخادم.");
     const data = await response.json();
     const integrations = data.integrations || {};
@@ -350,8 +433,10 @@ async function sendMessage() {
 }
 
 async function boot() {
+  await checkSession();
+  state.authChecking = false;
   render();
-  await loadStatus();
+  if (state.authenticated) await loadStatus();
   state.loading = false;
   window.setInterval(() => {
     if (document.visibilityState === "visible" && !state.sending) {
