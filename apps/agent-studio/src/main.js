@@ -16,6 +16,8 @@ const state = {
   messages: [],
   agents: AGENTS.map((agent) => ({ ...agent, status: "unknown", progress: 0, statusText: "بانتظار الربط" })),
   backend: { database: false, dispatcher: false, callback: false },
+  events: [],
+  latestRun: null,
   loading: true,
   sending: false,
   error: "",
@@ -79,7 +81,16 @@ function viewContent() {
     return '<section class="info-view"><div class="view-kicker">TEAM DIRECTORY</div><h2>فريق UTILORA</h2><p>ثمانية وكلاء متخصصين يعملون كفريق واحد. حالة كل وكيل ستظهر هنا عند اكتمال ربط محرك التشغيل.</p><div class="agent-directory">' + state.agents.map(renderAgent).join("") + '</div></section>';
   }
   if (state.view === "activity") {
-    return '<section class="info-view"><div class="view-kicker">ACTIVITY LOG</div><h2>سجل النشاط</h2><p>سيظهر هنا تسلسل المهام وبدء التشغيل والتقارير النهائية، مع وقت كل حدث.</p><div class="empty-state compact"><div class="empty-icon">' + icon("activity", 24) + '</div><strong>لا توجد أحداث مسجلة بعد</strong><span>ستظهر الأحداث بعد تفعيل الاتصال بقاعدة البيانات.</span></div></section>';
+    const rows = [...state.events].reverse();
+    const timeline = rows.length
+      ? rows.map((event) => {
+          const agent = AGENTS.find((item) => item.id === event.agent_id);
+          return '<article class="activity-event"><span class="activity-marker"></span><div class="activity-event-main"><div class="activity-event-head"><strong>' +
+            escapeHtml(agent?.name || event.agent_id || "UTILORA") + '</strong><time>' + escapeHtml(formatTime(event.created_at)) +
+            '</time></div><p>' + escapeHtml(event.message || event.event_type || "حدث جديد") + '</p></div></article>';
+        }).join("")
+      : '<div class="empty-state compact"><div class="empty-icon">' + icon("activity", 24) + '</div><strong>لا توجد أحداث مسجلة بعد</strong><span>ستظهر هنا بداية المهام وتقارير الوكلاء وحالات اكتمالها.</span></div>';
+    return '<section class="info-view"><div class="view-kicker">ACTIVITY LOG</div><h2>سجل النشاط</h2><p>آخر أحداث التشغيل المسجلة مباشرة في قاعدة بيانات الفريق.</p><div class="activity-timeline">' + timeline + '</div></section>';
   }
   if (state.view === "security") {
     return '<section class="info-view"><div class="view-kicker">ACCESS CONTROL</div><h2>الخصوصية والأمان</h2><p>هذه المساحة محمية بواسطة مصادقة Vercel على كل عمليات النشر. لا تُعرض مفاتيح الخدمات في المتصفح.</p><div class="security-cards"><div class="security-card"><span class="security-icon">' + icon("lock", 20) + '</span><div><strong>حماية الوصول</strong><small>Vercel Authentication — مفعّلة على جميع البيئات</small></div><b class="secure-tag">مفعّل</b></div><div class="security-card"><span class="security-icon">' + icon("shield", 20) + '</span><div><strong>قاعدة البيانات</strong><small>جداول الفريق محمية بـ Row Level Security</small></div><b class="pending-tag">بانتظار ربط الخادم</b></div><div class="security-card"><span class="security-icon">' + icon("agents", 20) + '</span><div><strong>الوكلاء</strong><small>الاتصال الآلي يجب أن يمر عبر قناة خادمية موثوقة</small></div><b class="pending-tag">قيد الإعداد</b></div></div></section>';
@@ -146,7 +157,13 @@ function bindEvents() {
   });
 }
 
-async function loadStatus() {
+async function loadStatus(options = {}) {
+  const silent = Boolean(options.silent);
+  const currentInput = $("#message-input");
+  const inputValue = currentInput?.value ?? "";
+  const hadFocus = Boolean(currentInput && document.activeElement === currentInput);
+  const selectionStart = currentInput?.selectionStart ?? inputValue.length;
+  const selectionEnd = currentInput?.selectionEnd ?? inputValue.length;
   const button = $("#refresh-button");
   if (button) { button.disabled = true; button.classList.add("spinning"); }
   try {
@@ -158,19 +175,37 @@ async function loadStatus() {
       dispatcher: Boolean(data.integrations?.dispatcher),
       callback: Boolean(data.integrations?.callback)
     };
-    if (data.agents && Array.isArray(data.agents)) {
+    state.latestRun = data.run || null;
+    state.events = Array.isArray(data.events) ? data.events : [];
+    if (Array.isArray(data.agents)) {
       for (const item of data.agents) {
         const agent = state.agents.find((entry) => entry.id === item.agent_id);
-        if (agent) Object.assign(agent, item);
+        if (agent) Object.assign(agent, {
+          status: item.status || agent.status,
+          statusText: item.status_text || item.statusText || agent.statusText,
+          progress: Number(item.progress) || 0,
+          response: item.response || null,
+          error: item.error || null
+        });
       }
     }
     state.error = "";
     if (state.backend.database) await loadHistory();
   } catch (error) {
-    state.error = error.message || "تعذّر الاتصال بالخادم.";
+    if (!silent) state.error = error.message || "تعذّر الاتصال بالخادم.";
   } finally {
     if (button) { button.disabled = false; button.classList.remove("spinning"); }
     render();
+    const nextInput = $("#message-input");
+    if (nextInput && inputValue) {
+      nextInput.value = inputValue;
+      nextInput.style.height = "auto";
+      nextInput.style.height = Math.min(nextInput.scrollHeight, 160) + "px";
+    }
+    if (nextInput && hadFocus) {
+      nextInput.focus();
+      try { nextInput.setSelectionRange(selectionStart, selectionEnd); } catch { /* Ignore unsupported selection. */ }
+    }
   }
 }
 
@@ -181,10 +216,18 @@ async function loadHistory() {
   if (!response.ok) throw new Error("قاعدة البيانات لم تُرجع سجل المحادثة.");
   const data = await response.json();
   state.messages = Array.isArray(data.messages) ? data.messages : [];
+  state.latestRun = Array.isArray(data.runs) ? (data.runs[0] || state.latestRun) : state.latestRun;
+  state.events = Array.isArray(data.events) ? data.events : state.events;
   if (Array.isArray(data.agents)) {
     for (const item of data.agents) {
       const agent = state.agents.find((entry) => entry.id === item.agent_id);
-      if (agent) Object.assign(agent, item);
+      if (agent) Object.assign(agent, {
+        status: item.status || agent.status,
+        statusText: item.status_text || item.statusText || agent.statusText,
+        progress: Number(item.progress) || 0,
+        response: item.response || null,
+        error: item.error || null
+      });
     }
   }
 }
@@ -216,6 +259,7 @@ async function sendMessage() {
     state.sending = false;
     const nextButton = $("#send-button");
     if (nextButton) nextButton.disabled = false;
+    loadStatus({ silent: true });
   }
 }
 
@@ -223,6 +267,11 @@ async function boot() {
   render();
   await loadStatus();
   state.loading = false;
+  window.setInterval(() => {
+    if (document.visibilityState === "visible" && !state.sending) {
+      loadStatus({ silent: true });
+    }
+  }, 7000);
 }
 
 boot();
