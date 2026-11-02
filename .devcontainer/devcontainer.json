@@ -1,0 +1,25 @@
+{
+  "name": "UTILORA Agent Team Chat",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:1-22-bookworm",
+  "postCreateCommand": "bash .devcontainer/post-create.sh",
+  "forwardPorts": [3000, 49374],
+  "portsAttributes": {
+    "49374": {
+      "label": "UTILORA Agent Chat",
+      "visibility": "private",
+      "onAutoForward": "notify"
+    },
+    "3000": {
+      "label": "UTILORA Preview",
+      "visibility": "private",
+      "onAutoForward": "openBrowser"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "GitHub.vscode-pull-request-github"
+      ]
+    }
+  }
+}
