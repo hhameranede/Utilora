@@ -160,8 +160,18 @@ export default async function handler(req, res) {
       status_text: "في قائمة الانتظار", progress: 0
     })));
 
+    // Set the run live before dispatch to avoid a fast callback being
+    // overwritten by a late "running" update after dispatch returns.
+    await db(config, "team_chat_runs?id=eq." + encodeURIComponent(run.id), "PATCH", {
+      status: "running",
+      stage: descriptor.kind === "group" ? "يختار الوكلاء المتخصصون من لديه إضافة مفيدة" : "الوكيل يقرأ سياق محادثتك الخاصة",
+      progress: 1, started_at: new Date().toISOString()
+    });
+
     const dispatchUrl = "https://api.github.com/repos/" + config.repository + "/actions/workflows/" + encodeURIComponent(config.workflow) + "/dispatches";
-    const dispatch = await fetch(dispatchUrl, {
+    let dispatch;
+    try {
+      dispatch = await fetch(dispatchUrl, {
       method: "POST",
       headers: {
         Authorization: "Bearer " + config.githubToken,
@@ -177,9 +187,12 @@ export default async function handler(req, res) {
           target_agent: descriptor.agentId || "none"
         }
       })
-    });
+      });
+    } catch {
+      dispatch = null;
+    }
 
-    if (!dispatch.ok) {
+    if (!dispatch?.ok) {
       await db(config, "team_chat_runs?id=eq." + encodeURIComponent(run.id), "PATCH", {
         status: "failed", stage: "تعذّر تشغيل GitHub Actions",
         error: "workflow_dispatch_failed", finished_at: new Date().toISOString()
@@ -190,11 +203,6 @@ export default async function handler(req, res) {
       return json(res, 502, { error: "تم حفظ الرسالة، لكن GitHub Actions رفض تشغيل الوكيل. راجع صلاحية رمز GitHub في الخادم." });
     }
 
-    await db(config, "team_chat_runs?id=eq." + encodeURIComponent(run.id), "PATCH", {
-      status: "running",
-      stage: descriptor.kind === "group" ? "يختار الوكلاء المتخصصون من لديه إضافة مفيدة" : "الوكيل يقرأ سياق محادثتك الخاصة",
-      progress: 1, started_at: new Date().toISOString()
-    });
     return json(res, 202, { message: { ...message, run_id: run.id }, run: { id: run.id, status: "running" } });
   } catch {
     return json(res, 502, { error: "حدث خطأ أثناء إرسال الرسالة. لم يتم إظهار أي رد غير مؤكد." });
