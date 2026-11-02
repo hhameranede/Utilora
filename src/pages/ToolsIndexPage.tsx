@@ -61,10 +61,10 @@ export const ToolsIndexPage: React.FC = () => {
                 key={cat.id}
                 onClick={() => setSelectedCategory(cat.id)}
                 aria-pressed={selectedCategory === cat.id}
-                className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors shrink-0 ${
+                className={`px-3.5 py-2 text-xs font-semibold rounded-xl border transition-all shrink-0 whitespace-nowrap ${
                   selectedCategory === cat.id
-                    ? 'bg-orange-700 text-white font-semibold shadow-xs'
-                    : 'text-stone-600 hover:text-stone-900'
+                    ? 'border-orange-700 bg-orange-700 text-white shadow-sm'
+                    : 'border-stone-200 bg-white text-stone-700 shadow-xs hover:border-orange-300 hover:bg-orange-50 hover:text-orange-800'
                 }`}
               >
                 {cat.localizedTitle[locale] || cat.localizedTitle.en}
