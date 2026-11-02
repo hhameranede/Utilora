@@ -41,7 +41,7 @@ async function db(config, path, method = "GET", body) {
       const response = await fetch(config.url + "/rest/v1/" + path, {
         method,
         headers,
-        signal: AbortSignal.timeout(20000),
+        signal: AbortSignal.timeout(4500),
         ...(body === undefined ? {} : { body: JSON.stringify(body) })
       });
       const text = await response.text();
