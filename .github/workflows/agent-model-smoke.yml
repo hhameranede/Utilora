@@ -175,6 +175,7 @@ jobs:
         run: |
           set -euo pipefail
           set +x
+          export PYTHONDONTWRITEBYTECODE=1
           PROMPT="$(cat <<'EOF'
           This is a non-interactive OpenCode routing check for your configured UTILORA role.
           Reply directly in one or two short sentences. State your configured agent role and describe its specialist responsibility.
