@@ -1,5 +1,8 @@
 title = "UTILORA Gitleaks configuration"
 
+[extend]
+useDefault = true
+
 [[allowlists]]
 description = "Supabase publishable keys are explicitly public API identifiers, not secrets"
 paths = [
