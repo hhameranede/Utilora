@@ -18,6 +18,11 @@ on:
         description: Specialist selected by the private room
         required: true
         type: string
+      target_agents:
+        description: Comma-separated specialist IDs selected for this group request
+        required: false
+        default: "problem-analyst,fast-task-engineer"
+        type: string
       dispatch_probe:
         description: Run a permission check without starting any AI agent
         required: false
@@ -45,7 +50,7 @@ jobs:
     timeout-minutes: 10
     strategy:
       fail-fast: false
-      max-parallel: 2
+      max-parallel: 3
       matrix:
         include:
           - agent: problem-analyst
@@ -62,33 +67,33 @@ jobs:
             model: nvidia-nim/deepseek-v4-1-flash
           - agent: security-auditor
             model: nvidia-nim/nemotron-ultra
-    env:
-      NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
-      AGENT_CHAT_RUN_ID: ${{ inputs.run_id }}
-      AGENT_NAME: ${{ matrix.agent }}
-      MODEL_ALIAS: ${{ matrix.model }}
     steps:
       - name: Check out UTILORA
-        if: ${{ inputs.mode == 'group' || matrix.agent == inputs.target_agent }}
+        if: ${{ (inputs.mode == 'private' && matrix.agent == inputs.target_agent) || (inputs.mode == 'group' && contains(format(',{0},', inputs.target_agents), format(',{0},', matrix.agent)) ) }}
         uses: actions/checkout@v4
         with:
           persist-credentials: false
 
       - name: Set up Node.js 22
-        if: ${{ inputs.mode == 'group' || matrix.agent == inputs.target_agent }}
+        if: ${{ (inputs.mode == 'private' && matrix.agent == inputs.target_agent) || (inputs.mode == 'group' && contains(format(',{0},', inputs.target_agents), format(',{0},', matrix.agent)) ) }}
         uses: actions/setup-node@v4
         with:
           node-version: 22
 
       - name: Install OpenCode
-        if: ${{ inputs.mode == 'group' || matrix.agent == inputs.target_agent }}
+        if: ${{ (inputs.mode == 'private' && matrix.agent == inputs.target_agent) || (inputs.mode == 'group' && contains(format(',{0},', inputs.target_agents), format(',{0},', matrix.agent)) ) }}
         run: |
           set -euo pipefail
           npm install --global opencode-ai@1.19.5
           opencode --version
 
       - name: Run specialist in read-only mode
-        if: ${{ inputs.mode == 'group' || matrix.agent == inputs.target_agent }}
+        if: ${{ (inputs.mode == 'private' && matrix.agent == inputs.target_agent) || (inputs.mode == 'group' && contains(format(',{0},', inputs.target_agents), format(',{0},', matrix.agent)) ) }}
+        env:
+          NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+          AGENT_CHAT_RUN_ID: ${{ inputs.run_id }}
+          AGENT_NAME: ${{ matrix.agent }}
+          MODEL_ALIAS: ${{ matrix.model }}
         run: node apps/agent-studio/scripts/agent-chat-worker.mjs
 
   project-lead:
