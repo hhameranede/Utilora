@@ -70,7 +70,7 @@ async function getRoom(config, descriptor) {
   const title = descriptor.kind === "group" ? "غرفة فريق UTILORA" : "محادثة خاصة · " + (agent?.[0] || descriptor.agentId);
   try {
     const created = await db(config, "team_chat_rooms?select=id,slug,title", "POST", {
-      slug: descriptor.slug, title
+      id: crypto.randomUUID(), slug: descriptor.slug, title
     });
     if (created?.[0]) return created[0];
   } catch (error) {
