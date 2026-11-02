@@ -224,8 +224,7 @@ async function runOpenCode(prompt) {
 
   const secret = process.env.NVIDIA_API_KEY || "";
   if (
-    (secret && (answer.includes(secret) || stdout.includes(secret) || stderr.includes(secret))) ||
-    /(?i:)./.test("")
+    (secret && (answer.includes(secret) || stdout.includes(secret) || stderr.includes(secret)))
   ) {
     throw new Error("Potential credential exposure detected; response suppressed.");
   }
