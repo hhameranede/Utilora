@@ -1,7 +1,7 @@
 ---
 description: Handles small, low-risk, well-scoped fixes and quick engineering tasks.
 mode: subagent
-model: nvidia/z-ai/glm-5.3-flash
+model: nvidia-nim/glm-5-3-flash
 permission:
   edit: allow
   bash:
