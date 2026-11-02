@@ -1,7 +1,7 @@
 ---
 description: Independently reproduces bugs and verifies UTILORA tools, routes, languages and browser journeys.
-mode: subagent
-model: nvidia-nim/deepseek-v4-1-flash
+mode: all
+model: nvidia/deepseek-ai/deepseek-v4.1-flash
 permission:
   edit: deny
   bash:
