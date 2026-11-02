@@ -142,8 +142,22 @@ async function writeCallback(body: any) {
   const responseText = typeof body.response === "string" ? body.response.slice(0, 18000) : "";
   const errorText = typeof body.error === "string" ? body.error.slice(0, 1000) : null;
 
-  if (!runId || !allowedAgents.has(agentId) || !["running", "completed", "failed"].includes(status)) {
+  if (!runId || !allowedAgents.has(agentId) || !["running", "completed", "failed", "skipped"].includes(status)) {
     return response(400, { error: "Invalid callback payload." });
+  }
+
+  const runRows = await supabase(
+    "team_chat_runs?id=eq." + encodeURIComponent(runId) + "&select=id,room_id&limit=1"
+  );
+  const run = runRows?.[0];
+  if (!run?.room_id) return response(404, { error: "Run not found." });
+  const roomRows = await supabase(
+    "team_chat_rooms?id=eq." + encodeURIComponent(run.room_id) + "&select=slug&limit=1"
+  );
+  const roomSlug = String(roomRows?.[0]?.slug || "");
+  const isPrivateRoom = roomSlug.startsWith("agent-");
+  if (isPrivateRoom && roomSlug !== "agent-" + agentId) {
+    return response(403, { error: "Agent is not assigned to this private room." });
   }
 
   const existing = await supabase(
@@ -151,7 +165,8 @@ async function writeCallback(body: any) {
       "&agent_id=eq." + encodeURIComponent(agentId) +
       "&select=run_id,agent_id,response&limit=1"
   );
-  const previousResponse = existing?.[0]?.response || null;
+  if (!existing?.[0]) return response(403, { error: "Agent is not assigned to this run." });
+  const previousResponse = existing[0].response || null;
 
   await supabase(
     "team_chat_agent_runs?on_conflict=run_id,agent_id",
@@ -198,7 +213,23 @@ async function writeCallback(body: any) {
   const done = rows.filter((row: any) => ["completed", "failed", "skipped"].includes(row.status)).length;
   const average = rows.length ? Math.round(rows.reduce((sum: number, row: any) => sum + (Number(row.progress) || 0), 0) / rows.length) : 0;
 
-  if (agentId === "project-lead" && status === "completed") {
+  if (isPrivateRoom && status === "completed") {
+    await supabase("team_chat_runs?id=eq." + encodeURIComponent(runId), "PATCH", {
+      status: "completed",
+      stage: "اكتملت المحادثة الخاصة مع الوكيل",
+      progress: 100,
+      finished_at: new Date().toISOString(),
+      error: null,
+    });
+  } else if (isPrivateRoom && status === "failed") {
+    await supabase("team_chat_runs?id=eq." + encodeURIComponent(runId), "PATCH", {
+      status: "failed",
+      stage: "تعذّر على الوكيل إكمال الرد",
+      progress: 100,
+      finished_at: new Date().toISOString(),
+      error: errorText || "private_agent_failed",
+    });
+  } else if (agentId === "project-lead" && status === "completed") {
     await supabase("team_chat_runs?id=eq." + encodeURIComponent(runId), "PATCH", {
       status: "completed",
       stage: "اكتمل رد الفريق",
