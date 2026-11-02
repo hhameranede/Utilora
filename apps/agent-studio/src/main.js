@@ -116,7 +116,7 @@ function viewContent() {
   }
   if (state.view === "security") {
     const securityBadge = (enabled) => '<b class="' + (enabled ? "secure-tag" : "pending-tag") + '">' + (enabled ? "متصل" : "غير مكتمل") + '</b>';
-    return '<section class="info-view"><div class="view-kicker">ACCESS CONTROL</div><h2>الخصوصية والأمان</h2><p>تسجيل الدخول عبر Supabase Auth، ثم جلسة خادمية موقعة داخل Cookie محمية. لا تُرسل مفاتيح الخدمات إلى المتصفح.</p><div class="security-cards"><div class="security-card"><span class="security-icon">' + icon("lock", 20) + '</span><div><strong>حماية الوصول</strong><small>حساب مالك واحد مسموح به · جلسة HttpOnly / Secure / SameSite</small></div><b class="secure-tag">مفعّل</b></div><div class="security-card"><span class="security-icon">' + icon("shield", 20) + '</span><div><strong>قاعدة البيانات</strong><small>RLS مفعّل، والوصول إلى الجداول محصور بمفتاح خادمي</small></div>' + securityBadge(state.backend.database) + '</div><div class="security-card"><span class="security-icon">' + icon("agents", 20) + '</span><div><strong>تشغيل الوكلاء</strong><small>GitHub Actions + هوية OIDC موثوقة، دون مفاتيح داخل المتصفح</small></div>' + securityBadge(state.backend.dispatcher && state.backend.callback) + '</div></div></section>';
+    return '<section class="info-view"><div class="view-kicker">ACCESS CONTROL</div><h2>الخصوصية والأمان</h2><p>تسجيل الدخول عبر Supabase Auth، ثم جلسة خادمية موقعة داخل Cookie محمية. لا تُرسل مفاتيح الخدمات إلى المتصفح.</p><div class="security-cards"><div class="security-card"><span class="security-icon">' + icon("lock", 20) + '</span><div><strong>حماية الوصول</strong><small>حساب مالك واحد مسموح به · جلسة HttpOnly / Secure / SameSite</small></div><b class="secure-tag">مفعّل</b></div><div class="security-card"><span class="security-icon">' + icon("shield", 20) + '</span><div><strong>قاعدة البيانات</strong><small>RLS مفعّل، والوصول إلى الجداول محصور بمفتاح خادمي</small></div>' + securityBadge(state.backend.database) + '</div><div class="security-card"><span class="security-icon">' + icon("agents", 20) + '</span><div><strong>قراءة إعدادات GitHub Actions</strong><small>هذا الفحص لا يثبت صلاحية إطلاق Workflow؛ استخدم الاختبار الآمن أدناه.</small></div>' + securityBadge(state.backend.dispatcher && state.backend.callback) + '</div></div><div class="dispatch-test"><button class="auth-submit" id="dispatch-check-button" type="button">اختبار صلاحية تشغيل GitHub Actions</button><p id="dispatch-check-result" class="dispatch-check-result" aria-live="polite">اختبار آمن: لا يشغّل الوكلاء ولا يستدعي نماذج NVIDIA.</p></div></section>';
   }
   const privateAgentId = state.room.startsWith("agent-") ? state.room.slice(6) : "";
   const privateAgent = AGENTS.find((agent) => agent.id === privateAgentId);
@@ -287,6 +287,7 @@ function bindEvents() {
   $("#dismiss-error")?.addEventListener("click", () => { state.error = ""; render(); });
   $("#logout-button")?.addEventListener("click", logout);
   $("#refresh-button")?.addEventListener("click", loadStatus);
+  $("#dispatch-check-button")?.addEventListener("click", runDispatchCheck);
   document.querySelectorAll("[data-prompt]").forEach((button) => {
     button.addEventListener("click", () => {
       const input = $("#message-input");
@@ -316,6 +317,39 @@ function bindEvents() {
       }
     });
   });
+}
+
+async function runDispatchCheck() {
+  const button = $("#dispatch-check-button");
+  const result = $("#dispatch-check-result");
+  if (!button || !result || button.disabled) return;
+
+  button.disabled = true;
+  button.textContent = "جارٍ اختبار الصلاحية…";
+  result.className = "dispatch-check-result";
+  result.textContent = "يتم إرسال طلب Workflow تجريبي بلا أي وكيل أو نموذج.";
+
+  try {
+    const response = await fetch("/api/dispatch-check", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: { accept: "application/json" }
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      result.classList.add("is-error");
+      result.textContent = data.error || "رفض GitHub طلب تشغيل Workflow.";
+      return;
+    }
+    result.classList.add("is-success");
+    result.textContent = "نجح GitHub في قبول workflow_dispatch. لم يبدأ أي وكيل ولم يتم استدعاء NVIDIA.";
+  } catch (error) {
+    result.classList.add("is-error");
+    result.textContent = error?.message || "تعذّر الاتصال بخدمة الفحص.";
+  } finally {
+    button.disabled = false;
+    button.textContent = "إعادة اختبار صلاحية تشغيل GitHub Actions";
+  }
 }
 
 async function loadStatus(options = {}) {
