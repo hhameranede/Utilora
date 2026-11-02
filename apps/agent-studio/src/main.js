@@ -66,7 +66,7 @@ function resetAgentStatuses() {
 function renderAgent(agent) {
   return '<div class="agent-row">' +
     '<div class="agent-avatar ' + agent.tone + '">' + escapeHtml(agent.initials) + '</div>' +
-    '<div class="agent-meta"><div class="agent-name">' + escapeHtml(agent.name) + '</div><div class="agent-role">' + escapeHtml(agent.role) + '</div><div class="agent-state">' + agentStatus(agent) + '</div><div class="agent-progress"><i style="width:' + Math.max(0, Math.min(100, Number(agent.progress) || 0)) + '%"></i></div></div>' +
+    '<div class="agent-meta"><div class="agent-name">' + escapeHtml(agent.name) + '</div><div class="agent-role">' + escapeHtml(agent.role) + '</div><div class="agent-state">' + agentStatus(agent) + '</div>' + (agent.error ? '<div class="agent-error" role="alert">' + escapeHtml(agent.error) + '</div>' : '') + '<div class="agent-progress"><i style="width:' + Math.max(0, Math.min(100, Number(agent.progress) || 0)) + '%"></i></div></div>' +
     '<button class="agent-more" type="button" aria-label="تفاصيل ' + escapeHtml(agent.name) + '" data-agent="' + agent.id + '">' + icon("dots", 17) + '</button>' +
     '</div>';
 }
@@ -86,6 +86,16 @@ function formatTime(value) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "";
   return date.toLocaleTimeString("ar-DZ", { hour: "2-digit", minute: "2-digit" });
+}
+
+function renderRunDiagnostics() {
+  if (state.view !== "chat") return "";
+  const failedAgents = state.agents.filter((agent) => agent.status === "failed" || agent.error);
+  if (state.latestRun?.status !== "failed" && !failedAgents.length) return "";
+  return '<section class="run-diagnostics" role="alert"><strong>تعذّر رد واحد أو أكثر من الوكلاء</strong>' +
+    (state.latestRun?.error ? '<p>' + escapeHtml(state.latestRun.error) + '</p>' : '') +
+    failedAgents.map((agent) => '<div class="run-diagnostic-agent"><b>' + escapeHtml(agent.name) + '</b><span>' + escapeHtml(agent.error || agent.statusText || "فشل التشغيل") + '</span></div>').join("") +
+    '</section>';
 }
 
 function viewContent() {
@@ -221,6 +231,7 @@ function render() {
     '<div class="main-content">' +
     (state.error ? '<div class="alert-banner" role="alert">' + escapeHtml(state.error) + '<button type="button" id="dismiss-error" aria-label="إغلاق">×</button></div>' : "") +
     (state.view === "chat" ? '<div class="room-banner"><div class="room-banner-icon">' + icon("lock", 18) + '</div><div class="room-banner-copy"><strong>' + escapeHtml(selectedAgent ? "محادثة مباشرة مع " + selectedAgent.name : "مجلس UTILORA · قيادة وتخصص") + '</strong><span>' + escapeHtml(state.latestRun?.stage || (selectedAgent ? "الوكيل متاح لمحادثتك الفردية" : "كل وكيل يقرر متى يشارك برأيه")) + '</span><div class="room-progress"><i style="width:' + Math.max(0, Math.min(100, Number(state.latestRun?.progress) || 0)) + '%"></i></div></div><div class="room-banner-status"><span></span>' + (state.latestRun?.status === "running" ? "قيد التنفيذ" : state.latestRun?.status === "completed" ? "اكتملت" : state.latestRun?.status === "failed" ? "تحتاج مراجعة" : "خاصة") + '</div></div>' : "") +
+    renderRunDiagnostics() +
     viewContent() +
     '</div></main>' +
     '<aside class="team-panel"><div class="team-panel-head"><div><div class="view-kicker">YOUR AI TEAM</div><h2>هيكل القيادة</h2></div><span class="team-count">08</span></div><div class="hierarchy-card"><div class="hierarchy-level owner-level"><span>1</span><div><strong>أنت · Owner</strong><small>القائد الأعلى وصاحب القرار النهائي</small></div><b>ROOT</b></div><div class="hierarchy-connector"></div><div class="hierarchy-level lead-level"><span>2</span><div><strong>Project Lead</strong><small>تنسيق الفريق وتوزيع المهام ورفع التوصيات</small></div><b>LEAD</b></div><div class="hierarchy-connector"></div><div class="hierarchy-note"><strong>3 · الوكلاء المتخصصون</strong><small>يشاركون عند الحاجة، يختلفون عند وجود سبب، ولا يتجاوزون صلاحياتهم.</small></div></div><div class="team-summary"><div class="summary-number">' + state.agents.filter((a) => a.status === "running").length + '<small>/ 8</small></div><div><strong>وكلاء نشطون</strong><span>حالة الاتصال الحالية</span></div></div><div class="team-list">' + state.agents.map(renderAgent).join("") + '</div><div class="team-footer"><div class="footer-line"><span></span></div><p>' + (dispatchReady ? "محرك تشغيل الفريق متصل" : "ربط محرك التشغيل لم يكتمل بعد") + '</p><button class="refresh-button" id="refresh-button" type="button">' + icon("refresh", 15) + ' تحديث الحالة</button></div></aside>' +
@@ -350,10 +361,10 @@ async function loadStatus(options = {}) {
         });
       }
     }
-    state.error = "";
     if (state.backend.database) await loadHistory();
   } catch (error) {
-    if (!silent) state.error = error.message || "تعذّر الاتصال بالخادم.";
+    const message = error?.message || "تعذّر الاتصال بالخادم.";
+    if (!state.error || !silent) state.error = message;
   } finally {
     if (button) { button.disabled = false; button.classList.remove("spinning"); }
     render();
