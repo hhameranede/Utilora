@@ -1,5 +1,3 @@
-import { createRemoteJWKSet, jwtVerify } from "jose";
-
 export const AGENTS = [
   ["problem-analyst", "nvidia-nim/deepseek-v4-1-flash"],
   ["implementation-engineer", "nvidia-nim/minimax-m3-1-flash"],
@@ -17,7 +15,10 @@ export const REQUIRED_ROOMS = [
   "agent-qa-engineer", "agent-security-auditor", "agent-project-lead"
 ];
 
-const jwksCache = new Map();
+const SESSION_COOKIE = "__Host-utilora_session";
+const SESSION_TTL_SECONDS = 8 * 60 * 60;
+const encoder = new TextEncoder();
+const loginBuckets = new Map();
 
 export function json(data, status = 200, extraHeaders = {}) {
   return new Response(JSON.stringify(data), {
@@ -25,53 +26,11 @@ export function json(data, status = 200, extraHeaders = {}) {
     headers: {
       "Content-Type": "application/json; charset=utf-8",
       "Cache-Control": "private, no-store, max-age=0",
-      "Vary": "Cookie, Authorization, Cf-Access-Jwt-Assertion",
+      "Vary": "Cookie, Authorization",
+      "X-Content-Type-Options": "nosniff",
       ...extraHeaders
     }
   });
-}
-
-function accessSettings(env) {
-  const raw = String(env.CF_ACCESS_TEAM_DOMAIN || "").trim();
-  const domain = raw.replace("https://", "").replace("http://", "").split("/")[0];
-  return {
-    domain,
-    issuer: domain ? "https://" + domain : "",
-    audience: String(env.CF_ACCESS_AUD || "").trim(),
-    allowedEmail: String(env.STUDIO_ALLOWED_EMAIL || "hhameranede@gmail.com").trim().toLowerCase()
-  };
-}
-
-export async function requireOwner(context) {
-  const settings = accessSettings(context.env);
-  if (!settings.domain || !settings.audience) {
-    return { response: json({
-      error: "لم تكتمل حماية Cloudflare Access بعد. لن يتم السماح بالوصول إلى بيانات المحادثة قبل ضبطها."
-    }, 503) };
-  }
-
-  const token = context.request.headers.get("Cf-Access-Jwt-Assertion");
-  if (!token) return { response: json({ error: "يلزم تسجيل الدخول عبر Cloudflare Access." }, 401) };
-
-  try {
-    let jwks = jwksCache.get(settings.domain);
-    if (!jwks) {
-      jwks = createRemoteJWKSet(new URL(settings.issuer + "/cdn-cgi/access/certs"));
-      jwksCache.set(settings.domain, jwks);
-    }
-    const { payload } = await jwtVerify(token, jwks, {
-      issuer: settings.issuer,
-      audience: settings.audience
-    });
-    const email = String(payload.email || "").toLowerCase();
-    if (!email || email !== settings.allowedEmail) {
-      return { response: json({ error: "هذا الحساب غير مخوّل للدخول إلى مساحة UTILORA." }, 403) };
-    }
-    return { identity: { email } };
-  } catch (error) {
-    console.warn("[Agent Studio] Cloudflare Access verification failed", error?.code || error?.name || "unknown");
-    return { response: json({ error: "تعذّر التحقق من جلسة Cloudflare Access. سجّل الدخول من جديد." }, 401) };
-  }
 }
 
 export function getConfig(env) {
@@ -80,12 +39,111 @@ export function getConfig(env) {
   return {
     url,
     key: String(env.SUPABASE_SECRET_KEY || env.SUPABASE_SERVICE_ROLE_KEY || ""),
+    publishableKey: String(env.SUPABASE_PUBLISHABLE_KEY || env.SUPABASE_ANON_KEY || ""),
+    sessionSecret: String(env.STUDIO_SESSION_SECRET || ""),
+    allowedEmail: String(env.STUDIO_ALLOWED_EMAIL || "hhameranede@gmail.com").trim().toLowerCase(),
     githubToken: String(env.UTILORA_GITHUB_TOKEN || ""),
     repository: String(env.UTILORA_GITHUB_REPOSITORY || "hhameranede/Utilora"),
     ref: String(env.UTILORA_AGENT_WORKFLOW_REF || "main"),
     workflow: String(env.UTILORA_AGENT_WORKFLOW_FILE || "agent-chat-execution.yml"),
     callbackUrl: String(env.AGENT_CHAT_CALLBACK_URL || "https://paleenigjkmjwinkblfv.supabase.co/functions/v1/agent-studio-callback")
   };
+}
+
+function toBase64Url(bytes) {
+  let binary = "";
+  for (const byte of bytes) binary += String.fromCharCode(byte);
+  return btoa(binary).replace(/=/g, "").replace(/\+/g, "-").replace(/\//g, "_");
+}
+
+function fromBase64Url(value) {
+  const normalized = value.replace(/-/g, "+").replace(/_/g, "/");
+  const binary = atob(normalized + "=".repeat((4 - normalized.length % 4) % 4));
+  return Uint8Array.from(binary, (char) => char.charCodeAt(0));
+}
+
+async function sessionKey(secret) {
+  if (secret.length < 32) throw new Error("STUDIO_SESSION_SECRET must contain at least 32 characters.");
+  return crypto.subtle.importKey(
+    "raw", encoder.encode(secret), { name: "HMAC", hash: "SHA-256" }, false, ["sign", "verify"]
+  );
+}
+
+function readCookie(request) {
+  const cookieHeader = request.headers.get("Cookie") || "";
+  for (const part of cookieHeader.split(";")) {
+    const item = part.trim();
+    if (item.startsWith(SESSION_COOKIE + "=")) return item.slice(SESSION_COOKIE.length + 1);
+  }
+  return "";
+}
+
+export async function createOwnerSessionCookie(email, env) {
+  const config = getConfig(env);
+  if (!config.sessionSecret || config.sessionSecret.length < 32) {
+    throw new Error("Session signing secret is not configured.");
+  }
+  if (email.toLowerCase() !== config.allowedEmail) throw new Error("Owner account is not allowed.");
+  const now = Math.floor(Date.now() / 1000);
+  const payload = { email: config.allowedEmail, iat: now, exp: now + SESSION_TTL_SECONDS };
+  const encodedPayload = toBase64Url(encoder.encode(JSON.stringify(payload)));
+  const signingInput = encoder.encode(encodedPayload);
+  const signature = await crypto.subtle.sign("HMAC", await sessionKey(config.sessionSecret), signingInput);
+  return SESSION_COOKIE + "=" + encodedPayload + "." + toBase64Url(new Uint8Array(signature)) +
+    "; Path=/; Max-Age=" + SESSION_TTL_SECONDS + "; Secure; HttpOnly; SameSite=Strict";
+}
+
+export function clearOwnerSessionCookie() {
+  return SESSION_COOKIE + "=; Path=/; Max-Age=0; Secure; HttpOnly; SameSite=Strict";
+}
+
+export async function requireOwner(context) {
+  const config = getConfig(context.env);
+  if (!config.sessionSecret || config.sessionSecret.length < 32) {
+    return { response: json({ error: "لم يكتمل إعداد مفتاح جلسات الدخول على Cloudflare." }, 503) };
+  }
+  const token = readCookie(context.request);
+  if (!token) return { response: json({ error: "سجّل الدخول للمتابعة." }, 401) };
+
+  try {
+    const parts = token.split(".");
+    if (parts.length !== 2) throw new Error("Invalid session format.");
+    const payloadBytes = fromBase64Url(parts[0]);
+    const signature = fromBase64Url(parts[1]);
+    const valid = await crypto.subtle.verify(
+      "HMAC", await sessionKey(config.sessionSecret), signature, encoder.encode(parts[0])
+    );
+    if (!valid) throw new Error("Invalid session signature.");
+    const payload = JSON.parse(new TextDecoder().decode(payloadBytes));
+    const now = Math.floor(Date.now() / 1000);
+    if (payload.email !== config.allowedEmail || !Number.isInteger(payload.exp) ||
+        !Number.isInteger(payload.iat) || payload.exp <= now ||
+        payload.iat > now + 60 || payload.exp - payload.iat > SESSION_TTL_SECONDS) {
+      throw new Error("Expired or unauthorized session.");
+    }
+    return { identity: { email: payload.email } };
+  } catch (error) {
+    console.warn("[Agent Studio] Session verification failed", error?.name || "unknown");
+    return { response: json({ error: "انتهت الجلسة أو لم تعد صالحة. سجّل الدخول مجددًا." }, 401) };
+  }
+}
+
+export function allowLoginAttempt(ip) {
+  const now = Date.now();
+  const key = String(ip || "unknown").slice(0, 80);
+  let bucket = loginBuckets.get(key);
+  if (!bucket || now - bucket.startedAt > 15 * 60 * 1000) {
+    bucket = { startedAt: now, count: 0 };
+  }
+  if (bucket.count >= 8) return false;
+  bucket.count += 1;
+  loginBuckets.set(key, bucket);
+  if (loginBuckets.size > 2000) {
+    for (const [entry, value] of loginBuckets) {
+      if (now - value.startedAt > 15 * 60 * 1000) loginBuckets.delete(entry);
+    }
+  }
+  return true;
 }
 
 export function assertServerKey(config) {
