@@ -67,11 +67,6 @@ jobs:
             model: nvidia-nim/deepseek-v4-1-flash
           - agent: security-auditor
             model: nvidia-nim/nemotron-ultra
-    env:
-      NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
-      AGENT_CHAT_RUN_ID: ${{ inputs.run_id }}
-      AGENT_NAME: ${{ matrix.agent }}
-      MODEL_ALIAS: ${{ matrix.model }}
     steps:
       - name: Check out UTILORA
         if: ${{ (inputs.mode == 'private' && matrix.agent == inputs.target_agent) || (inputs.mode == 'group' && contains(format(',{0},', inputs.target_agents), format(',{0},', matrix.agent)) ) }}
@@ -94,6 +89,11 @@ jobs:
 
       - name: Run specialist in read-only mode
         if: ${{ (inputs.mode == 'private' && matrix.agent == inputs.target_agent) || (inputs.mode == 'group' && contains(format(',{0},', inputs.target_agents), format(',{0},', matrix.agent)) ) }}
+        env:
+          NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+          AGENT_CHAT_RUN_ID: ${{ inputs.run_id }}
+          AGENT_NAME: ${{ matrix.agent }}
+          MODEL_ALIAS: ${{ matrix.model }}
         run: node apps/agent-studio/scripts/agent-chat-worker.mjs
 
   project-lead:
