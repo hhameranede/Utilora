@@ -439,7 +439,7 @@ async function boot() {
   if (state.authenticated) await loadStatus();
   state.loading = false;
   window.setInterval(() => {
-    if (document.visibilityState === "visible" && !state.sending) {
+    if (state.authenticated && document.visibilityState === "visible" && !state.sending) {
       loadStatus({ silent: true });
     }
   }, 7000);
