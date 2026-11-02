@@ -1,9 +1,6 @@
 name: UTILORA agent capability check
 
 on:
-  push:
-    branches:
-      - feat/autonomous-agent-foundation-2026-11-01
   workflow_dispatch:
     inputs:
       utilora_ref:
