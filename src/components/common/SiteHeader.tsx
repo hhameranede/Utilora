@@ -101,7 +101,7 @@ export const SiteHeader: React.FC = () => {
             {/* Quick Search Button */}
             <button
               onClick={() => setIsSearchOpen(true)}
-              className="flex items-center gap-2 px-2 sm:px-3 py-1.5 rounded-xl border border-stone-200 bg-stone-50 hover:bg-stone-100 hover:border-stone-300 text-xs text-stone-500 hover:text-stone-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
+              className="inline-flex min-h-10 min-w-10 items-center justify-center gap-2 px-2 sm:min-w-0 sm:justify-start sm:px-3 py-2 rounded-xl border border-stone-200 bg-stone-50 hover:bg-stone-100 hover:border-stone-300 text-xs text-stone-500 hover:text-stone-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
               aria-label={t('nav.searchShort')}
               aria-haspopup="dialog"
               aria-controls="utilora-global-search"
@@ -122,7 +122,7 @@ export const SiteHeader: React.FC = () => {
             <button
               type="button"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden p-2 rounded-xl border border-stone-200 text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition-colors"
+              className="md:hidden inline-flex min-h-10 min-w-10 items-center justify-center p-2 rounded-xl border border-stone-200 text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
               aria-label={t("nav.toggleNavigation")}
               aria-expanded={isMobileMenuOpen}
               aria-controls="utilora-mobile-navigation"
@@ -146,7 +146,7 @@ export const SiteHeader: React.FC = () => {
                 setIsMobileMenuOpen(false);
                 setIsSearchOpen(true);
               }}
-              className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-xs text-stone-500"
+              className="w-full min-h-10 flex items-center justify-between px-3 py-2.5 rounded-xl bg-stone-50 border border-stone-200 text-xs text-stone-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
             >
               <div className="flex items-center gap-2">
                 <Search size={15} className="text-orange-600" />
@@ -162,21 +162,21 @@ export const SiteHeader: React.FC = () => {
               <Link
                 routeType="home"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="block px-3 py-2 text-sm font-semibold text-stone-800 hover:text-orange-700"
+                className="block min-h-10 px-3 py-2.5 text-sm font-semibold text-stone-800 hover:text-orange-700"
               >
                 {t('brand.name')}
               </Link>
               <Link
                 routeType="tools-index"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="block px-3 py-2 text-sm font-semibold text-stone-800 hover:text-orange-700"
+                className="block min-h-10 px-3 py-2.5 text-sm font-semibold text-stone-800 hover:text-orange-700"
               >
                 {t('nav.tools')} (36)
               </Link>
               <Link
                 routeType="categories-index"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="block px-3 py-2 text-sm font-semibold text-stone-800 hover:text-orange-700"
+                className="block min-h-10 px-3 py-2.5 text-sm font-semibold text-stone-800 hover:text-orange-700"
               >
                 {t('nav.categories')}
               </Link>
@@ -187,7 +187,7 @@ export const SiteHeader: React.FC = () => {
                     routeType="category"
                     slug={cat.slug}
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="flex items-center gap-2 px-3 py-1.5 text-xs text-stone-600 hover:text-orange-700"
+                    className="flex min-h-10 items-center gap-2 px-3 py-2.5 text-xs text-stone-600 hover:text-orange-700"
                   >
                     <Icon name={cat.icon} size={13} className="text-orange-600" />
                     <span>{cat.localizedTitle[locale] || cat.localizedTitle.en}</span>
@@ -197,14 +197,14 @@ export const SiteHeader: React.FC = () => {
               <Link
                 routeType="articles-index"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="block px-3 py-2 text-sm font-semibold text-stone-800 hover:text-orange-700"
+                className="block min-h-10 px-3 py-2.5 text-sm font-semibold text-stone-800 hover:text-orange-700"
               >
                 {t('nav.articles')}
               </Link>
               <Link
                 routeType="about"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="block px-3 py-2 text-sm font-semibold text-stone-800 hover:text-orange-700"
+                className="block min-h-10 px-3 py-2.5 text-sm font-semibold text-stone-800 hover:text-orange-700"
               >
                 {t('nav.about')}
               </Link>
