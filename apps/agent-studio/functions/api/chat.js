@@ -30,6 +30,95 @@ function explainDispatchFailure(status, message) {
 }
 
 
+
+function normalizeChatText(value) {
+  return String(value || "")
+    .normalize("NFKC")
+    .toLocaleLowerCase()
+    .replace(/[\u064B-\u065F\u0670\u0640]/g, "")
+    .replace(/[أإآ]/g, "ا")
+    .replace(/[.,!?؟،؛:]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function getInstantReply(content, descriptor) {
+  const normalized = normalizeChatText(content);
+  const greetings = new Set([
+    "اهلا", "اهلا وسهلا", "اهلين", "هلا", "مرحبا", "مرحبتين",
+    "السلام عليكم", "سلام عليكم", "صباح الخير", "مساء الخير",
+    "hi", "hello", "hey", "good morning", "good evening"
+  ]);
+  const thanks = new Set([
+    "شكرا", "شكرا جزيلا", "يعطيك الصحة", "بارك الله فيك",
+    "thanks", "thank you", "thank you so much"
+  ]);
+  const farewells = new Set([
+    "مع السلامة", "في امان الله", "باي", "تصبح على خير", "bye", "goodbye"
+  ]);
+
+  if (greetings.has(normalized)) {
+    return descriptor.kind === "group"
+      ? "أهلاً بيك! 👋 أنا قائد فريق UTILORA. واش نقدروا ننجزولك اليوم؟ كي تعطينا مهمة، نوجّهها مباشرة غير للوكلاء المختصين."
+      : "أهلاً بيك! 👋 أنا معاك هنا. قولّي واش تحتاج ونعاونك مباشرة.";
+  }
+  if (thanks.has(normalized)) return "العفو! 😊 راني هنا لمساعدتك.";
+  if (farewells.has(normalized)) return "في أمان الله! 👋 نلقاك على خير.";
+  return null;
+}
+
+function selectGroupAgents(content) {
+  const text = normalizeChatText(content);
+  const selected = new Set();
+  const matches = (patterns) => patterns.some((pattern) => pattern.test(text));
+  const security = matches([
+    /امن|حماي|ثغر|اختراق|خصوصي|مصادق|تسجيل الدخول|صلاحيات|توكن|سيكرت|security|privacy|authentication|authorization|vulnerability|exploit|secret|token/
+  ]);
+  const visual = matches([
+    /تصميم|واجه|الوان|لون|تجربه المستخدم|تخطيط بصري|rtl|css|responsive|mobile|layout|ui|ux|design|accessibility/
+  ]);
+  const quality = matches([
+    /اختبار|اختبر|تحقق|فحص|جوده|bug|bugs|خطا|مشكله|تعطل|فشل|error|failed|regression|qa|test/
+  ]);
+  const planning = matches([
+    /خطه|تخطيط|استراتيجي|خارطه|اولويات|مستقبل|توسع|roadmap|strategy|long term|priorities|planning/
+  ]);
+  const implementation = matches([
+    /برمج|كود|ملف|اصلح|صلح|عدل|نفذ|انشئ|ابن|طور|دمج|انشر|deploy|implement|build|code|github|cloudflare|supabase|worker|api|sql|function|component|fix|change|update|create/
+  ]);
+
+  if (security) {
+    selected.add("security-auditor");
+    selected.add("implementation-engineer");
+    if (quality) selected.add("qa-engineer");
+  }
+  if (visual) {
+    selected.add("visual-reviewer");
+    selected.add("implementation-engineer");
+    if (quality) selected.add("qa-engineer");
+  }
+  if (quality) {
+    selected.add("qa-engineer");
+    selected.add("implementation-engineer");
+    selected.add("problem-analyst");
+  }
+  if (planning) {
+    selected.add("long-horizon-engineer");
+    selected.add("problem-analyst");
+  }
+  if (implementation) {
+    selected.add("implementation-engineer");
+    selected.add("problem-analyst");
+    if (quality) selected.add("qa-engineer");
+  }
+  if (!selected.size) {
+    selected.add("problem-analyst");
+    selected.add("fast-task-engineer");
+  }
+
+  return [...selected].slice(0, 3);
+}
+
 export async function onRequest(context) {
   const access = await requireOwner(context);
   if (access.response) return access.response;
@@ -64,9 +153,6 @@ export async function onRequest(context) {
   if (!config.url || !config.key || config.key.startsWith("sb_publishable_")) {
     return json({ error: "ربط قاعدة بيانات المحادثة غير مكتمل أو يستخدم مفتاحًا عامًا." }, 503);
   }
-  if (!config.githubToken) {
-    return json({ error: "ربط تشغيل الوكلاء عبر GitHub Actions غير مكتمل." }, 503);
-  }
 
   const diagnosticId = crypto.randomUUID();
   let runIdForRecovery = "";
@@ -77,6 +163,10 @@ export async function onRequest(context) {
     if (!descriptor) return json({ error: "غرفة المحادثة غير موجودة." }, 404);
     if (!content) return json({ error: "اكتب رسالة قبل الإرسال." }, 400);
     if (content.length > 12000) return json({ error: "الرسالة طويلة جدًا؛ الحد الأقصى 12 ألف حرف." }, 413);
+    const fastReply = getInstantReply(content, descriptor);
+    if (!fastReply && !config.githubToken) {
+      return json({ error: "ربط تشغيل الوكلاء عبر GitHub Actions غير مكتمل." }, 503);
+    }
 
     const room = await getRoom(config, descriptor);
     const createdMessages = await db(config,
@@ -104,25 +194,78 @@ export async function onRequest(context) {
       run_id: run.id
     });
 
+    const selectedAgentIds = descriptor.kind === "group"
+      ? selectGroupAgents(content)
+      : [descriptor.agentId];
     const participants = descriptor.kind === "group"
       ? AGENTS
       : AGENTS.filter(([id]) => id === descriptor.agentId);
-    await db(config, "team_chat_agent_runs", "POST", participants.map(([agent_id, model_id]) => ({
-      run_id: run.id,
-      agent_id,
-      model_id,
-      status: "queued",
-      status_text: "في قائمة الانتظار",
-      progress: 0
-    })));
+    const now = new Date().toISOString();
+    const instantAgentId = descriptor.kind === "group" ? "project-lead" : descriptor.agentId;
+
+    await db(config, "team_chat_agent_runs", "POST", participants.map(([agent_id, model_id]) => {
+      const instantCompleted = Boolean(fastReply) && agent_id === instantAgentId;
+      const notSelected = descriptor.kind === "group" &&
+        agent_id !== "project-lead" && !selectedAgentIds.includes(agent_id);
+      const skipped = Boolean(fastReply) ? !instantCompleted : notSelected;
+      return {
+        run_id: run.id,
+        agent_id,
+        model_id,
+        status: instantCompleted ? "completed" : skipped ? "skipped" : "queued",
+        status_text: instantCompleted
+          ? "رد فوري دون تشغيل نموذج"
+          : skipped ? "غير معني بهذه المهمة" : "في قائمة الانتظار",
+        progress: instantCompleted || skipped ? 100 : 0,
+        ...(instantCompleted ? { response: fastReply, started_at: now, finished_at: now } : {}),
+        ...(skipped && !instantCompleted ? { finished_at: now } : {})
+      };
+    }));
+
+    if (fastReply) {
+      const createdReplies = await db(config,
+        "team_chat_messages?select=id,room_id,run_id,role,agent_id,content,metadata,created_at", "POST", {
+          room_id: room.id,
+          run_id: run.id,
+          role: "agent",
+          agent_id: instantAgentId,
+          content: fastReply,
+          metadata: { source: "instant-rule", model_invoked: false }
+        });
+      const reply = createdReplies?.[0];
+      if (!reply?.id) throw new Error("Instant reply insert did not return an ID.");
+
+      await db(config, "team_chat_events", "POST", {
+        run_id: run.id,
+        agent_id: instantAgentId,
+        event_type: "agent.completed",
+        message: "تم الرد فوراً دون تشغيل أي نموذج.",
+        metadata: { source: "instant-rule", model_invoked: false }
+      });
+
+      await db(config, "team_chat_runs?id=eq." + encodeURIComponent(run.id), "PATCH", {
+        status: "completed",
+        stage: "تم الرد فوراً دون تشغيل نماذج",
+        progress: 100,
+        started_at: now,
+        finished_at: now
+      });
+      return json({
+        message: { ...message, run_id: run.id },
+        messages: [{ ...message, run_id: run.id }, reply],
+        run: { id: run.id, status: "completed" },
+        instant: true,
+        models_invoked: 0
+      }, 200);
+    }
 
     await db(config, "team_chat_runs?id=eq." + encodeURIComponent(run.id), "PATCH", {
       status: "running",
       stage: descriptor.kind === "group"
-        ? "يختار الوكلاء المتخصصون من لديه إضافة مفيدة"
+        ? "اختير " + selectedAgentIds.length + " وكلاء متخصصين للمهمة"
         : "الوكيل يقرأ سياق محادثتك الخاصة",
       progress: 1,
-      started_at: new Date().toISOString()
+      started_at: now
     });
 
     const dispatchUrl = "https://api.github.com/repos/" + config.repository +
@@ -144,7 +287,8 @@ export async function onRequest(context) {
           inputs: {
             run_id: run.id,
             mode: descriptor.kind,
-            target_agent: descriptor.agentId || "none"
+            target_agent: descriptor.agentId || "none",
+            target_agents: descriptor.kind === "group" ? selectedAgentIds.join(",") : ""
           }
         }),
         signal: AbortSignal.timeout(10000)
