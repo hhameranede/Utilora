@@ -1,6 +1,6 @@
 ---
 description: Performs read-only security and privacy reviews of UTILORA source, workflows, dependencies, and data flows.
-mode: all
+mode: subagent
 model: nvidia/nvidia/nemotron-3-ultra-550b-a55b
 permission:
   edit: deny
