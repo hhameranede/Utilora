@@ -1,12 +1,12 @@
 const AGENTS = [
-  ["problem-analyst", "nvidia/deepseek-ai/deepseek-v4.1-flash"],
-  ["implementation-engineer", "nvidia/minimaxai/minimax-m3.1-flash"],
-  ["fast-task-engineer", "nvidia/z-ai/glm-5.3-flash"],
-  ["visual-reviewer", "nvidia/nvidia/nemotron-3.5-super-vl-120b-a12b"],
-  ["long-horizon-engineer", "nvidia/poolside/laguna-xs-2.1"],
-  ["qa-engineer", "nvidia/deepseek-ai/deepseek-v4.1-flash"],
-  ["security-auditor", "nvidia/nvidia/nemotron-3-ultra-550b-a55b"],
-  ["project-lead", "nvidia/nvidia/nemotron-3-ultra-550b-a55b"]
+  ["problem-analyst", "nvidia-nim/deepseek-v4-1-flash"],
+  ["implementation-engineer", "nvidia-nim/minimax-m3-1-flash"],
+  ["fast-task-engineer", "nvidia-nim/glm-5-3-flash"],
+  ["visual-reviewer", "nvidia-nim/nemotron-super-vl"],
+  ["long-horizon-engineer", "nvidia-nim/laguna-xs-2-1"],
+  ["qa-engineer", "nvidia-nim/deepseek-v4-1-flash"],
+  ["security-auditor", "nvidia-nim/nemotron-ultra"],
+  ["project-lead", "nvidia-nim/nemotron-ultra"]
 ];
 const AGENT_IDS = new Set(AGENTS.map(([id]) => id));
 
