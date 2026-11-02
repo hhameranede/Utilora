@@ -36,12 +36,12 @@ const SOURCES = [
     url: "https://immunefi.com/bug-bounty/",
     reward: "Program-specific; some programs publish substantial caps",
     rewardType: "program-defined",
-    age: "Minimum age and contracting capacity must be checked in the selected program's terms",
-    country: "Program requires residence screening; Algeria is not named in the cited restricted-country rule, but this is not a payout guarantee",
-    payout: "KYC may be required before reward release; payment options vary by program",
-    automation: "Only in-scope testing; no automated exploitation or harmful activity",
-    eligibility: "verify",
-    note: "The selected project scope and its own rules control eligibility and reward."
+    age: "18+ under Immunefi Terms of Use; not eligible for a 17-year-old, even if a program is live",
+    country: "Algeria is not among the listed OFAC-prohibited jurisdictions in the reviewed terms; this is not a payment guarantee",
+    payout: "Program-specific; commonly USDC/other tokens, with KYC and sometimes invoice or proof-of-address requirements",
+    automation: "Immunefi rules prohibit AI-generated/automated scanner bug reports that lack researcher-provided impact analysis; no agent-only submission",
+    eligibility: "age-blocked",
+    note: "The platform terms require at least 18. Keep this source in the radar for future eligibility only."
   },
   {
     id: "algora",
@@ -171,10 +171,18 @@ export async function onRequest(context) {
     };
   }
 
+  const activePrograms = [
+    { id: "immunefi-0x", name: "0x Protocol", category: "Web3 security", url: "https://immunefi.com/bug-bounty/0x/information/", reward: "Program-defined; published high/critical reward ranges", updated: "Recently updated", status: "Live program", payout: "USDC on Ethereum; KYC applies", note: "18+ platform restriction. AI-generated scanner reports without researcher impact analysis are prohibited." },
+    { id: "immunefi-polygon", name: "Polygon", category: "Web3 security", url: "https://immunefi.com/bug-bounty/polygon/information/", reward: "Program-defined; paid in USDC or POL", updated: "Program page available", status: "Live program", payout: "USDC or POL at project discretion; invoice and KYC required", note: "18+ platform restriction. Algeria is not named in the reviewed OFAC/UNSC exclusion clause, but KYC/payment approval is not guaranteed." },
+    { id: "immunefi-lido", name: "Lido", category: "Web3 security", url: "https://immunefi.com/bug-bounty/lido/information/", reward: "Up to $2,000,000 for qualifying critical smart-contract impact; lower tiers also published", updated: "Updated within the last few days", status: "Live program", payout: "USDC, USDS, DAI or USDT depending on program terms", note: "18+ platform restriction. Proof of concept and strict scope rules apply." },
+    { id: "immunefi-cosmos", name: "Cosmos", category: "Web3 security", url: "https://immunefi.com/bug-bounty/cosmos/information/", reward: "Up to $50,000; published severity tiers", updated: "Updated 20 October 2026", status: "Live program", payout: "Program-specific; KYC and proof of concept requirements apply", note: "18+ platform restriction. Program terms and scope must be followed." }
+  ];
+
   return json({
     generatedAt: new Date().toISOString(),
     region: "DZ",
     sources,
+    activePrograms,
     opportunities,
     discovery,
     policy: {
