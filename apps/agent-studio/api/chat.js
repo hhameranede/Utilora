@@ -8,6 +8,7 @@ const AGENTS = [
   ["security-auditor", "nvidia/nvidia/nemotron-3-ultra-550b-a55b"],
   ["project-lead", "nvidia/nvidia/nemotron-3-ultra-550b-a55b"]
 ];
+const AGENT_IDS = new Set(AGENTS.map(([id]) => id));
 
 const json = (res, status, value) => {
   res.setHeader("Cache-Control", "private, no-store, max-age=0");
@@ -22,7 +23,8 @@ function getConfig() {
     githubToken: process.env.UTILORA_GITHUB_TOKEN,
     repository: process.env.UTILORA_GITHUB_REPOSITORY || "hhameranede/Utilora",
     ref: process.env.UTILORA_AGENT_WORKFLOW_REF || "main",
-    workflow: process.env.UTILORA_AGENT_WORKFLOW_FILE || "agent-chat-execution.yml"
+    workflow: process.env.UTILORA_AGENT_WORKFLOW_FILE || "agent-chat-execution.yml",
+    siteUrl: process.env.SITE_URL || "https://utilora-chat.vercel.app"
   };
 }
 
@@ -41,8 +43,60 @@ async function db(config, path, method = "GET", body) {
   const text = await response.text();
   let data;
   try { data = text ? JSON.parse(text) : null; } catch { data = null; }
-  if (!response.ok) throw new Error("Database operation failed.");
+  if (!response.ok) {
+    const message = response.status === 409 ? "Room already exists." : "Database operation failed.";
+    const error = new Error(message);
+    error.status = response.status;
+    throw error;
+  }
   return data;
+}
+
+function parseRoomSlug(value) {
+  const slug = typeof value === "string" ? value : "main";
+  if (slug === "main") return { slug, kind: "group", agentId: null };
+  if (slug.startsWith("agent-")) {
+    const agentId = slug.slice(6);
+    if (AGENT_IDS.has(agentId)) return { slug, kind: "private", agentId };
+  }
+  return null;
+}
+
+async function getRoom(config, descriptor) {
+  let rooms = await db(config, "team_chat_rooms?slug=eq." + encodeURIComponent(descriptor.slug) + "&select=id,slug,title&limit=1");
+  if (rooms?.[0]) return rooms[0];
+
+  const agent = AGENTS.find(([id]) => id === descriptor.agentId);
+  const title = descriptor.kind === "group" ? "غرفة فريق UTILORA" : "محادثة خاصة · " + (agent?.[0] || descriptor.agentId);
+  try {
+    const created = await db(config, "team_chat_rooms?select=id,slug,title", "POST", {
+      slug: descriptor.slug, title
+    });
+    if (created?.[0]) return created[0];
+  } catch (error) {
+    if (error.status !== 409) throw error;
+  }
+  rooms = await db(config, "team_chat_rooms?slug=eq." + encodeURIComponent(descriptor.slug) + "&select=id,slug,title&limit=1");
+  if (!rooms?.[0]) throw new Error("Room could not be created.");
+  return rooms[0];
+}
+
+async function getRoomSnapshot(config, room) {
+  const roomId = encodeURIComponent(room.id);
+  const [messages, runs] = await Promise.all([
+    db(config, "team_chat_messages?room_id=eq." + roomId + "&select=id,room_id,run_id,role,agent_id,content,metadata,created_at&order=created_at.asc&limit=200"),
+    db(config, "team_chat_runs?room_id=eq." + roomId + "&select=id,status,stage,progress,created_at,started_at,finished_at,error&order=created_at.desc&limit=1")
+  ]);
+  let agents = [];
+  let events = [];
+  if (runs?.[0]?.id) {
+    const runId = encodeURIComponent(runs[0].id);
+    [agents, events] = await Promise.all([
+      db(config, "team_chat_agent_runs?run_id=eq." + runId + "&select=agent_id,status,status_text,progress,response,error,started_at,finished_at"),
+      db(config, "team_chat_events?run_id=eq." + runId + "&select=id,agent_id,event_type,message,metadata,created_at&order=created_at.desc&limit=60")
+    ]);
+  }
+  return { room, messages: messages || [], runs: runs || [], agents: agents || [], events: events || [] };
 }
 
 export default async function handler(req, res) {
@@ -51,25 +105,12 @@ export default async function handler(req, res) {
   if (req.method === "GET") {
     if (!config.url || !config.key) return json(res, 503, { error: "ربط قاعدة بيانات مساحة الفريق لم يكتمل بعد." });
     try {
-      const slug = typeof req.query?.room === "string" ? req.query.room : "main";
-      if (slug !== "main") return json(res, 404, { error: "غرفة المحادثة غير موجودة." });
-      const rooms = await db(config, "team_chat_rooms?slug=eq.main&select=id,slug,title&limit=1");
-      if (!rooms?.[0]) return json(res, 404, { error: "غرفة الفريق غير مهيأة في قاعدة البيانات." });
-      const roomId = rooms[0].id;
-      const messages = await db(config, "team_chat_messages?room_id=eq." + encodeURIComponent(roomId) + "&select=id,room_id,run_id,role,agent_id,content,metadata,created_at&order=created_at.asc&limit=150");
-      const runs = await db(config, "team_chat_runs?room_id=eq." + encodeURIComponent(roomId) + "&select=id,status,stage,progress,created_at,finished_at&order=created_at.desc&limit=1");
-      let agents = [];
-      let events = [];
-      if (runs?.[0]?.id) {
-        const runId = encodeURIComponent(runs[0].id);
-        [agents, events] = await Promise.all([
-          db(config, "team_chat_agent_runs?run_id=eq." + runId + "&select=agent_id,status,status_text,progress,response,error,started_at,finished_at"),
-          db(config, "team_chat_events?run_id=eq." + runId + "&select=id,agent_id,event_type,message,metadata,created_at&order=created_at.desc&limit=40")
-        ]);
-      }
-      return json(res, 200, { room: rooms[0], messages: messages || [], runs: runs || [], agents: agents || [], events: events || [] });
+      const descriptor = parseRoomSlug(req.query?.room);
+      if (!descriptor) return json(res, 404, { error: "غرفة المحادثة غير موجودة." });
+      const room = await getRoom(config, descriptor);
+      return json(res, 200, { ...(await getRoomSnapshot(config, room)), kind: descriptor.kind, agentId: descriptor.agentId });
     } catch {
-      return json(res, 502, { error: "تعذّر جلب بيانات غرفة الفريق من قاعدة البيانات." });
+      return json(res, 502, { error: "تعذّر جلب سجل المحادثة من قاعدة البيانات." });
     }
   }
 
@@ -78,36 +119,45 @@ export default async function handler(req, res) {
     return json(res, 405, { error: "Method not allowed." });
   }
 
-  if (!config.url || !config.key) return json(res, 503, { error: "ربط Supabase غير مكتمل. لم تُحفظ رسالتك ولم يبدأ أي وكيل." });
-  if (!config.githubToken) return json(res, 503, { error: "ربط تشغيل الوكلاء عبر GitHub Actions غير مكتمل. لم تُحفظ رسالتك ولم يبدأ أي تشغيل." });
+  const origin = req.headers.origin;
+  if (origin && origin !== new URL(config.siteUrl).origin) {
+    return json(res, 403, { error: "مصدر الطلب غير مصرح به." });
+  }
+  if (!config.url || !config.key) return json(res, 503, { error: "ربط قاعدة بيانات المحادثة غير مكتمل." });
+  if (!config.githubToken) return json(res, 503, { error: "ربط تشغيل الوكلاء عبر GitHub Actions غير مكتمل." });
 
   try {
     const body = typeof req.body === "string" ? JSON.parse(req.body) : (req.body || {});
-    const roomSlug = body.room || "main";
+    const descriptor = parseRoomSlug(body.room);
     const content = typeof body.content === "string" ? body.content.trim() : "";
-    if (roomSlug !== "main") return json(res, 404, { error: "غرفة المحادثة غير موجودة." });
+    if (!descriptor) return json(res, 404, { error: "غرفة المحادثة غير موجودة." });
     if (!content) return json(res, 400, { error: "اكتب رسالة قبل الإرسال." });
     if (content.length > 12000) return json(res, 413, { error: "الرسالة طويلة جدًا؛ الحد الأقصى 12 ألف حرف." });
 
-    const rooms = await db(config, "team_chat_rooms?slug=eq.main&select=id&limit=1");
-    if (!rooms?.[0]) return json(res, 404, { error: "غرفة الفريق غير مهيأة في قاعدة البيانات." });
-    const roomId = rooms[0].id;
-
+    const room = await getRoom(config, descriptor);
+    const roomId = room.id;
     const createdMessages = await db(config, "team_chat_messages?select=id,room_id,role,content,created_at", "POST", {
-      room_id: roomId, role: "user", content, metadata: { source: "private-agent-studio" }
+      room_id: roomId, role: "user", content,
+      metadata: { source: "private-agent-studio", mode: descriptor.kind }
     });
     const message = createdMessages?.[0];
     if (!message?.id) throw new Error("Message insert did not return an ID.");
 
     const createdRuns = await db(config, "team_chat_runs?select=id,status,created_at", "POST", {
-      room_id: roomId, prompt_message_id: message.id, status: "queued", stage: "في قائمة الانتظار", progress: 0
+      room_id: roomId, prompt_message_id: message.id, status: "queued",
+      stage: descriptor.kind === "group" ? "قائد الفريق يوزع المهمة" : "تم توجيه الرسالة إلى الوكيل المختار",
+      progress: 0
     });
     const run = createdRuns?.[0];
     if (!run?.id) throw new Error("Run insert did not return an ID.");
 
     await db(config, "team_chat_messages?id=eq." + encodeURIComponent(message.id), "PATCH", { run_id: run.id });
-    await db(config, "team_chat_agent_runs", "POST", AGENTS.map(([agent_id, model_id]) => ({
-      run_id: run.id, agent_id, model_id, status: "queued", status_text: "في قائمة الانتظار", progress: 0
+    const participants = descriptor.kind === "group"
+      ? AGENTS
+      : AGENTS.filter(([id]) => id === descriptor.agentId);
+    await db(config, "team_chat_agent_runs", "POST", participants.map(([agent_id, model_id]) => ({
+      run_id: run.id, agent_id, model_id, status: "queued",
+      status_text: "في قائمة الانتظار", progress: 0
     })));
 
     const dispatchUrl = "https://api.github.com/repos/" + config.repository + "/actions/workflows/" + encodeURIComponent(config.workflow) + "/dispatches";
@@ -119,24 +169,34 @@ export default async function handler(req, res) {
         "X-GitHub-Api-Version": "2022-11-28",
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({ ref: config.ref, inputs: { run_id: run.id } })
+      body: JSON.stringify({
+        ref: config.ref,
+        inputs: {
+          run_id: run.id,
+          mode: descriptor.kind,
+          target_agent: descriptor.agentId || "none"
+        }
+      })
     });
 
     if (!dispatch.ok) {
       await db(config, "team_chat_runs?id=eq." + encodeURIComponent(run.id), "PATCH", {
-        status: "failed", stage: "تعذّر تشغيل GitHub Actions", error: "workflow_dispatch_failed", finished_at: new Date().toISOString()
+        status: "failed", stage: "تعذّر تشغيل GitHub Actions",
+        error: "workflow_dispatch_failed", finished_at: new Date().toISOString()
       });
       await db(config, "team_chat_agent_runs?run_id=eq." + encodeURIComponent(run.id), "PATCH", {
-        status: "failed", status_text: "تعذّر بدء التشغيل"
+        status: "failed", status_text: "تعذّر بدء التشغيل", progress: 100
       });
-      return json(res, 502, { error: "تم حفظ المهمة، لكن GitHub Actions رفض بدء تشغيل الفريق. راجع صلاحية رمز GitHub في إعدادات الخادم." });
+      return json(res, 502, { error: "تم حفظ الرسالة، لكن GitHub Actions رفض تشغيل الوكيل. راجع صلاحية رمز GitHub في الخادم." });
     }
 
     await db(config, "team_chat_runs?id=eq." + encodeURIComponent(run.id), "PATCH", {
-      status: "running", stage: "يستعد الوكلاء للعمل", progress: 1, started_at: new Date().toISOString()
+      status: "running",
+      stage: descriptor.kind === "group" ? "يختار الوكلاء المتخصصون من لديه إضافة مفيدة" : "الوكيل يقرأ سياق محادثتك الخاصة",
+      progress: 1, started_at: new Date().toISOString()
     });
     return json(res, 202, { message: { ...message, run_id: run.id }, run: { id: run.id, status: "running" } });
   } catch {
-    return json(res, 502, { error: "حدث خطأ أثناء إرسال المهمة. لم يتم إظهار أي رد غير مؤكد." });
+    return json(res, 502, { error: "حدث خطأ أثناء إرسال الرسالة. لم يتم إظهار أي رد غير مؤكد." });
   }
 }
