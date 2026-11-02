@@ -74,7 +74,7 @@ async function supabase(path: string, method = "GET", body?: unknown) {
   const headers: Record<string, string> = {
     apikey: key,
     "Content-Type": "application/json",
-    Prefer: "return=representation",
+    Prefer: method === "POST" && path.includes("on_conflict") ? "resolution=merge-duplicates,return=representation" : "return=representation",
   };
   if (legacy) headers.Authorization = "Bearer " + key;
 
