@@ -1,4 +1,6 @@
 import test from 'node:test';
+import { readFile } from 'node:fs/promises';
+import { resolve } from 'node:path';
 import assert from 'node:assert/strict';
 import { TOOLS_REGISTRY, TOOLS_LIST } from '../registry/tools.registry';
 import { CATEGORIES_REGISTRY, CATEGORIES_LIST } from '../registry/categories.registry';
@@ -7,6 +9,26 @@ import { parseRoute, buildRoutePath } from '../router/matcher';
 test('Tool Registry contains exactly 36 tools', () => {
   assert.equal(TOOLS_LIST.length, 36, 'Expected exactly 36 tools in registry');
   assert.equal(Object.keys(TOOLS_REGISTRY).length, 36);
+});
+
+
+test('every engine contract reference resolves to an exported symbol', async () => {
+  const sourceCache = new Map<string, string>();
+
+  for (const tool of TOOLS_LIST) {
+    const [sourcePath, symbolName] = tool.engineContractRef.split('#');
+    assert.ok(sourcePath && symbolName, tool.slug + ' must define a file#symbol engine contract reference');
+
+    let source = sourceCache.get(sourcePath);
+    if (!source) {
+      source = await readFile(resolve(process.cwd(), sourcePath), 'utf8');
+      sourceCache.set(sourcePath, source);
+    }
+
+    const exportPrefixes = ['export const ', 'export function ', 'export class ', 'export interface ', 'export type '];
+    const isExported = exportPrefixes.some((prefix) => source!.includes(prefix + symbolName));
+    assert.ok(isExported, tool.slug + ' points to missing export ' + symbolName + ' in ' + sourcePath);
+  }
 });
 
 test('Category Registry contains exactly 6 categories', () => {
