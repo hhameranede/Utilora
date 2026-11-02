@@ -1,4 +1,4 @@
-name: UTILORA Agent Studio — Team Run
+name: UTILORA Agent Studio — Private Team Run
 
 on:
   workflow_dispatch:
@@ -7,19 +7,36 @@ on:
         description: Private Agent Studio run identifier
         required: true
         type: string
+      mode:
+        description: Group council or one-to-one private room
+        required: true
+        type: choice
+        options:
+          - group
+          - private
+      target_agent:
+        description: Specialist selected by the private room
+        required: true
+        type: string
 
 permissions:
   contents: read
+  id-token: write
 
 concurrency:
   group: utilora-agent-studio-${{ inputs.run_id }}
   cancel-in-progress: false
 
+env:
+  AGENT_CHAT_API_URL: https://paleenigjkmjwinkblfv.supabase.co/functions/v1/agent-studio-callback
+  AGENT_CHAT_MODE: ${{ inputs.mode }}
+  AGENT_CHAT_TARGET_AGENT: ${{ inputs.target_agent }}
+
 jobs:
   specialists:
     name: ${{ matrix.agent }}
     runs-on: ubuntu-latest
-    timeout-minutes: 13
+    timeout-minutes: 10
     strategy:
       fail-fast: false
       max-parallel: 2
@@ -39,59 +56,62 @@ jobs:
             model: nvidia-nim/deepseek-v4-1-flash
           - agent: security-auditor
             model: nvidia-nim/nemotron-ultra
+    env:
+      NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+      AGENT_CHAT_RUN_ID: ${{ inputs.run_id }}
+      AGENT_NAME: ${{ matrix.agent }}
+      MODEL_ALIAS: ${{ matrix.model }}
     steps:
-      - name: Check out UTILORA source
+      - name: Check out UTILORA
+        if: ${{ inputs.mode == 'group' || matrix.agent == inputs.target_agent }}
         uses: actions/checkout@v4
         with:
           persist-credentials: false
-      - name: Extract Agent Studio source bundle
-        run: tar -xzf apps/agent-studio/agent-studio-source.tar.gz -C apps/agent-studio
+
       - name: Set up Node.js 22
+        if: ${{ inputs.mode == 'group' || matrix.agent == inputs.target_agent }}
         uses: actions/setup-node@v4
         with:
           node-version: 22
+
       - name: Install OpenCode
+        if: ${{ inputs.mode == 'group' || matrix.agent == inputs.target_agent }}
         run: |
           set -euo pipefail
           npm install --global opencode-ai@1.19.5
           opencode --version
-      - name: Run specialist and stream progress
-        env:
-          NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
-          AGENT_CHAT_API_URL: ${{ secrets.AGENT_CHAT_API_URL }}
-          AGENT_CHAT_CALLBACK_SECRET: ${{ secrets.AGENT_CHAT_CALLBACK_SECRET }}
-          AGENT_CHAT_RUN_ID: ${{ inputs.run_id }}
-          AGENT_NAME: ${{ matrix.agent }}
-          MODEL_ALIAS: ${{ matrix.model }}
+
+      - name: Run specialist in read-only mode
+        if: ${{ inputs.mode == 'group' || matrix.agent == inputs.target_agent }}
         run: node apps/agent-studio/scripts/agent-chat-worker.mjs
 
   project-lead:
-    if: always()
+    name: Project Lead
+    if: always() && (inputs.mode == 'group' || inputs.target_agent == 'project-lead')
     needs: specialists
     runs-on: ubuntu-latest
-    timeout-minutes: 13
+    timeout-minutes: 10
+    env:
+      NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+      AGENT_CHAT_RUN_ID: ${{ inputs.run_id }}
+      AGENT_NAME: project-lead
+      MODEL_ALIAS: nvidia-nim/nemotron-ultra
     steps:
-      - name: Check out UTILORA source
+      - name: Check out UTILORA
         uses: actions/checkout@v4
         with:
           persist-credentials: false
-      - name: Extract Agent Studio source bundle
-        run: tar -xzf apps/agent-studio/agent-studio-source.tar.gz -C apps/agent-studio
+
       - name: Set up Node.js 22
         uses: actions/setup-node@v4
         with:
           node-version: 22
+
       - name: Install OpenCode
         run: |
           set -euo pipefail
           npm install --global opencode-ai@1.19.5
           opencode --version
-      - name: Synthesize the team response
-        env:
-          NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
-          AGENT_CHAT_API_URL: ${{ secrets.AGENT_CHAT_API_URL }}
-          AGENT_CHAT_CALLBACK_SECRET: ${{ secrets.AGENT_CHAT_CALLBACK_SECRET }}
-          AGENT_CHAT_RUN_ID: ${{ inputs.run_id }}
-          AGENT_NAME: project-lead
-          MODEL_ALIAS: nvidia-nim/nemotron-ultra
+
+      - name: Respond as Project Lead
         run: node apps/agent-studio/scripts/agent-chat-worker.mjs
