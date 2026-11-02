@@ -28,6 +28,8 @@ jobs:
           node-version: 22
       - name: Install Agent Studio dependencies
         run: npm install --no-audit --no-fund
+      - name: Test bounty analysis refresh
+        run: npm run test:bounty-hunter
       - name: Check JavaScript syntax
         run: |
           node --check src/main.js
