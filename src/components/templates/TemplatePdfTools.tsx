@@ -91,7 +91,8 @@ export const TemplatePdfTools: React.FC<TemplatePdfToolsProps> = ({ toolName, to
         setMessage(t('pdfWorkspace.createdOutputFiles').replace('{count}', String(result.length)));
       } else if (toolSlug === 'rotate-pdf') {
         const pageSelection = targetPages.trim().toLowerCase();
-        const pages = !pageSelection || pageSelection === 'all'
+        const localizedAllKeyword = t('pdfWorkspace.allKeyword').trim().toLowerCase();
+        const pages = !pageSelection || pageSelection === 'all' || pageSelection === localizedAllKeyword
           ? 'all'
           : targetPages.split(',').map((part) => Number(part.trim()) - 1);
         const result = await rotatePdfFile(files[0], rotation, pages);
