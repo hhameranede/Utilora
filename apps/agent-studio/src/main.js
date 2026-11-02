@@ -99,32 +99,48 @@ function viewContent() {
     const securityBadge = (enabled) => '<b class="' + (enabled ? "secure-tag" : "pending-tag") + '">' + (enabled ? "متصل" : "غير مكتمل") + '</b>';
     return '<section class="info-view"><div class="view-kicker">ACCESS CONTROL</div><h2>الخصوصية والأمان</h2><p>تسجيل الدخول محمي عبر Vercel، وقاعدة البيانات لا تُقرأ إلا من الخادم. مفاتيح الخدمات لا تُرسل إلى المتصفح.</p><div class="security-cards"><div class="security-card"><span class="security-icon">' + icon("lock", 20) + '</span><div><strong>حماية الوصول</strong><small>Vercel Authentication على جميع البيئات · الفريق يحتوي على مالك واحد فقط حالياً</small></div><b class="secure-tag">مفعّل</b></div><div class="security-card"><span class="security-icon">' + icon("shield", 20) + '</span><div><strong>قاعدة البيانات</strong><small>RLS مفعّل، والوصول إلى الجداول محصور بمفتاح خادمي</small></div>' + securityBadge(state.backend.database) + '</div><div class="security-card"><span class="security-icon">' + icon("agents", 20) + '</span><div><strong>تشغيل الوكلاء</strong><small>GitHub Actions + هوية OIDC موثوقة، دون مفاتيح داخل المتصفح</small></div>' + securityBadge(state.backend.dispatcher && state.backend.callback) + '</div></div></section>';
   }
+  const privateAgentId = state.room.startsWith("agent-") ? state.room.slice(6) : "";
+  const privateAgent = AGENTS.find((agent) => agent.id === privateAgentId);
+  const roomTitle = privateAgent ? "محادثة خاصة مع " + privateAgent.name : "غرفة الفريق الجماعية";
+  const roomDescription = privateAgent
+    ? "هذه مساحة ثنائية بينك وبين " + privateAgent.role + ". سيحتفظ الوكيل بسياق محادثاتكما هنا ولن يشارك الردود في الغرفة الجماعية."
+    : "اكتب طلبك، وسيتولى Project Lead تنسيق المجلس. كل وكيل يقرر بنفسه إن كان لديه رأي تخصصي مفيد؛ وقد يتدخل مدقق الأمان حتى في نقاش التصميم عندما يرى خطرًا أمنيًا.";
+  const emptyState = '<div class="welcome-card"><div class="welcome-spark">' + icon("spark", 26) + '</div><div class="view-kicker">' + (privateAgent ? "PRIVATE ONE-TO-ONE" : "AUTONOMOUS TEAM COUNCIL") + '</div><h2>' + escapeHtml(roomTitle) + '</h2><p>' + escapeHtml(roomDescription) + '</p><div class="welcome-prompts">' +
+    (privateAgent
+      ? '<button type="button" class="prompt-chip" data-prompt="عرّفني بدورك وكيف يمكن أن تساعدني في UTILORA.">تعرّف عليّ بدورك</button><button type="button" class="prompt-chip" data-prompt="ما أهم المخاطر أو التحسينات التي تراها في المشروع؟">اطلب رأيك</button>'
+      : '<button type="button" class="prompt-chip" data-prompt="راجع بنية UTILORA الحالية وحدد أعلى ثلاث أولويات تقنية.">راجع بنية المشروع</button><button type="button" class="prompt-chip" data-prompt="ناقشوا تجربة المستخدم والأمان والجودة، وليتدخل كل وكيل عند الحاجة فقط.">افتح نقاشًا جماعيًا</button>') +
+    '</div></div>';
   return '<section class="chat-view"><div class="chat-feed" id="chat-feed">' +
-    (state.messages.length ? state.messages.map(renderMessage).join("") : '<div class="welcome-card"><div class="welcome-spark">' + icon("spark", 26) + '</div><div class="view-kicker">PRIVATE TEAM ROOM</div><h2>مرحبًا بك في غرفة الفريق</h2><p>اكتب هدفك أو المهمة التي تريد تنفيذها، وسيتعاون الوكلاء المتخصصون ثم يجمع Project Lead خلاصة الفريق في رد واحد.</p><div class="welcome-prompts"><button type="button" class="prompt-chip" data-prompt="راجع بنية UTILORA الحالية وحدد أعلى ثلاث أولويات تقنية.">راجع بنية المشروع وحدد الأولويات</button><button type="button" class="prompt-chip" data-prompt="افحص تجربة المستخدم في أدوات PDF واقترح تحسينات قابلة للتنفيذ.">قيّم تجربة أدوات PDF</button><button type="button" class="prompt-chip" data-prompt="نفّذ تدقيقًا أمنيًا للواجهة والخلفية وحدد المخاطر.">اطلب تدقيقًا أمنيًا</button></div></div>') +
-    '</div><div class="composer-wrap"><div class="composer" id="composer"><textarea id="message-input" rows="1" placeholder="اكتب رسالتك إلى فريق UTILORA…" aria-label="رسالتك إلى الفريق"></textarea><div class="composer-tools"><div class="composer-hint">' + icon("lock", 14) + '<span>محادثة خاصة — لا تظهر للزوار</span></div><button class="send-button" id="send-button" type="button" aria-label="إرسال الرسالة">' + icon("send", 18) + '<span>إرسال للفريق</span></button></div></div><div class="composer-foot">الضغط على Enter للإرسال · Shift + Enter لسطر جديد</div></div></section>';
+    (state.messages.length ? state.messages.map(renderMessage).join("") : emptyState) +
+    '</div><div class="composer-wrap"><div class="composer" id="composer"><textarea id="message-input" rows="1" placeholder="' + escapeHtml(privateAgent ? "اكتب إلى " + privateAgent.name + "…" : "اكتب رسالتك إلى مجلس UTILORA…") + '" aria-label="رسالتك"></textarea><div class="composer-tools"><div class="composer-hint">' + icon("lock", 14) + '<span>' + (privateAgent ? "محادثة فردية خاصة" : "الغرفة الجماعية · تدخل تلقائي حسب التخصص") + '</span></div><button class="send-button" id="send-button" type="button" aria-label="إرسال الرسالة">' + icon("send", 18) + '<span>' + (privateAgent ? "إرسال للوكيل" : "إرسال للمجلس") + '</span></button></div></div><div class="composer-foot">Enter للإرسال · Shift + Enter لسطر جديد</div></div></section>';
 }
 
 function render() {
   const previousFeed = $("#chat-feed");
   const keepFeedAtBottom = !previousFeed || previousFeed.scrollHeight - previousFeed.scrollTop - previousFeed.clientHeight < 120;
   const previousFeedScrollTop = previousFeed?.scrollTop || 0;
-  const activeLabel = state.view === "chat" ? "غرفة الفريق" : state.view === "agents" ? "الوكلاء" : state.view === "activity" ? "سجل النشاط" : "الأمان والخصوصية";
+  const selectedAgent = state.room.startsWith("agent-") ? AGENTS.find((agent) => agent.id === state.room.slice(6)) : null;
+  const activeLabel = state.view === "chat"
+    ? (selectedAgent ? "محادثة خاصة · " + selectedAgent.role : "غرفة الفريق الجماعية")
+    : state.view === "agents" ? "الوكلاء" : state.view === "activity" ? "سجل النشاط" : "الأمان والخصوصية";
   const dbReady = state.backend.database;
   const dispatchReady = state.backend.dispatcher;
   $("#app").innerHTML = '<div class="studio-shell">' +
     '<aside class="sidebar"><div class="brand"><div class="brand-mark">U</div><div><div class="brand-name">UTILORA</div><div class="brand-sub">AGENT STUDIO</div></div></div>' +
     '<div class="private-label">' + icon("lock", 13) + '<span>مساحة خاصة</span><i></i></div>' +
     '<div class="nav-label">WORKSPACE</div><nav class="side-nav">' +
-    navButton("chat", "غرفة الفريق") + navButton("agents", "الوكلاء") + navButton("activity", "سجل النشاط") +
+    navButton("chat", "الغرفة الجماعية") + navButton("agents", "الوكلاء") + navButton("activity", "سجل النشاط") +
+    '</nav><div class="nav-label agent-rooms-label">PRIVATE AGENT CHATS</div><nav class="side-nav agent-room-nav">' +
+    state.agents.map(renderRoomButton).join("") +
     '</nav><div class="nav-label security-nav-label">CONTROL</div><nav class="side-nav">' + navButton("security", "الأمان والخصوصية") + '</nav>' +
-    '<div class="sidebar-bottom"><div class="owner-card"><div class="owner-avatar">A</div><div><strong>Owner</strong><span>مالك مساحة UTILORA</span></div><span class="owner-dot"></span></div><div class="version">PRIVATE WORKSPACE <span>·</span> v0.1</div></div></aside>' +
+    '<div class="sidebar-bottom"><div class="owner-card"><div class="owner-avatar">A</div><div><strong>أنت · القائد الأعلى</strong><span>القرار النهائي والصلاحيات الكاملة</span></div><span class="owner-dot"></span></div><div class="version">PRIVATE WORKSPACE <span>·</span> v0.1</div></div></aside>' +
     '<main class="main-panel"><header class="topbar"><div class="topbar-title"><div class="mobile-mark">U</div><div><div class="breadcrumb">UTILORA <span>/</span> ' + escapeHtml(activeLabel) + '</div><h1>' + escapeHtml(activeLabel) + '</h1></div></div><div class="topbar-actions"><div class="connection-pill ' + (dbReady ? "is-online" : "is-pending") + '"><span></span>' + (dbReady ? "قاعدة البيانات متصلة" : "بانتظار ربط الخادم") + '</div><div class="avatar-small">A</div></div></header>' +
     '<div class="main-content">' +
     (state.error ? '<div class="alert-banner" role="alert">' + escapeHtml(state.error) + '<button type="button" id="dismiss-error" aria-label="إغلاق">×</button></div>' : "") +
-    (state.view === "chat" ? '<div class="room-banner"><div class="room-banner-icon">' + icon("lock", 18) + '</div><div class="room-banner-copy"><strong>غرفة UTILORA الخاصة</strong><span>' + escapeHtml(state.latestRun?.stage || "جاهزون لاستقبال المهمة") + '</span><div class="room-progress"><i style="width:' + Math.max(0, Math.min(100, Number(state.latestRun?.progress) || 0)) + '%"></i></div></div><div class="room-banner-status"><span></span>' + (state.latestRun?.status === "running" ? "قيد التنفيذ" : state.latestRun?.status === "completed" ? "مكتملة" : state.latestRun?.status === "failed" ? "تحتاج مراجعة" : "خاصة") + '</div></div>' : "") +
+    (state.view === "chat" ? '<div class="room-banner"><div class="room-banner-icon">' + icon("lock", 18) + '</div><div class="room-banner-copy"><strong>' + escapeHtml(selectedAgent ? "محادثة مباشرة مع " + selectedAgent.name : "مجلس UTILORA · قيادة وتخصص") + '</strong><span>' + escapeHtml(state.latestRun?.stage || (selectedAgent ? "الوكيل متاح لمحادثتك الفردية" : "كل وكيل يقرر متى يشارك برأيه")) + '</span><div class="room-progress"><i style="width:' + Math.max(0, Math.min(100, Number(state.latestRun?.progress) || 0)) + '%"></i></div></div><div class="room-banner-status"><span></span>' + (state.latestRun?.status === "running" ? "قيد التنفيذ" : state.latestRun?.status === "completed" ? "اكتملت" : state.latestRun?.status === "failed" ? "تحتاج مراجعة" : "خاصة") + '</div></div>' : "") +
     viewContent() +
     '</div></main>' +
-    '<aside class="team-panel"><div class="team-panel-head"><div><div class="view-kicker">YOUR AI TEAM</div><h2>فريق العمل</h2></div><span class="team-count">08</span></div><div class="team-summary"><div class="summary-number">' + state.agents.filter((a) => a.status === "running").length + '<small>/ 8</small></div><div><strong>وكلاء نشطون</strong><span>حالة الاتصال الحالية</span></div></div><div class="team-list">' + state.agents.map(renderAgent).join("") + '</div><div class="team-footer"><div class="footer-line"><span></span></div><p>' + (dispatchReady ? "محرك تشغيل الفريق متصل" : "ربط محرك التشغيل لم يكتمل بعد") + '</p><button class="refresh-button" id="refresh-button" type="button">' + icon("refresh", 15) + ' تحديث الحالة</button></div></aside>' +
+    '<aside class="team-panel"><div class="team-panel-head"><div><div class="view-kicker">YOUR AI TEAM</div><h2>هيكل القيادة</h2></div><span class="team-count">08</span></div><div class="hierarchy-card"><div class="hierarchy-level owner-level"><span>1</span><div><strong>أنت · Owner</strong><small>القائد الأعلى وصاحب القرار النهائي</small></div><b>ROOT</b></div><div class="hierarchy-connector"></div><div class="hierarchy-level lead-level"><span>2</span><div><strong>Project Lead</strong><small>تنسيق الفريق وتوزيع المهام ورفع التوصيات</small></div><b>LEAD</b></div><div class="hierarchy-connector"></div><div class="hierarchy-note"><strong>3 · الوكلاء المتخصصون</strong><small>يشاركون عند الحاجة، يختلفون عند وجود سبب، ولا يتجاوزون صلاحياتهم.</small></div></div><div class="team-summary"><div class="summary-number">' + state.agents.filter((a) => a.status === "running").length + '<small>/ 8</small></div><div><strong>وكلاء نشطون</strong><span>حالة الاتصال الحالية</span></div></div><div class="team-list">' + state.agents.map(renderAgent).join("") + '</div><div class="team-footer"><div class="footer-line"><span></span></div><p>' + (dispatchReady ? "محرك تشغيل الفريق متصل" : "ربط محرك التشغيل لم يكتمل بعد") + '</p><button class="refresh-button" id="refresh-button" type="button">' + icon("refresh", 15) + ' تحديث الحالة</button></div></aside>' +
     '</div>';
   bindEvents();
   const nextFeed = $("#chat-feed");
@@ -136,12 +152,36 @@ function render() {
 }
 
 function navButton(view, label) {
-  return '<button type="button" class="nav-item ' + (state.view === view ? "active" : "") + '" data-view="' + view + '">' + icon(view === "security" ? "shield" : view) + '<span>' + label + '</span>' + (state.view === view ? '<span class="nav-active-dot"></span>' : "") + '</button>';
+  const active = state.view === view && (view !== "chat" || state.room === "main");
+  return '<button type="button" class="nav-item ' + (active ? "active" : "") + '" data-view="' + view + '">' + icon(view === "security" ? "shield" : view) + '<span>' + label + '</span>' + (active ? '<span class="nav-active-dot"></span>' : "") + '</button>';
+}
+
+function renderRoomButton(agent) {
+  const active = state.view === "chat" && state.room === "agent-" + agent.id;
+  return '<button type="button" class="nav-item room-nav-item ' + (active ? "active" : "") + '" data-room-agent="' + agent.id + '" title="محادثة خاصة مع ' + escapeHtml(agent.name) + '"><span class="room-agent-dot ' + agent.tone + '">' + escapeHtml(agent.initials) + '</span><span>' + escapeHtml(agent.role) + '</span>' + (active ? '<span class="nav-active-dot"></span>' : '') + '</button>';
 }
 
 function bindEvents() {
   document.querySelectorAll("[data-view]").forEach((button) => {
-    button.addEventListener("click", () => { state.view = button.dataset.view; state.error = ""; render(); });
+    button.addEventListener("click", async () => {
+      state.view = button.dataset.view;
+      if (state.view === "chat") state.room = "main";
+      state.error = "";
+      render();
+      if (state.view === "chat") await loadStatus();
+    });
+  });
+  document.querySelectorAll("[data-room-agent]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      state.room = "agent-" + button.dataset.roomAgent;
+      state.view = "chat";
+      state.messages = [];
+      state.events = [];
+      state.latestRun = null;
+      state.error = "";
+      render();
+      await loadStatus();
+    });
   });
   $("#dismiss-error")?.addEventListener("click", () => { state.error = ""; render(); });
   $("#refresh-button")?.addEventListener("click", loadStatus);
@@ -163,8 +203,13 @@ function bindEvents() {
     button.addEventListener("click", () => {
       const agent = state.agents.find((item) => item.id === button.dataset.agent);
       if (agent) {
-        state.error = agent.name + " — " + agent.model + " · " + agent.statusText;
-        render();
+        state.room = "agent-" + agent.id;
+        state.view = "chat";
+        state.messages = [];
+        state.events = [];
+        state.latestRun = null;
+        state.error = "";
+        loadStatus();
       }
     });
   });
@@ -180,7 +225,7 @@ async function loadStatus(options = {}) {
   const button = $("#refresh-button");
   if (button) { button.disabled = true; button.classList.add("spinning"); }
   try {
-    const response = await fetch("/api/status", { credentials: "same-origin", headers: { accept: "application/json" } });
+    const response = await fetch("/api/status?room=" + encodeURIComponent(state.room), { credentials: "same-origin", headers: { accept: "application/json" } });
     if (!response.ok) throw new Error("تعذّر التحقق من حالة الخادم.");
     const data = await response.json();
     state.backend = {
