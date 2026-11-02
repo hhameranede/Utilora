@@ -84,7 +84,7 @@ async function getRoom(config, descriptor) {
 async function getRoomSnapshot(config, room) {
   const roomId = encodeURIComponent(room.id);
   const [messages, runs] = await Promise.all([
-    db(config, "team_chat_messages?room_id=eq." + roomId + "&select=id,room_id,run_id,role,agent_id,content,metadata,created_at&order=created_at.asc&limit=200"),
+    db(config, "team_chat_messages?room_id=eq." + roomId + "&select=id,room_id,run_id,role,agent_id,content,metadata,created_at&order=created_at.desc&limit=200"),
     db(config, "team_chat_runs?room_id=eq." + roomId + "&select=id,status,stage,progress,created_at,started_at,finished_at,error&order=created_at.desc&limit=1")
   ]);
   let agents = [];
@@ -96,7 +96,7 @@ async function getRoomSnapshot(config, room) {
       db(config, "team_chat_events?run_id=eq." + runId + "&select=id,agent_id,event_type,message,metadata,created_at&order=created_at.desc&limit=60")
     ]);
   }
-  return { room, messages: messages || [], runs: runs || [], agents: agents || [], events: events || [] };
+  return { room, messages: (messages || []).reverse(), runs: runs || [], agents: agents || [], events: events || [] };
 }
 
 export default async function handler(req, res) {
@@ -120,7 +120,9 @@ export default async function handler(req, res) {
   }
 
   const origin = req.headers.origin;
-  if (origin && origin !== new URL(config.siteUrl).origin) {
+  // A state-changing request must come from the dedicated chat origin.
+  // Reject missing Origin too: the browser always sends it for this JSON POST.
+  if (!origin || origin !== new URL(config.siteUrl).origin) {
     return json(res, 403, { error: "مصدر الطلب غير مصرح به." });
   }
   if (!config.url || !config.key) return json(res, 503, { error: "ربط قاعدة بيانات المحادثة غير مكتمل." });
