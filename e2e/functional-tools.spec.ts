@@ -137,7 +137,7 @@ test('PDF page counter reads the actual page count', async ({ page }) => {
   await page.goto('/en/tools/pdf-page-counter');
   await page.locator('input[type="file"]').setInputFiles(await makePdf('counter.pdf', 3));
   await page.getByRole('button', { name: 'Count PDF pages' }).click();
-  await expect(page.getByRole('status')).toContainText('3 page(s)');
+  await expect(page.getByRole('status')).toContainText('3 pages');
 });
 
 test('word counter updates word statistics while typing', async ({ page }) => {
