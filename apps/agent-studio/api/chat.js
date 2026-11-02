@@ -59,8 +59,15 @@ export default async function handler(req, res) {
       const messages = await db(config, "team_chat_messages?room_id=eq." + encodeURIComponent(roomId) + "&select=id,room_id,run_id,role,agent_id,content,metadata,created_at&order=created_at.asc&limit=150");
       const runs = await db(config, "team_chat_runs?room_id=eq." + encodeURIComponent(roomId) + "&select=id,status,stage,progress,created_at,finished_at&order=created_at.desc&limit=1");
       let agents = [];
-      if (runs?.[0]?.id) agents = await db(config, "team_chat_agent_runs?run_id=eq." + encodeURIComponent(runs[0].id) + "&select=agent_id,status,status_text,progress");
-      return json(res, 200, { room: rooms[0], messages: messages || [], runs: runs || [], agents: agents || [] });
+      let events = [];
+      if (runs?.[0]?.id) {
+        const runId = encodeURIComponent(runs[0].id);
+        [agents, events] = await Promise.all([
+          db(config, "team_chat_agent_runs?run_id=eq." + runId + "&select=agent_id,status,status_text,progress,response,error,started_at,finished_at"),
+          db(config, "team_chat_events?run_id=eq." + runId + "&select=id,agent_id,event_type,message,metadata,created_at&order=created_at.desc&limit=40")
+        ]);
+      }
+      return json(res, 200, { room: rooms[0], messages: messages || [], runs: runs || [], agents: agents || [], events: events || [] });
     } catch {
       return json(res, 502, { error: "تعذّر جلب بيانات غرفة الفريق من قاعدة البيانات." });
     }
