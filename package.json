@@ -17,6 +17,7 @@
     "test:diagnostics": "tsx --test src/tests/diagnostics.test.ts",
     "e2e": "playwright test",
     "test:products": "tsx --test src/tests/tool-experience.test.ts",
+    "test:registry": "tsx --test src/tests/registry.test.ts",
     "test:agent-config": "tsx scripts/test-agent-config.ts",
     "test:opencode-smoke": "python3 -m unittest discover -s scripts -p 'test_opencode_smoke.py'"
   },
