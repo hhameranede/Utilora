@@ -1,6 +1,6 @@
 ---
 description: Handles large, multi-stage coding tasks, architecture work, and longer repository changes.
-mode: all
+mode: subagent
 model: nvidia/poolside/laguna-xs-2.1
 permission:
   edit: allow
