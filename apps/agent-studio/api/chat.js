@@ -28,7 +28,18 @@ function getConfig() {
   };
 }
 
+function assertServerDatabaseConfig(config) {
+  if (!config.url || !config.key) {
+    throw new Error("Supabase server credentials are not configured.");
+  }
+  if (String(config.key).startsWith("sb_publishable_")) {
+    console.error("[Agent Studio] Supabase server key configuration rejected: publishable key supplied.");
+    throw new Error("SUPABASE_SECRET_KEY must contain a server-side Supabase secret key, not a publishable key.");
+  }
+}
+
 async function db(config, path, method = "GET", body) {
+  assertServerDatabaseConfig(config);
   const headers = {
     apikey: config.key,
     Authorization: "Bearer " + config.key,
