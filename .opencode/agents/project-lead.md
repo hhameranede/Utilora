@@ -1,7 +1,7 @@
 ---
 description: Coordinates UTILORA work, delegates specialist tasks and enforces acceptance criteria.
 mode: primary
-model: nvidia/nvidia/nemotron-3-ultra-550b-a55b
+model: nvidia-nim/nemotron-ultra
 permission:
   edit: deny
   bash: ask
