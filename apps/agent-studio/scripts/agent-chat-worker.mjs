@@ -16,6 +16,18 @@ function required(value, label) {
   return value;
 }
 
+function safeDiagnostic(value) {
+  let message = String(value?.message || value || "Unknown agent error.");
+  message = message
+    .replace(/Bearer\s+[A-Za-z0-9._~+\/-]+=*/gi, "Bearer [redacted]")
+    .replace(/nvapi-[A-Za-z0-9_-]{12,}/gi, "[redacted NVIDIA key]")
+    .replace(/gh[pousr]_[A-Za-z0-9]{20,}/gi, "[redacted GitHub token]")
+    .replace(/github_pat_[A-Za-z0-9_]{20,}/gi, "[redacted GitHub token]");
+  const secret = process.env.NVIDIA_API_KEY || "";
+  if (secret) message = message.split(secret).join("[redacted secret]");
+  return message.slice(0, 700);
+}
+
 async function getOidcToken() {
   const requestUrl = required(process.env.ACTIONS_ID_TOKEN_REQUEST_URL, "OIDC request URL");
   const requestToken = required(process.env.ACTIONS_ID_TOKEN_REQUEST_TOKEN, "OIDC request token");
@@ -42,7 +54,11 @@ async function api(action, payload = {}) {
     body: JSON.stringify({ action, ...payload })
   });
   const data = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(data.error || "Agent Studio API request failed.");
+  if (!response.ok) {
+    const error = new Error((data.error || "Agent Studio API request failed.") + " (HTTP " + response.status + ")");
+    error.status = response.status;
+    throw error;
+  }
   return data;
 }
 
@@ -259,17 +275,17 @@ async function main() {
   required(AGENT_NAME, "AGENT_NAME");
   required(MODEL_ALIAS, "MODEL_ALIAS");
 
-  await api("callback", {
-    run_id: RUN_ID,
-    agent_id: AGENT_NAME,
-    status: "running",
-    progress: 5,
-    status_text: "بدأ الوكيل قراءة المهمة",
-    event_type: "agent.started",
-    message: AGENT_NAME + " بدأ تنفيذ دوره."
-  });
-
   try {
+    await api("callback", {
+      run_id: RUN_ID,
+      agent_id: AGENT_NAME,
+      status: "running",
+      progress: 5,
+      status_text: "بدأ الوكيل قراءة المهمة",
+      event_type: "agent.started",
+      message: AGENT_NAME + " بدأ تنفيذ دوره."
+    });
+
     // Report missing provider credentials through the authenticated callback
     // instead of leaving the room stuck in a running state.
     required(process.env.NVIDIA_API_KEY, "NVIDIA_API_KEY");
@@ -300,7 +316,7 @@ async function main() {
     });
     console.log(AGENT_NAME + " completed successfully.");
   } catch (error) {
-    const safeError = String(error?.message || "Agent execution failed.").slice(0, 700);
+    const safeError = safeDiagnostic(error);
     try {
       await api("callback", {
         run_id: RUN_ID,
@@ -312,8 +328,8 @@ async function main() {
         event_type: "agent.failed",
         message: AGENT_NAME + " لم يُرجع إجابة نهائية."
       });
-    } catch {
-      // Do not print identity tokens or provider secrets while reporting a callback error.
+    } catch (callbackError) {
+      console.error(AGENT_NAME + " could not persist failure status: " + safeDiagnostic(callbackError));
     }
     console.error(AGENT_NAME + " failed: " + safeError);
     process.exitCode = 1;
@@ -321,6 +337,6 @@ async function main() {
 }
 
 main().catch((error) => {
-  console.error("Agent worker stopped safely: " + String(error?.message || "unknown error").slice(0, 300));
+  console.error("Agent worker stopped safely: " + safeDiagnostic(error));
   process.exitCode = 1;
 });

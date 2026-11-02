@@ -40,6 +40,8 @@ export async function onRequest(context) {
     return json({ error: "ربط تشغيل الوكلاء عبر GitHub Actions غير مكتمل." }, 503);
   }
 
+  const diagnosticId = crypto.randomUUID();
+  let runIdForRecovery = "";
   try {
     const body = await request.json().catch(() => ({}));
     const descriptor = parseRoomSlug(body.room);
@@ -68,6 +70,7 @@ export async function onRequest(context) {
     });
     const run = createdRuns?.[0];
     if (!run?.id) throw new Error("Run insert did not return an ID.");
+    runIdForRecovery = run.id;
 
     await db(config, "team_chat_messages?id=eq." + encodeURIComponent(message.id), "PATCH", {
       run_id: run.id
@@ -133,7 +136,8 @@ export async function onRequest(context) {
         progress: 100
       });
       return json({
-        error: "تم حفظ الرسالة، لكن GitHub Actions رفض تشغيل الوكيل. راجع صلاحية رمز GitHub في إعدادات Cloudflare."
+        error: "تم حفظ الرسالة، لكن GitHub Actions رفض تشغيل الوكيل (HTTP " + (dispatch?.status || "network") + "). تحقق من صلاحيات Actions للرمز الموجود في Cloudflare.",
+        diagnostic_id: diagnosticId
       }, 502);
     }
 
@@ -142,7 +146,37 @@ export async function onRequest(context) {
       run: { id: run.id, status: "running" }
     }, 202);
   } catch (error) {
-    console.error("[Agent Studio] Message submission failed", error?.status || error?.name || "unknown");
-    return json({ error: "حدث خطأ أثناء إرسال الرسالة. لم يتم إظهار أي رد غير مؤكد." }, 502);
+    if (runIdForRecovery) {
+      try {
+        await db(config, "team_chat_runs?id=eq." + encodeURIComponent(runIdForRecovery), "PATCH", {
+          status: "failed",
+          stage: "تعذّر تجهيز تشغيل الوكلاء",
+          error: "request_failed_" + diagnosticId,
+          finished_at: new Date().toISOString()
+        });
+        await db(config, "team_chat_agent_runs?run_id=eq." + encodeURIComponent(runIdForRecovery), "PATCH", {
+          status: "failed",
+          status_text: "تعذّر بدء التشغيل",
+          progress: 100,
+          error: "request_failed_" + diagnosticId
+        });
+      } catch (recoveryError) {
+        console.error("[Agent Studio] Failed to mark incomplete run", diagnosticId, recoveryError?.status || recoveryError?.name || "unknown");
+      }
+    }
+    const detail = [
+      error?.status ? "HTTP " + error.status : "",
+      error?.code ? "DB " + error.code : ""
+    ].filter(Boolean).join(" · ");
+    console.error("[Agent Studio] Message submission failed", {
+      diagnostic_id: diagnosticId,
+      status: error?.status || null,
+      code: error?.code || null,
+      name: error?.name || "unknown"
+    });
+    return json({
+      error: "تعذّر إرسال المهمة. مرجع التشخيص: " + diagnosticId.slice(0, 8) + (detail ? " (" + detail + ")" : "") + ". بقي نص الرسالة في مربع الكتابة.",
+      diagnostic_id: diagnosticId
+    }, 502);
   }
 }
