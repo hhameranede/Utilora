@@ -147,8 +147,19 @@ export function allowLoginAttempt(ip) {
 }
 
 export function assertServerKey(config) {
-  if (!config.url || !config.key || config.key.startsWith("sb_publishable_")) {
-    const error = new Error("Server-side Supabase configuration is missing or invalid.");
+  let legacyServiceRole = false;
+  try {
+    const parts = config.key.split(".");
+    if (parts.length === 3) {
+      const payload = JSON.parse(new TextDecoder().decode(fromBase64Url(parts[1])));
+      legacyServiceRole = payload.role === "service_role";
+    }
+  } catch {
+    legacyServiceRole = false;
+  }
+  const validServerKey = config.key.startsWith("sb_secret_") || legacyServiceRole;
+  if (!config.url || !validServerKey) {
+    const error = new Error("A Supabase secret key or legacy service_role key is required on the server.");
     error.status = 503;
     throw error;
   }
