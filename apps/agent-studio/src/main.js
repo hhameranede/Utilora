@@ -15,7 +15,7 @@ const state = {
   view: "chat",
   messages: [],
   agents: AGENTS.map((agent) => ({ ...agent, status: "unknown", progress: 0, statusText: "بانتظار الربط" })),
-  backend: { database: false, dispatcher: false, callback: false },
+  backend: { database: false, dispatcher: false, callback: false, healthChecked: false },
   events: [],
   latestRun: null,
   loading: true,
@@ -239,14 +239,20 @@ async function loadStatus(options = {}) {
   const button = $("#refresh-button");
   if (button) { button.disabled = true; button.classList.add("spinning"); }
   try {
-    const response = await fetch("/api/status?room=" + encodeURIComponent(state.room), { credentials: "same-origin", headers: { accept: "application/json" } });
+    const healthQuery = silent ? "" : "&health=1";
+    const response = await fetch("/api/status?room=" + encodeURIComponent(state.room) + healthQuery, { credentials: "same-origin", headers: { accept: "application/json" } });
     if (!response.ok) throw new Error("تعذّر التحقق من حالة الخادم.");
     const data = await response.json();
-    state.backend = {
-      database: Boolean(data.integrations?.database),
-      dispatcher: Boolean(data.integrations?.dispatcher),
-      callback: Boolean(data.integrations?.callback)
-    };
+    const integrations = data.integrations || {};
+    state.backend.database = Boolean(integrations.database);
+    if (integrations.checked) {
+      state.backend.dispatcher = Boolean(integrations.dispatcher);
+      state.backend.callback = Boolean(integrations.callback);
+      state.backend.healthChecked = true;
+    } else if (!state.backend.healthChecked) {
+      state.backend.dispatcher = Boolean(integrations.dispatcher);
+      state.backend.callback = Boolean(integrations.callback);
+    }
     state.latestRun = data.run || null;
     state.events = Array.isArray(data.events) ? data.events : [];
     if (Array.isArray(data.agents)) {
