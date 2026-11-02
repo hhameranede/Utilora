@@ -21,8 +21,8 @@ on:
       dispatch_probe:
         description: Run a permission check without starting any AI agent
         required: false
-        default: false
-        type: boolean
+        default: "false"
+        type: string
 
 permissions:
   contents: read
@@ -39,7 +39,7 @@ env:
 
 jobs:
   specialists:
-    if: ${{ !inputs.dispatch_probe }}
+    if: ${{ inputs.dispatch_probe != 'true' }}
     name: ${{ matrix.agent }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -93,7 +93,7 @@ jobs:
 
   project-lead:
     name: Project Lead
-    if: ${{ !inputs.dispatch_probe && (inputs.mode == 'group' || inputs.target_agent == 'project-lead') }}
+    if: ${{ inputs.dispatch_probe != 'true' && (inputs.mode == 'group' || inputs.target_agent == 'project-lead') }}
     needs: specialists
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -124,7 +124,7 @@ jobs:
 
   dispatch-probe:
     name: Verify workflow dispatch permission
-    if: ${{ inputs.dispatch_probe }}
+    if: ${{ inputs.dispatch_probe == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 1
     steps:
