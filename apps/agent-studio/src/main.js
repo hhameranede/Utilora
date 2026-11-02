@@ -105,6 +105,9 @@ function viewContent() {
 }
 
 function render() {
+  const previousFeed = $("#chat-feed");
+  const keepFeedAtBottom = !previousFeed || previousFeed.scrollHeight - previousFeed.scrollTop - previousFeed.clientHeight < 120;
+  const previousFeedScrollTop = previousFeed?.scrollTop || 0;
   const activeLabel = state.view === "chat" ? "غرفة الفريق" : state.view === "agents" ? "الوكلاء" : state.view === "activity" ? "سجل النشاط" : "الأمان والخصوصية";
   const dbReady = state.backend.database;
   const dispatchReady = state.backend.dispatcher;
@@ -124,6 +127,12 @@ function render() {
     '<aside class="team-panel"><div class="team-panel-head"><div><div class="view-kicker">YOUR AI TEAM</div><h2>فريق العمل</h2></div><span class="team-count">08</span></div><div class="team-summary"><div class="summary-number">' + state.agents.filter((a) => a.status === "running").length + '<small>/ 8</small></div><div><strong>وكلاء نشطون</strong><span>حالة الاتصال الحالية</span></div></div><div class="team-list">' + state.agents.map(renderAgent).join("") + '</div><div class="team-footer"><div class="footer-line"><span></span></div><p>' + (dispatchReady ? "محرك تشغيل الفريق متصل" : "ربط محرك التشغيل لم يكتمل بعد") + '</p><button class="refresh-button" id="refresh-button" type="button">' + icon("refresh", 15) + ' تحديث الحالة</button></div></aside>' +
     '</div>';
   bindEvents();
+  const nextFeed = $("#chat-feed");
+  if (nextFeed) {
+    nextFeed.scrollTop = keepFeedAtBottom
+      ? nextFeed.scrollHeight
+      : Math.min(previousFeedScrollTop, Math.max(0, nextFeed.scrollHeight - nextFeed.clientHeight));
+  }
 }
 
 function navButton(view, label) {
