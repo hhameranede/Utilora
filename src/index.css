@@ -2081,3 +2081,81 @@ main textarea, main select {
     max-height: 98px;
   }
 }
+
+
+/* Tablet fold: keep the hero concise so popular tools appear on the first screen. */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .ulx-site-shell .ul-hero-grid {
+    gap: 2px;
+    padding: 11px 0 6px;
+  }
+  .ulx-site-shell .ul-hero-kicker {
+    min-height: 28px;
+    margin-bottom: 5px;
+    padding: 4px 12px;
+    font-size: 10px;
+  }
+  .ulx-site-shell .ul-hero-title {
+    font-size: clamp(34px, 4.4vw, 42px);
+    line-height: 1.18;
+  }
+  .ulx-site-shell .ul-hero-description {
+    margin: 7px auto 9px;
+    font-size: 12px;
+    line-height: 1.5;
+  }
+  .ulx-site-shell .ul-hero-search {
+    min-height: 48px;
+    height: 48px;
+  }
+  .ulx-site-shell .ul-hero-search input {
+    height: 46px;
+    font-size: 12px;
+  }
+  .ulx-site-shell .ul-hero-actions {
+    gap: 8px;
+    margin-top: 7px;
+  }
+  .ulx-site-shell .ul-button-primary,
+  .ulx-site-shell .ul-button-secondary {
+    min-height: 39px;
+    padding-inline: 15px;
+    font-size: 10px;
+  }
+  .ulx-site-shell .ul-hero-shortcuts {
+    display: none !important;
+  }
+  .ulx-site-shell .ul-hero-visual {
+    flex: 0 0 174px;
+    height: 174px !important;
+    min-height: 174px !important;
+    max-height: 174px;
+    margin-top: 1px;
+  }
+  .ulx-site-shell .ul-device {
+    width: 87%;
+    padding: 7px 7px 9px;
+    transform: perspective(900px) rotateY(-3deg) scale(.64);
+  }
+  .ulx-site-shell .ul-device-screen {
+    min-height: 205px;
+    border-width: 5px;
+  }
+  .ulx-site-shell .ul-editor {
+    min-height: 178px;
+    grid-template-columns: 30px minmax(0,1fr);
+    gap: 5px;
+    padding: 5px;
+  }
+  .ulx-site-shell .ul-editor-rail {
+    gap: 8px;
+    padding-top: 5px;
+  }
+  .ulx-site-shell .ul-editor-canvas,
+  .ulx-site-shell .ul-editor-canvas svg {
+    min-height: 160px;
+  }
+  .ulx-site-shell .ul-device-base {
+    height: 10px;
+  }
+}
