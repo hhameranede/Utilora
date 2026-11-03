@@ -18,6 +18,7 @@ export interface DnsRecord {
 export interface DnsLookupResult {
   records: DnsRecord[];
   queriedTypes: DnsRecordType[];
+  errors: Array<{ type: DnsRecordType; message: string }>;
 }
 export interface RdapDomainResult {
   domain: string;
@@ -67,7 +68,8 @@ const DNS_CODE_TYPES: Record<number, DnsRecordType> = {
 };
 const DNS_TYPES: DnsRecordType[] = ['A', 'AAAA', 'CNAME', 'MX', 'TXT', 'NS', 'SOA'];
 const RDAP_ACCEPT = 'application/rdap+json, application/json';
-const DNS_ENDPOINT = 'https://cloudflare-dns.com/dns-query';
+const RDAP_ENDPOINT = '/api/rdap';
+const DNS_ENDPOINT = '/api/dns';
 const REQUEST_TIMEOUT_MS = 12_000;
 
 function parseIPv4(value: string): number[] | null {
@@ -246,16 +248,24 @@ async function fetchJson<T>(url: string, accept: string): Promise<T> {
       redirect: 'follow',
       signal: controller.signal,
     });
+    const payload: unknown = await response.json().catch(() => null);
     if (!response.ok) {
-      if (response.status === 404) throw new Error('No registry data was found for this domain.');
-      if (response.status === 429) throw new Error('The public lookup service is rate-limiting requests. Try again shortly.');
-      throw new Error('The public lookup service returned HTTP ' + response.status + '.');
+      const providerMessage = payload && typeof payload === 'object' && 'message' in payload
+        ? String((payload as { message?: unknown }).message || '')
+        : '';
+      if (providerMessage) throw new Error(providerMessage);
+      if (response.status === 404) throw new Error('No public registry data was found for this domain.');
+      if (response.status === 429) throw new Error('The public lookup provider is rate-limiting requests. Try again shortly.');
+      throw new Error('The lookup endpoint returned HTTP ' + response.status + '.');
     }
-    return await response.json() as T;
+    if (!payload || typeof payload !== 'object') {
+      throw new Error('The public lookup provider returned an invalid response.');
+    }
+    return payload as T;
   } catch (cause) {
     if (controller.signal.aborted) throw new Error('The lookup timed out. Please try again.');
     if (cause instanceof TypeError) {
-      throw new Error('The public lookup service could not be reached or did not allow this browser request (CORS).');
+      throw new Error('UTILORA’s public lookup endpoint could not be reached. Check your connection and try again.');
     }
     throw cause;
   } finally {
@@ -293,7 +303,7 @@ function firstEvent(events: Array<{ eventAction: string; eventDate: string }>, n
 export async function lookupDomainRdap(value: string): Promise<RdapDomainResult> {
   const domain = normalizeDomain(value);
   const payload = await fetchJson<Record<string, unknown>>(
-    'https://rdap.org/domain/' + encodeURIComponent(domain),
+    RDAP_ENDPOINT + '?domain=' + encodeURIComponent(domain),
     RDAP_ACCEPT,
   );
 
@@ -354,7 +364,7 @@ export async function lookupDnsRecords(value: string, requestedTypes: DnsRecordT
   const queriedTypes = [...new Set(requestedTypes.filter((type): type is DnsRecordType => DNS_TYPES.includes(type)))];
   if (!queriedTypes.length) throw new Error('Choose at least one DNS record type.');
 
-  const results = await Promise.all(queriedTypes.map(async (type) => {
+  const settled = await Promise.allSettled(queriedTypes.map(async (type) => {
     const url = DNS_ENDPOINT + '?name=' + encodeURIComponent(domain) + '&type=' + DNS_TYPE_CODES[type];
     const payload = await fetchJson<DnsJsonResponse>(url, 'application/dns-json');
     if (payload.Status === 2) throw new Error('The DNS resolver could not complete this query (SERVFAIL).');
@@ -367,12 +377,33 @@ export async function lookupDnsRecords(value: string, requestedTypes: DnsRecordT
     });
   }));
 
+  const records: DnsRecord[] = [];
+  const errors: Array<{ type: DnsRecordType; message: string }> = [];
+  settled.forEach((result, index) => {
+    if (result.status === 'fulfilled') {
+      records.push(...result.value);
+    } else {
+      errors.push({
+        type: queriedTypes[index],
+        message: result.reason instanceof Error ? result.reason.message : 'This DNS record type could not be queried.',
+      });
+    }
+  });
+
+  if (errors.length === queriedTypes.length) {
+    throw new Error(errors[0]?.message || 'The DNS lookup could not be completed.');
+  }
+
   const unique = new Map<string, DnsRecord>();
-  results.flat().forEach((record) => {
+  records.forEach((record) => {
     const key = [record.type, record.name, record.value, record.priority ?? ''].join('|');
     unique.set(key, record);
   });
-  return { records: [...unique.values()].sort((a, b) => a.type.localeCompare(b.type) || a.name.localeCompare(b.name)), queriedTypes };
+  return {
+    records: [...unique.values()].sort((a, b) => a.type.localeCompare(b.type) || a.name.localeCompare(b.name)),
+    queriedTypes,
+    errors,
+  };
 }
 
 async function resolvePublicAddresses(hostname: string): Promise<string[]> {
