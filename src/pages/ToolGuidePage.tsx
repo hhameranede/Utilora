@@ -302,7 +302,7 @@ export const ToolGuidePage: React.FC<ToolGuidePageProps> = ({ toolSlug }) => {
           </div>
 
           <div className="relative bg-[#fafaf9] p-2 sm:p-5">
-            <div className="rounded-2xl border border-stone-200 bg-white p-3 shadow-sm lg:hidden">
+            <div className="ul-guide-live-workspace rounded-2xl border border-stone-200 bg-white p-3 shadow-sm lg:hidden">
               <div className="mb-3 flex items-center gap-2 rounded-xl bg-orange-50 px-3 py-2 text-xs font-semibold text-orange-800">
                 <span className="h-2 w-2 rounded-full bg-orange-600" aria-hidden="true" />
                 {t('guide.liveWorkspace')}
@@ -367,7 +367,7 @@ export const ToolGuidePage: React.FC<ToolGuidePageProps> = ({ toolSlug }) => {
         </section>
 
         {isWideScreen && (
-          <div className="pointer-events-none fixed left-[-12000px] top-0 -z-10 w-[1080px]" aria-hidden="true">
+          <div className="ul-guide-desktop-capture pointer-events-none fixed left-[-12000px] top-0 -z-10 w-[1080px]" aria-hidden="true">
           <div ref={captureRef} className="w-[1080px] bg-[#fafaf9] p-8 text-stone-900">
             <div className="mb-6 flex items-center justify-between border-b border-stone-200 pb-4">
               <span className="text-xl font-extrabold tracking-tight">UTILORA</span>
