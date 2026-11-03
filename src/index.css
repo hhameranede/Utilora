@@ -169,3 +169,232 @@ footer a:hover { color:#df650b; }
 @media(prefers-reduced-motion:reduce) {
   *,*::before,*::after { scroll-behavior:auto!important; animation-duration:.01ms!important; transition-duration:.01ms!important; }
 }
+
+
+/* -------------------------------------------------------------------------- */
+/* UTILORA Design System v2 — responsive consistency and component rhythm     */
+/* -------------------------------------------------------------------------- */
+:root {
+  --ul-page-max: 1280px;
+  --ul-page-gutter: clamp(16px, 3.2vw, 40px);
+  --ul-section-gap: clamp(28px, 4vw, 52px);
+  --ul-card-radius: 20px;
+  --ul-control-radius: 13px;
+  --ul-border: #e7e9ee;
+  --ul-ink: #17191f;
+  --ul-muted: #626a76;
+  --ul-orange: #f47716;
+  --ul-orange-dark: #d95e08;
+  --ul-shadow-card: 0 8px 26px rgba(23, 25, 31, .045);
+  --ul-shadow-hover: 0 16px 38px rgba(23, 25, 31, .085);
+}
+
+html, body, #root { width: 100%; min-width: 320px; }
+body { overflow-x: clip; }
+#root { min-height: 100svh; display: flex; flex-direction: column; }
+main { width: 100%; min-width: 0; padding-block: clamp(18px, 2.5vw, 34px) clamp(36px, 4vw, 56px); }
+main > * { min-width: 0; }
+svg { flex: 0 0 auto; }
+button svg, a svg { display: block; }
+img, video, canvas, svg { max-width: 100%; }
+input, textarea, select { min-width: 0; max-width: 100%; }
+
+header.sticky { min-height: 72px; }
+header.sticky > div { min-height: 72px; height: auto; }
+header.sticky nav { gap: clamp(14px, 1.8vw, 26px); }
+header.sticky button, header.sticky a { white-space: nowrap; }
+header.sticky [aria-label] svg { width: 18px; height: 18px; }
+footer { margin-top: auto; }
+footer .max-w-7xl { width: min(100% - 2 * var(--ul-page-gutter), var(--ul-page-max)); }
+
+/* Shared page frame: identical gutters and readable measure across templates. */
+.ul-content-page {
+  width: min(calc(100% - 2 * var(--ul-page-gutter)), var(--ul-page-max));
+  max-width: var(--ul-page-max);
+  margin-inline: auto;
+}
+.ul-content-page > * { min-width: 0; }
+.ul-content-page h1 { max-width: 20ch; font-size: clamp(30px, 3.2vw, 46px); line-height: 1.16; text-wrap: balance; }
+.ul-content-page h2 { line-height: 1.25; text-wrap: balance; }
+.ul-content-page p, .ul-content-page li { overflow-wrap: anywhere; }
+.ul-content-page article, .ul-content-page .prose { min-width: 0; }
+.ul-content-page pre, .ul-content-page table, .ul-content-page .overflow-x-auto { max-width: 100%; }
+.ul-content-page pre, .ul-content-page table { display: block; overflow-x: auto; }
+.ul-content-page pre code { white-space: pre; }
+.ul-content-page img { height: auto; }
+.ul-content-page .sticky { align-self: start; }
+
+/* Shared card geometry — titles must wrap, never be ellipsized in catalog cards. */
+.ul-tool-card, .ul-category-card, .ul-featured-tool-card {
+  min-width: 0;
+  height: 100%;
+  border: 1px solid var(--ul-border) !important;
+  border-radius: var(--ul-card-radius) !important;
+  box-shadow: var(--ul-shadow-card);
+}
+.ul-tool-card { min-height: 218px; padding: clamp(16px, 1.6vw, 22px) !important; }
+.ul-tool-card h3 {
+  display: -webkit-box;
+  min-width: 0;
+  overflow: hidden;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-height: 1.45;
+}
+.ul-tool-card p { overflow-wrap: anywhere; }
+.ul-tool-card > div:first-child { min-width: 0; }
+.ul-tool-card > div:first-child > div:first-child { min-width: 0; }
+.ul-tool-card > div:first-child > div:first-child > div:last-child { min-width: 0; }
+.ul-tool-card > div:last-child { min-width: 0; gap: 10px; }
+.ul-tool-card > div:last-child > span:first-child { min-width: 0; overflow-wrap: anywhere; white-space: normal; }
+.ul-tool-card > div:last-child > span:last-child { max-width: 48%; white-space: nowrap; }
+.ul-tool-card svg, .ul-category-card svg, .ul-featured-tool-card svg {
+  width: 1.15em;
+  height: 1.15em;
+  stroke-width: 1.9;
+}
+.ul-tool-card .w-10 svg, .ul-category-card .w-12 svg, .ul-featured-tool-card .w-12 svg {
+  width: 22px;
+  height: 22px;
+}
+.ul-category-card { min-height: 208px; padding: clamp(18px, 2vw, 26px) !important; }
+.ul-featured-tool-card { min-height: 280px; }
+.ul-tool-card:hover, .ul-category-card:hover, .ul-featured-tool-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--ul-shadow-hover);
+}
+
+/* Iconography: stable optical box and stroke weight in all registries and nav items. */
+.ul-icon, [data-ul-icon] { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 auto; }
+.ul-tool-card svg, .ul-category-card svg, header svg, footer svg, .ul-content-page button svg {
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+.ul-category-card .w-12, .ul-tool-card .w-10, .ul-featured-tool-card .w-12 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+}
+
+/* Consistent form controls and direction-aware search affordances. */
+main input:not([type=checkbox]):not([type=radio]):not([type=range]),
+main textarea, main select {
+  min-height: 44px;
+  border-radius: var(--ul-control-radius) !important;
+}
+.ul-hero-search { min-height: 60px; }
+.ul-hero-search input {
+  padding-inline-start: 56px !important;
+  padding-inline-end: 22px !important;
+}
+.ul-hero-search-icon { inset-inline-start: 21px; inset-inline-end: auto; }
+:dir(rtl) .ul-content-page .relative > svg.absolute {
+  inset-inline-start: auto;
+  inset-inline-end: 13px;
+}
+:dir(rtl) .ul-content-page .relative > input {
+  padding-inline-start: 12px;
+  padding-inline-end: 40px;
+}
+:dir(ltr) .ul-content-page .relative > svg.absolute {
+  inset-inline-start: 13px;
+  inset-inline-end: auto;
+}
+:dir(ltr) .ul-content-page .relative > input {
+  padding-inline-start: 40px;
+  padding-inline-end: 12px;
+}
+
+/* Reading pages: avoid overly wide text and sidebar collisions. */
+.ul-content-page article > .grid { align-items: start; }
+.ul-content-page article > .grid > div:first-child { min-width: 0; max-width: 76ch; }
+.ul-content-page article > .grid > aside { min-width: 0; }
+.ul-content-page article section { scroll-margin-top: 92px; }
+.ul-content-page .prose { max-width: 78ch; }
+.ul-content-page .prose img, .ul-content-page article img { border-radius: 16px; }
+.ul-content-page .prose table { width: 100%; }
+.ul-content-page .prose pre { border-radius: 14px; }
+
+/* Workspace and tool-page shell: one predictable responsive surface. */
+#tool-workspace { min-width: 0; scroll-margin-top: 92px; }
+#tool-workspace > *, #tool-workspace [class*="grid"] > * { min-width: 0; }
+.ul-content-page [class*="rounded-2xl"][class*="border"],
+.ul-content-page [class*="rounded-3xl"][class*="border"] { min-width: 0; }
+.ul-content-page .grid { min-width: 0; }
+.ul-content-page .grid > * { min-width: 0; }
+
+/* Homepage composition scales naturally rather than shrinking the artwork to half size. */
+@media (min-width: 1440px) {
+  .ul-hero-grid { width: min(calc(100% - 2 * var(--ul-page-gutter)), 1360px); min-height: 520px; }
+  .ul-home-section, .ul-trust-strip { width: min(calc(100% - 2 * var(--ul-page-gutter)), 1320px); }
+}
+@media (max-width: 1024px) {
+  .ul-hero-grid { width: min(calc(100% - 40px), 1200px); gap: 24px; }
+  .ul-content-page .lg\\:grid-cols-12 { gap: 28px; }
+  .ul-tool-card { min-height: 210px; }
+}
+@media (max-width: 767px) {
+  header.sticky { min-height: 64px; }
+  header.sticky > div { min-height: 64px; padding-inline: 12px; gap: 8px; }
+  header.sticky > div > div:first-child { min-width: 0; gap: 10px; }
+  header.sticky > div > div:last-child { gap: 6px; }
+  header.sticky button, header.sticky a { max-width: 100%; }
+  main { padding-block: 16px 34px; }
+  .ul-content-page { width: min(calc(100% - 28px), var(--ul-page-max)); }
+  .ul-content-page > .space-y-12, .ul-content-page > .space-y-16 { gap: 30px; }
+  .ul-content-page h1 { font-size: clamp(27px, 7.4vw, 36px); line-height: 1.22; }
+  .ul-page-intro { padding: 20px; border-radius: 20px; }
+  .ul-tool-card { min-height: 196px; padding: 16px !important; border-radius: 17px !important; }
+  .ul-category-card { min-height: 178px; padding: 16px !important; border-radius: 17px !important; }
+  .ul-featured-tool-card { min-height: 0; padding: 20px !important; border-radius: 20px !important; }
+  .ul-tool-card h3 { font-size: 14px; line-height: 1.45; }
+  .ul-tool-card p, .ul-category-card p { font-size: 12px; line-height: 1.65; }
+  .ul-tool-card > div:last-child { align-items: center; }
+  .ul-tool-card > div:last-child > span:last-child { max-width: none; padding: 7px 9px; font-size: 10px; }
+  .ul-category-card .w-12, .ul-tool-card .w-10, .ul-featured-tool-card .w-12 { width: 40px; height: 40px; border-radius: 12px; }
+  .ul-category-card .w-12 svg, .ul-tool-card .w-10 svg, .ul-featured-tool-card .w-12 svg { width: 20px; height: 20px; }
+  .ul-home { gap: 24px; }
+  .ul-hero-grid { width: min(calc(100% - 28px), 680px); padding-top: 14px; }
+  .ul-hero-title { font-size: clamp(29px, 8vw, 38px); line-height: 1.24; }
+  .ul-hero-description { font-size: 13px; line-height: 1.75; }
+  .ul-hero-visual { height: auto; min-height: 205px; margin-top: 14px; overflow: hidden; }
+  .ul-device { width: min(82%, 420px); padding: 8px 8px 11px; border-radius: 17px; transform: perspective(900px) rotateY(-3deg) scale(.88); }
+  .ul-device-screen { min-height: 180px; border-width: 5px; }
+  .ul-editor { min-height: 165px; grid-template-columns: 30px minmax(0, 1fr); }
+  .ul-editor-canvas, .ul-editor-canvas svg { min-height: 155px; }
+  .ul-floating-panel { display: none; }
+  .ul-floating-image { width: 88px; inset-inline-end: 1%; bottom: 2%; }
+  .ul-image-badge { width: 44px; height: 44px; inset-inline-end: 7%; top: 0; }
+  .ul-hero-proof { display: none; }
+  .ul-home-section, .ul-trust-strip { width: min(calc(100% - 28px), 1320px); }
+  .ul-section-heading { align-items: center; gap: 10px; }
+  .ul-section-heading h2 { font-size: 19px; }
+  .ul-trust-strip { border-radius: 16px; }
+  .ul-trust-item { min-width: 0; }
+  .ul-content-page article > .grid { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+  .ul-content-page article > .grid > aside > .sticky { position: static; top: auto; }
+  .ul-content-page .grid-cols-1 { min-width: 0; }
+  .ul-content-page [class*="aspect-"] { max-width: 100%; }
+  .ul-content-page .overflow-x-auto { overscroll-behavior-inline: contain; }
+  .ul-content-page .flex.flex-wrap { row-gap: 10px; }
+  footer { margin-top: 44px; }
+  footer .max-w-7xl { width: min(calc(100% - 28px), var(--ul-page-max)); padding-block: 38px; }
+  footer .grid { gap: 26px 18px; }
+}
+@media (max-width: 390px) {
+  .ul-tool-card { padding: 13px !important; }
+  .ul-tool-card > div:last-child > span:last-child { padding-inline: 7px; font-size: 9px; }
+  .ul-category-card { padding: 13px !important; }
+  .ul-section-heading h2 { font-size: 17px; }
+  header.sticky > div { padding-inline: 9px; }
+}
+@media (min-width: 768px) and (max-width: 1100px) {
+  .ul-content-page article > .grid { grid-template-columns: minmax(0, 1fr); }
+  .ul-content-page article > .grid > aside > .sticky { position: static; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ul-tool-card, .ul-category-card, .ul-featured-tool-card, .ul-button-primary, .ul-button-secondary { transition: none !important; }
+}
