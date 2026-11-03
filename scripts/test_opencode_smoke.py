@@ -7,7 +7,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from opencode_smoke import extract_final_assistant_text, extract_latest_assistant_state
 from unittest.mock import patch
 
-import run_opencode_agent\nfrom run_opencode_agent import build_run_args, contains_credential, find_session_id, run_agent
+import run_opencode_agent
+from run_opencode_agent import build_run_args, contains_credential, find_session_id, run_agent
 
 
 class OpenCodeSmokeParserTests(unittest.TestCase):
