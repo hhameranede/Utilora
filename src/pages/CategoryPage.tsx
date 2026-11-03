@@ -138,7 +138,7 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ categorySlug }) => {
         )}
 
         {/* Category Tool List with Filter Bar */}
-        <section className="space-y-6">
+        <section className="ul-category-filter-row space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-stone-200">
             <div>
               <h2 className="text-xl font-bold text-stone-900">
