@@ -14,7 +14,7 @@ import { Head } from '../seo/Head';
 import { SAMPLE_ARTICLES } from '../data/articles.data';
 import { matchesSearch } from '../utils/search';
 
-const HeroArtwork: React.FC = () => (
+const HeroArtwork: React.FC<{ locale: string }> = ({ locale }) => (
   <div className="ul-hero-visual" data-testid="utilora-hero-art" aria-label="UTILORA image editing workspace illustration">
     <div className="ul-hero-orbit" />
     <div className="ul-device">
@@ -42,10 +42,10 @@ const HeroArtwork: React.FC = () => (
       <div className="ul-device-base"/>
     </div>
     <div className="ul-floating-panel" aria-hidden="true">
-      <h3>إعدادات الصورة</h3>
-      <label>السطوع<div className="ul-slider"><span style={{width:'68%'}}/></div></label>
-      <label>التباين<div className="ul-slider"><span style={{width:'46%'}}/></div></label>
-      <label>التشبع<div className="ul-slider"><span style={{width:'82%'}}/></div></label>
+      <h3>{locale === 'ar' ? 'إعدادات الصورة' : 'Image settings'}</h3>
+      <label>{locale === 'ar' ? 'السطوع' : 'Brightness'}<div className="ul-slider"><span style={{width:'68%'}}/></div></label>
+      <label>{locale === 'ar' ? 'التباين' : 'Contrast'}<div className="ul-slider"><span style={{width:'46%'}}/></div></label>
+      <label>{locale === 'ar' ? 'التشبع' : 'Saturation'}<div className="ul-slider"><span style={{width:'82%'}}/></div></label>
     </div>
     <div className="ul-floating-image" aria-hidden="true">
       <svg viewBox="0 0 220 130">
@@ -90,7 +90,7 @@ export const HomePage: React.FC = () => {
   return (
     <>
       <Head title="UTILORA — Every Digital Task. One Place." description="Free online tools for images, documents, text, code, websites and everyday digital tasks." locale={locale} routeType="home" isIndexable schemaType="WebSite"/>
-      <div className="ul-home w-full">
+      <div className="ul-home ulx-home-experience w-full">
         <section data-testid="utilora-home-hero" className="ul-hero-grid" aria-labelledby="utilora-hero-title">
           <div className="ul-hero-copy">
             <div className="ul-hero-kicker"><Sparkles size={15}/>{t('hero.badge')}</div>
@@ -114,7 +114,7 @@ export const HomePage: React.FC = () => {
               {CATEGORIES_LIST.slice(0,4).map((category)=><Link key={category.id} routeType="category" slug={category.slug}>{category.localizedTitle[locale]||category.localizedTitle.en}</Link>)}
             </div>
           </div>
-          <HeroArtwork/>
+          <HeroArtwork locale={locale}/>
         </section>
 
         <section id="quick-tools" className="ul-home-section" aria-labelledby="quick-tools-heading">

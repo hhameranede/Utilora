@@ -1,24 +1,23 @@
 import React from 'react';
 import { useI18n } from '../../i18n';
 
-interface BrandLogoProps {
-  compact?: boolean;
-}
+interface BrandLogoProps { compact?: boolean; }
 
 export const BrandLogo: React.FC<BrandLogoProps> = ({ compact = false }) => {
   const { t } = useI18n();
   return (
-  <span className="inline-flex items-center gap-2.5" aria-label={`${t("brand.name")} — ${t("brand.slogan")}`}>
-    <svg aria-hidden="true" viewBox="0 0 64 64" className="h-9 w-9 sm:h-10 sm:w-10 shrink-0">
-      <rect x="3" y="3" width="58" height="58" rx="17" fill="#ffffff" stroke="#e7e5e4" strokeWidth="2" />
-      <rect x="10" y="10" width="44" height="44" rx="13" fill="#fafaf9" stroke="#f5f5f4" strokeWidth="1.5" />
-      <path d="M21 22v13.5c0 8.1 4.8 13 11 13s11-4.9 11-13V22" fill="none" stroke="#ea580c" strokeWidth="7" strokeLinecap="square" />
-      <path d="M49 9l2.2 6.1L57 17.5l-5.8 2.1L49 26l-2.1-6.4-5.9-2.1 5.9-2.4L49 9z" fill="#fb923c" />
-    </svg>
-    <span className="flex min-w-0 flex-col leading-none">
-      <span className="text-base sm:text-lg font-extrabold tracking-[0.16em] text-stone-900">UTILORA</span>
-      {!compact && <span className="mt-1 text-[9px] sm:text-[10px] font-semibold uppercase tracking-[0.13em] text-orange-700">{t('brand.slogan')}</span>}
+    <span className="ulx-brand-lockup" aria-label={`${t('brand.name')} — ${t('brand.slogan')}`}>
+      <span className="ulx-brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 40 40" role="presentation">
+          <rect x="1" y="1" width="38" height="38" rx="12" fill="currentColor"/>
+          <path d="M12 11v11.5c0 5.1 3.1 8.5 8 8.5s8-3.4 8-8.5V11" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round"/>
+          <path d="m29 7 1.2 3.1 3.1 1.2-3.1 1.2L29 16l-1.2-3.5-3.1-1.2 3.1-1.2L29 7Z" fill="#fff" opacity=".92"/>
+        </svg>
+      </span>
+      <span className="ulx-brand-type">
+        <span className="ulx-brand-name">UTILORA<span>.</span></span>
+        {!compact && <span className="ulx-brand-tagline">{t('brand.slogan')}</span>}
+      </span>
     </span>
-  </span>
   );
 };
