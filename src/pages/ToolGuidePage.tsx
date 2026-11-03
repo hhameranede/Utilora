@@ -253,7 +253,7 @@ export const ToolGuidePage: React.FC<ToolGuidePageProps> = ({ toolSlug }) => {
         isIndexable={guideIsIndexable}
       />
 
-      <div className="ul-content-page mx-auto max-w-7xl space-y-8 px-4 sm:px-6 lg:px-8">
+      <div className="ul-content-page mx-auto max-w-7xl space-y-6 px-3 sm:space-y-8 sm:px-6 lg:px-8">
         <Breadcrumbs items={[
           { label: t('nav.tools'), routeType: 'tools-index' },
           { label: categoryName, routeType: 'category', slug: tool.category },
@@ -293,6 +293,8 @@ export const ToolGuidePage: React.FC<ToolGuidePageProps> = ({ toolSlug }) => {
 
           <div className="relative bg-[#fafaf9] p-2 sm:p-5">
             {screenshot ? (
+              <>
+                <div className="hidden md:block">
               <div className="relative mx-auto max-w-[1080px] overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
                 <img data-guide-screenshot src={screenshot} alt={t('guide.screenshotAlt').replace('{tool}', toolName)} className="block h-auto w-full" />
                 <svg
@@ -330,7 +332,15 @@ export const ToolGuidePage: React.FC<ToolGuidePageProps> = ({ toolSlug }) => {
                   })}
                 </svg>
               </div>
-            ) : captureError ? (
+                </div>
+                <div className="rounded-2xl border border-stone-200 bg-white p-3 shadow-sm md:hidden">
+                  <div className="mb-3 flex items-center gap-2 rounded-xl bg-orange-50 px-3 py-2 text-xs font-semibold text-orange-800">
+                    <span className="h-2 w-2 rounded-full bg-orange-600" aria-hidden="true" />
+                    {t('guide.liveWorkspace')}
+                  </div>
+                  <ToolWorkspaceResolver tool={tool} />
+                </div>
+              </>            ) : captureError ? (
               <div className="rounded-2xl border border-orange-200 bg-white p-5 text-center">
                 <p className="text-sm font-semibold text-stone-800">{t('guide.captureUnavailable')}</p>
                 <p className="mt-1 text-xs text-stone-500">{t('guide.liveWorkspace')}</p>
