@@ -552,7 +552,10 @@ export const RdapLookupAdapter = createConnectedAdapter<RdapLookupInput, RdapLoo
 export const DnsLookupAdapter = createConnectedAdapter<DnsLookupInput, DnsLookupOutput>(
   'dns-lookup',
   'DNS Lookup',
-  async ({ domain, recordTypes }) => ({ records: (await lookupDnsRecords(domain, recordTypes)).records }),
+  async ({ domain, recordTypes }) => {
+    const result = await lookupDnsRecords(domain, recordTypes);
+    return { records: result.records, errors: result.errors };
+  },
 );
 export const WebsiteStatusCheckerAdapter = createConnectedAdapter<WebsiteStatusCheckerInput, WebsiteStatusCheckerOutput>(
   'website-status-checker',
