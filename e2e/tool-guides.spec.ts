@@ -16,7 +16,12 @@ test('every tool guide captures its real rendered workspace and shows annotated 
     const annotations = page.locator('svg[data-guide-annotations]');
     await expect(annotations).toBeVisible();
     const targetCount = Number(await annotations.getAttribute('data-guide-target-count'));
-    expect(targetCount, tool.slug + ' guide should point to real workspace controls').toBeGreaterThanOrEqual(1);
+    if (tool.slug === 'video-downloader') {
+      expect(targetCount, 'preview-only downloader guide must not invent workspace controls').toBe(0);
+      await expect(page.getByText(/Preview only/i).first()).toBeVisible();
+    } else {
+      expect(targetCount, tool.slug + ' guide should point to real workspace controls').toBeGreaterThanOrEqual(1);
+    }
     expect(targetCount, tool.slug + ' guide should annotate at most three workflow targets').toBeLessThanOrEqual(3);
     await expect(annotations.locator('[data-guide-target]')).toHaveCount(targetCount);
     await expect(page.getByRole('link', { name: /Open tool/ })).toHaveAttribute('href', '/en/tools/' + tool.slug);
