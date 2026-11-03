@@ -1,6 +1,11 @@
 import unittest
+from pathlib import Path
+import sys
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from opencode_smoke import extract_final_assistant_text, extract_latest_assistant_state
+from run_opencode_agent import build_run_args, contains_credential, find_session_id
 
 
 class OpenCodeSmokeParserTests(unittest.TestCase):
@@ -112,6 +117,22 @@ class OpenCodeSmokeParserTests(unittest.TestCase):
 
         self.assertEqual(extract_final_assistant_text(transcript), "")
         self.assertEqual(extract_latest_assistant_state(transcript), ("missing", "Possibly incomplete."))
+
+
+class OpenCodeRunnerTests(unittest.TestCase):
+    def test_finds_session_id_from_jsonl_events(self):
+        raw = '{"type":"message.part.updated","part":{"sessionID":"session-123"}}\\n'
+        self.assertEqual(find_session_id(raw), "session-123")
+
+    def test_builds_non_interactive_same_session_recovery_command(self):
+        args = build_run_args("/workspace", "qa-engineer", "model-x", "Finish.", "session-123")
+        self.assertIn("--auto", args)
+        self.assertEqual(args[args.index("--session") + 1], "session-123")
+        self.assertEqual(args[-1], "Finish.")
+
+    def test_rejects_credential_like_diagnostics(self):
+        self.assertTrue(contains_credential("provider returned nvapi-abcdefghijklmnop"))
+        self.assertFalse(contains_credential("No credentials were present."))
 
 
 if __name__ == "__main__":
