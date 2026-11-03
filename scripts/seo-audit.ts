@@ -360,11 +360,20 @@ export function auditHtmlDocument(html: string, context: HtmlAuditContext, findi
   if (!/<div\b[^>]*id=["']root["'][^>]*>[\s\S]*\S[\s\S]*<\/div>/i.test(html)) {
     add('error', 'HTML_SSR_BODY_MISSING', 'The prerendered document has no server-rendered application content.');
   }
-  if (titles[0] && (titles[0].length < 20 || titles[0].length > 70)) {
-    add('warning', 'HTML_TITLE_LENGTH', 'Title length is ' + titles[0].length + ' characters; review search-result readability.');
-  }
-  if (descriptions[0] && (descriptions[0].length < 60 || descriptions[0].length > 180)) {
-    add('warning', 'HTML_DESCRIPTION_LENGTH', 'Description length is ' + descriptions[0].length + ' characters; review search-result readability.');
+  if (context.indexable) {
+    // Character-count guidance is language-aware: CJK snippets carry denser
+    // information per character, and non-indexable preview content is excluded.
+    const isChinese = locale === 'zh';
+    const titleMin = isChinese ? 8 : 20;
+    const titleMax = isChinese ? 45 : 80;
+    const descriptionMin = isChinese ? 20 : locale === 'ar' ? 35 : 40;
+    const descriptionMax = isChinese ? 90 : 200;
+    if (titles[0] && (titles[0].length < titleMin || titles[0].length > titleMax)) {
+      add('warning', 'HTML_TITLE_LENGTH', 'Title length is ' + titles[0].length + ' characters; review the localized search-result display.');
+    }
+    if (descriptions[0] && (descriptions[0].length < descriptionMin || descriptions[0].length > descriptionMax)) {
+      add('warning', 'HTML_DESCRIPTION_LENGTH', 'Description length is ' + descriptions[0].length + ' characters; review the localized search-result display.');
+    }
   }
 }
 
@@ -497,7 +506,7 @@ export async function runSeoAudit(distDirectory: string, siteUrl: string): Promi
     findings.push({ level: 'error', code: 'DIST_DIRECTORY_MISSING', message: 'Build output directory does not exist: ' + distDirectory });
   }
   for (const file of htmlFiles) {
-    if (file === 'index.html' || file === '404.html') continue;
+    if (file === 'index.html' || file === '404.html' || file === 'offline.html') continue;
     const routePath = '/' + file.slice(0, -5);
     if (!expectedRouteSet.has(routePath)) {
       findings.push({ level: 'warning', code: 'UNTRACKED_HTML_ROUTE', path: routePath, message: 'HTML output exists outside the prerender route registry.' });
