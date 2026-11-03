@@ -984,3 +984,20 @@ main textarea, main select {
 @media(prefers-reduced-motion:reduce) {
   .ulx-site-shell * { scroll-behavior:auto!important; transition-duration:.01ms!important; animation-duration:.01ms!important; }
 }
+
+
+/* Keep the reference hero decoration inside narrow viewport bounds. */
+@media(max-width:767px) {
+  .ulx-site-shell .ul-hero-grid:before {
+    inset:0 -4px;
+    border-radius:0 0 34px 34px;
+  }
+  .ulx-site-shell .ul-hero-grid:after {
+    right:-8px;
+    width:88px;
+    height:70px;
+  }
+}
+@media(max-width:390px) {
+  .ulx-site-shell .ul-hero-grid:before { inset:0; }
+}
