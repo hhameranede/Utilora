@@ -47,7 +47,7 @@ jobs:
     if: ${{ inputs.dispatch_probe != 'true' }}
     name: ${{ matrix.agent }}
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 12
     strategy:
       fail-fast: false
       max-parallel: 3
