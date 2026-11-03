@@ -18,7 +18,7 @@ test('every tool guide captures its real rendered workspace and shows annotated 
     const targetCount = Number(await annotations.getAttribute('data-guide-target-count'));
     if (tool.slug === 'video-downloader') {
       expect(targetCount, 'preview-only downloader guide must not invent workspace controls').toBe(0);
-      await expect(page.getByText(/Preview only/i).first()).toBeVisible();
+      await expect(page.getByRole('heading', { name: 'This tool is in preview' })).toBeVisible();
     } else {
       expect(targetCount, tool.slug + ' guide should point to real workspace controls').toBeGreaterThanOrEqual(1);
     }
