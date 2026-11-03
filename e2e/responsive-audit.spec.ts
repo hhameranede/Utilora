@@ -134,3 +134,36 @@ test('shared page templates remain aligned across mobile, tablet and desktop', a
     }
   }
 });
+
+
+test('homepage popular tool names are readable on narrow mobile screens in every locale', async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 800 });
+  for (const locale of ['ar', 'en', 'fr', 'es', 'pt', 'hi', 'zh', 'bn']) {
+    await page.goto('/' + locale, { waitUntil: 'domcontentloaded' });
+    const cards = page.locator('#quick-tools .ul-tool-card');
+    await expect(cards).toHaveCount(6);
+    const titleMetrics = await page.locator('#quick-tools .ul-tool-card h4').evaluateAll((titles) =>
+      titles.map((node) => {
+        const element = node as HTMLElement;
+        const style = getComputedStyle(element);
+        return {
+          text: element.textContent?.trim() || '',
+          clientWidth: element.clientWidth,
+          scrollWidth: element.scrollWidth,
+          whiteSpace: style.whiteSpace,
+          textOverflow: style.textOverflow,
+          lineHeight: parseFloat(style.lineHeight) || 0,
+          height: element.getBoundingClientRect().height,
+        };
+      }),
+    );
+    for (const metric of titleMetrics) {
+      expect(metric.text, locale + ' tool title must not be empty').not.toBe('');
+      expect(metric.clientWidth, locale + ' title must have usable width').toBeGreaterThan(100);
+      expect(metric.whiteSpace, locale + ' title must wrap instead of staying on one line').not.toBe('nowrap');
+      expect(metric.textOverflow, locale + ' title must not use an ellipsis').not.toBe('ellipsis');
+      expect(metric.scrollWidth, locale + ' title width must fit its content box').toBeLessThanOrEqual(metric.clientWidth + 1);
+    }
+    await expectNoHorizontalOverflow(page, '/' + locale, 360);
+  }
+});
