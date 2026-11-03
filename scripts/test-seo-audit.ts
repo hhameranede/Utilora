@@ -99,7 +99,7 @@ test('uses localized length guidance and skips non-indexable documents', () => {
   const chineseOrigin = 'https://example.test';
   const chineseHtml = '<html lang="zh" dir="ltr"><head>' +
     '<title>在线图像压缩工具</title>' +
-    '<meta name="description" content="快速压缩图像并调整质量。" />' +
+    '<meta name="description" content="快速压缩图像文件，调整输出质量，并比较压缩前后的文件大小。" />' +
     '<meta name="robots" content="index, follow" />' +
     '<link rel="canonical" href="' + chineseOrigin + '/zh/image-compressor" />' +
     '<link rel="alternate" hreflang="en" href="' + chineseOrigin + '/en/image-compressor" />' +
