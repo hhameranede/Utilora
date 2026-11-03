@@ -52,7 +52,7 @@ test('the production sitemap is complete, canonical, and XML-structured', async 
 
   const urlBlocks = [...sitemap.matchAll(/<url>([\s\S]*?)<\/url>/g)].map((match) => match[1]);
   // 8 locales × (home, two directory indexes, 6 categories, 35 tools,
-  // 35 guides, 6 workflow routes, and 6 informational/legal pages) = 736 URLs.
+  // 35 guides, 7 workflow routes, and 6 informational/legal pages) = 736 URLs.
   expect(urlBlocks).toHaveLength(736);
 
   const locations = urlBlocks.map((block) => {

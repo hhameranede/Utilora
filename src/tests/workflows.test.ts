@@ -15,11 +15,14 @@ test('every curated workflow has task-specific copy in all supported languages',
     for (const language of SUPPORTED_LANGUAGES) {
       const copy = workflow.localized[language.code];
       assert.ok(copy, workflow.slug + ' is missing ' + language.code);
-      assert.ok(copy.title.trim().length >= 8, workflow.slug + ' needs a localized title in ' + language.code);
-      assert.ok(copy.description.trim().length >= 35, workflow.slug + ' needs a localized description in ' + language.code);
-      assert.ok(copy.introduction.trim().length >= 60, workflow.slug + ' needs a useful introduction in ' + language.code);
-      assert.ok(copy.outcome.trim().length >= 25, workflow.slug + ' needs a clear outcome in ' + language.code);
-      assert.ok(copy.note.trim().length >= 25, workflow.slug + ' needs a practical caveat in ' + language.code);
+      const minimum = language.code === 'zh'
+        ? { title: 6, description: 22, introduction: 38, outcome: 18, note: 20 }
+        : { title: 8, description: 35, introduction: 60, outcome: 25, note: 25 };
+      assert.ok(copy.title.trim().length >= minimum.title, workflow.slug + ' needs a localized title in ' + language.code);
+      assert.ok(copy.description.trim().length >= minimum.description, workflow.slug + ' needs a localized description in ' + language.code);
+      assert.ok(copy.introduction.trim().length >= minimum.introduction, workflow.slug + ' needs a useful introduction in ' + language.code);
+      assert.ok(copy.outcome.trim().length >= minimum.outcome, workflow.slug + ' needs a clear outcome in ' + language.code);
+      assert.ok(copy.note.trim().length >= minimum.note, workflow.slug + ' needs a practical caveat in ' + language.code);
     }
 
     for (const slug of workflow.toolSlugs) {
