@@ -21,11 +21,11 @@ export const FeaturedToolCard: React.FC<FeaturedToolCardProps> = ({ tool, classN
 
   return (
     <div
-      className={`ul-featured-tool-card p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-white via-white to-orange-50/40 border border-stone-200/90 hover:border-orange-300 transition-all flex flex-col justify-between shadow-xs hover:shadow-md relative group ${className}`}
+      data-ul-category={tool.category} className={`ul-featured-tool-card p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-white via-white to-orange-50/40 border border-stone-200/90 hover:border-orange-300 transition-all flex flex-col justify-between shadow-xs hover:shadow-md relative group ${className}`}
     >
       <div>
         <div className="flex items-center justify-between gap-3 mb-6">
-          <div className="w-12 h-12 rounded-2xl bg-orange-50 border border-orange-100 flex items-center justify-center text-orange-700 shadow-xs">
+          <div className="ul-tool-icon w-12 h-12 rounded-2xl bg-orange-50 border border-orange-100 flex items-center justify-center text-orange-700 shadow-xs">
             <Icon name={tool.icon} size={24} />
           </div>
 
