@@ -74,7 +74,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, className = '', varian
         </div>
 
         {/* Title */}
-        <h3 className="text-sm font-semibold text-stone-900 group-hover:text-orange-700 transition-colors mb-1.5">
+        <h3 className="ul-tool-card-title text-sm font-semibold text-stone-900 group-hover:text-orange-700 transition-colors mb-1.5">
           {name}
         </h3>
 
