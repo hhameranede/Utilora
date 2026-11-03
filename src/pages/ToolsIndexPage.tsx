@@ -29,7 +29,7 @@ export const ToolsIndexPage: React.FC = () => {
         isIndexable={true}
       />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 sm:space-y-8">
+      <div className="ul-content-page max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 sm:space-y-8">
         <Breadcrumbs items={[{ label: t('nav.tools') }]} />
 
         <div>
