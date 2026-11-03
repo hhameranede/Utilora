@@ -20,7 +20,7 @@ jobs:
       startsWith(github.event.comment.body, '/team ')
     name: "${{ matrix.agent }}"
     runs-on: ubuntu-latest
-    timeout-minutes: 11
+    timeout-minutes: 13
     strategy:
       fail-fast: false
       max-parallel: 2
@@ -155,7 +155,7 @@ jobs:
           print("Verified: specialist has repository read access and no write, shell, delegation or external-web permissions.")
           PY
 
-      - name: Ask specialist
+      - name: Ask specialist with bounded same-session recovery
         env:
           NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
           AGENT_NAME: ${{ matrix.agent }}
@@ -167,69 +167,11 @@ jobs:
             echo "::error::Repository Actions secret NVIDIA_API_KEY is missing."
             exit 1
           fi
-          PROMPT="$(cat .agent-chat/current-prompt.txt)"
-          set +e
-          timeout --signal=TERM --kill-after=20s 7m opencode run --dir "$GITHUB_WORKSPACE" --agent "$AGENT_NAME" --model "$MODEL" --format json "$PROMPT" > "$RUNNER_TEMP/agent-events.jsonl" 2> "$RUNNER_TEMP/agent-debug.txt"
-          opencode_exit=$?
-          set -e
-          export OPENCODE_EXIT_CODE="$opencode_exit"
-          python3 - <<'PY'
-          import json, os, pathlib, re, subprocess, sys
-          sys.path.insert(0, str(pathlib.Path(os.environ["GITHUB_WORKSPACE"]) / "scripts"))
-          from opencode_smoke import extract_final_assistant_text
-          temp = pathlib.Path(os.environ["RUNNER_TEMP"])
-          raw = (temp / "agent-events.jsonl").read_text(encoding="utf-8", errors="replace")
-          debug = (temp / "agent-debug.txt").read_text(encoding="utf-8", errors="replace")
-          session = ""
-          for line in raw.splitlines():
-              try:
-                  event = json.loads(line)
-              except json.JSONDecodeError:
-                  continue
-              if isinstance(event, dict):
-                  part = event.get("part") or {}
-                  if isinstance(part, dict):
-                      session = session or event.get("sessionID") or part.get("sessionID", "")
-                  session = session or event.get("sessionID", "")
-          answer, finish, export_status, export_text = "", "missing", "missing-session", ""
-          if session:
-              try:
-                  result = subprocess.run(
-                      ["opencode", "export", session, "--sanitize"],
-                      capture_output=True, text=True, timeout=60
-                  )
-                  export_status, export_text = str(result.returncode), result.stdout or ""
-                  if result.returncode == 0:
-                      transcript = json.loads(export_text)
-                      answer = extract_final_assistant_text(transcript)
-                      for message in reversed(transcript.get("messages", [])):
-                          if not isinstance(message, dict):
-                              continue
-                          info = message.get("info") or {}
-                          if isinstance(info, dict) and (info.get("role") == "assistant" or message.get("role") == "assistant"):
-                              finish = info.get("finish") or message.get("finish") or "missing"
-                              break
-              except Exception as error:
-                  export_status = type(error).__name__
-          secret = os.environ.get("NVIDIA_API_KEY", "")
-          combined = raw + "\n" + debug + "\n" + export_text + "\n" + answer
-          if (secret and secret in combined) or re.search(r"(?i)nvapi-[A-Za-z0-9_-]{12,}|gh[pousr]_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}", combined):
-              pathlib.Path(temp, os.environ["AGENT_NAME"] + ".md").write_text(
-                  "The specialist response was suppressed because credential-like output was detected.\n",
-                  encoding="utf-8"
-              )
-              print("::error::Credential-like output detected; details suppressed.")
-              sys.exit(1)
-          report = answer.strip() if answer.strip() and finish == "stop" else (
-              "The specialist did not return a complete final answer. "
-              f"OpenCode exit={os.environ.get('OPENCODE_EXIT_CODE')}; "
-              f"session export={export_status}; finish={finish}."
-          )
-          pathlib.Path(temp, os.environ["AGENT_NAME"] + ".md").write_text(report + "\n", encoding="utf-8")
-          print(f"Captured {os.environ['AGENT_NAME']} response; finish={finish}; export={export_status}.")
-          if int(os.environ.get("OPENCODE_EXIT_CODE", "1")) != 0 or finish != "stop" or not answer.strip():
-              sys.exit(1)
-          PY
+          python3 scripts/run_opencode_agent.py \
+            --agent "$AGENT_NAME" \
+            --model "$MODEL" \
+            --prompt-file .agent-chat/current-prompt.txt \
+            --output-file "$RUNNER_TEMP/${AGENT_NAME}.md"
 
       - name: Upload specialist response
         if: always()
@@ -248,7 +190,7 @@ jobs:
       startsWith(github.event.comment.body, '/team ')
     needs: specialists
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 13
     steps:
       - name: Check out the default branch
         uses: actions/checkout@v4
@@ -337,7 +279,7 @@ jobs:
           print("Verified: Project Lead synthesis is read-only and cannot delegate.")
           PY
 
-      - name: Synthesize the team discussion
+      - name: Synthesize the team discussion with bounded session recovery
         continue-on-error: true
         env:
           NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
@@ -348,49 +290,11 @@ jobs:
             echo "::error::Repository Actions secret NVIDIA_API_KEY is missing."
             exit 1
           fi
-          PROMPT="$(cat .agent-chat/lead-prompt.txt)"
-          set +e
-          timeout --signal=TERM --kill-after=20s 7m opencode run --dir "$GITHUB_WORKSPACE" --agent project-lead --model nvidia-nim/nemotron-ultra --format json "$PROMPT" > "$RUNNER_TEMP/lead-events.jsonl" 2> "$RUNNER_TEMP/lead-debug.txt"
-          opencode_exit=$?
-          set -e
-          export OPENCODE_EXIT_CODE="$opencode_exit"
-          python3 - <<'PY'
-          import json, os, pathlib, re, subprocess, sys
-          sys.path.insert(0, str(pathlib.Path(os.environ["GITHUB_WORKSPACE"]) / "scripts"))
-          from opencode_smoke import extract_final_assistant_text
-          temp = pathlib.Path(os.environ["RUNNER_TEMP"])
-          raw = (temp / "lead-events.jsonl").read_text(encoding="utf-8", errors="replace")
-          debug = (temp / "lead-debug.txt").read_text(encoding="utf-8", errors="replace")
-          session = ""
-          for line in raw.splitlines():
-              try:
-                  event = json.loads(line)
-              except json.JSONDecodeError:
-                  continue
-              if isinstance(event, dict):
-                  part = event.get("part") or {}
-                  if isinstance(part, dict):
-                      session = session or event.get("sessionID") or part.get("sessionID", "")
-                  session = session or event.get("sessionID", "")
-          answer, export_text = "", ""
-          if session:
-              try:
-                  result = subprocess.run(["opencode", "export", session, "--sanitize"], capture_output=True, text=True, timeout=60)
-                  export_text = result.stdout or ""
-                  if result.returncode == 0:
-                      answer = extract_final_assistant_text(json.loads(export_text))
-              except Exception:
-                  answer = ""
-          secret = os.environ.get("NVIDIA_API_KEY", "")
-          combined = raw + "\n" + debug + "\n" + export_text + "\n" + answer
-          if (secret and secret in combined) or re.search(r"(?i)nvapi-[A-Za-z0-9_-]{12,}|gh[pousr]_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}", combined):
-              answer = "Project Lead synthesis was suppressed after credential-like output was detected."
-              print("::error::Credential-like output detected; synthesis suppressed.")
-          if not answer.strip():
-              answer = "Project Lead could not synthesize this run. Open the Actions run for details."
-          pathlib.Path(temp, "team-answer.md").write_text(answer.strip() + "\n", encoding="utf-8")
-          print(f"Project Lead synthesis captured; OpenCode exit={os.environ.get('OPENCODE_EXIT_CODE')}.")
-          PY
+          python3 scripts/run_opencode_agent.py \
+            --agent project-lead \
+            --model nvidia-nim/nemotron-ultra \
+            --prompt-file .agent-chat/lead-prompt.txt \
+            --output-file "$RUNNER_TEMP/team-answer.md"
 
       - name: Upload final answer
         if: always()
