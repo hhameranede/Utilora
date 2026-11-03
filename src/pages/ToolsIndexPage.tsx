@@ -43,8 +43,17 @@ export const ToolsIndexPage: React.FC = () => {
 
         {/* Filter Controls Bar */}
         <div className="p-3 sm:p-4 rounded-2xl bg-white border border-stone-200/90 shadow-xs flex flex-col md:flex-row items-center justify-between gap-3 sm:gap-4">
-          {/* Category Filter Tabs */}
-          <div role="group" aria-label={t('nav.categories')} className="min-w-0 max-w-full flex items-center gap-2 overflow-x-auto overscroll-x-contain w-full md:w-auto p-1.5 bg-stone-50 border border-stone-200 rounded-2xl" style={{ scrollbarWidth: 'thin' }}>
+          {/* Compact category selector for touch screens */}
+          <div className="w-full md:hidden">
+            <label htmlFor="tools-category-mobile" className="mb-1.5 block text-xs font-semibold text-stone-600">{t('nav.categories')}</label>
+            <select id="tools-category-mobile" value={selectedCategory} onChange={(event) => setSelectedCategory(event.target.value)} className="min-h-11 w-full rounded-xl border border-stone-200 bg-white px-3 text-sm font-semibold text-stone-800 shadow-xs focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/20">
+              <option value="all">{t('common.all')} (36)</option>
+              {CATEGORIES_LIST.map((cat) => <option key={cat.id} value={cat.id}>{cat.localizedTitle[locale] || cat.localizedTitle.en}</option>)}
+            </select>
+          </div>
+
+          {/* Category Filter Tabs — wider screens */}
+          <div role="group" aria-label={t('nav.categories')} className="hidden md:flex min-w-0 max-w-full items-center gap-2 overflow-x-auto overscroll-x-contain w-full md:w-auto p-1.5 bg-stone-50 border border-stone-200 rounded-2xl" style={{ scrollbarWidth: 'thin' }}>
             <button
               onClick={() => setSelectedCategory('all')}
               aria-pressed={selectedCategory === 'all'}
@@ -93,7 +102,7 @@ export const ToolsIndexPage: React.FC = () => {
             {t('common.noResults')}
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4">
+          <div className="grid grid-cols-1 min-[380px]:grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4">
             {filteredTools.map((tool) => (
               <ToolCard key={tool.id} tool={tool} />
             ))}

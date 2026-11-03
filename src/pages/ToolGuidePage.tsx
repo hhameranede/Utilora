@@ -253,7 +253,7 @@ export const ToolGuidePage: React.FC<ToolGuidePageProps> = ({ toolSlug }) => {
         isIndexable={guideIsIndexable}
       />
 
-      <div className="ul-content-page mx-auto max-w-7xl space-y-8 px-4 sm:px-6 lg:px-8">
+      <div className="ul-content-page mx-auto max-w-7xl space-y-6 px-3 sm:space-y-8 sm:px-6 lg:px-8">
         <Breadcrumbs items={[
           { label: t('nav.tools'), routeType: 'tools-index' },
           { label: categoryName, routeType: 'category', slug: tool.category },
@@ -288,60 +288,51 @@ export const ToolGuidePage: React.FC<ToolGuidePageProps> = ({ toolSlug }) => {
               <Camera size={15} className="text-orange-700" />
               {t('guide.screenshotTitle')}
             </div>
-            <span className="text-xs text-stone-500">{t('guide.screenshotCaption')}</span>
+            <span className="hidden text-xs text-stone-500 sm:inline">{t('guide.screenshotCaption')}</span>
           </div>
 
           <div className="relative bg-[#fafaf9] p-2 sm:p-5">
-            {screenshot ? (
-              <div className="relative mx-auto max-w-[1080px] overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
-                <img data-guide-screenshot src={screenshot} alt={t('guide.screenshotAlt').replace('{tool}', toolName)} className="block h-auto w-full" />
-                <svg
-                  data-guide-annotations
-                  data-guide-target-count={annotationTargets.length}
-                  viewBox={`0 0 ${GUIDE_CAPTURE_WIDTH} ${annotationHeight}`}
-                  preserveAspectRatio="none"
-                  className="pointer-events-none absolute inset-0 h-full w-full"
-                  aria-hidden="true"
-                >
-                  <defs>
-                    <marker id="guide-arrow-head" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto">
-                      <path d="M0,0 L8,4 L0,8 Z" fill="#f97316" />
-                    </marker>
-                  </defs>
-                  {annotationTargets.map((target, index) => {
-                    const startX = target.x >= GUIDE_CAPTURE_WIDTH / 2 ? GUIDE_CAPTURE_WIDTH - 34 : 34;
-                    const startY = Math.max(34, Math.min(annotationHeight - 34, target.y + (index - 1) * 64));
-                    const controlX = (startX + target.x) / 2;
-                    return (
-                      <g key={index} data-guide-target={index + 1}>
-                        <path
-                          d={`M ${startX} ${startY} Q ${controlX} ${startY} ${target.x} ${target.y}`}
-                          fill="none"
-                          stroke="#f97316"
-                          strokeWidth="5"
-                          strokeLinecap="round"
-                          markerEnd="url(#guide-arrow-head)"
-                        />
-                        <circle cx={target.x} cy={target.y} r="35" fill="#f97316" fillOpacity=".13" stroke="#f97316" strokeWidth="5" />
-                        <circle cx={target.x} cy={target.y} r="23" fill="#ffffff" stroke="#f97316" strokeWidth="5" />
-                        <text x={target.x} y={target.y + 10} fill="#c2410c" fontFamily="Arial,sans-serif" fontSize="27" fontWeight="700" textAnchor="middle">{index + 1}</text>
-                      </g>
-                    );
-                  })}
-                </svg>
+            <div className="rounded-2xl border border-stone-200 bg-white p-3 shadow-sm md:hidden">
+              <div className="mb-3 flex items-center gap-2 rounded-xl bg-orange-50 px-3 py-2 text-xs font-semibold text-orange-800">
+                <span className="h-2 w-2 rounded-full bg-orange-600" aria-hidden="true" />
+                {t('guide.liveWorkspace')}
               </div>
-            ) : captureError ? (
-              <div className="rounded-2xl border border-orange-200 bg-white p-5 text-center">
-                <p className="text-sm font-semibold text-stone-800">{t('guide.captureUnavailable')}</p>
-                <p className="mt-1 text-xs text-stone-500">{t('guide.liveWorkspace')}</p>
-                <div className="mt-5 text-start"><ToolWorkspaceResolver tool={tool} /></div>
-              </div>
-            ) : (
-              <div className="flex min-h-72 items-center justify-center gap-3 rounded-2xl border border-stone-200 bg-white text-xs text-stone-500" role="status">
-                <LoaderCircle size={17} className="animate-spin text-orange-500" />
-                {t('guide.captureLoading')}
-              </div>
-            )}
+              <ToolWorkspaceResolver tool={tool} />
+            </div>
+            <div className="hidden md:block">
+              {screenshot ? (
+                <div className="relative mx-auto max-w-[1080px] overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
+                  <img data-guide-screenshot src={screenshot} alt={t('guide.screenshotAlt').replace('{tool}', toolName)} className="block h-auto w-full" />
+                  <svg data-guide-annotations data-guide-target-count={annotationTargets.length} viewBox={`0 0 ${GUIDE_CAPTURE_WIDTH} ${annotationHeight}`} preserveAspectRatio="none" className="pointer-events-none absolute inset-0 h-full w-full" aria-hidden="true">
+                    <defs><marker id="guide-arrow-head" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#f97316" /></marker></defs>
+                    {annotationTargets.map((target, index) => {
+                      const startX = target.x >= GUIDE_CAPTURE_WIDTH / 2 ? GUIDE_CAPTURE_WIDTH - 34 : 34;
+                      const startY = Math.max(34, Math.min(annotationHeight - 34, target.y + (index - 1) * 64));
+                      const controlX = (startX + target.x) / 2;
+                      return (
+                        <g key={index} data-guide-target={index + 1}>
+                          <path d={`M ${startX} ${startY} Q ${controlX} ${startY} ${target.x} ${target.y}`} fill="none" stroke="#f97316" strokeWidth="5" strokeLinecap="round" markerEnd="url(#guide-arrow-head)" />
+                          <circle cx={target.x} cy={target.y} r="35" fill="#f97316" fillOpacity=".13" stroke="#f97316" strokeWidth="5" />
+                          <circle cx={target.x} cy={target.y} r="23" fill="#ffffff" stroke="#f97316" strokeWidth="5" />
+                          <text x={target.x} y={target.y + 10} fill="#c2410c" fontFamily="Arial,sans-serif" fontSize="27" fontWeight="700" textAnchor="middle">{index + 1}</text>
+                        </g>
+                      );
+                    })}
+                  </svg>
+                </div>
+              ) : captureError ? (
+                <div className="rounded-2xl border border-orange-200 bg-white p-5 text-center">
+                  <p className="text-sm font-semibold text-stone-800">{t('guide.captureUnavailable')}</p>
+                  <p className="mt-1 text-xs text-stone-500">{t('guide.liveWorkspace')}</p>
+                  <div className="mt-5 text-start"><ToolWorkspaceResolver tool={tool} /></div>
+                </div>
+              ) : (
+                <div className="flex min-h-72 items-center justify-center gap-3 rounded-2xl border border-stone-200 bg-white text-xs text-stone-500" role="status">
+                  <LoaderCircle size={17} className="animate-spin text-orange-500" />
+                  {t('guide.captureLoading')}
+                </div>
+              )}
+            </div>
           </div>
           <div className="grid grid-cols-1 gap-3 border-t border-stone-200 p-4 sm:grid-cols-3 sm:p-5">
             {steps.map((step, index) => (
