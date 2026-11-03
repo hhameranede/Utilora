@@ -127,7 +127,7 @@ test('shared page templates remain aligned across mobile, tablet and desktop', a
         icons.filter((icon) => {
           const rect = icon.getBoundingClientRect();
           const style = getComputedStyle(icon);
-          return element.getClientRects().length > 0 && style.display !== 'none' && style.visibility !== 'hidden' && (rect.width < 1 || rect.height < 1);
+          return icon.getClientRects().length > 0 && style.display !== 'none' && style.visibility !== 'hidden' && (rect.width < 1 || rect.height < 1);
         }).length,
       );
       expect(brokenIcons, route + ' has SVG icons with zero-sized boxes at ' + size.width + 'px').toBe(0);
