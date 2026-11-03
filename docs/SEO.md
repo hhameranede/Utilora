@@ -34,6 +34,20 @@ The current sitemap contains 680 unique, indexable URLs across eight locales. It
 
 When `SITE_URL` is omitted, the build does not guess a domain: stale sitemap output is removed, a robots file is still generated without a sitemap directive, and a warning is printed. The Vite HTML transform also removes social-image tags that would otherwise contain an unresolved domain placeholder. Configure the real domain in the production build environment.
 
+## Automated build-output audit
+
+The repository includes a dependency-free sitemap parser and a generated-site auditor:
+
+```bash
+SITE_URL=https://utilora.l.cd npm run build
+SITE_URL=https://utilora.l.cd npm run seo:audit
+npm run test:seo-audit
+```
+
+The audit compares the generated sitemap with the route registry, validates XML structure and URL uniqueness, verifies reciprocal hreflang links for all supported locales plus `x-default`, and checks that sitemap URLs have prerendered HTML files. It also checks each prerendered route for a unique title and description, robots directive, canonical URL, locale and text direction, hreflang set, Open Graph URL, JSON-LD validity, and server-rendered page content. Preview-only and sample article routes must remain `noindex, nofollow`; the generated 404 page must not contain a canonical URL or inherited homepage JSON-LD.
+
+Warnings identify review opportunities such as title/description length (using broader guidance for CJK locales and excluding non-indexable pages) and missing per-language SEO title or description entries. Errors fail the CI job. The JSON and Markdown reports are written to `.artifacts/seo-audit/` and uploaded by the quality workflow. This is a build-output check; it does not replace live HTTP checks for deployed status codes, response headers, or search-engine indexing.
+
 ## Runtime metadata
 
 `src/seo/Head.tsx` applies route metadata through `useEffect`:
