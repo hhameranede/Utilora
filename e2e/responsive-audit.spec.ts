@@ -96,3 +96,41 @@ test('all eight locales keep a tool workspace readable on a narrow mobile viewpo
     await expectNoHorizontalOverflow(page, route, 360);
   }
 });
+
+
+test('shared page templates remain aligned across mobile, tablet and desktop', async ({ page }) => {
+  test.setTimeout(120_000);
+  const routes = [
+    '/ar', '/en', '/fr', '/es', '/pt', '/hi', '/zh', '/bn',
+    '/en/tools', '/ar/tools',
+    '/en/categories/image', '/ar/categories/image',
+    '/en/tools/image-cropper', '/ar/tools/image-cropper',
+    '/en/tools/image-cropper/how-to', '/ar/tools/image-cropper/how-to',
+    '/en/articles', '/ar/articles',
+    '/en/articles/png-vs-webp-compression-performance',
+    '/en/privacy', '/ar/privacy',
+  ];
+  const sizes = [
+    { width: 360, height: 800 },
+    { width: 768, height: 1024 },
+    { width: 1440, height: 1000 },
+  ];
+
+  for (const size of sizes) {
+    await page.setViewportSize(size);
+    for (const route of routes) {
+      await page.goto(route, { waitUntil: 'domcontentloaded' });
+      await expect(page.locator('main')).toBeVisible();
+      await expectNoHorizontalOverflow(page, route, size.width);
+
+      const brokenIcons = await page.locator('svg').evaluateAll((icons) =>
+        icons.filter((icon) => {
+          const rect = icon.getBoundingClientRect();
+          const style = getComputedStyle(icon);
+          return style.display !== 'none' && (rect.width < 1 || rect.height < 1);
+        }).length,
+      );
+      expect(brokenIcons, route + ' has SVG icons with zero-sized boxes at ' + size.width + 'px').toBe(0);
+    }
+  }
+});
