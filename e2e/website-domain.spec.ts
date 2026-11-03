@@ -135,7 +135,7 @@ test('DNS lookup keeps successful records visible when one selected record type 
   await page.goto('/en/tools/dns-lookup');
   await page.getByRole('button', { name: 'Look up records' }).click();
 
-  await expect(page.getByRole('status')).toContainText('DNS results');
+  await expect(page.locator('[role="status"]').filter({ hasText: 'DNS results for example.com' })).toBeVisible();
   await expect(page.getByText('93.184.216.34')).toBeVisible();
   await expect(page.getByText(/TXT: TXT resolver temporarily unavailable/)).toBeVisible();
 });
