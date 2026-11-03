@@ -5,7 +5,7 @@ import sys
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from opencode_smoke import extract_final_assistant_text, extract_latest_assistant_state
-from run_opencode_agent import build_run_args, contains_credential, find_session_id
+from unittest.mock import patch\n\nimport run_opencode_agent\nfrom run_opencode_agent import build_run_args, contains_credential, find_session_id, run_agent
 
 
 class OpenCodeSmokeParserTests(unittest.TestCase):
@@ -133,6 +133,45 @@ class OpenCodeRunnerTests(unittest.TestCase):
     def test_rejects_credential_like_diagnostics(self):
         self.assertTrue(contains_credential("provider returned nvapi-abcdefghijklmnop"))
         self.assertFalse(contains_credential("No credentials were present."))
+
+    def test_resumes_the_same_session_after_an_incomplete_tool_call(self):
+        initial_stdout = '{"sessionID":"session-789"}\\n'
+        command_results = [
+            {"exit": 0, "timed_out": False, "overflow": False, "stdout": initial_stdout, "stderr": ""},
+            {"exit": 0, "timed_out": False, "overflow": False, "stdout": "", "stderr": ""},
+        ]
+        export_results = [
+            ("0", "tool-calls", "Partial inspection."),
+            ("0", "stop", "Completed specialist report."),
+        ]
+        with patch.object(run_opencode_agent, "_run_command", side_effect=command_results) as command, \\
+             patch.object(run_opencode_agent, "_export_state", side_effect=export_results):
+            success, report = run_agent("/workspace", "qa-engineer", "model-x", "Inspect the project.")
+
+        self.assertTrue(success)
+        self.assertEqual(report, "Completed specialist report.\\n")
+        self.assertEqual(command.call_count, 2)
+        recovery_args = command.call_args_list[1].args[0]
+        self.assertEqual(recovery_args[recovery_args.index("--session") + 1], "session-789")
+
+    def test_keeps_incomplete_results_as_diagnostics_not_success(self):
+        initial_stdout = '{"sessionID":"session-999"}\\n'
+        command_results = [
+            {"exit": 124, "timed_out": True, "overflow": False, "stdout": initial_stdout, "stderr": ""},
+            {"exit": 124, "timed_out": True, "overflow": False, "stdout": "", "stderr": ""},
+        ]
+        export_results = [
+            ("0", "tool-calls", "Draft only."),
+            ("0", "tool-calls", "Draft only."),
+        ]
+        with patch.object(run_opencode_agent, "_run_command", side_effect=command_results), \\
+             patch.object(run_opencode_agent, "_export_state", side_effect=export_results):
+            success, report = run_agent("/workspace", "qa-engineer", "model-x", "Inspect the project.")
+
+        self.assertFalse(success)
+        self.assertIn("Recovery attempted: true", report)
+        self.assertIn("Latest assistant finish: tool-calls", report)
+        self.assertIn("Partial visible draft (not a completed response)", report)
 
 
 if __name__ == "__main__":
