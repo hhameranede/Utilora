@@ -85,3 +85,37 @@ test('detects duplicate canonicals and incorrect robots directives', () => {
   assert.ok(findings.some((finding) => finding.code === 'HTML_CANONICAL_COUNT'));
   assert.ok(findings.some((finding) => finding.code === 'HTML_ROBOTS_MISMATCH'));
 });
+
+test('uses localized length guidance and skips non-indexable documents', () => {
+  const noindexFindings: AuditFinding[] = [];
+  auditHtmlDocument(validHtml().replace('index, follow','noindex, nofollow'), {
+    siteOrigin: origin,
+    routePath: '/en/example',
+    locales,
+    indexable: false,
+  }, noindexFindings);
+  assert.equal(noindexFindings.some((finding) => finding.code === 'HTML_TITLE_LENGTH' || finding.code === 'HTML_DESCRIPTION_LENGTH'), false);
+
+  const chineseOrigin = 'https://example.test';
+  const chineseHtml = '<html lang="zh" dir="ltr"><head>' +
+    '<title>在线图像压缩工具</title>' +
+    '<meta name="description" content="快速压缩图像并调整质量。" />' +
+    '<meta name="robots" content="index, follow" />' +
+    '<link rel="canonical" href="' + chineseOrigin + '/zh/image-compressor" />' +
+    '<link rel="alternate" hreflang="en" href="' + chineseOrigin + '/en/image-compressor" />' +
+    '<link rel="alternate" hreflang="zh" href="' + chineseOrigin + '/zh/image-compressor" />' +
+    '<link rel="alternate" hreflang="x-default" href="' + chineseOrigin + '/en/image-compressor" />' +
+    '<meta property="og:url" content="' + chineseOrigin + '/zh/image-compressor" />' +
+    '<meta property="og:image" content="' + chineseOrigin + '/og-utilora.svg" />' +
+    '<meta name="twitter:card" content="summary_large_image" />' +
+    '<script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication"}</script>' +
+    '</head><body><div id="root"><main><h1>工具</h1><p>内容</p></main></div></body></html>';
+  const chineseFindings: AuditFinding[] = [];
+  auditHtmlDocument(chineseHtml, {
+    siteOrigin: chineseOrigin,
+    routePath: '/zh/image-compressor',
+    locales: ['en', 'zh'],
+    indexable: true,
+  }, chineseFindings);
+  assert.equal(chineseFindings.some((finding) => finding.code === 'HTML_TITLE_LENGTH' || finding.code === 'HTML_DESCRIPTION_LENGTH'), false);
+});
