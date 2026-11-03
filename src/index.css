@@ -205,7 +205,7 @@ header.sticky nav { gap: clamp(14px, 1.8vw, 26px); }
 header.sticky button, header.sticky a { white-space: nowrap; }
 header.sticky [aria-label] svg { width: 18px; height: 18px; }
 footer { margin-top: auto; }
-footer .max-w-7xl { width: min(100% - 2 * var(--ul-page-gutter), var(--ul-page-max)); }
+footer .max-w-7xl { width: min(calc(100% - var(--ul-page-gutter) - var(--ul-page-gutter)), var(--ul-page-max)); }
 
 /* Shared page frame: identical gutters and readable measure across templates. */
 .ul-content-page {
