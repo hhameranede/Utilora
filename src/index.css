@@ -1259,3 +1259,134 @@ main textarea, main select {
     transform:translateX(-50%);
   }
 }
+
+
+/* Mobile-first pass: readable measures, compact spacing, and contained workspaces. */
+@media (max-width: 767px) {
+  .ulx-site-shell .ul-home {
+    gap: 20px;
+  }
+  .ulx-site-shell .ul-hero-grid {
+    width: calc(100% - 24px);
+    padding-inline: 0;
+  }
+  .ulx-site-shell .ul-hero-copy {
+    max-width: 100%;
+  }
+  .ulx-site-shell .ul-hero-title {
+    max-width: 100%;
+    font-size: clamp(27px, 7.4vw, 34px);
+    line-height: 1.22;
+    text-wrap: balance;
+  }
+  .ulx-site-shell .ul-hero-description {
+    max-width: 34rem;
+    font-size: 12px;
+    line-height: 1.65;
+  }
+  .ulx-site-shell .ul-hero-visual {
+    min-width: 0;
+    max-width: 100%;
+  }
+  .ulx-site-shell .ul-home-section,
+  .ulx-site-shell .ul-trust-strip {
+    width: calc(100% - 24px);
+  }
+  .ulx-site-shell .ul-section-heading {
+    gap: 10px;
+    align-items: center;
+  }
+  .ulx-site-shell .ul-section-heading h2 {
+    font-size: clamp(17px, 4.8vw, 21px);
+  }
+  .ulx-site-shell .ul-section-heading p {
+    max-width: 30ch;
+    font-size: 11px;
+    line-height: 1.45;
+  }
+  .ulx-site-shell .ul-content-page {
+    width: calc(100% - 24px);
+    max-width: 100%;
+    padding-inline: 0;
+  }
+  .ulx-site-shell .ul-content-page > * {
+    min-width: 0;
+    max-width: 100%;
+  }
+  .ulx-site-shell .ul-content-page h1 {
+    max-width: 100%;
+    font-size: clamp(26px, 7vw, 34px);
+    line-height: 1.2;
+    letter-spacing: -.03em;
+    overflow-wrap: anywhere;
+  }
+  .ulx-site-shell .ul-content-page h2 {
+    font-size: clamp(17px, 4.8vw, 22px);
+  }
+  .ulx-site-shell .ul-content-page .ul-page-intro {
+    padding: 18px;
+    border-radius: 20px;
+  }
+  .ulx-site-shell .ul-content-page pre,
+  .ulx-site-shell .ul-content-page table,
+  .ulx-site-shell .ul-content-page .overflow-x-auto {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+  .ulx-site-shell .ul-content-page img,
+  .ulx-site-shell .ul-content-page video,
+  .ulx-site-shell .ul-content-page canvas {
+    max-width: 100%;
+  }
+  .ulx-site-shell .ul-content-page .sticky {
+    position: static;
+  }
+  .ulx-site-shell .ul-content-page .grid {
+    min-width: 0;
+  }
+}
+
+@media (max-width: 379px) {
+  .ulx-site-shell .ul-hero-grid {
+    gap: 2px;
+    padding-top: 8px;
+  }
+  .ulx-site-shell .ul-hero-title {
+    font-size: 26px;
+    line-height: 1.2;
+  }
+  .ulx-site-shell .ul-hero-description {
+    margin-block: 6px 9px;
+    font-size: 11px;
+  }
+  .ulx-site-shell .ul-hero-search {
+    min-height: 44px;
+    height: 44px;
+  }
+  .ulx-site-shell .ul-hero-search input {
+    height: 42px;
+    font-size: 11px;
+  }
+  .ulx-site-shell .ul-button-primary,
+  .ulx-site-shell .ul-button-secondary {
+    min-height: 38px;
+    padding-inline: 12px;
+    font-size: 11px;
+  }
+  .ulx-site-shell .ul-hero-visual {
+    min-height: 68px;
+    height: 68px;
+  }
+  .ulx-site-shell .ul-device {
+    transform: perspective(800px) rotateY(-3deg) scale(.34);
+  }
+  .ulx-site-shell #quick-tools .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .ulx-site-shell .ul-section-heading {
+    flex-wrap: wrap;
+  }
+}
