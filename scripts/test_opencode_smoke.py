@@ -124,7 +124,7 @@ class OpenCodeSmokeParserTests(unittest.TestCase):
 
 class OpenCodeRunnerTests(unittest.TestCase):
     def test_finds_session_id_from_jsonl_events(self):
-        raw = '{"type":"message.part.updated","part":{"sessionID":"session-123"}}\\n'
+        raw = '{"type":"message.part.updated","part":{"sessionID":"session-123"}}\n'
         self.assertEqual(find_session_id(raw), "session-123")
 
     def test_builds_non_interactive_same_session_recovery_command(self):
@@ -138,7 +138,7 @@ class OpenCodeRunnerTests(unittest.TestCase):
         self.assertFalse(contains_credential("No credentials were present."))
 
     def test_resumes_the_same_session_after_an_incomplete_tool_call(self):
-        initial_stdout = '{"sessionID":"session-789"}\\n'
+        initial_stdout = '{"sessionID":"session-789"}\n'
         command_results = [
             {"exit": 0, "timed_out": False, "overflow": False, "stdout": initial_stdout, "stderr": ""},
             {"exit": 0, "timed_out": False, "overflow": False, "stdout": "", "stderr": ""},
@@ -152,13 +152,13 @@ class OpenCodeRunnerTests(unittest.TestCase):
                 success, report = run_agent("/workspace", "qa-engineer", "model-x", "Inspect the project.")
 
         self.assertTrue(success)
-        self.assertEqual(report, "Completed specialist report.\\n")
+        self.assertEqual(report, "Completed specialist report.\n")
         self.assertEqual(command.call_count, 2)
         recovery_args = command.call_args_list[1].args[0]
         self.assertEqual(recovery_args[recovery_args.index("--session") + 1], "session-789")
 
     def test_keeps_incomplete_results_as_diagnostics_not_success(self):
-        initial_stdout = '{"sessionID":"session-999"}\\n'
+        initial_stdout = '{"sessionID":"session-999"}\n'
         command_results = [
             {"exit": 124, "timed_out": True, "overflow": False, "stdout": initial_stdout, "stderr": ""},
             {"exit": 124, "timed_out": True, "overflow": False, "stdout": "", "stderr": ""},
