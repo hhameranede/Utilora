@@ -18,7 +18,7 @@ export const NotFoundPage: React.FC = () => {
         isIndexable={false}
       />
 
-      <div className="max-w-3xl mx-auto px-4 py-16 text-center space-y-8">
+      <div className="ul-content-page max-w-3xl mx-auto px-4 py-16 text-center space-y-8">
         <div className="w-16 h-16 rounded-3xl bg-orange-50 border border-orange-100 mx-auto flex items-center justify-center text-orange-600 shadow-xs">
           <AlertCircle size={32} />
         </div>
