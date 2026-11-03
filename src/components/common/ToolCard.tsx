@@ -26,7 +26,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, className = '', varian
         routeType="tool"
         slug={tool.slug}
         scrollTo="tool-workspace"
-        className={`group p-3.5 rounded-xl bg-white hover:bg-orange-50/40 border border-stone-200/80 hover:border-orange-300 transition-all flex items-center justify-between gap-3 shadow-xs hover:shadow-sm ${className}`}
+        className={`ul-tool-card group p-3.5 rounded-xl bg-white hover:bg-orange-50/40 border border-stone-200/80 hover:border-orange-300 transition-all flex items-center justify-between gap-3 shadow-xs hover:shadow-sm ${className}`}
       >
         <div className="flex items-center gap-3 min-w-0">
           <div className="w-8 h-8 rounded-lg bg-orange-50 group-hover:bg-orange-700 flex items-center justify-center text-orange-700 group-hover:text-white shrink-0 transition-colors">
@@ -51,7 +51,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, className = '', varian
       routeType="tool"
       slug={tool.slug}
       scrollTo="tool-workspace"
-      className={`group p-5 rounded-2xl bg-white hover:bg-white border border-stone-200/80 hover:border-orange-300 transition-all flex flex-col justify-between relative shadow-xs hover:shadow-md hover:shadow-orange-500/5 ${className}`}
+      className={`ul-tool-card group p-5 rounded-2xl bg-white hover:bg-white border border-stone-200/80 hover:border-orange-300 transition-all flex flex-col justify-between relative shadow-xs hover:shadow-md hover:shadow-orange-500/5 ${className}`}
     >
       <div>
         {/* Header Icon + Metadata in Zero-Pill Unboxed Text */}

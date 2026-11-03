@@ -1,4 +1,18 @@
 import React, { useState } from 'react';
+import {
+  ArrowRight,
+  CheckCircle2,
+  FileImage,
+  FileText,
+  Globe2,
+  Image as ImageIcon,
+  LockKeyhole,
+  Search,
+  ShieldCheck,
+  Sparkles,
+  WandSparkles,
+  Zap,
+} from 'lucide-react';
 import { useI18n } from '../i18n';
 import { Link } from '../router';
 import { CATEGORIES_LIST, getCategoryById } from '../registry/categories.registry';
@@ -7,356 +21,263 @@ import { CategoryCard } from '../components/common/CategoryCard';
 import { ToolCard } from '../components/common/ToolCard';
 import { FeaturedToolCard } from '../components/common/FeaturedToolCard';
 import { Head } from '../seo/Head';
-import { Search, Shield, Zap, Sparkles, ArrowRight, CheckCircle2, Lock, Cpu, Globe } from 'lucide-react';
 import { SAMPLE_ARTICLES } from '../data/articles.data';
 import { matchesSearch } from '../utils/search';
+
+const HeroArtwork: React.FC = () => (
+  <div className="ul-hero-visual" data-testid="utilora-hero-art" aria-label="UTILORA image editing workspace illustration">
+    <div className="ul-hero-orbit" />
+    <div className="ul-device">
+      <div className="ul-device-screen">
+        <div className="ul-device-toolbar"><i /><i /><i /><span className="ms-2 text-[9px] font-semibold text-slate-300">UTILORA Studio</span></div>
+        <div className="ul-editor">
+          <div className="ul-editor-rail" aria-hidden="true">
+            <ImageIcon size={16} /><FileText size={16} /><WandSparkles size={16} /><LockKeyhole size={16} /><Sparkles size={16} />
+          </div>
+          <div className="ul-editor-canvas">
+            <svg viewBox="0 0 520 300" role="img" aria-label="Mountain lake image preview" preserveAspectRatio="xMidYMid slice">
+              <defs>
+                <linearGradient id="ul-sky" x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0%" stopColor="#C8DEEF" />
+                  <stop offset="100%" stopColor="#F5E9D9" />
+                </linearGradient>
+                <linearGradient id="ul-water" x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0%" stopColor="#8BAFBE" />
+                  <stop offset="100%" stopColor="#D6E5E2" />
+                </linearGradient>
+              </defs>
+              <rect width="520" height="300" fill="url(#ul-sky)" />
+              <circle cx="400" cy="68" r="30" fill="#FFD49B" />
+              <path d="M0 191 87 90l57 57L247 35l125 146 77-81 71 81v119H0Z" fill="#738997" />
+              <path d="m179 102 68-67 125 146-46-21-36 19-45-34-32 21Z" fill="#F8FBFC" />
+              <path d="M0 204 94 157l90 44 107-39 83 49 75-42 71 33v98H0Z" fill="#657F8B" />
+              <path d="M0 225 104 206l99 24 91-27 105 30 121-25v92H0Z" fill="url(#ul-water)" />
+              <path d="m0 246 120-12 89 27 110-20 85 24 116-13v48H0Z" fill="#E7EFEC" opacity=".72" />
+              <path d="M48 213v18m28-20v17m330-8v19m35-26v17" stroke="#FFFFFF" strokeWidth="2" opacity=".38" />
+            </svg>
+            <div className="ul-crop-outline" />
+          </div>
+        </div>
+      </div>
+      <div className="ul-device-base" />
+    </div>
+    <div className="ul-floating-panel" aria-hidden="true">
+      <h3>إعدادات الصورة</h3>
+      <label>السطوع<div className="ul-slider"><span style={{ width: '68%' }} /></div></label>
+      <label>التباين<div className="ul-slider"><span style={{ width: '46%' }} /></div></label>
+      <label>التشبع<div className="ul-slider"><span style={{ width: '82%' }} /></div></label>
+    </div>
+    <div className="ul-floating-image" aria-hidden="true">
+      <svg viewBox="0 0 220 130">
+        <defs><linearGradient id="ul-thumb-sky" x1="0" x2="0" y1="0" y2="1"><stop stopColor="#C8DEEF" /><stop offset="1" stopColor="#F5E9D9" /></linearGradient></defs>
+        <rect width="220" height="130" rx="8" fill="url(#ul-thumb-sky)" />
+        <path d="M0 82 52 30l30 34 46-52 54 66 38-36v88H0Z" fill="#879CA4" />
+        <path d="M0 95 58 70l49 21 42-22 71 29v32H0Z" fill="#91B6BD" />
+        <path d="M0 111 80 96l64 18 76-10v26H0Z" fill="#E1EAE5" />
+      </svg>
+    </div>
+    <div className="ul-image-badge" aria-hidden="true"><ImageIcon size={34} /></div>
+    <div className="ul-hero-proof" aria-hidden="true">
+      <span><CheckCircle2 size={15} /> مجاني بالكامل</span>
+      <span><CheckCircle2 size={15} /> سريع وسهل</span>
+      <span><CheckCircle2 size={15} /> معالجة محلية</span>
+    </div>
+  </div>
+);
 
 export const HomePage: React.FC = () => {
   const { locale, t } = useI18n();
   const [searchQuery, setSearchQuery] = useState('');
-
-  const popularTools = getPopularTools();
+  const popularTools = getPopularTools().slice(0, 6);
   const featuredTools = getFeaturedTools().slice(0, 2);
-
   const filteredTools = searchQuery.trim()
-    ? TOOLS_LIST.filter((tool) => matchesSearch(searchQuery, tool.localizedName, tool.localizedDescription, tool.slug, tool.acceptedFormats))
+    ? TOOLS_LIST.filter((tool) => matchesSearch(searchQuery, tool.localizedName, tool.localizedDescription, tool.slug, tool.acceptedFormats)).slice(0, 8)
     : [];
+  const heroTitle = locale === 'ar'
+    ? <>{'كل ما تحتاجه من أدوات'} <span>{'في مكان واحد'}</span></>
+    : t('hero.title');
+
+  const trusts = locale === 'ar'
+    ? [
+        { icon: ShieldCheck, title: 'آمن وموثوق', detail: 'خصوصيتك تهمنا' },
+        { icon: Zap, title: 'سريع وفعال', detail: 'نتائج فورية للأدوات المحلية' },
+        { icon: LockKeyhole, title: 'معالجة محلية', detail: 'ملفاتك تبقى على جهازك' },
+        { icon: Globe2, title: 'متعدد اللغات', detail: 'ثماني لغات مدعومة' },
+      ]
+    : [
+        { icon: ShieldCheck, title: 'Privacy-aware', detail: 'Your data matters' },
+        { icon: Zap, title: 'Fast and simple', detail: 'Get useful results quickly' },
+        { icon: LockKeyhole, title: 'Local processing', detail: 'Files stay on your device' },
+        { icon: Globe2, title: 'Multilingual', detail: 'Eight supported languages' },
+      ];
 
   return (
     <>
       <Head
         title="UTILORA — Every Digital Task. One Place."
-        description="Global, free online digital tools platform. 36 specialized utilities for images, documents, text, code, websites, and videos."
+        description="Free online tools for images, documents, text, code, websites and everyday digital tasks."
         locale={locale}
         routeType="home"
-        isIndexable={true}
+        isIndexable
         schemaType="WebSite"
       />
 
-      <div className="w-full space-y-8 sm:space-y-12">
-        {/* ========================================== */}
-        {/* HERO SECTION                               */}
-        {/* ========================================== */}
-        <section className="relative pt-2 sm:pt-10 pb-2 sm:pb-4 text-center max-w-4xl mx-auto px-4">
-          {/* Subtle orange glow behind hero title */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 sm:w-96 sm:h-96 bg-orange-500/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="ul-home w-full">
+        <section
+          data-testid="utilora-home-hero"
+          className="ul-hero-grid"
+          aria-labelledby="utilora-hero-title"
+        >
+          <div className="ul-hero-copy">
+            <div className="ul-hero-kicker"><Sparkles size={15} />{t('hero.badge')}</div>
+            <h1 id="utilora-hero-title" className="ul-hero-title">{heroTitle}</h1>
+            <p className="ul-hero-description">{t('hero.subtitle')}</p>
 
-          {/* Clean Unboxed Category Kicker */}
-          <div className="text-[11px] sm:text-xs font-mono uppercase tracking-widest text-orange-700 mb-2 sm:mb-4 font-semibold">
-            {t('hero.badge')}
-          </div>
-
-          <h1 className="text-2xl sm:text-5xl font-extrabold text-stone-900 tracking-tight leading-[1.1] mb-2 sm:mb-3">
-            {t('hero.title')}
-          </h1>
-
-          <p className="text-sm sm:text-lg text-stone-600 max-w-2xl mx-auto leading-relaxed mb-3 sm:mb-5">
-            {t('hero.subtitle')}
-          </p>
-
-          {/* Hero Search Field */}
-          <div className="max-w-2xl mx-auto relative mb-3 sm:mb-4">
-            <div className="relative flex items-center">
-              <Search size={18} className="absolute start-4 text-orange-600 pointer-events-none" />
+            <div className="ul-hero-search">
+              <Search className="ul-hero-search-icon" size={20} aria-hidden="true" />
               <input
-                type="text"
+                type="search"
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(event) => setSearchQuery(event.target.value)}
                 placeholder={t('hero.searchPlaceholder')}
-                className="w-full ps-12 pe-4 py-2.5 sm:py-3 rounded-2xl bg-white border border-stone-200 text-sm sm:text-base text-stone-900 placeholder-stone-500 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 shadow-lg shadow-stone-200/50 transition-all"
+                aria-label={t('hero.searchPlaceholder')}
               />
-            </div>
-
-            {/* Quick Live Search Results Dropdown */}
-            {searchQuery.trim() && (
-              <div className="absolute start-0 end-0 top-full mt-2 rounded-2xl bg-white border border-stone-200 p-2 shadow-2xl z-20 text-start max-h-80 overflow-y-auto">
-                {filteredTools.length === 0 ? (
-                  <div className="p-4 text-xs text-stone-500 text-center">
-                    {t('common.noResults')}
-                  </div>
-                ) : (
-                  <div className="space-y-1">
-                    {filteredTools.map((tool) => (
-                      <Link
-                        key={tool.id}
-                        routeType="tool"
-                        slug={tool.slug}
-                        scrollTo="tool-workspace"
-                        className="flex items-center justify-between p-2.5 rounded-xl hover:bg-orange-50/70 text-xs transition-colors"
-                      >
-                        <span className="font-semibold text-stone-800">
-                          {tool.localizedName[locale] || tool.localizedName.en}
-                        </span>
-                        <span className="text-[11px] font-mono text-orange-700">
-                          {getCategoryById(tool.category)?.localizedTitle[locale] || tool.category}
-                        </span>
-                      </Link>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* Privacy & Guarantee Sub-badge (clean typography) */}
-          <div className="flex items-center justify-center gap-2 text-[11px] sm:text-xs text-stone-500">
-            <Lock size={13} className="text-orange-500" />
-            <span>{t('hero.privacyBadge')}</span>
-          </div>
-
-          <div className="mt-3 sm:mt-4 flex flex-wrap items-center justify-center gap-2.5 sm:gap-3">
-            <Link routeType="tools-index" className="inline-flex min-h-10 items-center justify-center rounded-xl bg-orange-700 px-4 sm:px-5 py-2.5 sm:py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-orange-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-700 focus-visible:ring-offset-2">
-              {t('nav.allTools')}
-            </Link>
-            <Link routeType="categories-index" className="inline-flex min-h-10 items-center justify-center rounded-xl border border-stone-300 bg-white px-4 sm:px-5 py-2.5 sm:py-3 text-sm font-semibold text-stone-700 transition hover:border-orange-400 hover:text-orange-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-700 focus-visible:ring-offset-2">
-              {t('hero.browseCategories')}
-            </Link>
-          </div>
-
-
-        </section>
-
-        {/* ========================================== */}
-        {/* POPULAR TOOLS SECTION                      */}
-        {/* ========================================== */}
-        <section id="quick-tools" aria-labelledby="quick-tools-heading" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-5 sm:mb-6 gap-3">
-            <div>
-              <h2 id="quick-tools-heading" className="text-xl sm:text-2xl font-bold text-stone-900">
-                {t('home.popularHeading')}
-              </h2>
-              <p className="text-xs sm:text-sm text-stone-500 mt-1">
-                {t('home.popularSub')}
-              </p>
-            </div>
-
-            <Link
-              routeType="tools-index"
-              className="inline-flex items-center justify-center gap-2 self-start rounded-xl bg-orange-700 px-4 py-2.5 text-xs font-bold text-white shadow-sm transition hover:bg-orange-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-700 focus-visible:ring-offset-2 sm:self-auto"
-            >
-              <span>{t('nav.allTools')}</span>
-              <ArrowRight size={14} />
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-            {popularTools.slice(0, 6).map((tool) => (
-              <ToolCard key={tool.id} tool={tool} variant="compact" />
-            ))}
-          </div>
-        </section>
-
-        {/* Platform statistics follow the first usable tools, not the hero. */}
-        <section aria-label="Platform statistics" className="hidden sm:block max-w-2xl mx-auto px-4">
-                    <div className="pt-5 grid grid-cols-3 max-w-lg mx-auto border-t border-stone-200 mt-5 text-center">
-            <div>
-              <div className="text-xl sm:text-2xl font-bold font-mono text-stone-900">36</div>
-              <div className="text-[11px] text-stone-500 mt-0.5">{t('hero.statsTools')}</div>
-            </div>
-            <div>
-              <div className="text-xl sm:text-2xl font-bold font-mono text-orange-700">6</div>
-              <div className="text-[11px] text-stone-500 mt-0.5">{t('hero.statsCategories')}</div>
-            </div>
-            <div>
-              <div className="text-xl sm:text-2xl font-bold font-mono text-stone-900">8</div>
-              <div className="text-[11px] text-stone-500 mt-0.5">{t('hero.statsGlobal')}</div>
-            </div>
-          </div>
-        </section>
-
-        {/* ========================================== */}
-        {/* SIX MAIN PRODUCT CATEGORIES                */}
-        {/* ========================================== */}
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-4">
-            <div>
-              <h2 className="text-xl sm:text-2xl font-bold text-stone-900">
-                {t('home.categoriesHeading')}
-              </h2>
-              <p className="text-xs sm:text-sm text-stone-500 mt-1">
-                {t('home.categoriesSub')}
-              </p>
-            </div>
-
-            <Link
-              routeType="categories-index"
-              className="text-xs font-semibold text-orange-700 hover:text-orange-700 flex items-center gap-1 group"
-            >
-              <span>{t('nav.categories')}</span>
-              <ArrowRight size={13} className="group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5 transition-transform" />
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {CATEGORIES_LIST.map((cat) => (
-              <CategoryCard key={cat.id} category={cat} />
-            ))}
-          </div>
-        </section>
-
-        {/* ========================================== */}
-        {/* FEATURED WORKSPACES                        */}
-        {/* ========================================== */}
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mb-8">
-            <h2 className="text-xl sm:text-2xl font-bold text-stone-900">
-              {t('home.featuredHeading')}
-            </h2>
-            <p className="text-xs sm:text-sm text-stone-500 mt-1">
-              {t('home.featuredSub')}
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {featuredTools.map((tool) => (
-              <FeaturedToolCard key={tool.id} tool={tool} />
-            ))}
-          </div>
-        </section>
-
-        {/* ========================================== */}
-        {/* HOW IT WORKS                               */}
-        {/* ========================================== */}
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="p-8 sm:p-12 rounded-3xl bg-white border border-stone-200/90 shadow-xs">
-            <div className="text-center max-w-2xl mx-auto mb-12">
-              <h2 className="text-xl sm:text-3xl font-bold text-stone-900 mb-2">
-                {t('home.howItWorksHeading')}
-              </h2>
-              <p className="text-xs sm:text-sm text-stone-500">
-                {t('home.howItWorksSub')}
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="space-y-3">
-                <div className="w-10 h-10 rounded-xl bg-orange-50 border border-orange-100 flex items-center justify-center text-orange-700 font-mono text-sm font-bold shadow-xs">
-                  01
+              {searchQuery.trim() && (
+                <div className="absolute start-0 end-0 top-[calc(100%+9px)] z-30 max-h-80 overflow-y-auto rounded-2xl border border-stone-200 bg-white p-2 text-start shadow-2xl">
+                  {filteredTools.length === 0 ? (
+                    <p className="p-4 text-center text-xs text-stone-500">{t('common.noResults')}</p>
+                  ) : filteredTools.map((tool) => (
+                    <Link
+                      key={tool.id}
+                      routeType="tool"
+                      slug={tool.slug}
+                      scrollTo="tool-workspace"
+                      className="flex items-center justify-between gap-3 rounded-xl px-3 py-3 text-sm hover:bg-orange-50"
+                    >
+                      <span className="font-bold text-stone-800">{tool.localizedName[locale] || tool.localizedName.en}</span>
+                      <span className="shrink-0 text-xs font-semibold text-orange-700">
+                        {getCategoryById(tool.category)?.localizedTitle[locale] || tool.category}
+                      </span>
+                    </Link>
+                  ))}
                 </div>
-                <h3 className="text-base font-semibold text-stone-900">
-                  {t('home.step1Title')}
-                </h3>
-                <p className="text-xs text-stone-600 leading-relaxed">
-                  {t('home.step1Desc')}
-                </p>
-              </div>
-
-              <div className="space-y-3">
-                <div className="w-10 h-10 rounded-xl bg-orange-50 border border-orange-100 flex items-center justify-center text-orange-700 font-mono text-sm font-bold shadow-xs">
-                  02
-                </div>
-                <h3 className="text-base font-semibold text-stone-900">
-                  {t('home.step2Title')}
-                </h3>
-                <p className="text-xs text-stone-600 leading-relaxed">
-                  {t('home.step2Desc')}
-                </p>
-              </div>
-
-              <div className="space-y-3">
-                <div className="w-10 h-10 rounded-xl bg-orange-50 border border-orange-100 flex items-center justify-center text-orange-700 font-mono text-sm font-bold shadow-xs">
-                  03
-                </div>
-                <h3 className="text-base font-semibold text-stone-900">
-                  {t('home.step3Title')}
-                </h3>
-                <p className="text-xs text-stone-600 leading-relaxed">
-                  {t('home.step3Desc')}
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ========================================== */}
-        {/* PRIVACY & TRUST ARCHITECTURE               */}
-        {/* ========================================== */}
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="p-8 sm:p-10 rounded-3xl bg-gradient-to-r from-orange-50/60 via-white to-orange-50/40 border border-orange-200/80 flex flex-col md:flex-row items-center justify-between gap-8 shadow-xs">
-            <div className="space-y-2 max-w-2xl">
-              <div className="flex items-center gap-2 text-xs font-mono text-orange-700 uppercase tracking-wider font-semibold">
-                <Shield size={14} />
-                <span>{t('home.privacyKicker')}</span>
-              </div>
-              <h3 className="text-xl sm:text-2xl font-bold text-stone-900">
-                {t('home.trustHeading')}
-              </h3>
-              <p className="text-xs sm:text-sm text-stone-600 leading-relaxed">
-                {t('common.privacyStatementDesc')}
-              </p>
+              )}
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-3 shrink-0">
-              <Link
-                routeType="privacy"
-                className="px-4 py-2.5 rounded-xl bg-stone-900 hover:bg-stone-800 text-xs font-semibold text-white transition-colors text-center shadow-xs"
-              >
-                {t('footer.privacy')}
+            <div className="ul-hero-actions">
+              <Link routeType="tools-index" className="ul-button-primary">
+                {t('nav.allTools')} <ArrowRight size={16} />
               </Link>
-              <Link
-                routeType="about"
-                className="px-4 py-2.5 rounded-xl border border-stone-300 hover:border-orange-500 text-xs font-semibold text-stone-700 hover:text-orange-700 transition-colors text-center bg-white"
-              >
-                {t('footer.about')}
+              <Link routeType="categories-index" className="ul-button-secondary">
+                {t('hero.browseCategories')}
               </Link>
             </div>
+
+            <div className="ul-hero-shortcuts" aria-label={t('nav.categories')}>
+              {CATEGORIES_LIST.slice(0, 4).map((category) => (
+                <Link key={category.id} routeType="category" slug={category.slug}>
+                  {category.localizedTitle[locale] || category.localizedTitle.en}
+                </Link>
+              ))}
+            </div>
+          </div>
+          <HeroArtwork />
+        </section>
+
+        <section id="quick-tools" className="ul-home-section" aria-labelledby="quick-tools-heading">
+          <div className="ul-section-heading">
+            <div>
+              <h2 id="quick-tools-heading">{t('home.popularHeading')}</h2>
+              <p>{t('home.popularSub')}</p>
+            </div>
+            <Link routeType="tools-index" className="ul-button-secondary">
+              {t('nav.allTools')} <ArrowRight size={14} />
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
+            {popularTools.map((tool) => <ToolCard key={tool.id} tool={tool} variant="compact" />)}
           </div>
         </section>
 
-        {/* ========================================== */}
-        {/* ARTICLES & GUIDES PREVIEW                  */}
-        {/* ========================================== */}
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-4">
-            <div>
-              <h2 className="text-xl sm:text-2xl font-bold text-stone-900">
-                {t('home.articlesPreviewHeading')}
-              </h2>
-              <p className="text-xs sm:text-sm text-stone-500 mt-1">
-                {t('home.articlesPreviewSub')}
-              </p>
-            </div>
+        <section className="ul-trust-strip" aria-label={locale === 'ar' ? 'مزايا UTILORA' : 'UTILORA benefits'}>
+          {trusts.map((item) => {
+            const TrustIcon = item.icon;
+            return (
+              <div className="ul-trust-item" key={item.title}>
+                <span className="ul-trust-icon"><TrustIcon size={19} /></span>
+                <span><strong>{item.title}</strong><small>{item.detail}</small></span>
+              </div>
+            );
+          })}
+        </section>
 
-            <Link
-              routeType="articles-index"
-              className="text-xs font-semibold text-orange-700 hover:text-orange-700 flex items-center gap-1 group"
-            >
-              <span>{t('articles.allGuides')}</span>
-              <ArrowRight size={13} className="group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5 transition-transform" />
+        <section className="ul-home-section" aria-labelledby="home-categories-heading">
+          <div className="ul-section-heading">
+            <div>
+              <h2 id="home-categories-heading">{t('home.categoriesHeading')}</h2>
+              <p>{t('home.categoriesSub')}</p>
+            </div>
+            <Link routeType="categories-index" className="text-sm font-extrabold text-orange-700 hover:text-orange-800">
+              {t('nav.categories')} <ArrowRight size={14} className="inline" />
             </Link>
           </div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
+            {CATEGORIES_LIST.map((category) => <CategoryCard key={category.id} category={category} />)}
+          </div>
+        </section>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {SAMPLE_ARTICLES.slice(0, 3).map((art) => (
+        {featuredTools.length > 0 && (
+          <section className="ul-home-section" aria-labelledby="home-featured-heading">
+            <div className="ul-section-heading">
+              <div>
+                <h2 id="home-featured-heading">{t('home.featuredHeading')}</h2>
+                <p>{t('home.featuredSub')}</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+              {featuredTools.map((tool) => <FeaturedToolCard key={tool.id} tool={tool} />)}
+            </div>
+          </section>
+        )}
+
+        <section className="ul-home-section rounded-[28px] border border-orange-100 bg-gradient-to-l from-orange-50/80 via-white to-white p-6 sm:p-10">
+          <div className="grid gap-7 md:grid-cols-[1fr_auto] md:items-center">
+            <div className="max-w-2xl">
+              <span className="ul-page-kicker"><ShieldCheck size={14} />{t('home.privacyKicker')}</span>
+              <h2 className="mt-4 text-2xl font-extrabold text-stone-900">{t('home.trustHeading')}</h2>
+              <p className="mt-2 text-sm leading-7 text-stone-600">{t('common.privacyStatementDesc')}</p>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <Link routeType="privacy" className="ul-button-primary">{t('footer.privacy')}</Link>
+              <Link routeType="about" className="ul-button-secondary">{t('footer.about')}</Link>
+            </div>
+          </div>
+        </section>
+
+        <section className="ul-home-section" aria-labelledby="home-articles-heading">
+          <div className="ul-section-heading">
+            <div>
+              <h2 id="home-articles-heading">{t('home.articlesPreviewHeading')}</h2>
+              <p>{t('home.articlesPreviewSub')}</p>
+            </div>
+            <Link routeType="articles-index" className="text-sm font-bold text-orange-700">{t('nav.articles')}</Link>
+          </div>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            {SAMPLE_ARTICLES.slice(0, 3).map((article) => (
               <Link
-                key={art.id}
+                key={article.id}
                 routeType="article-detail"
-                slug={art.slug}
-                className="group p-6 rounded-2xl bg-white hover:bg-white border border-stone-200/90 hover:border-orange-300 transition-all flex flex-col justify-between shadow-xs hover:shadow-md hover:shadow-orange-500/5"
+                slug={article.slug}
+                className="ul-tool-card group rounded-2xl border border-stone-200 bg-white p-5 no-underline"
               >
-                <div>
-                  <div className="flex items-center gap-2 text-xs text-stone-500 mb-3">
-                    <span className="capitalize">{art.category}</span>
-                    <span aria-hidden="true" className="text-stone-300">·</span>
-                    <span>{art.readingTimeMinutes} {t('articles.readTime')}</span>
-                  </div>
-                  <h3 className="text-sm font-semibold text-stone-900 group-hover:text-orange-700 transition-colors line-clamp-2 mb-2">
-                    {art.title[locale] || art.title.en}
-                  </h3>
-                  <p className="text-xs text-stone-600 line-clamp-2 leading-relaxed">
-                    {art.excerpt[locale] || art.excerpt.en}
-                  </p>
-                </div>
-
-                <div className="flex items-center justify-between text-xs font-medium text-stone-500 group-hover:text-orange-700 pt-4 border-t border-stone-100 mt-4">
-                  <span>{t('common.readGuide')}</span>
-                  <ArrowRight size={13} className="group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5 transition-transform" />
-                </div>
+                <span className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50 text-orange-700"><FileImage size={19} /></span>
+                <h3 className="text-base font-extrabold text-stone-900 group-hover:text-orange-700">{article.title[locale] || article.title.en}</h3>
+                <p className="mt-2 line-clamp-3 text-sm leading-6 text-stone-600">{article.excerpt[locale] || article.excerpt.en}</p>
+                <span className="mt-4 inline-flex items-center gap-2 text-xs font-extrabold text-orange-700">{t('articles.readMore')} <ArrowRight size={13} /></span>
               </Link>
             ))}
           </div>
         </section>
-
       </div>
     </>
   );

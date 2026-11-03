@@ -21,7 +21,7 @@ export const FeaturedToolCard: React.FC<FeaturedToolCardProps> = ({ tool, classN
 
   return (
     <div
-      className={`p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-white via-white to-orange-50/40 border border-stone-200/90 hover:border-orange-300 transition-all flex flex-col justify-between shadow-xs hover:shadow-md relative group ${className}`}
+      className={`ul-featured-tool-card p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-white via-white to-orange-50/40 border border-stone-200/90 hover:border-orange-300 transition-all flex flex-col justify-between shadow-xs hover:shadow-md relative group ${className}`}
     >
       <div>
         <div className="flex items-center justify-between gap-3 mb-6">
