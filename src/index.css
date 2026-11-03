@@ -397,3 +397,36 @@ main textarea, main select {
 @media (prefers-reduced-motion: reduce) {
   .ul-tool-card, .ul-category-card, .ul-featured-tool-card, .ul-button-primary, .ul-button-secondary { transition: none !important; }
 }
+
+
+/* Homepage's compact popular-tool list needs room for localized names. */
+@media (max-width: 767px) {
+  .ul-home #quick-tools > .grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+  #quick-tools .ul-tool-card h4 {
+    display: -webkit-box;
+    min-width: 0;
+    overflow: hidden;
+    white-space: normal !important;
+    text-overflow: clip !important;
+    overflow-wrap: anywhere;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-height: 1.4;
+  }
+  #quick-tools .ul-tool-card span.block {
+    display: block;
+    overflow: hidden;
+    white-space: normal !important;
+    text-overflow: clip !important;
+    overflow-wrap: anywhere;
+    -webkit-line-clamp: 1;
+    line-height: 1.35;
+  }
+  #quick-tools .ul-tool-card {
+    min-height: 68px;
+    padding: 12px 14px !important;
+  }
+}
