@@ -147,9 +147,9 @@ class OpenCodeRunnerTests(unittest.TestCase):
             ("0", "tool-calls", "Partial inspection."),
             ("0", "stop", "Completed specialist report."),
         ]
-        with patch.object(run_opencode_agent, "_run_command", side_effect=command_results) as command, \\
-             patch.object(run_opencode_agent, "_export_state", side_effect=export_results):
-            success, report = run_agent("/workspace", "qa-engineer", "model-x", "Inspect the project.")
+        with patch.object(run_opencode_agent, "_run_command", side_effect=command_results) as command:
+            with patch.object(run_opencode_agent, "_export_state", side_effect=export_results):
+                success, report = run_agent("/workspace", "qa-engineer", "model-x", "Inspect the project.")
 
         self.assertTrue(success)
         self.assertEqual(report, "Completed specialist report.\\n")
@@ -167,9 +167,9 @@ class OpenCodeRunnerTests(unittest.TestCase):
             ("0", "tool-calls", "Draft only."),
             ("0", "tool-calls", "Draft only."),
         ]
-        with patch.object(run_opencode_agent, "_run_command", side_effect=command_results), \\
-             patch.object(run_opencode_agent, "_export_state", side_effect=export_results):
-            success, report = run_agent("/workspace", "qa-engineer", "model-x", "Inspect the project.")
+        with patch.object(run_opencode_agent, "_run_command", side_effect=command_results):
+            with patch.object(run_opencode_agent, "_export_state", side_effect=export_results):
+                success, report = run_agent("/workspace", "qa-engineer", "model-x", "Inspect the project.")
 
         self.assertFalse(success)
         self.assertIn("Recovery attempted: true", report)
