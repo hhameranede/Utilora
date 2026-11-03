@@ -1,6 +1,6 @@
 import unittest
 
-from opencode_smoke import extract_final_assistant_text
+from opencode_smoke import extract_final_assistant_text, extract_latest_assistant_state
 
 
 class OpenCodeSmokeParserTests(unittest.TestCase):
@@ -9,17 +9,13 @@ class OpenCodeSmokeParserTests(unittest.TestCase):
             "messages": [
                 {
                     "info": {"role": "assistant", "finish": "tool-calls"},
-                    "parts": [
-                        {
-                            "type": "text",
-                            "text": "I'll inspect the repository before answering.",
-                        }
-                    ],
+                    "parts": [{"type": "text", "text": "Inspecting first."}],
                 }
             ]
         }
 
         self.assertEqual(extract_final_assistant_text(transcript), "")
+        self.assertEqual(extract_latest_assistant_state(transcript), ("tool-calls", "Inspecting first."))
 
     def test_returns_only_a_completed_final_assistant_response(self):
         transcript = {
@@ -35,10 +31,8 @@ class OpenCodeSmokeParserTests(unittest.TestCase):
             ]
         }
 
-        self.assertEqual(
-            extract_final_assistant_text(transcript),
-            "The final answer.",
-        )
+        self.assertEqual(extract_final_assistant_text(transcript), "The final answer.")
+        self.assertEqual(extract_latest_assistant_state(transcript), ("stop", "The final answer."))
 
     def test_ignores_user_messages_and_non_text_parts(self):
         transcript = {
@@ -58,6 +52,7 @@ class OpenCodeSmokeParserTests(unittest.TestCase):
         }
 
         self.assertEqual(extract_final_assistant_text(transcript), "")
+        self.assertEqual(extract_latest_assistant_state(transcript), ("stop", ""))
 
     def test_ignores_synthetic_and_ignored_text_parts(self):
         transcript = {
@@ -73,10 +68,7 @@ class OpenCodeSmokeParserTests(unittest.TestCase):
             ]
         }
 
-        self.assertEqual(
-            extract_final_assistant_text(transcript),
-            "Visible final.",
-        )
+        self.assertEqual(extract_final_assistant_text(transcript), "Visible final.")
 
     def test_accepts_finish_on_message_when_info_wrapper_is_absent(self):
         transcript = {
@@ -90,6 +82,36 @@ class OpenCodeSmokeParserTests(unittest.TestCase):
         }
 
         self.assertEqual(extract_final_assistant_text(transcript), "Complete.")
+
+    def test_does_not_fall_back_to_an_older_completed_turn(self):
+        transcript = {
+            "messages": [
+                {
+                    "info": {"role": "assistant", "finish": "stop"},
+                    "parts": [{"type": "text", "text": "Old answer."}],
+                },
+                {
+                    "info": {"role": "assistant", "finish": "tool-calls"},
+                    "parts": [{"type": "text", "text": "Still working."}],
+                },
+            ]
+        }
+
+        self.assertEqual(extract_final_assistant_text(transcript), "")
+        self.assertEqual(extract_latest_assistant_state(transcript), ("tool-calls", "Still working."))
+
+    def test_missing_finish_is_not_marked_completed(self):
+        transcript = {
+            "messages": [
+                {
+                    "info": {"role": "assistant"},
+                    "parts": [{"type": "text", "text": "Possibly incomplete."}],
+                }
+            ]
+        }
+
+        self.assertEqual(extract_final_assistant_text(transcript), "")
+        self.assertEqual(extract_latest_assistant_state(transcript), ("missing", "Possibly incomplete."))
 
 
 if __name__ == "__main__":
