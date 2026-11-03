@@ -507,3 +507,22 @@ main textarea, main select {
 }
 
 /* Test only visible SVGs: hidden drawers and menus may contain intentionally unlaid icons. */
+
+
+/* Final small-screen fold and tablet-art containment corrections. */
+@media (max-width: 390px) {
+  .ul-home { gap: 14px; }
+  .ul-hero-kicker { margin-bottom: 7px; padding: 5px 10px; font-size: 10px; }
+  .ul-hero-title { font-size: 27px; line-height: 1.13; }
+  .ul-hero-description { margin: 6px auto 9px; font-size: 11.5px; line-height: 1.45; }
+  .ul-hero-search { min-height: 48px !important; }
+  .ul-hero-search input { height: 46px; }
+  .ul-hero-actions { margin-top: 8px; gap: 8px; }
+  .ul-button-primary, .ul-button-secondary { min-height: 40px; padding-inline: 14px; font-size: 11px; }
+  .ul-hero-visual { height: 88px; min-height: 88px; margin-top: 2px; }
+  .ul-device { transform: perspective(900px) rotateY(-3deg) scale(.48); }
+}
+@media (min-width: 768px) and (max-width: 1023px) {
+  .ul-hero-visual { overflow: hidden; }
+  .ul-hero-orbit { inset-inline-end: 2%; }
+}
