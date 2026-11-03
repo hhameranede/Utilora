@@ -7,6 +7,7 @@ import { GlobalSearch } from './GlobalSearch';
 import { BrandLogo } from './BrandLogo';
 import { CATEGORIES_LIST } from '../../registry/categories.registry';
 import { Icon } from './Icon';
+import { WORKFLOW_UI } from '../../registry/workflows.registry';
 
 export const SiteHeader: React.FC = () => {
   const { locale, t } = useI18n();
@@ -37,6 +38,12 @@ export const SiteHeader: React.FC = () => {
                 }`}
               >
                 {t('nav.tools')}
+              </Link>
+              <Link
+                routeType="workflows-index"
+                className={`inline-flex min-h-10 items-center py-2 transition-colors hover:text-orange-700 ${route.type === 'workflow' || route.type === 'workflows-index' ? 'text-orange-700 font-semibold' : ''}`}
+              >
+                {WORKFLOW_UI[locale].workflows}
               </Link>
 
               {/* Categories Mega Dropdown */}
@@ -172,6 +179,13 @@ export const SiteHeader: React.FC = () => {
                 className="block min-h-10 px-3 py-2.5 text-sm font-semibold text-stone-800 hover:text-orange-700"
               >
                 {t('nav.tools')} (36)
+              </Link>
+              <Link
+                routeType="workflows-index"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="block min-h-10 px-3 py-2.5 text-sm font-semibold text-stone-800 hover:text-orange-700"
+              >
+                {WORKFLOW_UI[locale].workflows}
               </Link>
               <Link
                 routeType="categories-index"

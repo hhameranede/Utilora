@@ -121,6 +121,14 @@ test('Router matches home, categories, tools, and dev-templates paths', () => {
   const rDev = parseRoute('/dev/templates');
   assert.equal(rDev.type, 'dev-templates');
 
+  // Curated workflow routes preserve the selected locale and slug.
+  const workflow = parseRoute('/fr/workflows/prepare-images-for-web');
+  assert.equal(workflow.type, 'workflow');
+  assert.equal(workflow.workflowSlug, 'prepare-images-for-web');
+  assert.equal(buildRoutePath('fr', 'workflow', 'prepare-images-for-web'), '/fr/workflows/prepare-images-for-web');
+  assert.equal(parseRoute('/ar/workflows').type, 'workflows-index');
+  assert.equal(parseRoute('/en/workflows/not-a-real-workflow').type, 'not-found');
+
   // Nonexistent tool -> 404
   const rInvalid = parseRoute('/en/tools/nonexistent-tool-xyz');
   assert.equal(rInvalid.type, 'not-found');

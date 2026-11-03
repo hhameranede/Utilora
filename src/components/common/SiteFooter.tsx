@@ -5,6 +5,7 @@ import { CATEGORIES_LIST } from '../../registry/categories.registry';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { BrandLogo } from './BrandLogo';
 import { Shield } from 'lucide-react';
+import { WORKFLOW_UI } from '../../registry/workflows.registry';
 
 export const SiteFooter: React.FC = () => {
   const { locale, t } = useI18n();
@@ -77,6 +78,11 @@ export const SiteFooter: React.FC = () => {
               <li>
                 <Link routeType="tools-index" className="hover:text-orange-700 transition-colors">
                   {t('nav.allTools')} (36)
+                </Link>
+              </li>
+              <li>
+                <Link routeType="workflows-index" className="hover:text-orange-700 transition-colors">
+                  {WORKFLOW_UI[locale].workflows}
                 </Link>
               </li>
               <li>

@@ -7,6 +7,8 @@ export type RouteType =
   | 'tools-index'
   | 'tool'
   | 'tool-guide'
+  | 'workflows-index'
+  | 'workflow'
   | 'articles-index'
   | 'article-category'
   | 'article-detail'
@@ -24,6 +26,7 @@ export interface ParsedRoute {
   locale: SupportedLocale;
   categorySlug?: string;
   toolSlug?: string;
+  workflowSlug?: string;
   articleSlug?: string;
   rawPath: string;
 }

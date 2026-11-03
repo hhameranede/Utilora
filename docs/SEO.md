@@ -7,6 +7,7 @@ Only routes with complete, useful content should be listed in the production sit
 - Localized tools directory and categories index pages.
 - Localized category hub pages.
 - Localized detail pages and `/how-to` guides for all tools whose registry status is `functional` (currently 35 tools across eight locales).
+- A curated workflow directory and six localized, task-specific workflow hubs. Each hub connects only functional registered tools, links back to the real tool pages, and carries a HowTo JSON-LD graph.
 - Localized informational and legal pages.
 
 The following routes stay out of the sitemap until their content is production-ready:
@@ -30,7 +31,7 @@ The value must be an origin only: HTTP(S) scheme and hostname, without a path, q
 - `public/sitemap.xml`, with localized URLs and eight-language hreflang alternate links plus `x-default`.
 - `public/robots.txt`, allowing public routes, disallowing `/dev/`, and referencing the generated sitemap when `SITE_URL` is set.
 
-The current sitemap contains 680 unique, indexable URLs across eight locales. It remains a single XML sitemap because its URL count and file size are comfortably below protocol limits. Each URL includes reciprocal `hreflang` links for all supported locales plus `x-default`. Preview-only tools, sample articles, internal routes, and not-found URLs are excluded. Do not add `lastmod` values unless the build can supply a reliable last-modified date for each route.
+The current sitemap contains 736 unique, indexable URLs across eight locales: the previous 680 routes plus the workflow directory and six workflow detail pages in each locale. It remains a single XML sitemap because its URL count and file size are comfortably below protocol limits. Each URL includes reciprocal `hreflang` links for all supported locales plus `x-default`. Preview-only tools, sample articles, internal routes, and not-found URLs are excluded. Do not add `lastmod` values unless the build can supply a reliable last-modified date for each route.
 
 When `SITE_URL` is omitted, the build does not guess a domain: stale sitemap output is removed, a robots file is still generated without a sitemap directive, and a warning is printed. The Vite HTML transform also removes social-image tags that would otherwise contain an unresolved domain placeholder. Configure the real domain in the production build environment.
 

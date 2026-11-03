@@ -71,6 +71,7 @@ export const RouterProvider: React.FC<{ children: ReactNode; initialPath?: strin
       else if (parsedRoute.type === 'article-detail') slug = parsedRoute.articleSlug;
       else if (parsedRoute.type === 'article-category') slug = parsedRoute.categorySlug;
       else if (parsedRoute.type === 'tool-guide') slug = parsedRoute.toolSlug;
+      else if (parsedRoute.type === 'workflow') slug = parsedRoute.workflowSlug;
 
       const nextPath = buildRoutePath(newLocale, parsedRoute.type, slug);
       if (typeof window !== 'undefined') {

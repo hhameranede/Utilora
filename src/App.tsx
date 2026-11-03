@@ -17,6 +17,8 @@ import { CategoriesIndexPage } from './pages/CategoriesIndexPage';
 import { ToolPage } from './pages/ToolPage';
 import { ToolGuidePage } from './pages/ToolGuidePage';
 import { ToolsIndexPage } from './pages/ToolsIndexPage';
+import { WorkflowsIndexPage } from './pages/WorkflowsIndexPage';
+import { WorkflowPage } from './pages/WorkflowPage';
 import { ArticlesIndexPage } from './pages/articles/ArticlesIndexPage';
 import { ArticleCategoryPage } from './pages/articles/ArticleCategoryPage';
 import { ArticleDetailPage } from './pages/articles/ArticleDetailPage';
@@ -40,8 +42,10 @@ const AppContent: React.FC = () => {
       posthog.capture('tool_guide_viewed', { tool_slug: route.toolSlug, locale });
     } else if (route.type === 'category' && route.categorySlug) {
       posthog.capture('category_page_viewed', { category_slug: route.categorySlug, locale });
+    } else if (route.type === 'workflow' && route.workflowSlug) {
+      posthog.capture('workflow_page_viewed', { workflow_slug: route.workflowSlug, locale });
     }
-  }, [route.type, route.toolSlug, route.categorySlug, locale]);
+  }, [route.type, route.toolSlug, route.categorySlug, route.workflowSlug, locale]);
 
   const renderCurrentView = () => {
     switch (route.type) {
@@ -53,6 +57,10 @@ const AppContent: React.FC = () => {
         return <CategoryPage categorySlug={route.categorySlug!} />;
       case 'tools-index':
         return <ToolsIndexPage />;
+      case 'workflows-index':
+        return <WorkflowsIndexPage />;
+      case 'workflow':
+        return <WorkflowPage workflowSlug={route.workflowSlug!} />;
       case 'tool':
         return <ToolPage toolSlug={route.toolSlug!} />;
       case 'tool-guide':

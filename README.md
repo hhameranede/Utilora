@@ -62,9 +62,9 @@ UTILORA includes a web app manifest and a production-only service worker. The se
 SITE_URL=https://your-real-domain.example npm run seo:generate
 ```
 
-This writes `public/sitemap.xml` and `public/robots.txt`. The sitemap contains localized home, tool-directory, category, and legal routes, plus every functional tool detail page and its usage guide across all eight languages. The single preview-only tool and sample article routes remain excluded.
+This writes `public/sitemap.xml` and `public/robots.txt`. The sitemap contains localized home, tool-directory, category, legal, and curated workflow routes, plus every functional tool detail page and its usage guide across all eight languages. The single preview-only tool and sample article routes remain excluded.
 
-**Static route rendering:** `npm run build` prerenders the 528 localized routes into HTML files in `dist`, including page content and route-specific metadata before JavaScript runs. Each localized route is emitted once as `dist/<route>.html`; Cloudflare Pages serves that file at its extensionless URL (for example, `/en/tools`). We intentionally do not also emit `<route>/index.html`, because that would create a second trailing-slash URL for the same content. The build also creates a top-level `404.html`, so Cloudflare Pages returns a real 404 for unknown routes instead of falling back to the SPA shell. The root `/` still uses the Vite root document; the localized pages are the prerendered SEO routes.
+**Static route rendering:** `npm run build` prerenders 824 localized routes into HTML files in `dist`, including page content and route-specific metadata before JavaScript runs. Each localized route is emitted once as `dist/<route>.html`; Cloudflare Pages serves that file at its extensionless URL (for example, `/en/tools`). We intentionally do not also emit `<route>/index.html`, because that would create a second trailing-slash URL for the same content. The build also creates a top-level `404.html`, so Cloudflare Pages returns a real 404 for unknown routes instead of falling back to the SPA shell. The root `/` still uses the Vite root document; the localized pages are the prerendered SEO routes.
 
 ### Run Unit Tests
 ```bash
@@ -132,6 +132,7 @@ Comprehensive guides for development and extension:
 - `docs/ENGINE_INTEGRATION.md` — Phase 2 adapter contracts and WASM binding
 - `docs/LOCALIZATION.md` — 8-language translations and Arabic RTL handling
 - `docs/SEO.md` — Meta tags, structured JSON-LD, and noindex rules
+- `docs/GLOBAL_SEARCH_GROWTH.md` — Search-intent workflow hubs, internal distribution, and global growth quality gates
 - `docs/PRODUCT_EXPERIENCE_STANDARD.md` — Product-page anatomy, tool-specific content, SEO accuracy, privacy rules, and quality gates
 - `docs/IMPLEMENTATION_STATUS.md` — Verified feature checklist
 
