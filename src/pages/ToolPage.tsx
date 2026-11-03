@@ -126,7 +126,7 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
   });
 
   return (
-    <article className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-7 sm:space-y-10">
+    <article className="ul-content-page ul-tool-page max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-7 sm:space-y-10">
       <Head
         title={seoTitle}
         description={seoDescription}
