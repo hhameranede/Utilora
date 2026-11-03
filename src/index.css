@@ -1045,3 +1045,205 @@ main textarea, main select {
   .ulx-site-shell .ul-content-page select,
   .ulx-site-shell .ul-content-page textarea { max-width:100%; min-width:0; }
 }
+
+
+/* Final E2E fixes: compact mobile fold, tablet hero containment, narrow catalog cards. */
+@media (min-width:768px) and (max-width:900px) {
+  .ulx-site-shell .ul-hero-grid {
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:stretch !important;
+    justify-content:center;
+    width:calc(100% - 44px);
+    min-width:0;
+    min-height:0;
+    gap:14px;
+    padding:24px 0 15px;
+    overflow-x:clip;
+  }
+  .ulx-site-shell .ul-hero-grid::before {
+    inset:0 !important;
+    border-radius:0 0 38px 38px;
+  }
+  .ulx-site-shell .ul-hero-grid::after {
+    inset-inline-end:0;
+    max-width:100%;
+  }
+  .ulx-site-shell .ul-hero-copy {
+    width:100%;
+    max-width:100%;
+    text-align:center;
+  }
+  .ulx-site-shell .ul-hero-title {
+    max-width:100%;
+    font-size:clamp(34px,5vw,44px);
+  }
+  .ulx-site-shell .ul-hero-description,
+  .ulx-site-shell .ul-hero-search { margin-inline:auto; }
+  .ulx-site-shell .ul-hero-actions,
+  .ulx-site-shell .ul-hero-shortcuts { justify-content:center; }
+  .ulx-site-shell .ul-hero-visual {
+    width:100%;
+    max-width:520px;
+    min-width:0;
+    min-height:190px;
+    height:190px;
+    margin:0 auto;
+    overflow:hidden;
+  }
+  .ulx-site-shell .ul-device {
+    width:min(100%,500px);
+    transform:perspective(900px) rotateY(-3deg) scale(.62);
+  }
+}
+
+@media (max-width:390px) {
+  .ulx-site-shell .ul-hero-grid {
+    width:calc(100% - 24px);
+    gap:0;
+    padding:8px 0 8px;
+    overflow-x:clip;
+  }
+  .ulx-site-shell .ul-hero-grid::before {
+    inset:0 !important;
+    border-radius:0 0 25px 25px;
+  }
+  .ulx-site-shell .ul-hero-grid::after { display:none; }
+  .ulx-site-shell .ul-hero-kicker {
+    min-height:25px;
+    margin-bottom:5px;
+    padding:3px 10px;
+    font-size:8px;
+  }
+  .ulx-site-shell .ul-hero-title {
+    margin:7px 0 6px;
+    font-size:26px;
+    line-height:1.16;
+    letter-spacing:-.035em;
+  }
+  .ulx-site-shell .ul-hero-description {
+    margin:4px auto 8px;
+    font-size:9px;
+    line-height:1.45;
+  }
+  .ulx-site-shell .ul-hero-search {
+    min-height:40px;
+    height:40px;
+    margin-inline:auto;
+  }
+  .ulx-site-shell .ul-hero-search input { height:38px; font-size:9px; }
+  .ulx-site-shell .ul-hero-actions { margin-top:7px; gap:7px; }
+  .ulx-site-shell .ul-button-primary,
+  .ulx-site-shell .ul-button-secondary { min-height:34px; padding:0 11px; font-size:9px; }
+  .ulx-site-shell .ul-hero-shortcuts { margin-top:7px; gap:4px; }
+  .ulx-site-shell .ul-hero-shortcuts a { min-height:24px; padding:4px 7px; font-size:7px; }
+  .ulx-site-shell .ul-hero-visual {
+    width:100%;
+    min-width:0;
+    min-height:78px !important;
+    height:78px !important;
+    margin:0 auto;
+    overflow:hidden;
+  }
+  .ulx-site-shell .ul-device {
+    width:78%;
+    transform:perspective(900px) rotateY(-3deg) scale(.36);
+    transform-origin:center center;
+  }
+  .ulx-site-shell .ul-floating-image,
+  .ulx-site-shell .ul-image-badge { display:none; }
+  .ulx-site-shell #quick-tools .ul-compact-tool-card {
+    display:flex;
+    width:100%;
+    min-width:0;
+    min-height:78px !important;
+    height:auto;
+    padding:8px 9px !important;
+    gap:5px;
+  }
+  .ulx-site-shell #quick-tools .ul-compact-tool-card > div:first-child {
+    width:100%;
+    min-width:0;
+    gap:5px;
+  }
+  .ulx-site-shell #quick-tools .ul-compact-tool-card .ul-tool-icon {
+    width:30px !important;
+    height:30px !important;
+    flex-basis:30px;
+  }
+  .ulx-site-shell #quick-tools .ul-compact-tool-card h4 {
+    font-size:9px;
+    line-height:1.25;
+  }
+  .ulx-site-shell #quick-tools .ul-compact-tool-card .ul-compact-tool-category {
+    display:none !important;
+  }
+}
+
+@media (max-width:360px) {
+  .ulx-site-shell .ul-content-page {
+    width:calc(100% - 20px);
+    max-width:100%;
+    overflow-x:clip;
+  }
+  .ulx-site-shell .ul-content-page .ul-tool-card {
+    min-width:0;
+    max-width:100%;
+    width:100%;
+    overflow:hidden;
+    padding:9px !important;
+  }
+  .ulx-site-shell .ul-content-page .ul-tool-card > div:first-child {
+    display:grid;
+    width:100%;
+    min-width:0;
+    grid-template-columns:32px minmax(0,1fr);
+    align-items:start;
+    gap:7px;
+  }
+  .ulx-site-shell .ul-content-page .ul-tool-card > div:first-child > .ul-tool-icon {
+    width:32px !important;
+    height:32px !important;
+    min-width:32px;
+  }
+  .ulx-site-shell .ul-content-page .ul-tool-card > div:first-child > div:last-child {
+    display:flex;
+    flex-wrap:wrap;
+    align-items:flex-start;
+    justify-content:flex-start;
+    width:100%;
+    min-width:0;
+    max-width:100%;
+    gap:2px 4px;
+    font-size:8px;
+    line-height:1.2;
+    white-space:normal;
+    overflow-wrap:anywhere;
+  }
+  .ulx-site-shell .ul-content-page .ul-tool-card > div:first-child > div:last-child span {
+    min-width:0;
+    max-width:100%;
+    white-space:normal;
+    overflow-wrap:anywhere;
+  }
+  .ulx-site-shell .ul-content-page .ul-tool-card h3 {
+    min-width:0;
+    font-size:10px;
+    line-height:1.35;
+    overflow-wrap:anywhere;
+  }
+  .ulx-site-shell .ul-content-page .ul-tool-card p { font-size:8px; line-height:1.4; }
+  .ulx-site-shell .ul-content-page .ul-tool-card > div:last-child {
+    min-width:0;
+    width:100%;
+    gap:5px;
+  }
+  .ulx-site-shell .ul-content-page .ul-tool-card > div:last-child > span:first-child {
+    display:none;
+  }
+  .ulx-site-shell .ul-content-page .ul-tool-card > div:last-child > span:last-child {
+    max-width:100%;
+    padding:5px 7px;
+    font-size:8px;
+  }
+}
