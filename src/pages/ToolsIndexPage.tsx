@@ -42,9 +42,9 @@ export const ToolsIndexPage: React.FC = () => {
         </div>
 
         {/* Filter Controls Bar */}
-        <div className="p-3 sm:p-4 rounded-2xl bg-white border border-stone-200/90 shadow-xs flex flex-col md:flex-row items-center justify-between gap-3 sm:gap-4">
+        <div className="ul-tools-filter-row p-3 sm:p-4 rounded-2xl bg-white border border-stone-200/90 shadow-xs flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 sm:gap-4">
           {/* Compact category selector for touch screens */}
-          <div className="w-full md:hidden">
+          <div className="w-full lg:hidden">
             <label htmlFor="tools-category-mobile" className="mb-1.5 block text-xs font-semibold text-stone-600">{t('nav.categories')}</label>
             <select id="tools-category-mobile" value={selectedCategory} onChange={(event) => setSelectedCategory(event.target.value)} className="min-h-11 w-full rounded-xl border border-stone-200 bg-white px-3 text-sm font-semibold text-stone-800 shadow-xs focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/20">
               <option value="all">{t('common.all')} (36)</option>
@@ -53,7 +53,7 @@ export const ToolsIndexPage: React.FC = () => {
           </div>
 
           {/* Category Filter Tabs — wider screens */}
-          <div role="group" aria-label={t('nav.categories')} className="hidden md:flex min-w-0 max-w-full items-center gap-2 overflow-x-auto overscroll-x-contain w-full md:w-auto p-1.5 bg-stone-50 border border-stone-200 rounded-2xl" style={{ scrollbarWidth: 'thin' }}>
+          <div role="group" aria-label={t('nav.categories')} className="hidden lg:flex min-w-0 max-w-full items-center gap-2 overflow-x-auto overscroll-x-contain w-full md:w-auto p-1.5 bg-stone-50 border border-stone-200 rounded-2xl" style={{ scrollbarWidth: 'thin' }}>
             <button
               onClick={() => setSelectedCategory('all')}
               aria-pressed={selectedCategory === 'all'}
@@ -82,7 +82,7 @@ export const ToolsIndexPage: React.FC = () => {
           </div>
 
           {/* Search Field */}
-          <div className="relative w-full md:w-72">
+          <div className="relative w-full lg:w-72">
             <Search size={14} className="absolute start-3.5 top-1/2 -translate-y-1/2 text-orange-600" />
             <input
               type="text"
@@ -94,7 +94,7 @@ export const ToolsIndexPage: React.FC = () => {
           </div>
         </div>
 
-        <p className="-mt-3 text-[11px] text-stone-400 md:hidden">{t('tools.scrollHint')}</p>
+        <p className="-mt-3 text-[11px] text-stone-400 lg:hidden">{t('tools.scrollHint')}</p>
 
         {/* Tool Cards Grid */}
         {filteredTools.length === 0 ? (
@@ -102,7 +102,7 @@ export const ToolsIndexPage: React.FC = () => {
             {t('common.noResults')}
           </div>
         ) : (
-          <div className="grid grid-cols-1 min-[380px]:grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4">
+          <div className="ul-tools-catalog-grid grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4">
             {filteredTools.map((tool) => (
               <ToolCard key={tool.id} tool={tool} />
             ))}

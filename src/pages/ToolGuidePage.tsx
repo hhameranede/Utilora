@@ -177,6 +177,16 @@ export const ToolGuidePage: React.FC<ToolGuidePageProps> = ({ toolSlug }) => {
   const [captureError, setCaptureError] = useState(false);
   const [annotationTargets, setAnnotationTargets] = useState<GuideAnnotationPoint[]>([]);
   const [annotationHeight, setAnnotationHeight] = useState(1000);
+  const [isWideScreen, setIsWideScreen] = useState(() => typeof window !== 'undefined' && window.matchMedia('(min-width: 1024px)').matches);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const media = window.matchMedia('(min-width: 1024px)');
+    const update = () => setIsWideScreen(media.matches);
+    update();
+    media.addEventListener('change', update);
+    return () => media.removeEventListener('change', update);
+  }, []);
 
   const toolName = tool ? (tool.localizedName[locale] || tool.localizedName.en) : toolSlug;
   const category = tool ? getCategoryById(tool.category) : undefined;
@@ -201,7 +211,7 @@ export const ToolGuidePage: React.FC<ToolGuidePageProps> = ({ toolSlug }) => {
   }, [tool, locale, toolName, formats, t]);
 
   useEffect(() => {
-    if (!tool || !captureRef.current) return;
+    if (!tool || !isWideScreen || !captureRef.current) return;
     let active = true;
     setCaptureError(false);
     setScreenshot('');
@@ -234,7 +244,7 @@ export const ToolGuidePage: React.FC<ToolGuidePageProps> = ({ toolSlug }) => {
     };
     void capture();
     return () => { active = false; };
-  }, [toolSlug, locale, tool]);
+  }, [toolSlug, locale, tool, isWideScreen]);
 
   if (!tool) return null;
 
@@ -292,14 +302,14 @@ export const ToolGuidePage: React.FC<ToolGuidePageProps> = ({ toolSlug }) => {
           </div>
 
           <div className="relative bg-[#fafaf9] p-2 sm:p-5">
-            <div className="rounded-2xl border border-stone-200 bg-white p-3 shadow-sm md:hidden">
+            <div className="ul-guide-live-workspace rounded-2xl border border-stone-200 bg-white p-3 shadow-sm lg:hidden">
               <div className="mb-3 flex items-center gap-2 rounded-xl bg-orange-50 px-3 py-2 text-xs font-semibold text-orange-800">
                 <span className="h-2 w-2 rounded-full bg-orange-600" aria-hidden="true" />
                 {t('guide.liveWorkspace')}
               </div>
               <ToolWorkspaceResolver tool={tool} />
             </div>
-            <div className="hidden md:block">
+            <div className="hidden lg:block">
               {screenshot ? (
                 <div className="relative mx-auto max-w-[1080px] overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
                   <img data-guide-screenshot src={screenshot} alt={t('guide.screenshotAlt').replace('{tool}', toolName)} className="block h-auto w-full" />
@@ -356,7 +366,8 @@ export const ToolGuidePage: React.FC<ToolGuidePageProps> = ({ toolSlug }) => {
           </Link>
         </section>
 
-        <div className="pointer-events-none fixed left-[-12000px] top-0 -z-10 w-[1080px]" aria-hidden="true">
+        {isWideScreen && (
+          <div className="ul-guide-desktop-capture pointer-events-none fixed left-[-12000px] top-0 -z-10 w-[1080px]" aria-hidden="true">
           <div ref={captureRef} className="w-[1080px] bg-[#fafaf9] p-8 text-stone-900">
             <div className="mb-6 flex items-center justify-between border-b border-stone-200 pb-4">
               <span className="text-xl font-extrabold tracking-tight">UTILORA</span>
@@ -366,7 +377,8 @@ export const ToolGuidePage: React.FC<ToolGuidePageProps> = ({ toolSlug }) => {
             <p className="mb-6 text-sm text-stone-600">{tool.localizedDescription[locale] || tool.localizedDescription.en}</p>
             <ToolWorkspaceResolver tool={tool} />
           </div>
-        </div>
+          </div>
+        )}
       </div>
     </>
   );

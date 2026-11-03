@@ -18,7 +18,7 @@ export const CategoriesIndexPage: React.FC = () => {
         isIndexable={true}
       />
 
-      <div className="ul-content-page max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+      <div className="ul-content-page max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-7 sm:space-y-10 lg:space-y-12">
         <Breadcrumbs items={[{ label: t('nav.categories') }]} />
 
         <div>
@@ -30,7 +30,7 @@ export const CategoriesIndexPage: React.FC = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4">
+        <div className="ul-categories-grid grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4">
           {CATEGORIES_LIST.map((cat) => (
             <CategoryCard key={cat.id} category={cat} />
           ))}
