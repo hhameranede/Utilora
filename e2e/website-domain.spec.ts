@@ -115,7 +115,7 @@ test('HTTP headers checker shows exposed response headers and CORS visibility li
 });
 
 test('DNS lookup keeps successful records visible when one selected record type fails', async ({ page }) => {
-  await page.route(/\\/api\\/dns\\?/, async (route) => {
+  await page.route(/\/api\/dns\?/, async (route) => {
     const requestUrl = new URL(route.request().url());
     const type = requestUrl.searchParams.get('type');
     if (type === '16') {
