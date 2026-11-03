@@ -340,7 +340,8 @@ export const ToolGuidePage: React.FC<ToolGuidePageProps> = ({ toolSlug }) => {
                   </div>
                   <ToolWorkspaceResolver tool={tool} />
                 </div>
-              </>            ) : captureError ? (
+              </>
+            ) : captureError ? (
               <div className="rounded-2xl border border-orange-200 bg-white p-5 text-center">
                 <p className="text-sm font-semibold text-stone-800">{t('guide.captureUnavailable')}</p>
                 <p className="mt-1 text-xs text-stone-500">{t('guide.liveWorkspace')}</p>
