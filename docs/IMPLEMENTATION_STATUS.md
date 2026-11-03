@@ -1,6 +1,6 @@
 # Implementation Status Checklist
 
-This checklist separates repository implementation from CI verification, deployment, and real-device QA. The current registry contains 36 tools: 35 marked `functional` and one UI-only preview (`video-downloader`). The functional set consists of 30 browser-local tools and five public Website & Domain lookups. Five video tools now have working local processing or inspection flows. All 36 tools have localized `/how-to` guides with screenshots captured from their rendered workspaces and numbered orange SVG annotations. Community/forum pages, data, and public routes have been removed. The workflow is configured for type checks, engine tests, SEO/prerender checks, and Playwright E2E; confirm the latest run before merging. Production deployment from `main` remains disabled pending approval.
+This checklist separates repository implementation from CI verification, deployment, and real-device QA. The current registry contains 36 tools: 35 marked `functional` and one UI-only preview (`video-downloader`). The functional set consists of 30 browser-local tools and five public Website & Domain lookups. Five video tools now have working local processing or inspection flows. All 36 tools have localized `/how-to` guides with screenshots captured from their rendered workspaces and numbered orange SVG annotations. Community/forum pages, data, and public routes have been removed. The workflow is configured for type checks, engine tests, SEO/prerender checks, and Playwright E2E; confirm the latest run before merging. Cloudflare Pages production deployments from `main` are currently enabled (verified 2026-11-03); this SEO audit change does not alter production settings.
 
 ## Verification status
 - [x] TypeScript check and Vite production build passed in GitHub Actions run #18.
@@ -10,7 +10,7 @@ This checklist separates repository implementation from CI verification, deploym
 - [ ] Manual visual QA on real mobile and desktop devices completed.
 - [x] Cloudflare Pages project connected; preview build and asset deployment succeeded (537 files uploaded).
 - [ ] Direct HTTP/browser verification of localized routes, canonical tags, and 404 status still pending.
-- [x] Production deployment from `main` explicitly disabled pending approval.
+- [x] Cloudflare Pages production deployments from `main` are enabled; this SEO-only change does not modify deployment settings.
 
 
 
@@ -56,7 +56,7 @@ This checklist separates repository implementation from CI verification, deploym
 ## Cloudflare Pages preview configuration
 - [x] The `utilora` Pages project is connected to `hhameranede/Utilora`, with `npm run build`, output directory `dist`, and Node.js 22.
 - [x] The current quality branch `fix/white-gray-orange-and-accurate-status-2026-11-01` is explicitly included in preview deployments.
-- [x] Production deployments remain disabled for `main`; this task does not enable them.
+- [x] Production deployments from `main` are currently enabled in Cloudflare Pages; no deployment setting was changed by this SEO audit work.
 - [ ] The new branch preview deployment has completed and its localized routes have passed live HTTP/browser checks.
 
 
