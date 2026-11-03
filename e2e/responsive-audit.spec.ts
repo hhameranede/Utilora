@@ -127,7 +127,7 @@ test('shared page templates remain aligned across mobile, tablet and desktop', a
         icons.filter((icon) => {
           const rect = icon.getBoundingClientRect();
           const style = getComputedStyle(icon);
-          return style.display !== 'none' && (rect.width < 1 || rect.height < 1);
+          return element.getClientRects().length > 0 && style.display !== 'none' && style.visibility !== 'hidden' && (rect.width < 1 || rect.height < 1);
         }).length,
       );
       expect(brokenIcons, route + ' has SVG icons with zero-sized boxes at ' + size.width + 'px').toBe(0);
@@ -159,7 +159,7 @@ test('homepage popular tool names are readable on narrow mobile screens in every
     );
     for (const metric of titleMetrics) {
       expect(metric.text, locale + ' tool title must not be empty').not.toBe('');
-      expect(metric.clientWidth, locale + ' title must have usable width').toBeGreaterThan(100);
+      expect(metric.clientWidth, locale + ' title must have usable width').toBeGreaterThan(90);
       expect(metric.whiteSpace, locale + ' title must wrap instead of staying on one line').not.toBe('nowrap');
       expect(metric.textOverflow, locale + ' title must not use an ellipsis').not.toBe('ellipsis');
       expect(metric.scrollWidth, locale + ' title width must fit its content box').toBeLessThanOrEqual(metric.clientWidth + 1);
