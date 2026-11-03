@@ -1,20 +1,19 @@
-"""Small, dependency-free helpers for trustworthy OpenCode smoke checks."""
+"""Small, dependency-free helpers for trustworthy OpenCode response capture."""
 
 from __future__ import annotations
 
 from typing import Any
 
 
-def extract_final_assistant_text(transcript: dict[str, Any]) -> str:
-    """Return text only when the latest assistant message finished normally.
+def extract_latest_assistant_state(transcript: dict[str, Any]) -> tuple[str, str]:
+    """Return the latest assistant turn's finish reason and visible text.
 
-    OpenCode may emit useful-looking assistant text before a tool call. Such a
-    message has finish == "tool-calls" and is not the final answer. Never
-    promote it to a successful smoke result.
+    A tool-calling or interrupted assistant turn is deliberately exposed as
+    incomplete; callers may resume its session, but must never mark it complete.
     """
     messages = transcript.get("messages")
     if not isinstance(messages, list):
-        return ""
+        return "missing", ""
 
     for message in reversed(messages):
         if not isinstance(message, dict):
@@ -28,13 +27,10 @@ def extract_final_assistant_text(transcript: dict[str, Any]) -> str:
         if role != "assistant":
             continue
 
-        finish = info.get("finish") or message.get("finish")
-        if finish != "stop":
-            return ""
-
+        finish = info.get("finish") or message.get("finish") or "missing"
         parts = message.get("parts")
         if not isinstance(parts, list):
-            return ""
+            return str(finish), ""
 
         extracted: list[str] = []
         for part in parts:
@@ -47,6 +43,12 @@ def extract_final_assistant_text(transcript: dict[str, Any]) -> str:
             if isinstance(value, str) and value.strip():
                 extracted.append(value.strip())
 
-        return "\n".join(extracted).strip()
+        return str(finish), "\n".join(extracted).strip()
 
-    return ""
+    return "missing", ""
+
+
+def extract_final_assistant_text(transcript: dict[str, Any]) -> str:
+    """Return text only when the latest assistant message finished normally."""
+    finish, text = extract_latest_assistant_state(transcript)
+    return text if finish == "stop" else ""
