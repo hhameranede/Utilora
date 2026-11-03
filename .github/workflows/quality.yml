@@ -53,6 +53,9 @@ jobs:
       - name: Test standalone product content
         run: npm run test:products
 
+      - name: Test SEO audit engine
+        run: npm run test:seo-audit
+
       - name: Test local browser engines
         run: npm run test:core
 
@@ -104,6 +107,20 @@ jobs:
           grep -q 'noindex, nofollow' dist/404.html
           grep -q 'Page not found' dist/404.html
           grep -q 'id="root"><' dist/en.html
+
+      - name: Audit generated SEO output
+        run: npm run seo:audit
+        env:
+          SITE_URL: https://utilora.invalid
+
+      - name: Upload SEO audit report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: seo-audit-report
+          path: .artifacts/seo-audit/
+          if-no-files-found: ignore
+          retention-days: 14
 
       - name: Install Chromium for browser tests
         run: npx playwright install --with-deps chromium
