@@ -2000,3 +2000,65 @@ main textarea, main select {
     transition: none !important;
   }
 }
+
+
+/* Featured content cards follow the same compact rhythm on touch screens. */
+@media (max-width: 767px) {
+  .ulx-site-shell .ul-featured-tool-card {
+    min-width: 0;
+    padding: 14px !important;
+    border-radius: 17px !important;
+    gap: 12px;
+  }
+  .ulx-site-shell .ul-featured-tool-meta {
+    gap: 8px;
+    margin-bottom: 10px !important;
+  }
+  .ulx-site-shell .ul-featured-tool-category {
+    min-width: 0;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 3px 6px;
+    font-size: 9px;
+    overflow-wrap: anywhere;
+  }
+  .ulx-site-shell .ul-featured-tool-title {
+    font-size: 14px !important;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+  }
+  .ulx-site-shell .ul-featured-tool-description {
+    margin-bottom: 12px !important;
+    font-size: 10px;
+    line-height: 1.55;
+  }
+  .ulx-site-shell .ul-featured-tool-formats {
+    margin-bottom: 12px !important;
+    gap: 5px;
+    font-size: 9px;
+  }
+  .ulx-site-shell .ul-featured-tool-footer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding-top: 12px !important;
+  }
+  .ulx-site-shell .ul-featured-tool-action {
+    width: 100%;
+    min-height: 40px;
+    justify-content: center;
+    padding: 8px 12px !important;
+    font-size: 11px;
+  }
+}
+@media (max-width: 379px) {
+  .ulx-site-shell .ul-featured-tool-card {
+    padding: 12px !important;
+  }
+  .ulx-site-shell .ul-featured-tool-category {
+    font-size: 8px;
+  }
+  .ulx-site-shell .ul-featured-tool-description {
+    font-size: 9px;
+  }
+}
