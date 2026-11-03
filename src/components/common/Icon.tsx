@@ -127,5 +127,5 @@ interface IconProps extends React.SVGProps<SVGSVGElement> {
 
 export const Icon: React.FC<IconProps> = ({ name, size = 18, className = '', ...props }) => {
   const Component = ICON_MAP[name] || Zap;
-  return <Component size={size} className={className} {...props} />;
+  return <Component size={size} className={`ul-icon ${className}`} strokeWidth={1.9} aria-hidden={props['aria-label'] ? undefined : true} {...props} />;
 };
