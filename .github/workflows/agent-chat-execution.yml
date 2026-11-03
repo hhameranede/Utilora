@@ -101,7 +101,7 @@ jobs:
     if: ${{ always() && inputs.dispatch_probe != 'true' && (inputs.mode == 'group' || inputs.target_agent == 'project-lead') }}
     needs: specialists
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 12
     env:
       NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
       AGENT_CHAT_RUN_ID: ${{ inputs.run_id }}
