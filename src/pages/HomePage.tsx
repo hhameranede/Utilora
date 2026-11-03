@@ -117,16 +117,6 @@ export const HomePage: React.FC = () => {
           <HeroArtwork locale={locale}/>
         </section>
 
-        <section id="quick-tools" className="ul-home-section" aria-labelledby="quick-tools-heading">
-          <div className="ul-section-heading">
-            <div><h2 id="quick-tools-heading">{t('home.popularHeading')}</h2><p>{t('home.popularSub')}</p></div>
-            <Link routeType="tools-index" className="ul-button-secondary">{t('nav.allTools')} <ArrowRight size={14}/></Link>
-          </div>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
-            {popularTools.map((tool)=><ToolCard key={tool.id} tool={tool} variant="compact"/>)}
-          </div>
-        </section>
-
         <section className="ul-trust-strip" aria-label={locale==='ar'?'مزايا UTILORA':'UTILORA benefits'}>
           {trusts.map((item)=>{const TrustIcon=item.icon;return <div className="ul-trust-item" key={item.title}><span className="ul-trust-icon"><TrustIcon size={19}/></span><span><strong>{item.title}</strong><small>{item.detail}</small></span></div>;})}
         </section>
@@ -136,8 +126,18 @@ export const HomePage: React.FC = () => {
             <div><h2 id="home-categories-heading">{t('home.categoriesHeading')}</h2><p>{t('home.categoriesSub')}</p></div>
             <Link routeType="categories-index" className="text-sm font-extrabold text-orange-700">{t('nav.categories')} <ArrowRight size={14} className="inline"/></Link>
           </div>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 xl:grid-cols-6">
             {CATEGORIES_LIST.map((category)=><CategoryCard key={category.id} category={category}/>)}
+          </div>
+        </section>
+
+        <section id="quick-tools" className="ul-home-section" aria-labelledby="quick-tools-heading">
+          <div className="ul-section-heading">
+            <div><h2 id="quick-tools-heading">{t('home.popularHeading')}</h2><p>{t('home.popularSub')}</p></div>
+            <Link routeType="tools-index" className="ul-button-secondary">{t('nav.allTools')} <ArrowRight size={14}/></Link>
+          </div>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 xl:grid-cols-6">
+            {popularTools.map((tool)=><ToolCard key={tool.id} tool={tool} variant="compact"/>)}
           </div>
         </section>
 
