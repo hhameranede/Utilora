@@ -42,7 +42,7 @@ export const ToolsIndexPage: React.FC = () => {
         </div>
 
         {/* Filter Controls Bar */}
-        <div className="p-3 sm:p-4 rounded-2xl bg-white border border-stone-200/90 shadow-xs flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 sm:gap-4">
+        <div className="ul-tools-filter-row p-3 sm:p-4 rounded-2xl bg-white border border-stone-200/90 shadow-xs flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 sm:gap-4">
           {/* Compact category selector for touch screens */}
           <div className="w-full lg:hidden">
             <label htmlFor="tools-category-mobile" className="mb-1.5 block text-xs font-semibold text-stone-600">{t('nav.categories')}</label>
