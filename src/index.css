@@ -2062,3 +2062,22 @@ main textarea, main select {
     font-size: 9px;
   }
 }
+
+
+/* Preserve a deliberate, readable illustration height inside the mobile flex hero. */
+@media (max-width: 767px) {
+  .ulx-site-shell .ul-hero-visual {
+    flex: 0 0 108px;
+    height: 108px !important;
+    min-height: 108px !important;
+    max-height: 108px;
+  }
+}
+@media (max-width: 379px) {
+  .ulx-site-shell .ul-hero-visual {
+    flex: 0 0 98px;
+    height: 98px !important;
+    min-height: 98px !important;
+    max-height: 98px;
+  }
+}
