@@ -113,3 +113,29 @@ test('HTTP headers checker shows exposed response headers and CORS visibility li
   await expect(page.getByText('content-security-policy').first()).toBeVisible();
   await expect(page.getByText('Seen', { exact: true })).toHaveCount(4);
 });
+
+test('DNS lookup keeps successful records visible when one selected record type fails', async ({ page }) => {
+  await page.route(/\\/api\\/dns\\?/, async (route) => {
+    const requestUrl = new URL(route.request().url());
+    const type = requestUrl.searchParams.get('type');
+    if (type === '16') {
+      await route.fulfill({
+        status: 502,
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ message: 'TXT resolver temporarily unavailable' }),
+      });
+      return;
+    }
+    const Answer = type === '1'
+      ? [{ name: 'example.com.', type: 1, TTL: 300, data: '93.184.216.34' }]
+      : [];
+    await route.fulfill({ status: 200, headers: { 'content-type': 'application/dns-json' }, body: JSON.stringify({ Status: 0, Answer }) });
+  });
+
+  await page.goto('/en/tools/dns-lookup');
+  await page.getByRole('button', { name: 'Look up records' }).click();
+
+  await expect(page.getByRole('status')).toContainText('DNS results');
+  await expect(page.getByText('93.184.216.34')).toBeVisible();
+  await expect(page.getByText(/TXT: TXT resolver temporarily unavailable/)).toBeVisible();
+});
