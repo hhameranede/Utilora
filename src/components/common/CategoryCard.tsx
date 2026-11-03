@@ -20,11 +20,11 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({ category, className 
     <Link
       routeType="category"
       slug={category.slug}
-      className={`ul-category-card group p-6 rounded-2xl bg-white hover:bg-white border border-stone-200/80 hover:border-orange-300 transition-all flex flex-col justify-between relative shadow-xs hover:shadow-md hover:shadow-orange-500/5 ${className}`}
+      data-ul-category={category.id} className={`ul-category-card group p-6 rounded-2xl bg-white hover:bg-white border border-stone-200/80 hover:border-orange-300 transition-all flex flex-col justify-between relative shadow-xs hover:shadow-md hover:shadow-orange-500/5 ${className}`}
     >
       <div>
         <div className="flex items-center justify-between mb-4">
-          <div className="w-12 h-12 rounded-xl bg-orange-50 group-hover:bg-orange-700 border border-orange-100 flex items-center justify-center text-orange-700 group-hover:text-white transition-all shadow-xs">
+          <div className="ul-category-icon w-12 h-12 rounded-xl bg-orange-50 group-hover:bg-orange-700 border border-orange-100 flex items-center justify-center text-orange-700 group-hover:text-white transition-all shadow-xs">
             <Icon name={category.icon} size={22} />
           </div>
           <span className="text-xs font-mono text-stone-500">
