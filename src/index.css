@@ -209,7 +209,7 @@ footer .max-w-7xl { width: min(100% - 2 * var(--ul-page-gutter), var(--ul-page-m
 
 /* Shared page frame: identical gutters and readable measure across templates. */
 .ul-content-page {
-  width: min(calc(100% - 2 * var(--ul-page-gutter)), var(--ul-page-max));
+  width: min(calc(100% - var(--ul-page-gutter) - var(--ul-page-gutter)), var(--ul-page-max));
   max-width: var(--ul-page-max);
   margin-inline: auto;
 }
@@ -328,12 +328,11 @@ main textarea, main select {
 
 /* Homepage composition scales naturally rather than shrinking the artwork to half size. */
 @media (min-width: 1440px) {
-  .ul-hero-grid { width: min(calc(100% - 2 * var(--ul-page-gutter)), 1360px); min-height: 520px; }
-  .ul-home-section, .ul-trust-strip { width: min(calc(100% - 2 * var(--ul-page-gutter)), 1320px); }
+  .ul-hero-grid { width: min(calc(100% - var(--ul-page-gutter) - var(--ul-page-gutter)), 1360px); min-height: 520px; }
+  .ul-home-section, .ul-trust-strip { width: min(calc(100% - var(--ul-page-gutter) - var(--ul-page-gutter)), 1320px); }
 }
 @media (max-width: 1024px) {
   .ul-hero-grid { width: min(calc(100% - 40px), 1200px); gap: 24px; }
-  .ul-content-page .lg\\:grid-cols-12 { gap: 28px; }
   .ul-tool-card { min-height: 210px; }
 }
 @media (max-width: 767px) {
