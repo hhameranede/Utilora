@@ -1390,3 +1390,24 @@ main textarea, main select {
     flex-wrap: wrap;
   }
 }
+
+
+/* Mid-size phones (roughly 400–480px): keep the hero artwork from pushing
+   the first useful tool cards below a 720px viewport. */
+@media (min-width:391px) and (max-width:479px) {
+  .ulx-site-shell .ul-hero-kicker { margin-bottom:7px; }
+  .ulx-site-shell .ul-hero-description { margin:6px auto 9px; }
+  .ulx-site-shell .ul-hero-actions { margin-top:8px; }
+  .ulx-site-shell .ul-hero-visual {
+    width:100%;
+    height:82px;
+    min-height:82px;
+    margin-top:2px;
+    overflow:hidden;
+  }
+  .ulx-site-shell .ul-device {
+    width:78%;
+    transform:perspective(900px) rotateY(-3deg) scale(.35);
+    transform-origin:center;
+  }
+}
