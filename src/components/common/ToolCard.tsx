@@ -33,10 +33,10 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, className = '', varian
             <Icon name={tool.icon} size={16} />
           </div>
           <div className="min-w-0">
-            <h4 className="text-xs font-semibold text-stone-900 group-hover:text-orange-700 truncate">
+            <h4 className="ul-compact-tool-title text-xs font-semibold text-stone-900 group-hover:text-orange-700">
               {name}
             </h4>
-            <span className="text-xs text-stone-500 truncate block">
+            <span className="ul-compact-tool-category text-xs text-stone-500 block">
               {categoryTitle}
             </span>
           </div>
