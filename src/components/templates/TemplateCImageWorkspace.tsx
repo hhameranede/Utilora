@@ -236,14 +236,14 @@ export const TemplateCImageWorkspace: React.FC<TemplateCImageWorkspaceProps> = (
   return (
     <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-5">
       <section className="lg:col-span-7 space-y-4 min-w-0">
-        <button type="button" onClick={() => inputRef.current?.click()} className="w-full p-7 sm:p-9 rounded-2xl border-2 border-dashed border-stone-300 hover:border-orange-400 bg-white transition-colors text-center">
+        <button type="button" onClick={() => inputRef.current?.click()} className="w-full p-5 sm:p-9 rounded-2xl border-2 border-dashed border-stone-300 hover:border-orange-400 bg-white transition-colors text-center">
           <input ref={inputRef} type="file" accept="image/png,image/jpeg,image/webp,image/gif,image/avif,image/bmp" className="hidden" onChange={(event) => handleFile(event.target.files?.[0])} />
           <span className="mx-auto w-12 h-12 rounded-xl bg-orange-50 border border-orange-100 text-orange-600 flex items-center justify-center"><Upload size={22} /></span>
           <span className="block mt-3 text-sm font-semibold text-stone-900">{file ? 'Choose another image' : 'Select an image to begin'}</span>
           <span className="block mt-1 text-xs text-stone-500">PNG, JPG, WebP, GIF, AVIF or BMP · Up to 50 MB</span>
         </button>
 
-        <div className="rounded-2xl border border-stone-200 bg-stone-50 min-h-[260px] p-4 flex items-center justify-center">
+        <div className="rounded-2xl border border-stone-200 bg-stone-50 min-h-[180px] sm:min-h-[260px] p-3 sm:p-4 flex items-center justify-center">
           {(resultUrl || sourceUrl) ? (
             <div className="relative inline-block max-w-full">
               <img
@@ -297,7 +297,7 @@ export const TemplateCImageWorkspace: React.FC<TemplateCImageWorkspaceProps> = (
       </section>
 
       <aside className="lg:col-span-5 min-w-0">
-        <div className="p-5 sm:p-6 rounded-2xl bg-white border border-stone-200 shadow-xs space-y-5">
+        <div className="p-4 sm:p-6 rounded-2xl bg-white border border-stone-200 shadow-xs space-y-4 sm:space-y-5">
           <div className="flex items-center gap-2 pb-3 border-b border-stone-100">
             <FileImage size={17} className="text-orange-600" />
             <h2 className="text-sm font-semibold text-stone-900">{toolName} settings</h2>
