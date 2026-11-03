@@ -55,12 +55,12 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, className = '', varian
     >
       <div>
         {/* Header Icon + Metadata in Zero-Pill Unboxed Text */}
-        <div className="flex items-center justify-between gap-2 mb-3.5">
+        <div className="ul-tool-card-meta flex items-center justify-between gap-2 mb-3.5">
           <div className="ul-tool-icon w-10 h-10 rounded-xl bg-orange-50 group-hover:bg-orange-700 border border-orange-100 flex items-center justify-center text-orange-700 group-hover:text-white transition-all shadow-xs">
             <Icon name={tool.icon} size={19} />
           </div>
 
-          <div className="flex items-center gap-1.5 text-xs text-stone-500">
+          <div className="ul-tool-card-category flex items-center gap-1.5 text-xs text-stone-500">
             <span className="font-medium text-stone-500 group-hover:text-orange-700 transition-colors">
               {categoryTitle}
             </span>
@@ -79,17 +79,17 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, className = '', varian
         </h3>
 
         {/* Description */}
-        <p className="text-sm text-stone-600 line-clamp-2 leading-relaxed mb-4">
+        <p className="ul-tool-card-description text-sm text-stone-600 line-clamp-2 leading-relaxed mb-4">
           {description}
         </p>
       </div>
 
       {/* Footer State: Formats or Engine preview reminder */}
-      <div className="pt-3 border-t border-stone-100 flex items-center justify-between text-xs text-stone-500">
-        <span className="truncate">
+      <div className="ul-tool-card-footer pt-3 border-t border-stone-100 flex items-center justify-between text-xs text-stone-500">
+        <span className="ul-tool-card-formats truncate">
           {tool.status !== 'functional' ? t('common.previewOnly') : tool.acceptedFormats ? tool.acceptedFormats.slice(0, 3).join(', ') : tool.category === 'website-domain' ? t('common.publicLookup') : t('common.runsLocally')}
         </span>
-        <span className="inline-flex items-center justify-center gap-1.5 shrink-0 rounded-lg border border-orange-100 bg-orange-50 px-3 py-2 text-orange-800 font-semibold transition-all group-hover:border-orange-700 group-hover:bg-orange-700 group-hover:text-white">
+        <span className="ul-tool-card-action inline-flex items-center justify-center gap-1.5 shrink-0 rounded-lg border border-orange-100 bg-orange-50 px-3 py-2 text-orange-800 font-semibold transition-all group-hover:border-orange-700 group-hover:bg-orange-700 group-hover:text-white">
           <span>{t('common.openTool')}</span>
           <ArrowUpRight size={14} />
         </span>
