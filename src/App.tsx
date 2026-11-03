@@ -84,7 +84,7 @@ const AppContent: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#f8f9fc] text-stone-900 selection:bg-orange-100 selection:text-orange-900">
+    <div className="ulx-site-shell min-h-screen flex flex-col bg-[#f8f9fc] text-stone-900 selection:bg-orange-100 selection:text-orange-900">
       <SiteHeader />
       <main className="flex-1 py-5 sm:py-8">
         {renderCurrentView()}
