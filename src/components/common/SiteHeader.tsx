@@ -29,7 +29,7 @@ export const SiteHeader: React.FC = () => {
             </Link>
 
             {/* Desktop Navigation Links */}
-            <nav className="hidden md:flex items-center gap-6 text-xs font-medium text-stone-600">
+            <nav className="hidden lg:flex items-center gap-6 text-xs font-medium text-stone-600">
               <Link
                 routeType="tools-index"
                 className={`inline-flex min-h-10 items-center py-2 transition-colors hover:text-orange-700 ${
@@ -122,7 +122,7 @@ export const SiteHeader: React.FC = () => {
             <button
               type="button"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden inline-flex min-h-10 min-w-10 items-center justify-center p-2 rounded-xl border border-stone-200 text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
+              className="lg:hidden inline-flex min-h-10 min-w-10 items-center justify-center p-2 rounded-xl border border-stone-200 text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
               aria-label={t("nav.toggleNavigation")}
               aria-expanded={isMobileMenuOpen}
               aria-controls="utilora-mobile-navigation"
@@ -138,7 +138,7 @@ export const SiteHeader: React.FC = () => {
 
       {/* Mobile Drawer Menu */}
       {isMobileMenuOpen && (
-        <div id="utilora-mobile-navigation" role="navigation" aria-label={t('nav.toggleNavigation')} className="fixed inset-0 top-16 z-30 bg-white md:hidden overflow-y-auto p-4 border-b border-stone-200 animate-fadeIn">
+        <div id="utilora-mobile-navigation" role="navigation" aria-label={t('nav.toggleNavigation')} className="fixed inset-0 top-16 z-30 bg-white lg:hidden overflow-y-auto p-4 border-b border-stone-200 animate-fadeIn">
           <div className="space-y-4">
             {/* Quick search input */}
             <button
