@@ -5,7 +5,7 @@ This checklist separates repository implementation from CI verification, deploym
 ## Verification status
 - [x] TypeScript check and Vite production build passed in GitHub Actions run #18.
 - [x] Sitemap/robots output generated and validated in that build.
-- [x] Static HTML prerendering generated 528 localized routes; CI checks sample route bodies, canonical URLs, RTL direction, preview noindex, and 404 output.
+- [x] Static HTML prerendering generated 768 localized routes in the 2026-11-03 verified build; CI checks sample route bodies, canonical URLs, RTL direction, preview noindex, and 404 output.
 - [x] Automated responsive route audit covers all 36 tool routes at 360px, 768px, and 1280px, plus all eight locale routes at 360px. This is automated Chromium viewport coverage, not physical-device QA.
 - [ ] Manual visual QA on real mobile and desktop devices completed.
 - [x] Cloudflare Pages project connected; preview build and asset deployment succeeded (537 files uploaded).
