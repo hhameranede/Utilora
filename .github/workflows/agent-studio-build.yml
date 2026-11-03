@@ -30,10 +30,14 @@ jobs:
         run: npm install --no-audit --no-fund
       - name: Test bounty analysis refresh
         run: npm run test:bounty-hunter
+      - name: Test safe OpenCode session recovery
+        run: npm run test:agent-runtime
       - name: Check JavaScript syntax
         run: |
           node --check src/main.js
           node --check src/bounty-hunter.js
           node --check functions/api/bounties.js
+          node --check scripts/agent-chat-worker.mjs
+          node --check scripts/opencode-session.mjs
       - name: Build Agent Studio
         run: npm run build
