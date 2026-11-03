@@ -1,6 +1,7 @@
 import { spawn } from "node:child_process";
 import { promisify } from "node:util";
 import { execFile as execFileCallback } from "node:child_process";
+import { buildOpenCodeArgs, findSessionId, latestAssistantState, needsSessionRecovery } from "./opencode-session.mjs";
 
 const execFile = promisify(execFileCallback);
 const API_URL = process.env.AGENT_CHAT_API_URL;
@@ -10,6 +11,9 @@ const MODEL_ALIAS = process.env.MODEL_ALIAS;
 const RUN_MODE = process.env.AGENT_CHAT_MODE || "group";
 const AUDIENCE = "utilora-agent-studio";
 const MAX_OUTPUT_BYTES = 8 * 1024 * 1024;
+const OPENCODE_RUN_BUDGET_MS = 8 * 60 * 1000;
+const OPENCODE_FIRST_TURN_MS = 6 * 60 * 1000;
+const OPENCODE_RECOVERY_TURN_MS = 90 * 1000;
 
 function required(value, label) {
   if (!value) throw new Error("Missing required workflow input: " + label);
@@ -173,55 +177,24 @@ function buildPrompt(context) {
   ].join("\n");
 }
 
-function findSessionId(raw) {
-  for (const line of raw.split(/\r?\n/)) {
-    try {
-      const event = JSON.parse(line);
-      const part = event.part || {};
-      const session = event.sessionID || event.sessionId || part.sessionID || part.sessionId;
-      if (typeof session === "string" && session) return session;
-    } catch {
-      // Ignore non-JSON log lines.
-    }
-  }
-  return "";
-}
+async function runOpenCodeCommand(prompt, options) {
+  const { workspace, env, deadline, sessionId = "" } = options;
+  const remainingMs = deadline - Date.now();
+  if (remainingMs < 10_000) throw new Error("OpenCode execution budget exhausted.");
 
-function extractFinalAssistantText(transcript) {
-  const messages = Array.isArray(transcript?.messages) ? transcript.messages : [];
-  for (let i = messages.length - 1; i >= 0; i -= 1) {
-    const message = messages[i];
-    if (!message || typeof message !== "object") continue;
-    const info = message.info || {};
-    const role = info.role || message.role;
-    if (role !== "assistant") continue;
-    const finish = info.finish || message.finish;
-    if (finish !== "stop") return "";
-    const parts = Array.isArray(message.parts) ? message.parts : [];
-    return parts
-      .filter((part) => part && part.type === "text" && !part.synthetic && !part.ignored)
-      .map((part) => String(part.text || "").trim())
-      .filter(Boolean)
-      .join("\n")
-      .trim();
-  }
-  return "";
-}
+  const timeoutMs = Math.min(
+    sessionId ? OPENCODE_RECOVERY_TURN_MS : OPENCODE_FIRST_TURN_MS,
+    remainingMs - 8_000
+  );
+  if (timeoutMs < 5_000) throw new Error("Insufficient time remains to complete an OpenCode turn.");
 
-async function runOpenCode(prompt) {
-  const workspace = required(process.env.GITHUB_WORKSPACE, "GitHub workspace");
-  const env = {
-    ...process.env,
-    OPENCODE_CONFIG_CONTENT: makeReadOnlyConfig(AGENT_NAME)
-  };
-  const child = spawn("opencode", [
-    "run",
-    "--dir", workspace,
-    "--agent", AGENT_NAME,
-    "--model", MODEL_ALIAS,
-    "--format", "json",
-    prompt
-  ], {
+  const child = spawn("opencode", buildOpenCodeArgs({
+    workspace,
+    agent: AGENT_NAME,
+    model: MODEL_ALIAS,
+    prompt,
+    sessionId
+  }), {
     cwd: workspace,
     env,
     stdio: ["ignore", "pipe", "pipe"]
@@ -230,6 +203,7 @@ async function runOpenCode(prompt) {
   let stdout = "";
   let stderr = "";
   let overflow = false;
+  let timedOut = false;
   child.stdout.setEncoding("utf8");
   child.stderr.setEncoding("utf8");
   child.stdout.on("data", (chunk) => {
@@ -244,33 +218,95 @@ async function runOpenCode(prompt) {
     if (Buffer.byteLength(stderr + chunk) <= 2 * 1024 * 1024) stderr += chunk;
   });
 
-  const exitCode = await new Promise((resolve, reject) => {
-    const timeout = setTimeout(() => child.kill("SIGTERM"), 7 * 60 * 1000);
-    child.once("error", (error) => { clearTimeout(timeout); reject(error); });
-    child.once("close", (code) => { clearTimeout(timeout); resolve(code ?? 1); });
+  const outcome = await new Promise((resolve, reject) => {
+    let killTimer;
+    const timeout = setTimeout(() => {
+      timedOut = true;
+      child.kill("SIGTERM");
+      killTimer = setTimeout(() => child.kill("SIGKILL"), 10_000);
+    }, timeoutMs);
+    child.once("error", (error) => {
+      clearTimeout(timeout);
+      if (killTimer) clearTimeout(killTimer);
+      reject(error);
+    });
+    child.once("close", (code) => {
+      clearTimeout(timeout);
+      if (killTimer) clearTimeout(killTimer);
+      resolve({ exitCode: timedOut ? 124 : (code ?? 1), timedOut });
+    });
   });
 
   if (overflow) throw new Error("OpenCode output exceeded the safety limit.");
-  const sessionId = findSessionId(stdout);
-  if (!sessionId) throw new Error("OpenCode did not provide a session ID. Exit=" + exitCode);
+  return { ...outcome, stdout, stderr };
+}
 
-  const exported = await execFile("opencode", ["export", sessionId], {
+async function exportOpenCodeState(sessionId, workspace, env) {
+  const exported = await execFile("opencode", ["export", sessionId, "--sanitize"], {
     cwd: workspace,
     env,
-    timeout: 60 * 1000,
+    timeout: 45 * 1000,
     maxBuffer: MAX_OUTPUT_BYTES,
     encoding: "utf8"
   });
   const transcript = JSON.parse(exported.stdout);
-  const answer = extractFinalAssistantText(transcript);
-  if (Number(exitCode) !== 0 || !answer) {
-    throw new Error("OpenCode did not finish with a complete final response. Exit=" + exitCode);
+  return { state: latestAssistantState(transcript), transcriptText: exported.stdout || "" };
+}
+
+async function runOpenCode(prompt, options = {}) {
+  const workspace = required(process.env.GITHUB_WORKSPACE, "GitHub workspace");
+  const env = {
+    ...process.env,
+    OPENCODE_CONFIG_CONTENT: makeReadOnlyConfig(AGENT_NAME)
+  };
+  const deadline = options.deadline || (Date.now() + OPENCODE_RUN_BUDGET_MS);
+  const suppliedSessionId = options.sessionId || "";
+
+  const initial = await runOpenCodeCommand(prompt, {
+    workspace, env, deadline, sessionId: suppliedSessionId
+  });
+  const sessionId = suppliedSessionId || findSessionId(initial.stdout);
+  if (!sessionId) {
+    throw new Error("OpenCode did not provide a session ID. Exit=" + initial.exitCode);
+  }
+
+  let exported = await exportOpenCodeState(sessionId, workspace, env);
+  let recovery = null;
+  if (needsSessionRecovery(exported.state, initial.exitCode)) {
+    const recoveryPrompt = [
+      "Continue this exact session and finish the requested response now.",
+      "Do not restart the investigation, repeat completed work, or delegate to another agent.",
+      "Use only tools explicitly permitted by the current read-only policy.",
+      "Do not edit files, run shell commands, delegate tasks, push, merge, deploy, or change settings.",
+      "If an inspection could not be completed, state that limitation clearly.",
+      "Return a complete final answer in the language of the original request."
+    ].join("\n");
+    recovery = await runOpenCodeCommand(recoveryPrompt, {
+      workspace, env, deadline, sessionId
+    });
+    exported = await exportOpenCodeState(sessionId, workspace, env);
+  }
+
+  const answer = exported.state.text || "";
+  const finalExitCode = recovery ? recovery.exitCode : initial.exitCode;
+  if (finalExitCode !== 0 || exported.state.finish !== "stop" || !answer.trim()) {
+    throw new Error(
+      "OpenCode final response incomplete. initial_exit=" + initial.exitCode +
+      "; initial_timeout=" + initial.timedOut +
+      "; initial_finish=" + (recovery ? "recovery-requested" : exported.state.finish) +
+      "; recovery_exit=" + (recovery ? recovery.exitCode : "not-run") +
+      "; recovery_timeout=" + (recovery ? recovery.timedOut : "not-run") +
+      "; final_finish=" + exported.state.finish
+    );
   }
 
   const secret = process.env.NVIDIA_API_KEY || "";
-  if (
-    (secret && (answer.includes(secret) || stdout.includes(secret) || stderr.includes(secret)))
-  ) {
+  const inspectedOutput = [
+    initial.stdout, initial.stderr,
+    recovery?.stdout || "", recovery?.stderr || "",
+    exported.transcriptText, answer
+  ].join("\n");
+  if (secret && inspectedOutput.includes(secret)) {
     throw new Error("Potential credential exposure detected; response suppressed.");
   }
   const credentialPatterns = [
@@ -282,13 +318,13 @@ async function runOpenCode(prompt) {
     /-----BEGIN [A-Z ]*PRIVATE KEY-----/,
     /\bsk-[A-Za-z0-9_-]{20,}\b/i
   ];
-  if (credentialPatterns.some((pattern) => pattern.test(answer))) {
+  if (credentialPatterns.some((pattern) => pattern.test(inspectedOutput))) {
     throw new Error("Credential-like output detected; response suppressed.");
   }
   if (/\[redacted:(?:text|file):prt_/i.test(answer)) {
     throw new Error("OpenCode returned sanitized placeholder text; response suppressed.");
   }
-  return answer.slice(0, 18000);
+  return { answer: answer.slice(0, 18000), sessionId };
 }
 
 async function main() {
@@ -315,12 +351,16 @@ async function main() {
     const ownerRequest = String(context.prompt?.content || "");
     const requiresArabic = /[\u0600-\u06FF]/u.test(ownerRequest);
     const prompt = buildPrompt(context);
-    let answer = await runOpenCode(prompt);
+    const deadline = Date.now() + OPENCODE_RUN_BUDGET_MS;
+    let result = await runOpenCode(prompt, { deadline });
+    let answer = result.answer;
     if (requiresArabic && answer !== "NO_PARTICIPATION" && !/[\u0600-\u06FF]{3,}/u.test(answer)) {
-      console.warn(AGENT_NAME + " returned a non-Arabic draft; retrying once with a strict Arabic instruction.");
-      answer = await runOpenCode(
-        prompt + "\n\nSTRICT FINAL CHECK: Your previous draft did not satisfy the owner's Arabic-language requirement. Rewrite the complete answer in clear Arabic now. Include Arabic explanation throughout; keep only code, file paths, and proper technical names in their original form."
+      console.warn(AGENT_NAME + " returned a non-Arabic draft; continuing the same session with a strict Arabic instruction.");
+      result = await runOpenCode(
+        "Rewrite your complete final answer in clear Arabic now. Include Arabic explanation throughout; keep only code, file paths, and proper technical names in their original form.",
+        { deadline, sessionId: result.sessionId }
       );
+      answer = result.answer;
     }
     if (requiresArabic && answer !== "NO_PARTICIPATION" && !/[\u0600-\u06FF]{3,}/u.test(answer)) {
       throw new Error("The model did not return an Arabic answer; the response was withheld.");
