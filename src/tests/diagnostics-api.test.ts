@@ -99,3 +99,20 @@ test('diagnostic proxy returns a bounded error when the upstream does not return
     globalThis.fetch = originalFetch;
   }
 });
+
+test('diagnostic proxy preserves useful 404 and 429 provider errors even with plain-text bodies', async () => {
+  const previousFetch = globalThis.fetch;
+  try {
+    globalThis.fetch = (async () => new Response('not found', { status: 404 })) as typeof fetch;
+    const missing = await rdapGet({ request: makeRequest('/api/rdap?domain=example.com') });
+    assert.equal(missing.status, 404);
+    assert.match(String((await missing.json() as { message: string }).message), /No public registry data/i);
+
+    globalThis.fetch = (async () => new Response('rate limit', { status: 429 })) as typeof fetch;
+    const limited = await dnsGet({ request: makeRequest('/api/dns?name=example.com&type=A') });
+    assert.equal(limited.status, 429);
+    assert.match(String((await limited.json() as { message: string }).message), /rate-limiting/i);
+  } finally {
+    globalThis.fetch = previousFetch;
+  }
+});
