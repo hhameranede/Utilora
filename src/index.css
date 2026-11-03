@@ -1001,3 +1001,47 @@ main textarea, main select {
 @media(max-width:390px) {
   .ulx-site-shell .ul-hero-grid:before { inset:0; }
 }
+
+
+/* Final tablet and compact-phone safeguards from the responsive browser audit. */
+@media (min-width:768px) and (max-width:900px) {
+  .ulx-site-shell .ul-hero-grid {
+    display:flex; flex-direction:column; align-items:stretch; justify-content:center;
+    width:calc(100% - 44px); min-height:0; gap:14px; padding:25px 0 16px;
+  }
+  .ulx-site-shell .ul-hero-copy { max-width:100%; text-align:center; }
+  .ulx-site-shell .ul-hero-title { max-width:100%; font-size:clamp(36px,5.4vw,48px); }
+  .ulx-site-shell .ul-hero-description { margin-inline:auto; }
+  .ulx-site-shell .ul-hero-search { margin-inline:auto; }
+  .ulx-site-shell .ul-hero-actions,.ulx-site-shell .ul-hero-shortcuts { justify-content:center; }
+  .ulx-site-shell .ul-hero-visual {
+    width:100%; max-width:560px; min-width:0; min-height:235px; height:235px;
+    margin:0 auto; overflow:hidden;
+  }
+  .ulx-site-shell .ul-device { width:min(100%,540px); transform:perspective(900px) rotateY(-3deg) scale(.78); }
+  .ulx-site-shell .ul-floating-panel { inset-inline-start:0; }
+}
+@media (max-width:390px) {
+  .ulx-site-shell .ul-hero-visual { height:108px; min-height:108px; margin-top:1px; }
+  .ulx-site-shell .ul-device { transform:perspective(900px) rotateY(-3deg) scale(.48); }
+  .ulx-site-shell #quick-tools .ul-compact-tool-card { min-height:88px; padding:9px!important; gap:5px; }
+  .ulx-site-shell #quick-tools .ul-compact-tool-card > div:first-child { gap:5px; }
+  .ulx-site-shell #quick-tools .ul-compact-tool-card h4 { font-size:10px; line-height:1.35; }
+  .ulx-site-shell #quick-tools .ul-compact-tool-card .ul-compact-tool-category { font-size:8px; line-height:1.2; }
+}
+@media (max-width:360px) {
+  .ulx-site-shell header.sticky > div { width:calc(100% - 16px); gap:4px; }
+  .ulx-site-shell header.sticky > div > div:first-child { gap:6px; flex:1 1 0; }
+  .ulx-site-shell header.sticky > div > div:first-child > a { min-width:0; }
+  .ulx-site-shell header.sticky > div > div:last-child { min-width:0; gap:4px; flex:0 1 auto; }
+  .ulx-site-shell header.sticky > div > div:last-child > button { min-width:31px; min-height:32px; padding-inline:5px; }
+  .ulx-site-shell .ul-content-page { width:calc(100% - 20px); max-width:100%; overflow-x:clip; }
+  .ulx-site-shell .ul-content-page > * { min-width:0; max-width:100%; }
+  .ulx-site-shell .ul-content-page .relative,
+  .ulx-site-shell .ul-content-page .flex,
+  .ulx-site-shell .ul-content-page .grid { min-width:0; max-width:100%; }
+  .ulx-site-shell .ul-content-page .overflow-x-auto { max-width:100%; overscroll-behavior-inline:contain; }
+  .ulx-site-shell .ul-content-page input,
+  .ulx-site-shell .ul-content-page select,
+  .ulx-site-shell .ul-content-page textarea { max-width:100%; min-width:0; }
+}
