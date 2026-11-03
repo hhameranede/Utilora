@@ -2,6 +2,7 @@ import { SupportedLocale } from '../i18n';
 import { ParsedRoute, RouteType } from './types';
 import { TOOLS_REGISTRY } from '../registry/tools.registry';
 import { CATEGORIES_REGISTRY } from '../registry/categories.registry';
+import { getWorkflowBySlug } from '../registry/workflows.registry';
 
 const VALID_LOCALES: SupportedLocale[] = ['en', 'ar', 'fr', 'es', 'pt', 'hi', 'zh', 'bn'];
 
@@ -117,6 +118,15 @@ export function parseRoute(pathname: string): ParsedRoute {
     }
   }
 
+  // Curated multi-tool workflow routes.
+  if (first === 'workflows') {
+    if (restSegments.length === 1) return { type: 'workflows-index', locale, rawPath: cleanPath };
+    if (restSegments.length === 2 && second && getWorkflowBySlug(second)) {
+      return { type: 'workflow', locale, workflowSlug: second, rawPath: cleanPath };
+    }
+    return { type: 'not-found', locale, rawPath: cleanPath };
+  }
+
   // Articles routes: /articles, /articles/category/:cat, /articles/:slug
   if (first === 'articles') {
     if (restSegments.length === 1) {
@@ -162,6 +172,10 @@ export function buildRoutePath(
       return `/${locale}/categories/${slug || ''}`;
     case 'tools-index':
       return `/${locale}/tools`;
+    case 'workflows-index':
+      return `/${locale}/workflows`;
+    case 'workflow':
+      return `/${locale}/workflows/${slug || ''}`;
     case 'tool':
       return `/${locale}/tools/${slug || ''}`;
     case 'tool-guide':

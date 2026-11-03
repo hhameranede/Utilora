@@ -6,6 +6,7 @@ import { dirname, resolve } from 'node:path';
 import { SUPPORTED_LANGUAGES } from '../src/i18n';
 import { CATEGORIES_LIST } from '../src/registry/categories.registry';
 import { TOOLS_LIST } from '../src/registry/tools.registry';
+import { WORKFLOWS_LIST } from '../src/registry/workflows.registry';
 import { SAMPLE_ARTICLES } from '../src/data/articles.data';
 import { buildRoutePath } from '../src/router/matcher';
 
@@ -40,6 +41,11 @@ function createHead(meta: PageMetadata, origin: string): string {
       '@context': 'https://schema.org', '@type': 'SoftwareApplication',
       name: meta.title, applicationCategory: 'UtilityApplication', operatingSystem: 'Any',
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' }, ...meta.schemaData,
+    };
+  } else if (meta.schemaType === 'HowTo') {
+    schema = {
+      '@context': 'https://schema.org', '@type': 'HowTo',
+      name: meta.title, description: meta.description, ...meta.schemaData,
     };
   } else if (meta.schemaType === 'Article') {
     schema = {
@@ -97,6 +103,8 @@ function getRoutes(): RouteEntry[] {
     add(locale, 'tools-index');
     add(locale, 'categories-index');
     CATEGORIES_LIST.forEach((item) => add(locale, 'category', item.slug));
+    add(locale, 'workflows-index');
+    WORKFLOWS_LIST.forEach((item) => add(locale, 'workflow', item.slug));
     TOOLS_LIST.forEach((item) => {
       add(locale, 'tool', item.slug);
       add(locale, 'tool-guide', item.slug);

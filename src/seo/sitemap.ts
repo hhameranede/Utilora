@@ -2,9 +2,10 @@ import { SUPPORTED_LANGUAGES } from '../i18n';
 import { CATEGORIES_LIST } from '../registry/categories.registry';
 import { buildRoutePath } from '../router/matcher';
 import { TOOLS_LIST } from '../registry/tools.registry';
+import { WORKFLOWS_LIST } from '../registry/workflows.registry';
 
 type PublicRoute = 'home' | 'tools-index' | 'categories-index' | 'category' | 'tool' |
-  'tool-guide' | 'about' | 'contact' | 'privacy' | 'terms' | 'copyright' | 'acceptable-use';
+  'tool-guide' | 'workflows-index' | 'workflow' | 'about' | 'contact' | 'privacy' | 'terms' | 'copyright' | 'acceptable-use';
 
 interface SitemapRoute {
   type: PublicRoute;
@@ -21,6 +22,8 @@ const PUBLIC_ROUTES: SitemapRoute[] = [
       { type: 'tool' as const, slug: tool.slug },
       { type: 'tool-guide' as const, slug: tool.slug },
     ]),
+  { type: 'workflows-index' },
+  ...WORKFLOWS_LIST.map((workflow) => ({ type: 'workflow' as const, slug: workflow.slug })),
   { type: 'about' },
   { type: 'contact' },
   { type: 'privacy' },

@@ -11,6 +11,8 @@ import { RelatedTools } from '../components/common/RelatedTools';
 import { FAQAccordion, FAQItem } from '../components/common/FAQAccordion';
 import { Icon } from '../components/common/Icon';
 import { Head } from '../seo/Head';
+import { WorkflowCard } from '../components/common/WorkflowCard';
+import { getWorkflowsForTool, WORKFLOW_UI } from '../registry/workflows.registry';
 
 interface ToolPageProps {
   toolSlug: string;
@@ -56,6 +58,8 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
   const localProcessingText = t('product.localProcessing');
   const networkProcessingText = t('product.networkProcessing');
   const previewText = t('product.previewMessage');
+  const relatedWorkflows = getWorkflowsForTool(tool.slug);
+  const workflowUi = WORKFLOW_UI[locale];
 
   const baseFaqs: FAQItem[] = tool.faqs || [
     {
@@ -416,6 +420,15 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
           toolSlugs={tool.relatedTools}
           title={t('product.relatedTools')}
         />
+      )}
+
+      {relatedWorkflows.length > 0 && (
+        <section className="space-y-4 border-t border-stone-200 pt-8">
+          <h2 className="text-xl font-bold text-stone-900">{workflowUi.relatedWorkflows}</h2>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {relatedWorkflows.map((workflow) => <WorkflowCard key={workflow.slug} workflow={workflow} />)}
+          </div>
+        </section>
       )}
     </article>
   );

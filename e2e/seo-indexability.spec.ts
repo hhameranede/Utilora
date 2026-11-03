@@ -8,6 +8,10 @@ test('functional tool pages are indexable while unfinished previews remain noind
   for (const locale of ['en', 'ar', 'fr', 'es', 'pt', 'hi', 'zh', 'bn']) {
     expect(sitemap).toContain('/' + locale + '/tools/json-formatter');
   }
+  for (const locale of ['en', 'ar', 'fr', 'es', 'pt', 'hi', 'zh', 'bn']) {
+    expect(sitemap).toContain('/' + locale + '/workflows');
+    expect(sitemap).toContain('/' + locale + '/workflows/prepare-images-for-web');
+  }
   expect(sitemap).toContain('/en/tools/video-compressor');
   expect(sitemap).toContain('/en/tools/video-compressor/how-to');
   expect(sitemap).not.toContain('/en/tools/video-downloader/how-to');
@@ -48,8 +52,8 @@ test('the production sitemap is complete, canonical, and XML-structured', async 
 
   const urlBlocks = [...sitemap.matchAll(/<url>([\s\S]*?)<\/url>/g)].map((match) => match[1]);
   // 8 locales × (home, two directory indexes, 6 categories, 35 tools,
-  // 35 tool guides, and 6 informational/legal pages) = 680 URLs.
-  expect(urlBlocks).toHaveLength(680);
+  // 35 guides, 6 workflow routes, and 6 informational/legal pages) = 736 URLs.
+  expect(urlBlocks).toHaveLength(736);
 
   const locations = urlBlocks.map((block) => {
     const match = block.match(/<loc>([^<]+)<\/loc>/);
@@ -62,6 +66,7 @@ test('the production sitemap is complete, canonical, and XML-structured', async 
   expect(sitemap).not.toContain('pages.dev');
   expect(sitemap).not.toContain('video-downloader');
   expect(sitemap).not.toContain('/articles');
+  expect(sitemap).toContain('/en/workflows/inspect-a-domain');
   expect(sitemap).not.toContain('/dev/');
 
   const expectedLanguages = ['en', 'ar', 'fr', 'es', 'pt', 'hi', 'zh', 'bn', 'x-default'];

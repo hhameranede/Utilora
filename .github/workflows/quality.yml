@@ -53,6 +53,9 @@ jobs:
       - name: Test standalone product content
         run: npm run test:products
 
+      - name: Test curated workflow content
+        run: npm run test:workflows
+
       - name: Test local browser engines
         run: npm run test:core
 
@@ -78,12 +81,17 @@ jobs:
           grep -q 'hreflang="ar"' public/sitemap.xml
           grep -q 'hreflang="bn"' public/sitemap.xml
           grep -q "/tools/json-formatter" public/sitemap.xml
+          grep -q "/workflows/prepare-images-for-web" public/sitemap.xml
           grep -q "/tools/video-compressor/how-to" public/sitemap.xml
           ! grep -q "/tools/video-downloader/how-to" public/sitemap.xml
           test -s dist/ar.html
           test -s dist/en/tools.html
           test -s dist/en/tools/image-converter.html
           test -s dist/en/tools/image-converter/how-to.html
+          test -s dist/en/workflows.html
+          test -s dist/en/workflows/prepare-images-for-web.html
+          test -s dist/ar/workflows/prepare-images-for-web.html
+          grep -q '"@type":"HowTo"' dist/en/workflows/prepare-images-for-web.html
           test -s dist/ar/tools/video-compressor/how-to.html
           ! grep -R -q '/community' dist
           test -s dist/en/tools/json-formatter.html

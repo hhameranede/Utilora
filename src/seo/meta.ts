@@ -12,7 +12,7 @@ export interface PageMetadataConfig {
   ogType?: 'website' | 'article';
   publishedTime?: string;
   author?: string;
-  schemaType?: 'WebSite' | 'SoftwareApplication' | 'Article' | 'BreadcrumbList';
+  schemaType?: 'WebSite' | 'SoftwareApplication' | 'Article' | 'BreadcrumbList' | 'HowTo';
   schemaData?: Record<string, unknown>;
 }
 
@@ -158,6 +158,14 @@ export function applyDocumentMetadata(config: PageMetadataConfig) {
         price: '0',
         priceCurrency: 'USD',
       },
+      ...config.schemaData,
+    };
+  } else if (config.schemaType === 'HowTo') {
+    structuredData = {
+      '@context': 'https://schema.org',
+      '@type': 'HowTo',
+      name: config.title,
+      description: config.description,
       ...config.schemaData,
     };
   } else if (config.schemaType === 'Article') {

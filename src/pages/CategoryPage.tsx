@@ -13,6 +13,8 @@ import { Head } from '../seo/Head';
 import { Search } from 'lucide-react';
 import { Link } from '../router';
 import { matchesSearch } from '../utils/search';
+import { WorkflowCard } from '../components/common/WorkflowCard';
+import { getWorkflowsForCategory, WORKFLOW_UI } from '../registry/workflows.registry';
 
 interface CategoryPageProps {
   categorySlug: string;
@@ -28,6 +30,8 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ categorySlug }) => {
   const tools = getToolsByCategory(category.id);
   const featuredTool = tools.find((t) => t.isFeatured) || tools[0];
   const relatedCategories = CATEGORIES_LIST.filter((c) => c.id !== category.id).slice(0, 3);
+  const workflows = getWorkflowsForCategory(category.id);
+  const workflowUi = WORKFLOW_UI[locale];
 
   const filteredTools = filterQuery.trim()
     ? tools.filter((tool) => matchesSearch(filterQuery, tool.localizedName, tool.localizedDescription, tool.slug, tool.acceptedFormats))
@@ -170,6 +174,15 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ categorySlug }) => {
             ))}
           </div>
         </section>
+
+        {workflows.length > 0 && (
+          <section className="space-y-4 border-t border-stone-200/80 pt-8">
+            <h2 className="text-xl font-bold text-stone-900">{workflowUi.workflows}</h2>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {workflows.map((workflow) => <WorkflowCard key={workflow.slug} workflow={workflow} />)}
+            </div>
+          </section>
+        )}
 
         {/* Relevant Educational Guides */}
         <RelatedArticles title={`${t('common.relatedArticles')} · ${title}`} />
