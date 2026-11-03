@@ -29,7 +29,7 @@ export const ToolsIndexPage: React.FC = () => {
         isIndexable={true}
       />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 sm:space-y-8">
+      <div className="ul-content-page max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 sm:space-y-8">
         <Breadcrumbs items={[{ label: t('nav.tools') }]} />
 
         <div>
@@ -44,11 +44,11 @@ export const ToolsIndexPage: React.FC = () => {
         {/* Filter Controls Bar */}
         <div className="p-3 sm:p-4 rounded-2xl bg-white border border-stone-200/90 shadow-xs flex flex-col md:flex-row items-center justify-between gap-3 sm:gap-4">
           {/* Category Filter Tabs */}
-          <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto p-1.5 bg-stone-50 border border-stone-200 rounded-2xl [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <div role="group" aria-label={t('nav.categories')} className="min-w-0 max-w-full flex items-center gap-2 overflow-x-auto overscroll-x-contain w-full md:w-auto p-1.5 bg-stone-50 border border-stone-200 rounded-2xl" style={{ scrollbarWidth: 'thin' }}>
             <button
               onClick={() => setSelectedCategory('all')}
               aria-pressed={selectedCategory === 'all'}
-              className={`px-3.5 py-2 text-xs font-semibold rounded-xl border transition-all shrink-0 whitespace-nowrap ${
+              className={`min-h-10 px-3.5 py-2 text-xs font-semibold rounded-xl border transition-all shrink-0 whitespace-nowrap ${
                 selectedCategory === 'all'
                   ? 'border-orange-700 bg-orange-700 text-white shadow-sm'
                   : 'border-stone-200 bg-white text-stone-700 shadow-xs hover:border-orange-300 hover:bg-orange-50 hover:text-orange-800'
@@ -61,7 +61,7 @@ export const ToolsIndexPage: React.FC = () => {
                 key={cat.id}
                 onClick={() => setSelectedCategory(cat.id)}
                 aria-pressed={selectedCategory === cat.id}
-                className={`px-3.5 py-2 text-xs font-semibold rounded-xl border transition-all shrink-0 whitespace-nowrap ${
+                className={`min-h-10 px-3.5 py-2 text-xs font-semibold rounded-xl border transition-all shrink-0 whitespace-nowrap ${
                   selectedCategory === cat.id
                     ? 'border-orange-700 bg-orange-700 text-white shadow-sm'
                     : 'border-stone-200 bg-white text-stone-700 shadow-xs hover:border-orange-300 hover:bg-orange-50 hover:text-orange-800'

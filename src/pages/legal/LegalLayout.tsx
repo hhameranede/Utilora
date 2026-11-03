@@ -31,7 +31,7 @@ export const LegalLayout: React.FC<LegalLayoutProps> = ({
         isIndexable={true}
       />
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+      <div className="ul-content-page max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
         <Breadcrumbs items={[{ label: title }]} />
 
         <div className="space-y-3 pb-6 border-b border-stone-200">

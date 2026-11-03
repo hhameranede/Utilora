@@ -24,8 +24,28 @@ interface ToolWorkspaceResolverProps {
 }
 
 export const ToolWorkspaceResolver: React.FC<ToolWorkspaceResolverProps> = ({ tool }) => {
-  const { locale } = useI18n();
+  const { locale, t } = useI18n();
   const toolName = tool.localizedName[locale] || tool.localizedName.en;
+
+  // This item is intentionally a non-interactive preview until a real direct-media engine exists.
+  // Do not expose the generic file uploader: it suggests support for PDFs and images that this tool does not provide.
+  if (tool.slug === 'video-downloader') {
+    return (
+      <div className="rounded-2xl border border-dashed border-orange-300 bg-orange-50/50 p-5 sm:p-7" role="status">
+        <div className="flex items-center gap-3">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-orange-200 bg-white text-orange-700">
+            <span aria-hidden="true" className="text-lg">▶</span>
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-stone-900">{t('product.previewOnly')}</p>
+            <p className="mt-0.5 text-xs text-orange-800">{t('product.notAvailable')}</p>
+          </div>
+        </div>
+        <p className="mt-4 text-sm leading-6 text-stone-700">{tool.localizedDescription[locale] || tool.localizedDescription.en}</p>
+        <p className="mt-3 text-xs leading-5 text-stone-600">{t('product.previewNotWorking')}</p>
+      </div>
+    );
+  }
 
   if (tool.category === 'image') {
     return (

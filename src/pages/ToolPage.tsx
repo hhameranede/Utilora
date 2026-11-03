@@ -126,7 +126,7 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
   });
 
   return (
-    <article className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+    <article className="ul-content-page ul-tool-page max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-7 sm:space-y-10">
       <Head
         title={seoTitle}
         description={seoDescription}
@@ -154,7 +154,7 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
         ]}
       />
 
-      <header className="overflow-hidden rounded-[2rem] border border-stone-200 bg-gradient-to-br from-white via-white to-orange-50/70 p-6 shadow-sm sm:p-9">
+      <header className="overflow-hidden rounded-2xl border border-stone-200 bg-gradient-to-br from-white via-white to-orange-50/70 p-4 shadow-sm sm:rounded-[2rem] sm:p-8">
         <div className="flex flex-wrap items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-500">
           <span className="rounded-full border border-orange-200 bg-orange-50 px-3 py-1 text-orange-700">UTILORA</span>
           <span>{categoryTitle}</span>
@@ -162,7 +162,7 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
           <span>{toolName}</span>
         </div>
 
-        <div className="mt-6 grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+        <div className="mt-4 grid gap-4 sm:gap-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
           <div className="max-w-3xl">
             <div className="flex items-center gap-3">
               <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-orange-100 bg-white text-orange-700 shadow-sm">
@@ -180,24 +180,24 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
               </div>
             </div>
 
-            <h1 className="mt-5 text-3xl font-extrabold tracking-tight text-stone-950 sm:text-5xl">
+            <h1 className="mt-3 text-2xl font-extrabold tracking-tight text-stone-950 sm:text-5xl">
               {toolName}
             </h1>
-            <p className="mt-4 max-w-2xl text-base leading-8 text-stone-600 sm:text-lg">
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-stone-600 sm:text-lg sm:leading-8">
               {positioning}
             </p>
-            <p className="mt-3 max-w-2xl text-sm leading-7 text-stone-500">
+            <p className="mt-2 hidden max-w-2xl text-sm leading-7 text-stone-500 sm:block">
               {toolDesc}
             </p>
 
-            <div className="mt-6 flex flex-wrap gap-2">
-              <span className="inline-flex items-center gap-2 rounded-full border border-stone-200 bg-white px-3 py-2 text-xs font-medium text-stone-700">
+            <div className="mt-3 sm:mt-5 flex flex-wrap gap-2">
+              <span className="inline-flex items-center gap-2 rounded-full border border-stone-200 bg-white px-2.5 py-1.5 text-[11px] font-medium text-stone-700">
                 <CheckCircle2 size={14} className="text-orange-700" />
                 {isFunctional
                   ? t('product.free')
                   : t('product.freePreview')}
               </span>
-              <span className="inline-flex items-center gap-2 rounded-full border border-stone-200 bg-white px-3 py-2 text-xs font-medium text-stone-700">
+              <span className="inline-flex items-center gap-2 rounded-full border border-stone-200 bg-white px-2.5 py-1.5 text-[11px] font-medium text-stone-700">
                 <ShieldCheck size={14} className="text-orange-700" />
                 {!isFunctional
                   ? t('product.previewOnly')
@@ -205,7 +205,7 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
                     ? t('product.publicLookups')
                     : t('product.browserProcessing')}
               </span>
-              <span className="inline-flex items-center gap-2 rounded-full border border-stone-200 bg-white px-3 py-2 text-xs font-medium text-stone-700">
+              <span className="inline-flex items-center gap-2 rounded-full border border-stone-200 bg-white px-2.5 py-1.5 text-[11px] font-medium text-stone-700">
                 <Sparkles size={14} className="text-orange-700" />
                 {isFunctional
                   ? t('product.noInstall')
@@ -233,7 +233,7 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
           </div>
         </div>
 
-        <nav aria-label={t('product.toolPageSections')} className="mt-8 flex flex-wrap gap-x-5 gap-y-2 border-t border-stone-200/80 pt-5 text-xs font-semibold text-stone-500">
+        <nav aria-label={t('product.toolPageSections')} className="mt-4 flex flex-wrap gap-x-4 gap-y-2 border-t border-stone-200/80 pt-4 text-xs font-semibold text-stone-500">
           <a className="transition hover:text-orange-700" href="#tool-workspace">{t('product.workspace')}</a>
           <a className="transition hover:text-orange-700" href="#tool-features">{t('product.features')}</a>
           <a className="transition hover:text-orange-700" href="#how-it-works">{t('product.workflow')}</a>
@@ -251,7 +251,7 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
         </div>
       )}
 
-      <section id="tool-workspace" className="scroll-mt-6 space-y-4">
+      <section id="tool-workspace" className="scroll-mt-20 space-y-3 sm:space-y-4">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.14em] text-orange-700">
@@ -267,7 +267,7 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
               : t('product.processesOnDevice')}
           </p>
         </div>
-        <div className="rounded-[1.75rem] border border-stone-200 bg-white p-3 shadow-sm sm:p-5">
+        <div className="rounded-2xl border border-stone-200 bg-white p-2 shadow-sm sm:rounded-[1.75rem] sm:p-5">
           <ToolWorkspaceResolver tool={tool} />
         </div>
       </section>

@@ -21,7 +21,7 @@ export const FeaturedToolCard: React.FC<FeaturedToolCardProps> = ({ tool, classN
 
   return (
     <div
-      className={`p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-white via-white to-orange-50/40 border border-stone-200/90 hover:border-orange-300 transition-all flex flex-col justify-between shadow-xs hover:shadow-md relative group ${className}`}
+      className={`ul-featured-tool-card p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-white via-white to-orange-50/40 border border-stone-200/90 hover:border-orange-300 transition-all flex flex-col justify-between shadow-xs hover:shadow-md relative group ${className}`}
     >
       <div>
         <div className="flex items-center justify-between gap-3 mb-6">
@@ -67,6 +67,7 @@ export const FeaturedToolCard: React.FC<FeaturedToolCardProps> = ({ tool, classN
         <Link
           routeType="tool"
           slug={tool.slug}
+          scrollTo="tool-workspace"
           className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-orange-700 hover:bg-orange-800 text-white text-sm font-semibold shadow-xs shadow-orange-500/20 transition-all hover:scale-102"
         >
           <span>{t('common.openTool')}</span>

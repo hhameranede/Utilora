@@ -145,7 +145,7 @@ export const TemplatePdfTools: React.FC<TemplatePdfToolsProps> = ({ toolName, to
         </label>
 
         <div className="p-4 rounded-2xl bg-white border border-stone-200 shadow-xs space-y-3">
-          <div className="flex items-center justify-between gap-3"><h3 className="text-xs font-semibold text-stone-800">{t('pdfWorkspace.selectedFiles')} ({files.length})</h3><button type="button" onClick={() => { setFiles([]); setOutputs([]); setMessage(''); setError(''); }} className="text-[11px] text-stone-500 hover:text-red-600">{t('pdfWorkspace.clearList')}</button></div>
+          <div className="flex items-center justify-between gap-3"><h3 className="text-xs font-semibold text-stone-800">{t('pdfWorkspace.selectedFiles')} ({files.length})</h3><button type="button" onClick={() => { setFiles([]); setOutputs([]); setMessage(''); setError(''); }} className="inline-flex min-h-10 items-center rounded-lg px-3 text-xs font-medium text-stone-600 hover:bg-red-50 hover:text-red-700">{t('pdfWorkspace.clearList')}</button></div>
           {files.length === 0 ? <p className="text-xs text-stone-400 py-4 text-center">{t('pdfWorkspace.noFilesSelected')}</p> : (
             <ul className="space-y-2 max-h-72 overflow-y-auto">
               {files.map((file, index) => (
@@ -157,11 +157,11 @@ export const TemplatePdfTools: React.FC<TemplatePdfToolsProps> = ({ toolName, to
                   <div className="flex items-center gap-1 shrink-0">
                     {multiple && (
                       <>
-                        <button type="button" onClick={() => moveFile(index, 'up')} disabled={index === 0} className="p-1.5 rounded-md hover:bg-stone-200 text-stone-500 disabled:opacity-30" title={t('pdfWorkspace.moveFileUp')}><ArrowUp size={14} /></button>
-                        <button type="button" onClick={() => moveFile(index, 'down')} disabled={index === files.length - 1} className="p-1.5 rounded-md hover:bg-stone-200 text-stone-500 disabled:opacity-30" title={t('pdfWorkspace.moveFileDown')}><ArrowDown size={14} /></button>
+                        <button type="button" onClick={() => moveFile(index, 'up')} disabled={index === 0} className="inline-flex min-h-10 min-w-10 items-center justify-center rounded-lg hover:bg-stone-200 text-stone-500 disabled:opacity-30" title={t('pdfWorkspace.moveFileUp')} aria-label={t('pdfWorkspace.moveFileUp')}><ArrowUp size={14} /></button>
+                        <button type="button" onClick={() => moveFile(index, 'down')} disabled={index === files.length - 1} className="inline-flex min-h-10 min-w-10 items-center justify-center rounded-lg hover:bg-stone-200 text-stone-500 disabled:opacity-30" title={t('pdfWorkspace.moveFileDown')} aria-label={t('pdfWorkspace.moveFileDown')}><ArrowDown size={14} /></button>
                       </>
                     )}
-                    <button type="button" onClick={() => removeFile(index)} className="p-1.5 rounded-md hover:bg-red-50 text-stone-400 hover:text-red-600" title={t('pdfWorkspace.removeFile')}><X size={14} /></button>
+                    <button type="button" onClick={() => removeFile(index)} className="inline-flex min-h-10 min-w-10 items-center justify-center rounded-lg hover:bg-red-50 text-stone-400 hover:text-red-600" title={t('pdfWorkspace.removeFile')} aria-label={t('pdfWorkspace.removeFile')}><X size={14} /></button>
                   </div>
                 </li>
               ))}
@@ -172,7 +172,7 @@ export const TemplatePdfTools: React.FC<TemplatePdfToolsProps> = ({ toolName, to
         {outputs.length > 0 && (
           <div className="p-4 rounded-2xl bg-orange-50/60 border border-orange-200/80 space-y-3">
             <div className="flex items-center justify-between gap-3"><h3 className="text-xs font-bold text-stone-900">{t('pdfWorkspace.outputFiles')} ({outputs.length})</h3>{outputs.length > 1 && <button type="button" onClick={downloadAll} className="text-xs font-semibold text-orange-800 underline">{t('pdfWorkspace.downloadAll')}</button>}</div>
-            {outputs.map((output) => <div key={output.name} className="flex items-center justify-between gap-3 bg-white border border-stone-200 rounded-xl p-3"><div className="min-w-0"><p className="text-xs font-semibold text-stone-900 truncate">{output.name}</p><p className="text-[11px] text-stone-500">{output.note} · {formatBytes(output.blob.size)}</p></div><button type="button" onClick={() => downloadFile(output)} className="shrink-0 p-2 rounded-lg bg-stone-900 text-white" aria-label={`${t('pdfWorkspace.downloadFile')} ${output.name}`}><Download size={15} /></button></div>)}
+            {outputs.map((output) => <div key={output.name} className="flex items-center justify-between gap-3 bg-white border border-stone-200 rounded-xl p-3"><div className="min-w-0"><p className="text-xs font-semibold text-stone-900 truncate">{output.name}</p><p className="text-[11px] text-stone-500">{output.note} · {formatBytes(output.blob.size)}</p></div><button type="button" onClick={() => downloadFile(output)} className="inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-xl bg-stone-900 text-white hover:bg-stone-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2" aria-label={`${t('pdfWorkspace.downloadFile')} ${output.name}`}><Download size={15} /></button></div>)}
           </div>
         )}
       </section>

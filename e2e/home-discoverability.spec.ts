@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 test('homepage exposes popular tools immediately on a mobile screen', async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 844 });
+  await page.setViewportSize({ width: 360, height: 720 });
   await page.goto('/en');
 
   const quickTools = page.locator('#quick-tools');
@@ -12,7 +12,7 @@ test('homepage exposes popular tools immediately on a mobile screen', async ({ p
 
   const firstRow = await Promise.all([0, 1].map((index) => cards.nth(index).boundingBox()));
   expect(
-    firstRow.every((box) => box !== null && box.y + box.height <= 844),
+    firstRow.every((box) => box !== null && box.y + box.height <= 720),
     'The first two real tool shortcuts should be fully visible without scrolling.',
   ).toBe(true);
 

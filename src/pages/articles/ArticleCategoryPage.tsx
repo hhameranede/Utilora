@@ -29,7 +29,7 @@ export const ArticleCategoryPage: React.FC<ArticleCategoryPageProps> = ({ catego
         isIndexable={false}
       />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+      <div className="ul-content-page max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         <Breadcrumbs
           items={[
             { label: t('nav.articles'), routeType: 'articles-index' },
