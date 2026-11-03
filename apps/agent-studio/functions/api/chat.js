@@ -218,8 +218,10 @@ export async function onRequest(context) {
           ? "رد فوري دون تشغيل نموذج"
           : skipped ? "غير معني بهذه المهمة" : "في قائمة الانتظار",
         progress: instantCompleted || skipped ? 100 : 0,
-        ...(instantCompleted ? { response: fastReply, started_at: now, finished_at: now } : {}),
-        ...(skipped && !instantCompleted ? { finished_at: now } : {})
+        response: instantCompleted ? fastReply : null,
+        error: null,
+        started_at: instantCompleted ? now : null,
+        finished_at: instantCompleted || skipped ? now : null
       };
     }));
 
