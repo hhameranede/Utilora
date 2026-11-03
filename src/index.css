@@ -60,3 +60,26 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #f97316;
 }
+
+@media (max-width: 640px) {
+  /* Keep the first row of real tools visible on a short mobile viewport. */
+  .ul-home { gap: 17px; }
+  .ul-hero-grid { gap: 0; }
+  .ul-hero-shortcuts { display: none; }
+  .ul-hero-visual { height: 90px; min-height: 90px; margin-top: 2px; }
+  .ul-device { width: 78%; transform: perspective(800px) rotateY(-4deg) scale(.50); transform-origin: center center; }
+  .ul-device-screen { min-height: 145px; }
+  .ul-editor { min-height: 132px; }
+  .ul-editor-canvas, .ul-editor-canvas svg { min-height: 125px; }
+  .ul-floating-panel, .ul-hero-proof { display: none; }
+  .ul-floating-image { width: 72px; }
+  .ul-image-badge { width: 38px; height: 38px; }
+  .ul-image-badge svg { width: 22px; height: 22px; }
+  .ul-home #quick-tools a[href*="/tools/"] {
+    min-height: 60px;
+    padding: 9px 10px;
+    border-radius: 15px;
+    box-shadow: 0 5px 16px rgba(23,25,31,.035);
+  }
+  .ul-home #quick-tools .ul-section-heading { margin-bottom: 9px; }
+}
