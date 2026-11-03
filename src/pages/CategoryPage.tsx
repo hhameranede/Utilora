@@ -95,7 +95,7 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ categorySlug }) => {
         schemaType="BreadcrumbList"
       />
 
-      <div className="ul-content-page max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
+      <div className="ul-content-page max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 sm:space-y-12 lg:space-y-16">
         {/* Breadcrumbs */}
         <Breadcrumbs
           items={[
@@ -105,7 +105,7 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ categorySlug }) => {
         />
 
         {/* Category Hero Banner */}
-        <div className="p-8 sm:p-12 rounded-3xl bg-gradient-to-br from-white via-white to-orange-50/40 border border-stone-200/90 shadow-xs relative">
+        <div className="p-5 sm:p-8 lg:p-12 rounded-3xl bg-gradient-to-br from-white via-white to-orange-50/40 border border-stone-200/90 shadow-xs relative">
           <div className="max-w-3xl space-y-4">
             <div className="w-14 h-14 rounded-2xl bg-orange-50 border border-orange-100 flex items-center justify-center text-orange-700 shadow-xs">
               <Icon name={category.icon} size={28} />
@@ -162,7 +162,7 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ categorySlug }) => {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4">
+          <div className="ul-category-tools-grid grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4">
             {filteredTools.length === 0 ? (
               <p className="col-span-full rounded-2xl border border-dashed border-stone-300 bg-white px-4 py-10 text-center text-sm text-stone-600">{t('common.noResults')}</p>
             ) : filteredTools.map((tool) => (
