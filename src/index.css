@@ -899,6 +899,7 @@ main textarea, main select {
   .ulx-site-shell .ul-tool-page { width:calc(100% - 48px); }
 }
 @media(max-width:1023px) {
+  .ulx-site-shell header.sticky nav { display:none; }
   .ulx-site-shell header.sticky > div { width:calc(100% - 36px); gap:13px; }
   .ulx-site-shell header.sticky > div > div:first-child { gap:15px; }
   .ulx-site-shell header.sticky nav { gap:13px; }
