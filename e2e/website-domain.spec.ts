@@ -18,7 +18,7 @@ const rdapFixture = {
 };
 
 async function mockRdap(page: Page) {
-  await page.route('https://rdap.org/domain/**', (route) => route.fulfill({
+  await page.route(/\/api\/rdap\?domain=/, (route) => route.fulfill({
     status: 200,
     headers: { 'access-control-allow-origin': '*', 'content-type': 'application/rdap+json' },
     body: JSON.stringify(rdapFixture),
@@ -26,7 +26,7 @@ async function mockRdap(page: Page) {
 }
 
 async function mockPublicDns(page: Page) {
-  await page.route('https://cloudflare-dns.com/dns-query**', async (route) => {
+  await page.route(/\/api\/dns\?/, async (route) => {
     const requestUrl = new URL(route.request().url());
     const type = requestUrl.searchParams.get('type');
     let Answer: Array<{ name: string; type: number; TTL: number; data: string }> = [];
