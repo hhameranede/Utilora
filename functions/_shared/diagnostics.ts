@@ -84,26 +84,27 @@ export async function fetchTrustedLookupJson(
       return jsonResponse({ message: "The public lookup provider returned an unexpectedly large response." }, 502);
     }
 
+    const providerFailure = (statusCode: number, responseBody: unknown): Response => {
+      const providerMessage = responseBody && typeof responseBody === "object" && "description" in responseBody
+        ? String((responseBody as { description?: unknown }).description || "")
+        : "";
+      const message = statusCode === 404
+        ? "No public registry data was found for this domain."
+        : statusCode === 429
+          ? "The public lookup provider is rate-limiting requests. Try again shortly."
+          : providerMessage || "The public lookup provider returned HTTP " + statusCode + ".";
+      return jsonResponse({ message }, statusCode === 404 || statusCode === 429 ? statusCode : 502);
+    };
+
     let payload: unknown;
     try {
       payload = JSON.parse(text);
     } catch {
+      if (!upstream.ok) return providerFailure(upstream.status, null);
       return jsonResponse({ message: "The public lookup provider returned an invalid JSON response." }, 502);
     }
 
-    if (!upstream.ok) {
-      const providerMessage = payload && typeof payload === "object" && "description" in payload
-        ? String((payload as { description?: unknown }).description || "")
-        : "";
-      const message = upstream.status === 404
-        ? "No public registry data was found for this domain."
-        : upstream.status === 429
-          ? "The public lookup provider is rate-limiting requests. Try again shortly."
-          : providerMessage || "The public lookup provider returned HTTP " + upstream.status + ".";
-      const status = upstream.status === 404 || upstream.status === 429 ? upstream.status : 502;
-      return jsonResponse({ message }, status);
-    }
-
+    if (!upstream.ok) return providerFailure(upstream.status, payload);
     return jsonResponse(payload, 200, "public, max-age=" + maxAgeSeconds + ", s-maxage=" + (maxAgeSeconds * 2));
   } catch {
     const timedOut = controller.signal.aborted;
