@@ -9,14 +9,14 @@ test('PWA manifest exposes a standalone UTILORA install target', async ({ reques
   expect(manifest.start_url).toBe('/en');
   expect(manifest.scope).toBe('/');
   expect(manifest.display).toBe('standalone');
-  expect(manifest.theme_color).toBe('#fafaf9');
+  expect(manifest.theme_color).toBe('#f8f9fc');
   expect(manifest.icons).toEqual(expect.arrayContaining([
     expect.objectContaining({ src: '/pwa-icon.svg', type: 'image/svg+xml' }),
   ]));
 
   const icon = await request.get('/pwa-icon.svg');
   expect(icon.ok()).toBeTruthy();
-  expect(await icon.text()).toContain('#ea580c');
+  expect(await icon.text()).toContain('#F47716');
 });
 
 test('service worker keeps a visited tool available offline and shows a fallback for a new route', async ({ page }) => {
