@@ -4,83 +4,134 @@ import { Link } from '../../router';
 import { CATEGORIES_LIST } from '../../registry/categories.registry';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { BrandLogo } from './BrandLogo';
-import { ArrowUpLeft, ShieldCheck } from 'lucide-react';
+import { Shield } from 'lucide-react';
 
 export const SiteFooter: React.FC = () => {
   const { locale, t } = useI18n();
 
   return (
-    <footer className="ul-footer w-full text-stone-500">
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-14 lg:px-8">
-        <div className="grid grid-cols-2 gap-9 md:grid-cols-4 lg:grid-cols-6">
+    <footer className="w-full bg-white border-t border-stone-200/80 text-stone-500 mt-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        {/* Top Grid: Brand & Categories & Platform Links */}
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 mb-12">
+          {/* Brand Column */}
           <div className="col-span-2 space-y-4">
-            <Link routeType="home" className="inline-flex rounded-xl">
-              <BrandLogo />
+            <Link routeType="home" className="flex items-center gap-2.5">
+              <BrandLogo compact />
             </Link>
-            <p className="max-w-sm text-sm leading-7 text-stone-600">
+            <p className="text-xs text-stone-500 max-w-sm leading-relaxed">
               {t('hero.subtitle', 'Powerful, simple, and free online utilities for your images, documents, text, code, websites, and videos.')}
             </p>
-            <div className="inline-flex items-center gap-2 rounded-full border border-orange-100 bg-orange-50 px-3 py-2 text-xs font-semibold text-orange-800">
-              <ShieldCheck size={15} />
-              {t('hero.privacyBadge')}
+            <div className="flex items-center gap-2 text-xs text-stone-500 pt-2">
+              <Shield size={14} className="text-orange-500" />
+              <span>{t('footer.cookieNotice')}</span>
             </div>
           </div>
 
+          {/* Categories 1-3 */}
           <div>
-            <h3 className="mb-4 text-sm font-extrabold text-stone-900">{t('nav.categories')}</h3>
-            <ul className="space-y-3 text-sm">
-              {CATEGORIES_LIST.slice(0, 3).map((category) => (
-                <li key={category.id}>
-                  <Link routeType="category" slug={category.slug}>
-                    {category.localizedTitle[locale] || category.localizedTitle.en}
+            <h4 className="text-xs font-semibold text-stone-900 uppercase tracking-wider mb-3">
+              {t('nav.categories')}
+            </h4>
+            <ul className="space-y-2 text-xs">
+              {CATEGORIES_LIST.slice(0, 3).map((cat) => (
+                <li key={cat.id}>
+                  <Link
+                    routeType="category"
+                    slug={cat.slug}
+                    className="hover:text-orange-700 transition-colors"
+                  >
+                    {cat.localizedTitle[locale] || cat.localizedTitle.en}
                   </Link>
                 </li>
               ))}
             </ul>
           </div>
 
+          {/* Categories 4-6 */}
           <div>
-            <h3 className="mb-4 text-sm font-extrabold text-stone-900">{t('footer.moreCategories')}</h3>
-            <ul className="space-y-3 text-sm">
-              {CATEGORIES_LIST.slice(3).map((category) => (
-                <li key={category.id}>
-                  <Link routeType="category" slug={category.slug}>
-                    {category.localizedTitle[locale] || category.localizedTitle.en}
+            <h4 className="text-xs font-semibold text-stone-900 uppercase tracking-wider mb-3">
+              {t('footer.moreCategories')}
+            </h4>
+            <ul className="space-y-2 text-xs">
+              {CATEGORIES_LIST.slice(3, 6).map((cat) => (
+                <li key={cat.id}>
+                  <Link
+                    routeType="category"
+                    slug={cat.slug}
+                    className="hover:text-orange-700 transition-colors"
+                  >
+                    {cat.localizedTitle[locale] || cat.localizedTitle.en}
                   </Link>
                 </li>
               ))}
             </ul>
           </div>
 
+          {/* Resources & Content */}
           <div>
-            <h3 className="mb-4 text-sm font-extrabold text-stone-900">{t('footer.platform')}</h3>
-            <ul className="space-y-3 text-sm">
-              <li><Link routeType="tools-index">{t('nav.allTools')}</Link></li>
-              <li><Link routeType="categories-index">{t('nav.categories')}</Link></li>
-              <li><Link routeType="articles-index">{t('nav.articles')}</Link></li>
-              <li><Link routeType="about">{t('nav.about')}</Link></li>
-              <li><Link routeType="contact">{t('footer.contact')}</Link></li>
+            <h4 className="text-xs font-semibold text-stone-900 uppercase tracking-wider mb-3">
+              {t('footer.platform')}
+            </h4>
+            <ul className="space-y-2 text-xs">
+              <li>
+                <Link routeType="tools-index" className="hover:text-orange-700 transition-colors">
+                  {t('nav.allTools')} (36)
+                </Link>
+              </li>
+              <li>
+                <Link routeType="articles-index" className="hover:text-orange-700 transition-colors">
+                  {t('nav.articles')}
+                </Link>
+              </li>
             </ul>
           </div>
 
+          {/* Legal & Compliance */}
           <div>
-            <h3 className="mb-4 text-sm font-extrabold text-stone-900">{t('footer.legal')}</h3>
-            <ul className="space-y-3 text-sm">
-              <li><Link routeType="privacy">{t('footer.privacy')}</Link></li>
-              <li><Link routeType="terms">{t('footer.terms')}</Link></li>
-              <li><Link routeType="copyright">{t('footer.copyright')}</Link></li>
-              <li><Link routeType="acceptable-use">{t('footer.acceptableUse')}</Link></li>
+            <h4 className="text-xs font-semibold text-stone-900 uppercase tracking-wider mb-3">
+              {t('footer.legal')}
+            </h4>
+            <ul className="space-y-2 text-xs">
+              <li>
+                <Link routeType="privacy" className="hover:text-orange-700 transition-colors">
+                  {t('footer.privacy')}
+                </Link>
+              </li>
+              <li>
+                <Link routeType="terms" className="hover:text-orange-700 transition-colors">
+                  {t('footer.terms')}
+                </Link>
+              </li>
+              <li>
+                <Link routeType="copyright" className="hover:text-orange-700 transition-colors">
+                  {t('footer.copyright')}
+                </Link>
+              </li>
+              <li>
+                <Link routeType="acceptable-use" className="hover:text-orange-700 transition-colors">
+                  {t('footer.acceptableUse')}
+                </Link>
+              </li>
+              <li>
+                <Link routeType="about" className="hover:text-orange-700 transition-colors">
+                  {t('footer.about')}
+                </Link>
+              </li>
+              <li>
+                <Link routeType="contact" className="hover:text-orange-700 transition-colors">
+                  {t('footer.contact')}
+                </Link>
+              </li>
             </ul>
           </div>
         </div>
 
-        <div className="mt-10 flex flex-col items-center justify-between gap-5 border-t border-stone-200 pt-6 md:flex-row">
+        {/* Middle Divider & Language Selector */}
+        <div className="pt-8 border-t border-stone-200/80 flex flex-col md:flex-row items-center justify-between gap-6">
           <LanguageSwitcher variant="footer" />
-          <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-stone-500">
-            <span>© {new Date().getFullYear()} UTILORA. {t('footer.rights')}</span>
-            <Link routeType="home" className="inline-flex items-center gap-1 font-bold text-orange-700">
-              UTILORA <ArrowUpLeft size={13} />
-            </Link>
+          <div className="text-xs text-stone-500">
+            © {new Date().getFullYear()} UTILORA. {t('footer.rights')}
           </div>
         </div>
       </div>

@@ -20,7 +20,7 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({ category, className 
     <Link
       routeType="category"
       slug={category.slug}
-      className={`ul-category-card group p-6 rounded-2xl bg-white hover:bg-white border border-stone-200/80 hover:border-orange-300 transition-all flex flex-col justify-between relative shadow-xs hover:shadow-md hover:shadow-orange-500/5 ${className}`}
+      className={`group p-6 rounded-2xl bg-white hover:bg-white border border-stone-200/80 hover:border-orange-300 transition-all flex flex-col justify-between relative shadow-xs hover:shadow-md hover:shadow-orange-500/5 ${className}`}
     >
       <div>
         <div className="flex items-center justify-between mb-4">

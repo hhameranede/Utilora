@@ -182,23 +182,10 @@ export const ToolGuidePage: React.FC<ToolGuidePageProps> = ({ toolSlug }) => {
   const category = tool ? getCategoryById(tool.category) : undefined;
   const categoryName = category ? (category.localizedTitle[locale] || category.localizedTitle.en) : '';
   const formats = tool?.acceptedFormats?.join(', ') || t('guide.formatsShown');
-  const steps = useMemo(() => {
-    if (!tool) return [];
-    if (tool.slug === 'video-downloader') {
-      return locale === 'ar'
-        ? [
-            { title: 'الأداة قيد التطوير', description: 'هذه الصفحة تعرض معاينة فقط. لم تُفعّل وظيفة تنزيل الفيديو بعد، لذلك لا توجد منطقة رفع أو إعدادات أو زر تنزيل يمكن استخدامه حالياً.', annotation: 'معاينة توضيحية — لا توجد عناصر تفاعلية' },
-            { title: 'لا ترفع ملفاتك هنا', description: 'لا تحتاج إلى اختيار ملف أو إدخال رابط في هذه النسخة. انتظر حتى تُعلن صفحة الأداة عن توفر محرك فعلي.', annotation: 'لا توجد مدخلات في النسخة الحالية' },
-            { title: 'تحقق من حالة الأداة', description: 'ارجع إلى صفحة الأداة للاطلاع على حالة الإتاحة قبل محاولة استخدامها.', annotation: 'تفاصيل حالة الإتاحة' },
-          ]
-        : [
-            { title: 'This tool is in preview', description: 'This page is a visual preview only. Video downloading is not enabled yet, so there is no upload area, settings panel, or download action to use.', annotation: 'Preview only — no interactive controls' },
-            { title: 'Do not upload a file here', description: 'This version does not ask you to select a file or enter a link. Wait until the tool page announces that a real engine is available.', annotation: 'No inputs are available in this preview' },
-            { title: 'Check availability first', description: 'Return to the tool page to review its availability status before trying to use it.', annotation: 'Availability information' },
-          ];
-    }
-    return getGuideSteps(tool.category, locale, toolName, formats, t);
-  }, [tool, locale, toolName, formats, t]);
+  const steps = useMemo(
+    () => tool ? getGuideSteps(tool.category, locale, toolName, formats, t) : [],
+    [tool, locale, toolName, formats, t],
+  );
 
   useEffect(() => {
     if (!tool || !captureRef.current) return;
@@ -253,7 +240,7 @@ export const ToolGuidePage: React.FC<ToolGuidePageProps> = ({ toolSlug }) => {
         isIndexable={guideIsIndexable}
       />
 
-      <div className="ul-content-page mx-auto max-w-7xl space-y-8 px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl space-y-8 px-4 sm:px-6 lg:px-8">
         <Breadcrumbs items={[
           { label: t('nav.tools'), routeType: 'tools-index' },
           { label: categoryName, routeType: 'category', slug: tool.category },

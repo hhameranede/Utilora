@@ -17,8 +17,8 @@ export const SiteHeader: React.FC = () => {
 
   return (
     <>
-      <header className="ul-site-header sticky top-0 z-40 w-full border-b border-stone-200/80 bg-white shadow-xs">
-        <div className="ul-header-inner max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-0.5 sm:gap-4">
+      <header className="sticky top-0 z-40 w-full border-b border-stone-200/80 bg-white shadow-xs">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-0.5 sm:gap-4">
           {/* Brand Logo */}
           <div className="flex items-center gap-6">
             <Link
@@ -29,10 +29,10 @@ export const SiteHeader: React.FC = () => {
             </Link>
 
             {/* Desktop Navigation Links */}
-            <nav className="hidden md:flex items-center gap-6 text-sm font-semibold text-stone-600">
+            <nav className="hidden md:flex items-center gap-6 text-xs font-medium text-stone-600">
               <Link
                 routeType="tools-index"
-                className={`ul-nav-link inline-flex min-h-10 items-center py-2 transition-colors hover:text-orange-700 ${
+                className={`inline-flex min-h-10 items-center py-2 transition-colors hover:text-orange-700 ${
                   route.type === 'tools-index' || route.type === 'tool' || route.type === 'tool-guide' ? 'text-orange-700 font-semibold' : ''
                 }`}
               >
@@ -53,7 +53,7 @@ export const SiteHeader: React.FC = () => {
                   aria-haspopup="true"
                   aria-expanded={isCategoryMenuOpen}
                   aria-controls="utilora-category-menu"
-                  className={`ul-nav-link inline-flex min-h-10 items-center gap-1 px-1 py-2 transition-colors hover:text-orange-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-700 focus-visible:ring-offset-4 rounded-md ${route.type === 'categories-index' || route.type === 'category' ? 'text-orange-700 font-semibold' : ''}`}
+                  className={`inline-flex min-h-10 items-center gap-1 px-1 py-2 transition-colors hover:text-orange-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-700 focus-visible:ring-offset-4 rounded-md ${route.type === 'categories-index' || route.type === 'category' ? 'text-orange-700 font-semibold' : ''}`}
                 >
                   <span>{t('nav.categories')}</span>
                   <ChevronDown size={12} aria-hidden="true" className={`transition-transform text-stone-500 ${isCategoryMenuOpen ? 'rotate-180 text-orange-700' : ''}`} />
