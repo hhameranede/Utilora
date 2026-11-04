@@ -8,6 +8,7 @@ export const TemplateKDnsLookup: React.FC<{ toolName: string }> = ({ toolName })
   const [domain, setDomain] = useState('example.com');
   const [selectedTypes, setSelectedTypes] = useState<DnsRecordType[]>(RECORD_TYPES);
   const [records, setRecords] = useState<DnsRecord[]>([]);
+  const [partialErrors, setPartialErrors] = useState<Array<{ type: DnsRecordType; message: string }>>([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [hasRun, setHasRun] = useState(false);
@@ -23,10 +24,12 @@ export const TemplateKDnsLookup: React.FC<{ toolName: string }> = ({ toolName })
     setBusy(true);
     setError('');
     setRecords([]);
+    setPartialErrors([]);
     setHasRun(false);
     try {
       const result = await lookupDnsRecords(domain, selectedTypes);
       setRecords(result.records);
+      setPartialErrors(result.errors);
       setHasRun(true);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'The DNS lookup could not be completed.');
@@ -61,10 +64,19 @@ export const TemplateKDnsLookup: React.FC<{ toolName: string }> = ({ toolName })
             })}
           </div>
         </div>
-        <p className="text-[11px] text-stone-500">Queries use Cloudflare DNS-over-HTTPS. The resolver may return cached answers and TTL values.</p>
+        <p className="text-[11px] text-stone-500">Queries use UTILORA’s same-origin lookup endpoint backed by Cloudflare DNS-over-HTTPS. The resolver may return cached answers and TTL values.</p>
       </form>
 
       {error && <div role="alert" className="p-4 rounded-xl border border-red-200 bg-red-50 text-xs text-red-800 flex gap-2"><AlertCircle size={15} className="shrink-0 mt-0.5" />{error}</div>}
+
+      {hasRun && partialErrors.length > 0 && (
+        <div role="status" className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-xs text-amber-900">
+          <p className="font-semibold">Some record types could not be queried. Successful results are shown below.</p>
+          <ul className="mt-2 list-disc pl-5 space-y-1">
+            {partialErrors.map((item) => <li key={item.type}><span className="font-mono font-semibold">{item.type}</span>: {item.message}</li>)}
+          </ul>
+        </div>
+      )}
 
       {hasRun && (
         <section className="rounded-2xl bg-white border border-stone-200 shadow-xs overflow-hidden">

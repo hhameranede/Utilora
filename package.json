@@ -14,7 +14,7 @@
     "prerender": "tsx scripts/prerender-routes.tsx",
     "test:pdf": "tsx scripts/test-pdf-core.ts",
     "test:image": "tsx scripts/test-image-core.ts",
-    "test:diagnostics": "tsx --test src/tests/diagnostics.test.ts",
+    "test:diagnostics": "tsx --test src/tests/diagnostics.test.ts src/tests/diagnostics-api.test.ts",
     "e2e": "playwright test",
     "test:products": "tsx --test src/tests/tool-experience.test.ts",
     "test:registry": "tsx --test src/tests/registry.test.ts",

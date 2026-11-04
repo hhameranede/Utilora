@@ -36,6 +36,7 @@ export interface DnsLookupOutput {
     ttl: number;
     priority?: number;
   }>;
+  errors: Array<{ type: string; message: string }>;
 }
 
 export interface WebsiteStatusCheckerInput { url: string; }

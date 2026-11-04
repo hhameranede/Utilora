@@ -46,7 +46,7 @@ MD5 is not exposed by the current browser-native hash workspace. It requires a s
 
 `video-downloader` remains a UI-only preview. It does not pretend to download media. A future implementation should only accept direct media resources the user is authorized to download; it must not bypass DRM, access controls, or a platform's download restrictions.
 
-The five Website & Domain tools are functional and connected to public read-only services: Domain Age Checker and RDAP Lookup use RDAP, DNS Lookup uses DNS-over-HTTPS, and Website Status / HTTP Headers use credential-free browser-originated HEAD requests. These probes depend on public-service availability and browser CORS; a CORS-blocked result must remain unknown rather than being labeled offline.
+The five Website & Domain tools use public read-only services. Domain Age Checker and RDAP Lookup call a same-origin Cloudflare Pages Function that fetches the public RDAP service server-side; DNS Lookup uses a same-origin Pages Function backed by Cloudflare DNS-over-HTTPS. This avoids depending on each registry's browser CORS policy. Website Status and HTTP Headers remain credential-free browser-originated HEAD requests after public DNS validation. A target website that blocks cross-origin response access must remain unknown rather than being labeled offline.
 
 ## Technology and remaining engineering work
 
@@ -54,7 +54,7 @@ The five Website & Domain tools are functional and connected to public read-only
 | :--- | :--- | :--- |
 | Image processing | Browser Canvas APIs | Profile large inputs and monitor memory on lower-powered devices |
 | PDF manipulation/rendering | `pdf-lib` + PDF.js in the browser | Expand PDF.js browser coverage and stress-test large documents |
-| Network diagnostics | Public RDAP / DNS-over-HTTPS / credential-free HEAD requests | Verify real-world CORS and provider rate limits; keep private-address protections in place |
+| Network diagnostics | Same-origin RDAP and DNS Pages Functions; browser-originated credential-free HEAD requests for target-site checks | Verify live Pages Function deployment and provider rate limits; target-site status/header checks remain subject to the target's CORS policy |
 | Video compression, trimming, and audio extraction | Mediabunny browser codecs | Expand browser/device codec coverage and test longer high-resolution clips |
 | Direct video downloading | Not connected | Design a permissions-respecting direct-file workflow before enabling processing |
 
@@ -63,7 +63,7 @@ The five Website & Domain tools are functional and connected to public read-only
 - Never display a successful result unless the engine actually completed.
 - Validate file types, sizes, and user input before processing.
 - Keep user files in memory and avoid server persistence unless a future feature explicitly requires it.
-- Network tools must defend against private IPs, redirects to internal targets, DNS rebinding, and abuse.
+- The RDAP and DNS Pages Functions accept only validated public hostnames and fixed upstream origins; never turn them into arbitrary URL proxies. Website probes must continue to reject private/reserved DNS answers, avoid credentials, and never follow redirects to internal targets.
 - Long-running operations must support cancellation or clear timeouts.
 - Unsupported browsers must receive an honest compatibility message, not a fake output.
 

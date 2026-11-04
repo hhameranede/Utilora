@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { isPublicIpAddress, normalizeDomain, normalizeWebsiteUrl, parseDnsAnswer } from '../engines/diagnostics/browser';
+import { isPublicIpAddress, lookupDnsRecords, lookupDomainRdap, normalizeDomain, normalizeWebsiteUrl, parseDnsAnswer } from '../engines/diagnostics/browser';
 
 test('domain normalization canonicalizes case, trailing dots, and IDNs', () => {
   assert.equal(normalizeDomain('ExAmPlE.com.'), 'example.com');
@@ -54,4 +54,61 @@ test('DNS answer parsing normalizes MX priorities, TXT quoting, names and TTL', 
     name: 'example.com', type: 'TXT', value: 'v=spf1 -all', ttl: 300,
   });
   assert.equal(parseDnsAnswer({ name: 'example.com.', type: 99, TTL: 1, data: 'unknown' }), null);
+});
+
+test('RDAP client uses the same-origin endpoint and parses real registry events', async () => {
+  const previousFetch = globalThis.fetch;
+  let requestedUrl = '';
+  globalThis.fetch = (async (input) => {
+    requestedUrl = String(input);
+    return new Response(JSON.stringify({
+      handle: 'EXAMPLE.COM',
+      events: [{ eventAction: 'registration', eventDate: '2010-01-02T00:00:00Z' }],
+      entities: [],
+      nameservers: [],
+    }), { status: 200, headers: { 'content-type': 'application/json' } });
+  }) as typeof fetch;
+  try {
+    const result = await lookupDomainRdap('Example.com');
+    assert.equal(requestedUrl, '/api/rdap?domain=example.com');
+    assert.equal(result.domain, 'example.com');
+    assert.equal(result.createdAt, '2010-01-02T00:00:00.000Z');
+    assert.ok((result.ageDays ?? 0) > 0);
+  } finally {
+    globalThis.fetch = previousFetch;
+  }
+});
+
+test('DNS lookup keeps successful record types when another query fails', async () => {
+  const previousFetch = globalThis.fetch;
+  const requestedTypes: string[] = [];
+  globalThis.fetch = (async (input) => {
+    const url = new URL(String(input), 'https://utilora.test');
+    const type = url.searchParams.get('type') || '';
+    requestedTypes.push(type);
+    if (type === '16') return new Response(JSON.stringify({ message: 'temporary TXT resolver failure' }), { status: 502 });
+    return new Response(JSON.stringify({
+      Status: 0,
+      Answer: [{ name: 'example.com.', type: 1, TTL: 300, data: '93.184.216.34' }],
+    }), { status: 200, headers: { 'content-type': 'application/json' } });
+  }) as typeof fetch;
+  try {
+    const result = await lookupDnsRecords('example.com', ['A', 'TXT']);
+    assert.deepEqual(requestedTypes.sort(), ['1', '16']);
+    assert.equal(result.records.length, 1);
+    assert.equal(result.records[0].value, '93.184.216.34');
+    assert.deepEqual(result.errors, [{ type: 'TXT', message: 'temporary TXT resolver failure' }]);
+  } finally {
+    globalThis.fetch = previousFetch;
+  }
+});
+
+test('DNS lookup still fails clearly when every selected record type fails', async () => {
+  const previousFetch = globalThis.fetch;
+  globalThis.fetch = (async () => new Response(JSON.stringify({ message: 'resolver unavailable' }), { status: 502 })) as typeof fetch;
+  try {
+    await assert.rejects(lookupDnsRecords('example.com', ['A', 'AAAA']), /resolver unavailable/);
+  } finally {
+    globalThis.fetch = previousFetch;
+  }
 });
