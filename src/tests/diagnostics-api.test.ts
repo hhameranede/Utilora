@@ -1,10 +1,18 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { onRequestGet as rdapGet } from '../../functions/api/rdap';
+import { onRequestGet as rdapGet, resolveRdapBaseUrls } from '../../functions/api/rdap';
 import { onRequestGet as dnsGet } from '../../functions/api/dns';
 
 const makeRequest = (path: string) => new Request('https://utilora.test' + path);
 const originalFetch = globalThis.fetch;
+const rdapBootstrap = (urls = ['https://registry.example.net/rdap/']) => ({
+  version: '1.0',
+  services: [
+    [['com'], ['https://registry.example.net/com/']],
+    [['example.com'], urls],
+  ],
+});
+const rdapFixture = { objectClassName: 'domain', handle: 'EXAMPLE.COM', events: [] };
 
 test('RDAP endpoint rejects URL and local-hostname injection without contacting an upstream', async () => {
   let called = false;
@@ -23,26 +31,101 @@ test('RDAP endpoint rejects URL and local-hostname injection without contacting 
   }
 });
 
-test('RDAP endpoint calls only the fixed RDAP provider and returns registry JSON', async () => {
-  let calledUrl = '';
-  let calledInit: RequestInit | undefined;
-  const fixture = { objectClassName: 'domain', handle: 'EXAMPLE.COM', events: [] };
+test('RDAP bootstrap selects the label-wise longest HTTPS suffix match', () => {
+  const urls = resolveRdapBaseUrls('shop.example.com', {
+    services: [
+      [['com'], ['https://registry.example.net/com/']],
+      [['example.com'], ['https://registry.example.net/example/']],
+      [['shop.example.com'], ['https://registry.example.net/shop/']],
+    ],
+  });
+  assert.deepEqual(urls.map((url) => url.href), ['https://registry.example.net/shop/']);
+});
+
+test('RDAP bootstrap rejects insecure and private registry URLs', () => {
+  const urls = resolveRdapBaseUrls('example.com', {
+    services: [
+      [['com'], [
+        'http://registry.example.net/rdap/',
+        'https://localhost/rdap/',
+        'https://127.0.0.1/rdap/',
+      ]],
+    ],
+  });
+  assert.deepEqual(urls, []);
+});
+
+test('RDAP endpoint uses IANA bootstrap and returns authoritative registry JSON', async () => {
+  const calls: Array<{ url: string; init?: RequestInit }> = [];
   globalThis.fetch = (async (input, init) => {
-    calledUrl = String(input);
-    calledInit = init;
-    return new Response(JSON.stringify(fixture), { status: 200, headers: { 'content-type': 'application/rdap+json' } });
+    const url = String(input);
+    calls.push({ url, init });
+    if (url === 'https://data.iana.org/rdap/dns.json') {
+      return new Response(JSON.stringify(rdapBootstrap()), { status: 200, headers: { 'content-type': 'application/json' } });
+    }
+    return new Response(JSON.stringify(rdapFixture), { status: 200, headers: { 'content-type': 'application/rdap+json' } });
   }) as typeof fetch;
   try {
     const response = await rdapGet({ request: makeRequest('/api/rdap?domain=ExAmPlE.com.') });
     assert.equal(response.status, 200);
     assert.equal(response.headers.get('cache-control'), 'public, max-age=300, s-maxage=600');
-    assert.deepEqual(await response.json(), fixture);
-    const upstream = new URL(calledUrl);
-    assert.equal(upstream.origin, 'https://rdap.org');
-    assert.equal(upstream.pathname, '/domain/example.com');
-    assert.equal(calledInit?.method, 'GET');
-    assert.equal(calledInit?.credentials, 'omit');
-    assert.equal(calledInit?.redirect, 'follow');
+    assert.deepEqual(await response.json(), rdapFixture);
+    assert.equal(calls.length, 2);
+    assert.equal(calls[0].url, 'https://data.iana.org/rdap/dns.json');
+    assert.equal(new URL(calls[1].url).origin, 'https://registry.example.net');
+    assert.equal(new URL(calls[1].url).pathname, '/rdap/domain/example.com');
+    assert.equal(calls[0].init?.method, 'GET');
+    assert.equal(calls[0].init?.credentials, 'omit');
+    assert.equal((calls[0].init?.headers as Record<string, string>).Accept, 'application/json');
+    assert.equal(calls[1].init?.method, 'GET');
+    assert.equal(calls[1].init?.credentials, 'omit');
+    assert.equal(calls[1].init?.redirect, 'follow');
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test('RDAP endpoint refuses insecure-only IANA entries instead of downgrading to HTTP', async () => {
+  let calls = 0;
+  globalThis.fetch = (async () => {
+    calls += 1;
+    return new Response(JSON.stringify({
+      services: [[['foo'], ['http://registry.example.net/rdap/']]],
+    }), { status: 200, headers: { 'content-type': 'application/json' } });
+  }) as typeof fetch;
+  try {
+    const response = await rdapGet({ request: makeRequest('/api/rdap?domain=example.foo') });
+    assert.equal(response.status, 503);
+    assert.equal(calls, 1);
+    assert.match(String((await response.json() as { message: string }).message), /secure HTTPS RDAP service/i);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test('RDAP endpoint tries a second IANA-listed HTTPS server when the first returns 403', async () => {
+  const requested: string[] = [];
+  globalThis.fetch = (async (input) => {
+    const url = String(input);
+    requested.push(url);
+    if (url === 'https://data.iana.org/rdap/dns.json') {
+      return new Response(JSON.stringify(rdapBootstrap([
+        'https://blocked.example.net/rdap/',
+        'https://backup.example.net/rdap/',
+      ])), { status: 200, headers: { 'content-type': 'application/json' } });
+    }
+    if (url.startsWith('https://blocked.example.net/')) {
+      return new Response('forbidden', { status: 403 });
+    }
+    return new Response(JSON.stringify(rdapFixture), { status: 200, headers: { 'content-type': 'application/rdap+json' } });
+  }) as typeof fetch;
+  try {
+    const response = await rdapGet({ request: makeRequest('/api/rdap?domain=example.com') });
+    assert.equal(response.status, 200);
+    assert.deepEqual(await response.json(), rdapFixture);
+    assert.equal(requested.length, 3);
+    assert.match(requested[1], /^https:\/\/blocked\.example\.net\//);
+    assert.match(requested[2], /^https:\/\/backup\.example\.net\//);
   } finally {
     globalThis.fetch = originalFetch;
   }
@@ -100,10 +183,15 @@ test('diagnostic proxy returns a bounded error when the upstream does not return
   }
 });
 
-test('diagnostic proxy preserves useful 404 and 429 provider errors even with plain-text bodies', async () => {
+test('diagnostic proxy preserves useful RDAP 404 and DNS 429 provider errors', async () => {
   const previousFetch = globalThis.fetch;
   try {
-    globalThis.fetch = (async () => new Response('not found', { status: 404 })) as typeof fetch;
+    globalThis.fetch = (async (input) => {
+      if (String(input) === 'https://data.iana.org/rdap/dns.json') {
+        return new Response(JSON.stringify(rdapBootstrap()), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+      return new Response('not found', { status: 404 });
+    }) as typeof fetch;
     const missing = await rdapGet({ request: makeRequest('/api/rdap?domain=example.com') });
     assert.equal(missing.status, 404);
     assert.match(String((await missing.json() as { message: string }).message), /No public registry data/i);
