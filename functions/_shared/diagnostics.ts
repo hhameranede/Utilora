@@ -57,17 +57,18 @@ export function normalizePublicDomain(value: string): string | null {
 }
 
 /**
- * Fetches JSON only from a fixed, trusted public lookup provider.
- * Callers must never pass a user-supplied URL or hostname as the upstream origin.
+ * Fetches JSON from a provider whose HTTPS origin was fixed in code or resolved
+ * from the official IANA RDAP bootstrap registry. Never pass user-supplied URLs.
  * The abort timer remains active while the upstream response body is consumed.
  */
 export async function fetchTrustedLookupJson(
   url: URL,
   accept: string,
   maxAgeSeconds: number,
+  timeoutMs = 10_000,
 ): Promise<Response> {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 10_000);
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
     const upstream = await fetch(url, {
