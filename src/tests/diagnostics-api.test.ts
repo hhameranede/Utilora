@@ -65,7 +65,7 @@ test('RDAP bootstrap prefers the longest matching suffix', async () => {
     if (url === 'https://data.iana.org/rdap/dns.json') {
       return new Response(JSON.stringify(bootstrap([
         [['com'], ['https://rdap.verisign.com/com/v1/']],
-        [['example.com'], ['https://rdap.example-registry.test/v1/']],
+        [['example.com'], ['https://rdap.example-registry.net/v1/']],
       ])), { status: 200 });
     }
     return new Response(JSON.stringify(rdapFixture), { status: 200 });
@@ -73,7 +73,7 @@ test('RDAP bootstrap prefers the longest matching suffix', async () => {
   try {
     const response = await rdapGet({ request: makeRequest('/api/rdap?domain=www.example.com') });
     assert.equal(response.status, 200);
-    assert.equal(calledUrls[1], 'https://rdap.example-registry.test/v1/domain/www.example.com');
+    assert.equal(calledUrls[1], 'https://rdap.example-registry.net/v1/domain/www.example.com');
   } finally {
     globalThis.fetch = originalFetch;
   }
