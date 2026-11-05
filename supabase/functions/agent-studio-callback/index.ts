@@ -1,4 +1,5 @@
 import { createRemoteJWKSet, jwtVerify } from "npm:jose@5.10.0";
+import { summarizeSpecialistRuns } from "./lifecycle.mjs";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "https://utilora-chat.vercel.app",
@@ -178,9 +179,9 @@ async function writeCallback(body: any) {
       status_text: statusText || status,
       progress,
       ...(responseText ? { response: responseText } : {}),
-      ...(errorText ? { error: errorText } : {}),
+      ...(status === "failed" ? { error: errorText || "agent_failed" } : { error: null }),
       ...(status === "running" ? { started_at: new Date().toISOString() } : {}),
-      ...(["completed", "failed"].includes(status) ? { finished_at: new Date().toISOString() } : {}),
+      ...(["completed", "failed", "skipped"].includes(status) ? { finished_at: new Date().toISOString() } : {}),
     }]
   );
 
@@ -230,12 +231,15 @@ async function writeCallback(body: any) {
       error: errorText || "private_agent_failed",
     });
   } else if (agentId === "project-lead" && status === "completed") {
+    const outcome = summarizeSpecialistRuns(rows);
     await supabase("team_chat_runs?id=eq." + encodeURIComponent(runId), "PATCH", {
-      status: "completed",
-      stage: "اكتمل رد الفريق",
+      status: outcome.status,
+      stage: outcome.status === "completed"
+        ? "اكتمل رد الفريق"
+        : "اكتمل رد قائد الفريق لكن بعض الوكلاء تعثروا",
       progress: 100,
       finished_at: new Date().toISOString(),
-      error: null,
+      error: outcome.error,
     });
   } else if (agentId === "project-lead" && status === "failed") {
     await supabase("team_chat_runs?id=eq." + encodeURIComponent(runId), "PATCH", {
