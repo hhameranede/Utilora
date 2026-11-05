@@ -8,7 +8,7 @@
     "build": "vite build",
     "preview": "vite preview --host 0.0.0.0",
     "test:bounty-hunter": "node --test scripts/test-bounty-hunter.mjs",
-    "test:agent-runtime": "node --test scripts/test-opencode-session.mjs"
+    "test:agent-runtime": "node --test scripts/test-opencode-session.mjs scripts/test-team-run-lifecycle.mjs"
   },
   "devDependencies": {
     "vite": "8.3.5"
