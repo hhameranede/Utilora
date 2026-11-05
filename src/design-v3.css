@@ -403,8 +403,8 @@
 
 .ulx-site-shell .ul-tool-page #tool-workspace button:disabled {
   cursor: not-allowed;
-  opacity: .48;
-  box-shadow: none !important;
+  opacity: .58;
+  box-shadow: 0 4px 10px rgba(223, 101, 11, .12) !important;
   transform: none !important;
 }
 

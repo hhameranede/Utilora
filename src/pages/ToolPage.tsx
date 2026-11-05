@@ -167,9 +167,16 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
           <div className="flex items-center gap-2">
             <span className={isFunctional ? "inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[10px] font-bold text-emerald-800" : "inline-flex items-center gap-1.5 rounded-full border border-orange-200 bg-orange-50 px-2.5 py-1 text-[10px] font-bold text-orange-800"}>
               <span aria-hidden="true" className={isFunctional ? "h-1.5 w-1.5 rounded-full bg-emerald-500" : "h-1.5 w-1.5 rounded-full bg-orange-500"} />
-              {isFunctional ? t('product.ready') : t('product.previewOnly')}
+              {isFunctional ? t('product.ready') : `${t('product.previewOnly')} · ${t('product.freePreview')}`}
             </span>
-            <Link routeType="tool-guide" slug={tool.slug} className="inline-flex min-h-8 items-center justify-center gap-1.5 rounded-lg border border-stone-200 bg-white px-2.5 py-1.5 text-[10px] font-bold text-stone-700 shadow-sm transition hover:border-orange-300 hover:text-orange-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2">
+            <a
+              href="#tool-workspace"
+              className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-lg border border-orange-700 bg-orange-700 px-3 py-2 text-[10px] font-extrabold text-white shadow-sm transition hover:border-orange-800 hover:bg-orange-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2"
+            >
+              {t('product.openTool')}
+              <ArrowRight size={13} />
+            </a>
+            <Link routeType="tool-guide" slug={tool.slug} className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-lg border border-stone-200 bg-white px-2.5 py-2 text-[10px] font-bold text-stone-700 shadow-sm transition hover:border-orange-300 hover:text-orange-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2">
               <FileText size={13} />
               {t('product.howToUse')}
             </Link>
