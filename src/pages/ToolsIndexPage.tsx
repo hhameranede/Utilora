@@ -90,7 +90,7 @@ export const ToolsIndexPage: React.FC = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={t('tools.searchPlaceholder')}
               aria-label={t('tools.searchPlaceholder')}
-              className="w-full ps-9 pe-3 py-2.5 rounded-xl bg-white border border-stone-200 text-sm text-stone-900 placeholder-stone-500 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 shadow-xs transition-all
+              className="w-full ps-9 pe-3 py-2.5 rounded-xl bg-white border border-stone-200 text-sm text-stone-900 placeholder-stone-500 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 shadow-xs transition-all"
             />
           </div>
         </div>
