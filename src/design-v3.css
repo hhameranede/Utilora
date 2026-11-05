@@ -1,0 +1,317 @@
+/* UTILORA Design v3 — motion, depth and interaction polish.
+   Intentionally presentation-only: keeps the existing palette and page structure. */
+
+:root {
+  --ulx-motion-fast: 180ms;
+  --ulx-motion-base: 280ms;
+  --ulx-motion-slow: 620ms;
+  --ulx-ease-out: cubic-bezier(.22, 1, .36, 1);
+}
+
+@keyframes ulx-fade-up {
+  from { opacity: 0; transform: translate3d(0, 14px, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+@keyframes ulx-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes ulx-float {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(var(--ulx-float-rotation, 0deg)); }
+  50% { transform: translate3d(0, -8px, 0) rotate(var(--ulx-float-rotation, 0deg)); }
+}
+
+@keyframes ulx-orbit {
+  0%, 100% { transform: rotate(-11deg) scale(1); }
+  50% { transform: rotate(-7deg) scale(1.025); }
+}
+
+/* Shared surface language. No colors are declared or replaced in this layer. */
+.ulx-site-shell .ul-tool-card,
+.ulx-site-shell .ul-category-card,
+.ulx-site-shell .ul-featured-tool-card,
+.ulx-site-shell .ul-page-intro,
+.ulx-site-shell .ul-content-page .rounded-2xl.border,
+.ulx-site-shell .ul-content-page .rounded-3xl.border {
+  border-radius: 22px !important;
+  box-shadow: var(--ul-shadow-card);
+  transition:
+    transform var(--ulx-motion-base) var(--ulx-ease-out),
+    box-shadow var(--ulx-motion-base) var(--ulx-ease-out),
+    border-color var(--ulx-motion-fast) ease;
+}
+
+.ulx-site-shell .ul-featured-tool-card,
+.ulx-site-shell .ul-page-intro {
+  border-radius: 26px !important;
+}
+
+.ulx-site-shell .ul-tool-card,
+.ulx-site-shell .ul-category-card,
+.ulx-site-shell .ul-featured-tool-card {
+  backface-visibility: hidden;
+}
+
+.ulx-site-shell .ul-button-primary,
+.ulx-site-shell .ul-button-secondary,
+.ulx-site-shell button,
+.ulx-site-shell [role="button"] {
+  transition:
+    transform var(--ulx-motion-fast) var(--ulx-ease-out),
+    box-shadow var(--ulx-motion-fast) ease,
+    border-color var(--ulx-motion-fast) ease;
+}
+
+.ulx-site-shell .ul-button-primary,
+.ulx-site-shell .ul-button-secondary {
+  border-radius: 999px;
+}
+
+.ulx-site-shell button:active,
+.ulx-site-shell a:active,
+.ulx-site-shell [role="button"]:active {
+  transform: translateY(1px) scale(.985);
+}
+
+.ulx-site-shell button:focus-visible,
+.ulx-site-shell a:focus-visible,
+.ulx-site-shell input:focus-visible,
+.ulx-site-shell textarea:focus-visible,
+.ulx-site-shell select:focus-visible {
+  outline-offset: 3px;
+}
+
+/* Navigation underline uses currentColor, so every existing locale keeps its colors. */
+.ulx-site-shell header.sticky nav a,
+.ulx-site-shell header.sticky nav button {
+  position: relative;
+}
+
+.ulx-site-shell header.sticky nav a::after,
+.ulx-site-shell header.sticky nav button::after {
+  position: absolute;
+  inset-inline: 0;
+  bottom: -6px;
+  height: 2px;
+  border-radius: 999px;
+  background: currentColor;
+  content: "";
+  transform: scaleX(0);
+  transform-origin: right center;
+  transition: transform var(--ulx-motion-fast) var(--ulx-ease-out);
+}
+
+.ulx-site-shell:dir(ltr) header.sticky nav a::after,
+.ulx-site-shell:dir(ltr) header.sticky nav button::after {
+  transform-origin: left center;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .ulx-site-shell header.sticky nav a:hover::after,
+  .ulx-site-shell header.sticky nav button:hover::after {
+    transform: scaleX(1);
+  }
+
+  .ulx-site-shell .ul-tool-card:hover,
+  .ulx-site-shell .ul-category-card:hover,
+  .ulx-site-shell .ul-featured-tool-card:hover {
+    transform: translateY(-2px) scale(1.006);
+    box-shadow: var(--ul-shadow-hover);
+  }
+
+  .ulx-site-shell .ul-tool-card .ul-tool-icon,
+  .ulx-site-shell .ul-category-card .ul-category-icon,
+  .ulx-site-shell .ul-featured-tool-card .ul-tool-icon {
+    transition: transform var(--ulx-motion-base) var(--ulx-ease-out);
+  }
+
+  .ulx-site-shell .ul-tool-card:hover .ul-tool-icon,
+  .ulx-site-shell .ul-category-card:hover .ul-category-icon,
+  .ulx-site-shell .ul-featured-tool-card:hover .ul-tool-icon {
+    transform: scale(1.055);
+  }
+
+  .ulx-site-shell .ul-button-primary:hover,
+  .ulx-site-shell .ul-button-secondary:hover {
+    transform: translateY(-2px);
+  }
+
+  .ulx-site-shell .ul-hero-search > div a:hover {
+    transform: translateX(2px);
+  }
+
+  .ulx-site-shell .ul-tool-page label:has(input[type="file"]):hover,
+  .ulx-site-shell .ul-tool-page [class*="dropzone"]:hover,
+  .ulx-site-shell .ul-tool-page [class*="drop-zone"]:hover,
+  .ulx-site-shell .ul-tool-page [class*="upload-area"]:hover,
+  .ulx-site-shell .ul-tool-page [data-testid*="drop"]:hover {
+    transform: translateY(-1px);
+  }
+}
+
+/* File surfaces and controls receive the same short, calm interaction response. */
+.ulx-site-shell .ul-tool-page label:has(input[type="file"]),
+.ulx-site-shell .ul-tool-page [class*="dropzone"],
+.ulx-site-shell .ul-tool-page [class*="drop-zone"],
+.ulx-site-shell .ul-tool-page [class*="upload-area"],
+.ulx-site-shell .ul-tool-page [data-testid*="drop"] {
+  transition:
+    transform var(--ulx-motion-fast) var(--ulx-ease-out),
+    box-shadow var(--ulx-motion-fast) ease,
+    border-color var(--ulx-motion-fast) ease;
+}
+
+.ulx-site-shell main input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+.ulx-site-shell main textarea,
+.ulx-site-shell main select {
+  transition:
+    box-shadow var(--ulx-motion-fast) ease,
+    border-color var(--ulx-motion-fast) ease;
+}
+
+.ulx-site-shell .ul-hero-search > div {
+  transform-origin: top center;
+  animation: ulx-fade-up 220ms var(--ulx-ease-out) both;
+}
+
+.ulx-site-shell .ul-hero-search > div a {
+  transition: transform var(--ulx-motion-fast) var(--ulx-ease-out);
+}
+
+.ulx-site-shell .ul-hero-copy > * {
+  animation: ulx-fade-up var(--ulx-motion-slow) var(--ulx-ease-out) both;
+}
+
+.ulx-site-shell .ul-hero-copy > :nth-child(1) { animation-delay: 40ms; }
+.ulx-site-shell .ul-hero-copy > :nth-child(2) { animation-delay: 100ms; }
+.ulx-site-shell .ul-hero-copy > :nth-child(3) { animation-delay: 160ms; }
+.ulx-site-shell .ul-hero-copy > :nth-child(4) { animation-delay: 220ms; }
+.ulx-site-shell .ul-hero-copy > :nth-child(5) { animation-delay: 280ms; }
+.ulx-site-shell .ul-hero-visual {
+  animation: ulx-fade-in 800ms ease both;
+  animation-delay: 220ms;
+}
+
+.ulx-site-shell .ul-hero-orbit {
+  animation: ulx-orbit 13s ease-in-out infinite;
+}
+
+.ulx-site-shell .ul-floating-panel {
+  --ulx-float-rotation: 0deg;
+  animation: ulx-float 8s ease-in-out infinite;
+}
+
+.ulx-site-shell .ul-floating-image {
+  --ulx-float-rotation: 5deg;
+  animation: ulx-float 9s ease-in-out infinite;
+  animation-delay: -2.5s;
+}
+
+.ulx-site-shell .ul-image-badge {
+  --ulx-float-rotation: -8deg;
+  animation: ulx-float 7s ease-in-out infinite;
+  animation-delay: -1.5s;
+}
+
+/* Small, ordered entrances for catalogue cards. */
+.ulx-site-shell .ul-home-section .grid > * {
+  animation: ulx-fade-up 520ms var(--ulx-ease-out) both;
+}
+
+.ulx-site-shell .ul-home-section .grid > :nth-child(1) { animation-delay: 35ms; }
+.ulx-site-shell .ul-home-section .grid > :nth-child(2) { animation-delay: 75ms; }
+.ulx-site-shell .ul-home-section .grid > :nth-child(3) { animation-delay: 115ms; }
+.ulx-site-shell .ul-home-section .grid > :nth-child(4) { animation-delay: 155ms; }
+.ulx-site-shell .ul-home-section .grid > :nth-child(5) { animation-delay: 195ms; }
+.ulx-site-shell .ul-home-section .grid > :nth-child(6) { animation-delay: 235ms; }
+.ulx-site-shell .ul-home-section .grid > :nth-child(7) { animation-delay: 275ms; }
+.ulx-site-shell .ul-home-section .grid > :nth-child(8) { animation-delay: 315ms; }
+
+/* Scroll reveal is progressive enhancement: unsupported browsers show content normally. */
+@supports (animation-timeline: view()) {
+  .ulx-site-shell .ul-home-section:not(:first-child),
+  .ulx-site-shell .ul-trust-strip {
+    animation: ulx-fade-up 1ms linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 32%;
+  }
+}
+
+@media (max-width: 767px) {
+  .ulx-site-shell .ul-tool-card,
+  .ulx-site-shell .ul-category-card,
+  .ulx-site-shell .ul-featured-tool-card {
+    border-radius: 18px !important;
+  }
+
+  .ulx-site-shell .ul-featured-tool-card,
+  .ulx-site-shell .ul-page-intro {
+    border-radius: 21px !important;
+  }
+
+  .ulx-site-shell .ul-hero-orbit,
+  .ulx-site-shell .ul-floating-panel,
+  .ulx-site-shell .ul-floating-image,
+  .ulx-site-shell .ul-image-badge {
+    animation-duration: 12s;
+  }
+}
+
+/* Coarse pointers never get hover-lift behavior. */
+@media (hover: none), (pointer: coarse) {
+  .ulx-site-shell .ul-tool-card:hover,
+  .ulx-site-shell .ul-category-card:hover,
+  .ulx-site-shell .ul-featured-tool-card:hover,
+  .ulx-site-shell .ul-button-primary:hover,
+  .ulx-site-shell .ul-button-secondary:hover {
+    transform: none !important;
+  }
+
+  .ulx-site-shell .ul-tool-card:hover .ul-tool-icon,
+  .ulx-site-shell .ul-category-card:hover .ul-category-icon,
+  .ulx-site-shell .ul-featured-tool-card:hover .ul-tool-icon {
+    transform: none !important;
+  }
+}
+
+/* FAQ accordion uses a zero-to-one grid track so its height animates naturally. */
+.ul-faq-answer {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition:
+    grid-template-rows 320ms var(--ulx-ease-out),
+    opacity 220ms ease;
+}
+
+.ul-faq-answer.is-open {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+.ul-faq-answer-clip {
+  min-height: 0;
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ulx-site-shell *,
+  .ulx-site-shell *::before,
+  .ulx-site-shell *::after,
+  .ul-faq-answer,
+  .ul-faq-answer * {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+
+  .ulx-site-shell .ul-tool-card:hover,
+  .ulx-site-shell .ul-category-card:hover,
+  .ulx-site-shell .ul-featured-tool-card:hover,
+  .ulx-site-shell .ul-button-primary:hover,
+  .ulx-site-shell .ul-button-secondary:hover {
+    transform: none !important;
+  }
+}
