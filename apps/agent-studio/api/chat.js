@@ -166,7 +166,6 @@ export default async function handler(req, res) {
     const content = typeof body.content === "string" ? body.content.trim() : "";
     if (!descriptor) return json(res, 404, { error: "غرفة المحادثة غير موجودة." });
     if (!content) return json(res, 400, { error: "اكتب رسالة قبل الإرسال." });
-    if (content.length > 12000) return json(res, 413, { error: "الرسالة طويلة جدًا؛ الحد الأقصى 12 ألف حرف." });
 
     const room = await getRoom(config, descriptor);
     const roomId = room.id;
