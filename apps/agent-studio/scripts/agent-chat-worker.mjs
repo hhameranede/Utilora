@@ -1,7 +1,7 @@
 import { spawn } from "node:child_process";
 import { promisify } from "node:util";
 import { execFile as execFileCallback } from "node:child_process";
-import { buildOpenCodeArgs, findSessionId, latestAssistantState, needsSessionRecovery } from "./opencode-session.mjs";
+import { buildOpenCodeArgs, findSessionId, getOwnerPrompt, latestAssistantState, needsSessionRecovery } from "./opencode-session.mjs";
 
 const execFile = promisify(execFileCallback);
 const API_URL = process.env.AGENT_CHAT_API_URL;
@@ -104,7 +104,7 @@ function makeReadOnlyConfig(agentName) {
 }
 
 function buildPrompt(context) {
-  const userRequest = String(context.prompt?.content || "").slice(0, 12000);
+  const userRequest = getOwnerPrompt(context.prompt?.content);
   const requiresArabic = /[\u0600-\u06FF]/u.test(userRequest);
   const languageRule = requiresArabic
     ? "MANDATORY LANGUAGE: The owner's latest request is in Arabic. Write the entire user-facing answer in clear Arabic. Keep code, file paths, product names, and standard technical identifiers unchanged, but explain them in Arabic. Do not answer in English, do not emit placeholder tokens, and do not output symbol-only text."
