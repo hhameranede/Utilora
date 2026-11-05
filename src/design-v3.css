@@ -315,3 +315,122 @@
     transform: none !important;
   }
 }
+
+
+/* Workspace-first tool pages: the task surface is the first visual priority. */
+.ulx-site-shell .ul-tool-page {
+  row-gap: 18px !important;
+}
+
+.ulx-site-shell .ul-tool-page .ul-tool-intro {
+  border-radius: 20px !important;
+  box-shadow: 0 8px 24px rgba(25, 32, 45, .055) !important;
+}
+
+.ulx-site-shell .ul-tool-page .ul-workspace-frame {
+  border-color: #d7dce5 !important;
+  background: linear-gradient(145deg, #ffffff 0%, #fffaf6 100%) !important;
+  box-shadow: 0 16px 36px rgba(27, 35, 49, .09), 0 3px 9px rgba(27, 35, 49, .045) !important;
+}
+
+.ulx-site-shell .ul-tool-page #tool-workspace form {
+  border-color: #d8dee7 !important;
+  box-shadow: 0 10px 26px rgba(27, 35, 49, .075) !important;
+}
+
+.ulx-site-shell .ul-tool-page #tool-workspace input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]),
+.ulx-site-shell .ul-tool-page #tool-workspace textarea,
+.ulx-site-shell .ul-tool-page #tool-workspace select {
+  min-height: 48px;
+  border: 1.5px solid #cbd2dd !important;
+  border-radius: 13px !important;
+  background: #ffffff !important;
+  color: #17191f !important;
+  box-shadow: 0 4px 12px rgba(27, 35, 49, .065), inset 0 1px 0 rgba(255, 255, 255, .95) !important;
+}
+
+.ulx-site-shell .ul-tool-page #tool-workspace textarea {
+  min-height: 176px;
+  padding: 14px 15px !important;
+  line-height: 1.7;
+}
+
+.ulx-site-shell .ul-tool-page #tool-workspace input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):focus,
+.ulx-site-shell .ul-tool-page #tool-workspace textarea:focus,
+.ulx-site-shell .ul-tool-page #tool-workspace select:focus {
+  border-color: #e87922 !important;
+  box-shadow: 0 0 0 4px rgba(232, 121, 34, .13), 0 6px 16px rgba(27, 35, 49, .07) !important;
+}
+
+.ulx-site-shell .ul-tool-page #tool-workspace label:has(input[type="file"]),
+.ulx-site-shell .ul-tool-page #tool-workspace button[class*="border-dashed"],
+.ulx-site-shell .ul-tool-page #tool-workspace div:has(> input[type="file"]) {
+  min-height: 142px;
+  border: 2px dashed #e5a366 !important;
+  border-radius: 19px !important;
+  background: linear-gradient(135deg, #ffffff 0%, #fff7ef 100%) !important;
+  box-shadow: 0 12px 27px rgba(193, 100, 28, .11), 0 3px 8px rgba(27, 35, 49, .045) !important;
+  transition: transform 180ms cubic-bezier(.22, 1, .36, 1), border-color 180ms ease, box-shadow 180ms ease !important;
+}
+
+.ulx-site-shell .ul-tool-page #tool-workspace label:has(input[type="file"]):hover,
+.ulx-site-shell .ul-tool-page #tool-workspace button[class*="border-dashed"]:hover,
+.ulx-site-shell .ul-tool-page #tool-workspace div:has(> input[type="file"]):hover {
+  border-color: #df650b !important;
+  box-shadow: 0 16px 32px rgba(193, 100, 28, .16), 0 4px 10px rgba(27, 35, 49, .05) !important;
+}
+
+.ulx-site-shell .ul-tool-page #tool-workspace button[type="submit"],
+.ulx-site-shell .ul-tool-page #tool-workspace button[class*="bg-stone-900"],
+.ulx-site-shell .ul-tool-page #tool-workspace button[class*="bg-orange-500"] {
+  min-height: 48px;
+  border: 1px solid #bd4e07 !important;
+  border-radius: 13px !important;
+  background: #df650b !important;
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  box-shadow: 0 9px 20px rgba(223, 101, 11, .22), 0 2px 5px rgba(27, 35, 49, .06) !important;
+  transition: transform 180ms cubic-bezier(.22, 1, .36, 1), background-color 180ms ease, box-shadow 180ms ease !important;
+}
+
+.ulx-site-shell .ul-tool-page #tool-workspace button[type="submit"]:hover:not(:disabled),
+.ulx-site-shell .ul-tool-page #tool-workspace button[class*="bg-stone-900"]:hover:not(:disabled),
+.ulx-site-shell .ul-tool-page #tool-workspace button[class*="bg-orange-500"]:hover:not(:disabled) {
+  background: #bd4e07 !important;
+  box-shadow: 0 12px 24px rgba(189, 78, 7, .26) !important;
+  transform: translateY(-1px);
+}
+
+.ulx-site-shell .ul-tool-page #tool-workspace button:disabled {
+  cursor: not-allowed;
+  opacity: .48;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+.ulx-site-shell .ul-tool-page #tool-workspace input[type="checkbox"],
+.ulx-site-shell .ul-tool-page #tool-workspace input[type="radio"],
+.ulx-site-shell .ul-tool-page #tool-workspace input[type="range"] {
+  accent-color: #df650b;
+}
+
+@media (max-width: 767px) {
+  .ulx-site-shell .ul-tool-page {
+    row-gap: 14px !important;
+  }
+
+  .ulx-site-shell .ul-tool-page .ul-tool-intro {
+    padding: 13px !important;
+  }
+
+  .ulx-site-shell .ul-tool-page .ul-workspace-frame {
+    padding: 9px !important;
+  }
+
+  .ulx-site-shell .ul-tool-page #tool-workspace label:has(input[type="file"]),
+  .ulx-site-shell .ul-tool-page #tool-workspace button[class*="border-dashed"],
+  .ulx-site-shell .ul-tool-page #tool-workspace div:has(> input[type="file"]) {
+    min-height: 128px;
+    padding: 20px 14px !important;
+  }
+}

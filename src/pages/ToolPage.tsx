@@ -130,7 +130,7 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
   });
 
   return (
-    <article className="ul-content-page ul-tool-page max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-7 sm:space-y-10">
+    <article className="ul-content-page ul-tool-page max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4 sm:space-y-6">
       <Head
         title={seoTitle}
         description={seoDescription}
@@ -158,91 +158,32 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
         ]}
       />
 
-      <header className="overflow-hidden rounded-2xl border border-stone-200 bg-gradient-to-br from-white via-white to-orange-50/70 p-4 shadow-sm sm:rounded-[2rem] sm:p-8">
-        <div className="flex flex-wrap items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-500">
-          <span className="rounded-full border border-orange-200 bg-orange-50 px-3 py-1 text-orange-700">UTILORA</span>
-          <span>{categoryTitle}</span>
-          <span aria-hidden="true">/</span>
-          <span>{toolName}</span>
+      <header className="ul-tool-intro overflow-hidden rounded-2xl border border-stone-200 bg-gradient-to-r from-white via-white to-orange-50/80 p-4 shadow-sm sm:p-5">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex flex-wrap items-center gap-2 text-[10px] font-bold uppercase tracking-[0.12em] text-stone-500 sm:text-[11px]">
+            <span className="rounded-full border border-orange-200 bg-orange-50 px-2.5 py-1 text-orange-700">UTILORA</span>
+            <span>{categoryTitle}</span>
+          </div>
+          <span className={isFunctional ? "inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[10px] font-bold text-emerald-800" : "inline-flex items-center gap-1.5 rounded-full border border-orange-200 bg-orange-50 px-2.5 py-1 text-[10px] font-bold text-orange-800"}>
+            <span aria-hidden="true" className={isFunctional ? "h-1.5 w-1.5 rounded-full bg-emerald-500" : "h-1.5 w-1.5 rounded-full bg-orange-500"} />
+            {isFunctional ? t('product.ready') : t('product.previewOnly')}
+          </span>
         </div>
-
-        <div className="mt-4 grid gap-4 sm:gap-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
-          <div className="max-w-3xl">
-            <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-orange-100 bg-white text-orange-700 shadow-sm">
-                <Icon name={tool.icon} size={25} />
-              </div>
-              <div className="min-w-0">
-                <p className="text-xs font-medium text-stone-500">
-                  {t('product.focusedTool')}
-                </p>
-                <p className="mt-0.5 text-xs font-semibold text-orange-700">
-                  {isFunctional
-                    ? t('product.ready')
-                    : t('product.previewOnly')}
-                </p>
-              </div>
+        <div className="mt-2.5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-orange-100 bg-white text-orange-700 shadow-sm sm:h-11 sm:w-11">
+              <Icon name={tool.icon} size={22} />
             </div>
-
-            <h1 className="mt-3 text-2xl font-extrabold tracking-tight text-stone-950 sm:text-5xl">
-              {toolName}
-            </h1>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-stone-600 sm:text-lg sm:leading-8">
-              {positioning}
-            </p>
-            <p className="mt-2 hidden max-w-2xl text-sm leading-7 text-stone-500 sm:block">
-              {toolDesc}
-            </p>
-
-            <div className="mt-3 sm:mt-5 flex flex-wrap gap-2">
-              <span className="inline-flex items-center gap-2 rounded-full border border-stone-200 bg-white px-2.5 py-1.5 text-[11px] font-medium text-stone-700">
-                <CheckCircle2 size={14} className="text-orange-700" />
-                {isFunctional
-                  ? t('product.free')
-                  : t('product.freePreview')}
-              </span>
-              <span className="inline-flex items-center gap-2 rounded-full border border-stone-200 bg-white px-2.5 py-1.5 text-[11px] font-medium text-stone-700">
-                <ShieldCheck size={14} className="text-orange-700" />
-                {!isFunctional
-                  ? t('product.previewOnly')
-                  : isNetworkLookup
-                    ? t('product.publicLookups')
-                    : t('product.browserProcessing')}
-              </span>
-              <span className="inline-flex items-center gap-2 rounded-full border border-stone-200 bg-white px-2.5 py-1.5 text-[11px] font-medium text-stone-700">
-                <Sparkles size={14} className="text-orange-700" />
-                {isFunctional
-                  ? t('product.noInstall')
-                  : t('product.notAvailable')}
-              </span>
+            <div className="min-w-0">
+              <h1 className="text-xl font-extrabold tracking-tight text-stone-950 sm:text-3xl">{toolName}</h1>
+              <p className="mt-1 max-w-3xl text-xs leading-5 text-stone-600 sm:text-sm sm:leading-6">{positioning}</p>
             </div>
           </div>
-
-          <div className="flex flex-wrap gap-2 lg:justify-end">
-            <a
-              href="#tool-workspace"
-              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-orange-700 px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-orange-800 focus:outline-none focus:ring-2 focus:ring-orange-700 focus:ring-offset-2"
-            >
-              {t('product.openTool')}
-              <ArrowRight size={16} />
-            </a>
-            <Link
-              routeType="tool-guide"
-              slug={tool.slug}
-              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-stone-200 bg-white px-5 py-3 text-sm font-semibold text-stone-700 transition hover:border-orange-300 hover:text-orange-700"
-            >
-              <FileText size={16} />
-              {t('product.howToUse')}
-            </Link>
-          </div>
+          <Link routeType="tool-guide" slug={tool.slug} className="inline-flex min-h-10 shrink-0 self-start items-center justify-center gap-2 rounded-xl border border-stone-200 bg-white px-3.5 py-2 text-xs font-semibold text-stone-700 shadow-sm transition hover:border-orange-300 hover:text-orange-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 sm:self-center">
+            <FileText size={15} />
+            {t('product.howToUse')}
+          </Link>
         </div>
-
-        <nav aria-label={t('product.toolPageSections')} className="mt-4 flex flex-wrap gap-x-4 gap-y-2 border-t border-stone-200/80 pt-4 text-xs font-semibold text-stone-500">
-          <a className="transition hover:text-orange-700" href="#tool-workspace">{t('product.workspace')}</a>
-          <a className="transition hover:text-orange-700" href="#tool-features">{t('product.features')}</a>
-          <a className="transition hover:text-orange-700" href="#how-it-works">{t('product.workflow')}</a>
-          <a className="transition hover:text-orange-700" href="#tool-faq">{t('product.faq')}</a>
-        </nav>
       </header>
 
       {!isFunctional && (
@@ -255,13 +196,13 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
         </div>
       )}
 
-      <section id="tool-workspace" className="scroll-mt-20 space-y-3 sm:space-y-4">
+      <section id="tool-workspace" className="ul-workspace-section scroll-mt-20 space-y-2.5 sm:space-y-3">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.14em] text-orange-700">
               {t('product.workspace')}
             </p>
-            <h2 className="mt-2 text-2xl font-bold text-stone-950 sm:text-3xl">
+            <h2 className="mt-1 text-lg font-bold text-stone-950 sm:text-xl">
               {t('product.useTool').replace('{tool}', toolName)}
             </h2>
           </div>
@@ -271,10 +212,16 @@ export const ToolPage: React.FC<ToolPageProps> = ({ toolSlug }) => {
               : t('product.processesOnDevice')}
           </p>
         </div>
-        <div className="rounded-2xl border border-stone-200 bg-white p-2 shadow-sm sm:rounded-[1.75rem] sm:p-5">
+        <div className="ul-workspace-frame rounded-2xl border-2 border-stone-200 bg-white p-2 shadow-lg sm:rounded-[1.5rem] sm:p-4">
           <ToolWorkspaceResolver tool={tool} />
         </div>
       </section>
+
+      {toolDesc !== positioning && (
+        <p className="ul-tool-long-description max-w-4xl text-xs leading-6 text-stone-500 sm:text-sm">
+          {toolDesc}
+        </p>
+      )}
 
       {benefits.length > 0 && (
         <section id="tool-features" className="scroll-mt-6 space-y-5">
