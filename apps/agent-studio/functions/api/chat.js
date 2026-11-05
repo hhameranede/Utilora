@@ -163,7 +163,6 @@ export async function onRequest(context) {
     const content = typeof body.content === "string" ? body.content.trim() : "";
     if (!descriptor) return json({ error: "غرفة المحادثة غير موجودة." }, 404);
     if (!content) return json({ error: "اكتب رسالة قبل الإرسال." }, 400);
-    if (content.length > 12000) return json({ error: "الرسالة طويلة جدًا؛ الحد الأقصى 12 ألف حرف." }, 413);
     const fastReply = getInstantReply(content, descriptor);
     if (!fastReply && !config.githubToken) {
       return json({ error: "ربط تشغيل الوكلاء عبر GitHub Actions غير مكتمل." }, 503);

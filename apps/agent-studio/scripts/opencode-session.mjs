@@ -1,3 +1,7 @@
+export function getOwnerPrompt(content) {
+  return String(content ?? "");
+}
+
 export function findSessionId(raw) {
   for (const line of String(raw || "").split(/\r?\n/)) {
     try {
