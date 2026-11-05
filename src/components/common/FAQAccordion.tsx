@@ -27,16 +27,19 @@ export const FAQAccordion: React.FC<FAQAccordionProps> = ({ faqs, className = ''
         const isOpen = openIndex === index;
         const qText = faq.question[locale] || faq.question.en;
         const aText = faq.answer[locale] || faq.answer.en;
+        const answerId = `faq-answer-${index}`;
 
         return (
           <div
             key={index}
             className="rounded-2xl border border-stone-200/90 bg-white shadow-xs overflow-hidden transition-colors"
+            data-faq-open={isOpen}
           >
             <button
               type="button"
               onClick={() => toggle(index)}
               aria-expanded={isOpen}
+              aria-controls={answerId}
               className="w-full flex items-center justify-between p-4 text-start text-sm font-semibold text-stone-900 hover:text-orange-700 transition-colors"
             >
               <span>{qText}</span>
@@ -46,11 +49,17 @@ export const FAQAccordion: React.FC<FAQAccordionProps> = ({ faqs, className = ''
               />
             </button>
 
-            {isOpen && (
-              <div className="px-4 pb-4 pt-1 text-sm text-stone-600 leading-relaxed border-t border-stone-100">
-                {aText}
+            <div
+              id={answerId}
+              className={`ul-faq-answer ${isOpen ? 'is-open' : ''}`}
+              aria-hidden={!isOpen}
+            >
+              <div className="ul-faq-answer-clip">
+                <div className="px-4 pb-4 pt-1 text-sm text-stone-600 leading-relaxed border-t border-stone-100">
+                  {aText}
+                </div>
               </div>
-            )}
+            </div>
           </div>
         );
       })}
