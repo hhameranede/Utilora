@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useI18n } from '../../i18n';
 import { useRouter, Link } from '../../router';
 import { Search, Menu, X, ChevronDown } from 'lucide-react';
@@ -15,6 +15,59 @@ export const SiteHeader: React.FC = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isCategoryMenuOpen, setIsCategoryMenuOpen] = useState(false);
+  const mobileMenuButtonRef = useRef<HTMLButtonElement>(null);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isMobileMenuOpen) return;
+
+    const previousBodyOverflow = document.body.style.overflow;
+    const focusableSelector = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+    document.body.style.overflow = 'hidden';
+
+    const frame = window.requestAnimationFrame(() => {
+      mobileMenuRef.current?.querySelector<HTMLElement>(focusableSelector)?.focus();
+    });
+
+    const handleMenuKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        setIsMobileMenuOpen(false);
+        return;
+      }
+
+      if (event.key !== 'Tab' || !mobileMenuRef.current) return;
+
+      const menu = mobileMenuRef.current;
+      const focusable = Array.from(menu.querySelectorAll<HTMLElement>(focusableSelector))
+        .filter((element) => element.getClientRects().length > 0 && getComputedStyle(element).visibility !== 'hidden');
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      if (!first || !last) return;
+
+      if (event.shiftKey && (document.activeElement === first || !menu.contains(document.activeElement))) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && (document.activeElement === last || !menu.contains(document.activeElement))) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+
+    document.addEventListener('keydown', handleMenuKeyDown);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      document.removeEventListener('keydown', handleMenuKeyDown);
+      document.body.style.overflow = previousBodyOverflow;
+      mobileMenuButtonRef.current?.focus();
+    };
+  }, [isMobileMenuOpen]);
+
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+    setIsCategoryMenuOpen(false);
+  }, [route.rawPath]);
 
   return (
     <>
@@ -128,7 +181,8 @@ export const SiteHeader: React.FC = () => {
             {/* Mobile Menu Toggle Button */}
             <button
               type="button"
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              ref={mobileMenuButtonRef}
+              onClick={() => setIsMobileMenuOpen((open) => !open)}
               className="lg:hidden inline-flex min-h-10 min-w-10 items-center justify-center p-2 rounded-xl border border-stone-200 text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
               aria-label={t("nav.toggleNavigation")}
               aria-expanded={isMobileMenuOpen}
@@ -145,8 +199,25 @@ export const SiteHeader: React.FC = () => {
 
       {/* Mobile Drawer Menu */}
       {isMobileMenuOpen && (
-        <div id="utilora-mobile-navigation" role="navigation" aria-label={t('nav.toggleNavigation')} className="fixed inset-0 top-16 z-30 bg-white lg:hidden overflow-y-auto p-4 border-b border-stone-200 animate-fadeIn">
+        <div
+          id="utilora-mobile-navigation"
+          ref={mobileMenuRef}
+          role="dialog"
+          aria-modal="true"
+          aria-label={t('nav.toggleNavigation')}
+          className="fixed inset-0 top-16 z-30 bg-white lg:hidden overflow-y-auto p-4 border-b border-stone-200 animate-fadeIn"
+        >
           <div className="space-y-4">
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-xl border border-stone-200 text-stone-600 hover:bg-stone-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
+                aria-label={t('common.close')}
+              >
+                <X size={18} aria-hidden="true" />
+              </button>
+            </div>
             {/* Quick search input */}
             <button
               onClick={() => {
@@ -159,13 +230,10 @@ export const SiteHeader: React.FC = () => {
                 <Search size={15} className="text-orange-600" />
                 <span>{t('nav.search')}</span>
               </div>
-              <kbd className="px-1.5 py-0.5 text-[10px] font-mono text-stone-500 bg-white border border-stone-200 rounded">
-                ⌘K
-              </kbd>
             </button>
 
             {/* Mobile Nav Links */}
-            <div className="space-y-1">
+            <nav aria-label={t('nav.toggleNavigation')} className="space-y-1">
               <Link
                 routeType="home"
                 onClick={() => setIsMobileMenuOpen(false)}
@@ -222,7 +290,7 @@ export const SiteHeader: React.FC = () => {
               >
                 {t('nav.about')}
               </Link>
-            </div>
+            </nav>
 
             {/* Mobile Language Selector */}
             <div className="pt-4 border-t border-stone-200">

@@ -8,6 +8,7 @@ interface TemplateCImageWorkspaceProps {
   toolName: string;
   toolSlug?: string;
   defaultFormat?: ImageFormat;
+  acceptedFormats?: string[];
   showQuality?: boolean;
   showDimensions?: boolean;
   showCropperGrid?: boolean;
@@ -17,6 +18,7 @@ export const TemplateCImageWorkspace: React.FC<TemplateCImageWorkspaceProps> = (
   toolName,
   toolSlug = 'image-cropper',
   defaultFormat = 'webp',
+  acceptedFormats = ['.png', '.jpg', '.jpeg', '.webp'],
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const previewImageRef = useRef<HTMLImageElement>(null);
@@ -56,6 +58,10 @@ export const TemplateCImageWorkspace: React.FC<TemplateCImageWorkspaceProps> = (
   const isRotate = toolSlug === 'image-rotator';
   const isResize = toolSlug === 'image-resizer';
   const isCompress = toolSlug === 'image-compressor';
+  const acceptedExtensions = acceptedFormats.map((extension) => extension.toLowerCase());
+  const acceptedFormatsLabel = acceptedFormats
+    .map((extension) => extension.replace(/^\./, '').toUpperCase())
+    .join(', ');
 
   const handleFile = async (selected?: File) => {
     if (!selected) return;
@@ -78,6 +84,14 @@ export const TemplateCImageWorkspace: React.FC<TemplateCImageWorkspaceProps> = (
     if (!selected.type.startsWith('image/')) {
       setPreparingFile(false);
       setError('Please choose a valid image file.');
+      return;
+    }
+    const extension = selected.name.includes('.')
+      ? `.${selected.name.split('.').pop()?.toLowerCase() ?? ''}`
+      : '';
+    if (!acceptedExtensions.includes(extension)) {
+      setPreparingFile(false);
+      setError(`Unsupported image format. Supported formats: ${acceptedFormatsLabel}.`);
       return;
     }
     if (selected.size > 50 * 1024 * 1024) {
@@ -236,11 +250,25 @@ export const TemplateCImageWorkspace: React.FC<TemplateCImageWorkspaceProps> = (
   return (
     <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-5">
       <section className="lg:col-span-7 space-y-4 min-w-0">
-        <button type="button" onClick={() => inputRef.current?.click()} className="w-full p-5 sm:p-9 rounded-2xl border-2 border-dashed border-stone-300 hover:border-orange-400 bg-white transition-colors text-center">
-          <input ref={inputRef} type="file" accept="image/png,image/jpeg,image/webp,image/gif,image/avif,image/bmp" className="hidden" onChange={(event) => handleFile(event.target.files?.[0])} />
+        <input
+          ref={inputRef}
+          type="file"
+          accept={acceptedFormats.join(',')}
+          className="hidden"
+          onChange={(event) => {
+            const selected = event.target.files?.[0];
+            event.currentTarget.value = '';
+            void handleFile(selected);
+          }}
+        />
+        <button
+          type="button"
+          onClick={() => inputRef.current?.click()}
+          className="w-full p-5 sm:p-9 rounded-2xl border-2 border-dashed border-stone-300 hover:border-orange-400 bg-white transition-colors text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2"
+        >
           <span className="mx-auto w-12 h-12 rounded-xl bg-orange-50 border border-orange-100 text-orange-600 flex items-center justify-center"><Upload size={22} /></span>
           <span className="block mt-3 text-sm font-semibold text-stone-900">{file ? 'Choose another image' : 'Select an image to begin'}</span>
-          <span className="block mt-1 text-xs text-stone-500">PNG, JPG, WebP, GIF, AVIF or BMP · Up to 50 MB</span>
+          <span className="block mt-1 text-xs text-stone-500">{acceptedFormatsLabel} · Up to 50 MB</span>
         </button>
 
         <div className="rounded-2xl border border-stone-200 bg-stone-50 min-h-[180px] sm:min-h-[260px] p-3 sm:p-4 flex items-center justify-center">

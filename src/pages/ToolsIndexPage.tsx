@@ -89,7 +89,8 @@ export const ToolsIndexPage: React.FC = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={t('tools.searchPlaceholder')}
-              className="w-full ps-9 pe-3 py-2.5 rounded-xl bg-white border border-stone-200 text-sm text-stone-900 placeholder-stone-500 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 shadow-xs transition-all"
+              aria-label={t('tools.searchPlaceholder')}
+              className="w-full ps-9 pe-3 py-2.5 rounded-xl bg-white border border-stone-200 text-sm text-stone-900 placeholder-stone-500 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 shadow-xs transition-all
             />
           </div>
         </div>
@@ -98,8 +99,19 @@ export const ToolsIndexPage: React.FC = () => {
 
         {/* Tool Cards Grid */}
         {filteredTools.length === 0 ? (
-          <div className="py-16 text-center text-stone-500 text-sm">
-            {t('common.noResults')}
+          <div role="status" aria-live="polite" className="py-14 px-5 text-center rounded-2xl border border-dashed border-stone-200 bg-white text-stone-600">
+            <p className="text-sm font-semibold text-stone-800">{t('common.noResults')}</p>
+            <p className="mt-1 text-xs text-stone-500">{t('common.tryAnother')}</p>
+            <button
+              type="button"
+              onClick={() => {
+                setSearchQuery('');
+                setSelectedCategory('all');
+              }}
+              className="mt-4 inline-flex min-h-11 items-center justify-center rounded-xl bg-orange-700 px-4 py-2.5 text-xs font-semibold text-white transition-colors hover:bg-orange-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2"
+            >
+              {t('nav.allTools')}
+            </button>
           </div>
         ) : (
           <div className="grid grid-cols-1 min-[380px]:grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4">
