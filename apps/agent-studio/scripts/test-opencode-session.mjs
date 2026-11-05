@@ -2,11 +2,19 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   buildOpenCodeArgs,
+  getOwnerPrompt,
   extractFinalAssistantText,
   findSessionId,
   latestAssistantState,
   needsSessionRecovery
 } from "./opencode-session.mjs";
+
+test("preserves owner prompts longer than the former 12k character cap", () => {
+  const prompt = "UTILORA long request ".repeat(900);
+  assert.ok(prompt.length > 12000);
+  assert.equal(getOwnerPrompt(prompt), prompt);
+  assert.equal(getOwnerPrompt(null), "");
+});
 
 test("finds a session identifier from OpenCode JSONL events", () => {
   const raw = [
