@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowRight, CheckCircle2, FileText, Info, Lock, ShieldCheck, Sparkles, Workflow } from 'lucide-react';
+import { ArrowRight, FileText, Info, Lock, Sparkles, Workflow } from 'lucide-react';
 import { useI18n } from '../i18n';
 import { getToolBySlug } from '../registry/tools.registry';
 import { getCategoryById } from '../registry/categories.registry';
