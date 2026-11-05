@@ -92,63 +92,6 @@ export const TemplateETextEditor: React.FC<TemplateETextEditorProps> = ({
 
   return (
     <div className="w-full space-y-6">
-      {/* Live Text Analytics Metrics Strip (Clean unboxed figures with subtle labels) */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-        <div className="p-3.5 rounded-2xl bg-white border border-stone-200/90 shadow-xs text-center">
-          <span className="text-[10px] font-mono uppercase text-stone-500 tracking-wider block mb-1">
-            {t('templates.words')}
-          </span>
-          <span className="text-xl sm:text-2xl font-bold font-mono text-orange-600">
-            {stats.words.toLocaleString()}
-          </span>
-        </div>
-
-        <div className="p-3.5 rounded-2xl bg-white border border-stone-200/90 shadow-xs text-center">
-          <span className="text-[10px] font-mono uppercase text-stone-500 tracking-wider block mb-1">
-            {t('templates.characters')}
-          </span>
-          <span className="text-xl sm:text-2xl font-bold font-mono text-stone-800">
-            {stats.charsWithSpaces.toLocaleString()}
-          </span>
-        </div>
-
-        <div className="p-3.5 rounded-2xl bg-white border border-stone-200/90 shadow-xs text-center">
-          <span className="text-[10px] font-mono uppercase text-stone-500 tracking-wider block mb-1">
-            No Spaces
-          </span>
-          <span className="text-xl sm:text-2xl font-bold font-mono text-stone-800">
-            {stats.charsNoSpaces.toLocaleString()}
-          </span>
-        </div>
-
-        <div className="p-3.5 rounded-2xl bg-white border border-stone-200/90 shadow-xs text-center">
-          <span className="text-[10px] font-mono uppercase text-stone-500 tracking-wider block mb-1">
-            {t('templates.lines')}
-          </span>
-          <span className="text-xl sm:text-2xl font-bold font-mono text-stone-800">
-            {stats.lines.toLocaleString()}
-          </span>
-        </div>
-
-        <div className="p-3.5 rounded-2xl bg-white border border-stone-200/90 shadow-xs text-center">
-          <span className="text-[10px] font-mono uppercase text-stone-500 tracking-wider block mb-1">
-            {t('templates.readingTime')}
-          </span>
-          <span className="text-xl sm:text-2xl font-bold font-mono text-stone-800">
-            ~{stats.readTimeMin}m
-          </span>
-        </div>
-
-        <div className="p-3.5 rounded-2xl bg-white border border-stone-200/90 shadow-xs text-center">
-          <span className="text-[10px] font-mono uppercase text-stone-500 tracking-wider block mb-1">
-            {t('templates.speakingTime')}
-          </span>
-          <span className="text-xl sm:text-2xl font-bold font-mono text-stone-800">
-            ~{stats.speakTimeMin}m
-          </span>
-        </div>
-      </div>
-
       {/* Optional Mode Selectors */}
       {showCaseOptions && (
         <div className="p-4 rounded-2xl bg-white border border-stone-200/90 shadow-xs flex flex-wrap items-center gap-2">
@@ -246,6 +189,64 @@ export const TemplateETextEditor: React.FC<TemplateETextEditorProps> = ({
           </div>
         </div>
       </div>
+      {/* Live Text Analytics Metrics Strip (Clean unboxed figures with subtle labels) */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+        <div className="p-3.5 rounded-2xl bg-white border border-stone-200/90 shadow-xs text-center">
+          <span className="text-[10px] font-mono uppercase text-stone-500 tracking-wider block mb-1">
+            {t('templates.words')}
+          </span>
+          <span className="text-xl sm:text-2xl font-bold font-mono text-orange-600">
+            {stats.words.toLocaleString()}
+          </span>
+        </div>
+
+        <div className="p-3.5 rounded-2xl bg-white border border-stone-200/90 shadow-xs text-center">
+          <span className="text-[10px] font-mono uppercase text-stone-500 tracking-wider block mb-1">
+            {t('templates.characters')}
+          </span>
+          <span className="text-xl sm:text-2xl font-bold font-mono text-stone-800">
+            {stats.charsWithSpaces.toLocaleString()}
+          </span>
+        </div>
+
+        <div className="p-3.5 rounded-2xl bg-white border border-stone-200/90 shadow-xs text-center">
+          <span className="text-[10px] font-mono uppercase text-stone-500 tracking-wider block mb-1">
+            No Spaces
+          </span>
+          <span className="text-xl sm:text-2xl font-bold font-mono text-stone-800">
+            {stats.charsNoSpaces.toLocaleString()}
+          </span>
+        </div>
+
+        <div className="p-3.5 rounded-2xl bg-white border border-stone-200/90 shadow-xs text-center">
+          <span className="text-[10px] font-mono uppercase text-stone-500 tracking-wider block mb-1">
+            {t('templates.lines')}
+          </span>
+          <span className="text-xl sm:text-2xl font-bold font-mono text-stone-800">
+            {stats.lines.toLocaleString()}
+          </span>
+        </div>
+
+        <div className="p-3.5 rounded-2xl bg-white border border-stone-200/90 shadow-xs text-center">
+          <span className="text-[10px] font-mono uppercase text-stone-500 tracking-wider block mb-1">
+            {t('templates.readingTime')}
+          </span>
+          <span className="text-xl sm:text-2xl font-bold font-mono text-stone-800">
+            ~{stats.readTimeMin}m
+          </span>
+        </div>
+
+        <div className="p-3.5 rounded-2xl bg-white border border-stone-200/90 shadow-xs text-center">
+          <span className="text-[10px] font-mono uppercase text-stone-500 tracking-wider block mb-1">
+            {t('templates.speakingTime')}
+          </span>
+          <span className="text-xl sm:text-2xl font-bold font-mono text-stone-800">
+            ~{stats.speakTimeMin}m
+          </span>
+        </div>
+      </div>
+
+
     </div>
   );
 };
