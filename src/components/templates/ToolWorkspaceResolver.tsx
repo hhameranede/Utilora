@@ -53,6 +53,7 @@ export const ToolWorkspaceResolver: React.FC<ToolWorkspaceResolverProps> = ({ to
         toolName={toolName}
         toolSlug={tool.slug}
         defaultFormat={tool.slug === 'image-converter' ? 'webp' : 'jpeg'}
+        acceptedFormats={tool.acceptedFormats}
       />
     );
   }
@@ -85,6 +86,7 @@ export const ToolWorkspaceResolver: React.FC<ToolWorkspaceResolverProps> = ({ to
           toolName={toolName}
           toolSlug={tool.slug}
           defaultFormat={tool.slug === 'image-converter' ? 'webp' : 'jpeg'}
+          acceptedFormats={tool.acceptedFormats}
           showCropperGrid={tool.slug === 'image-cropper'}
         />
       );
