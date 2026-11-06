@@ -127,7 +127,7 @@ def check_environment() -> dict[str, str]:
     return env
 
 def protected_path_reason(path: str) -> str:
-    normalized = path.replace("\\", "/").lstrip("./")
+    normalized = path.replace("\\", "/").lstrip("/")
     base = normalized.rsplit("/", 1)[-1]
     if normalized.startswith(".github/workflows/"):
         return "GitHub Actions workflows are outside this task's write scope."
