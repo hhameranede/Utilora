@@ -14,6 +14,7 @@ from pathlib import Path
 import re
 import subprocess
 import sys
+import shutil
 from typing import Any
 
 from opencode_smoke import extract_latest_assistant_state
@@ -342,6 +343,8 @@ def main() -> int:
         )
         return 1
 
+    # Remove only the temporary agent profile created by the workflow before reviewing the patch.
+    shutil.rmtree(Path(workspace) / ".opencode", ignore_errors=True)
     diff_ok, diff_report = inspect_diff(workspace)
     if not diff_ok:
         Path(args.output_file).write_text(
