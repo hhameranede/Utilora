@@ -1,0 +1,49 @@
+name: ExportFlow Laguna preflight
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/EXPORTFLOW_LAGUNA_PREFLIGHT"
+
+permissions:
+  contents: read
+
+jobs:
+  preflight:
+    name: Verify ExportFlow credentials and private checkout
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Verify secret presence without printing values
+        shell: bash
+        env:
+          EXPORTFLOW_GITHUB_TOKEN: ${{ secrets.EXPORTFLOW_GITHUB_TOKEN }}
+          NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+        run: |
+          set -euo pipefail
+          test -n "${EXPORTFLOW_GITHUB_TOKEN:-}" || { echo "::error::EXPORTFLOW_GITHUB_TOKEN is missing."; exit 1; }
+          test -n "${NVIDIA_API_KEY:-}" || { echo "::error::NVIDIA_API_KEY is missing."; exit 1; }
+          echo "Both secrets are present (values hidden)."
+
+      - name: Check out the private ExportFlow repository
+        uses: actions/checkout@v4
+        with:
+          repository: hhameranede/exportflow
+          ref: main
+          path: exportflow
+          token: ${{ secrets.EXPORTFLOW_GITHUB_TOKEN }}
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Confirm expected repository and roadmap issue access
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.EXPORTFLOW_GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          test -f exportflow/package.json
+          gh api repos/hhameranede/exportflow/issues/29 --jq '.number' | grep -qx '29'
+          echo "Private checkout and Issue #29 read access are confirmed."
