@@ -68,7 +68,7 @@ def prepare_prompt(
     for marker, value in replacements.items():
         prompt = prompt.replace(marker, value)
 
-    remaining = [marker for marker in PLACEHOLDERS if marker in prompt]
+    remaining = sorted(set(re.findall(r"__[A-Z][A-Z0-9_]*__", prompt)))
     if remaining:
         raise ValueError("Unresolved prompt placeholders: " + ", ".join(remaining))
     if not str(issue.get("body") or "").strip():
