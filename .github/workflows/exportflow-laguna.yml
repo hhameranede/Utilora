@@ -176,7 +176,8 @@ jobs:
       - name: Install OpenCode
         run: |
           set -euo pipefail
-          npm install --global opencode-ai@1.19.5
+          npm install --global --allow-scripts=opencode-ai opencode-ai@1.19.5
+          command -v opencode
           opencode --version
 
       - name: Execute Laguna with bounded self-repair
