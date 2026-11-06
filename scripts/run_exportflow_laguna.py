@@ -305,11 +305,12 @@ def main() -> int:
             workspace, RECOVERY_PROMPT, session_id, args.recovery_seconds, env
         )
     if not state.get("complete") or not session_id:
-        Path(args.output_file).write_text(
+        failure_report = (
             "Laguna did not return a complete response. No patch will be published.\n"
-            + json.dumps(state, ensure_ascii=False, indent=2) + "\n",
-            encoding="utf-8",
+            + json.dumps(state, ensure_ascii=False, indent=2) + "\n"
         )
+        Path(args.output_file).write_text(failure_report, encoding="utf-8")
+        print(failure_report, flush=True)
         return 1
 
     checks_report = ""
@@ -336,22 +337,24 @@ def main() -> int:
             break
 
     if not checks_ok:
-        Path(args.output_file).write_text(
+        failure_report = (
             "Laguna changes are not ready: verification remained failing after bounded repair.\n\n"
-            + checks_report + "\n",
-            encoding="utf-8",
+            + checks_report + "\n"
         )
+        Path(args.output_file).write_text(failure_report, encoding="utf-8")
+        print(failure_report, flush=True)
         return 1
 
     # Remove only the temporary agent profile created by the workflow before reviewing the patch.
     shutil.rmtree(Path(workspace) / ".opencode", ignore_errors=True)
     diff_ok, diff_report = inspect_diff(workspace)
     if not diff_ok:
-        Path(args.output_file).write_text(
+        failure_report = (
             "Laguna changes are not publishable.\n\n" + diff_report
-            + "\n\nVerification:\n" + checks_report + "\n",
-            encoding="utf-8",
+            + "\n\nVerification:\n" + checks_report + "\n"
         )
+        Path(args.output_file).write_text(failure_report, encoding="utf-8")
+        print(failure_report, flush=True)
         return 1
 
     report = (
@@ -361,10 +364,9 @@ def main() -> int:
         + diff_report + "\n"
     )
     if contains_credential(report, secret):
-        Path(args.output_file).write_text(
-            "Report withheld because credential-like output was detected.\n",
-            encoding="utf-8",
-        )
+        failure_report = "Report withheld because credential-like output was detected.\n"
+        Path(args.output_file).write_text(failure_report, encoding="utf-8")
+        print(failure_report, flush=True)
         return 1
     Path(args.output_file).write_text(report, encoding="utf-8")
     print("Laguna completed; independent checks passed; diff is eligible for isolated PR publication.")
