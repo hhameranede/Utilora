@@ -55,8 +55,9 @@ jobs:
         working-directory: utilora
         run: |
           set -euo pipefail
-          python3 -m py_compile scripts/run_exportflow_laguna.py scripts/test_exportflow_laguna.py
+          python3 -m py_compile scripts/run_exportflow_laguna.py scripts/test_exportflow_laguna.py scripts/prepare_exportflow_prompt.py scripts/test_prepare_exportflow_prompt.py
           python3 -m unittest discover -s scripts -p 'test_exportflow_laguna.py' -v
+          python3 -m unittest discover -s scripts -p 'test_prepare_exportflow_prompt.py' -v
 
       - name: Check out ExportFlow without persisting credentials
         uses: actions/checkout@v4
