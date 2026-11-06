@@ -47,6 +47,11 @@ jobs:
           python3 -m py_compile scripts/run_exportflow_laguna.py scripts/test_exportflow_laguna.py
           python3 -m unittest discover -s scripts -p 'test_exportflow_laguna.py' -v
 
+      - name: Test ExportFlow Laguna prompt preparation
+        run: |
+          python3 -m py_compile scripts/prepare_exportflow_prompt.py scripts/test_prepare_exportflow_prompt.py
+          python3 -m unittest discover -s scripts -p 'test_prepare_exportflow_prompt.py' -v
+
       - name: Verify agent and MCP configuration and OpenCode discovery
         run: npm run test:agent-config
         env:
