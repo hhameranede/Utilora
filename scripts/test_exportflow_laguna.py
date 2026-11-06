@@ -20,7 +20,7 @@ class LagunaRunnerTests(unittest.TestCase):
         self.assertIn("/workspace/exportflow", args)
         self.assertIn(AGENT, args)
         self.assertIn(MODEL, args)
-        self.assertEqual(args[-2:], ["--session", "session-123"])
+        self.assertEqual(args[-3:-1], ["--session", "session-123"])
         self.assertEqual(args[-1], "Inspect roadmap")
 
     def test_permission_overlay_denies_shell_except_read_only_git_inspection(self):
