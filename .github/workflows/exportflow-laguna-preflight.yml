@@ -17,6 +17,19 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
+      - name: Check out UTILORA workflow definitions
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Go for actionlint
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.24.x"
+
+      - name: Lint the Laguna workflow with actionlint
+        run: go run github.com/rhysd/actionlint/cmd/actionlint@v1.7.7 .github/workflows/exportflow-laguna.yml
+
       - name: Verify secret presence without printing values
         shell: bash
         env:
