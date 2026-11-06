@@ -42,6 +42,17 @@ jobs:
           path: utilora
           persist-credentials: false
 
+      - name: Validate Laguna runner safety tests
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run Laguna runner unit tests
+        working-directory: utilora
+        run: |
+          set -euo pipefail
+          python3 -m py_compile scripts/run_exportflow_laguna.py scripts/test_exportflow_laguna.py
+          python3 -m unittest discover -s scripts -p 'test_exportflow_laguna.py' -v
+
       - name: Check out ExportFlow without persisting credentials
         uses: actions/checkout@v4
         with:
@@ -259,6 +270,7 @@ another agent. The trusted runner provides all verification results after your c
           and returns exact failures for same-session repair. Never weaken tests or fabricate results.
           AGENT
           echo "Temporary Laguna profile installed; repository write token is not available to the agent."
+          touch "$RUNNER_TEMP/exportflow-laguna-profile-created"
 
       - name: Install OpenCode
         run: |
@@ -285,7 +297,12 @@ another agent. The trusted runner provides all verification results after your c
 
       - name: Remove temporary agent profile from the checkout
         if: always()
-        run: rm -rf "$GITHUB_WORKSPACE/exportflow/.opencode"
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -f "$RUNNER_TEMP/exportflow-laguna-profile-created" ]; then
+            rm -rf "$GITHUB_WORKSPACE/exportflow/.opencode"
+          fi
 
       - name: Create the review patch
         if: success()
