@@ -81,6 +81,7 @@ jobs:
         run: |
           set -euo pipefail
           set +x
+          gh auth setup-git --hostname github.com
           gh api repos/hhameranede/exportflow/issues/29 > "$RUNNER_TEMP/exportflow-issue-29.json"
           gh api --paginate --slurp repos/hhameranede/exportflow/issues/29/comments > "$RUNNER_TEMP/exportflow-issue-29-comments.json"
           gh api 'repos/hhameranede/exportflow/pulls?state=open&per_page=50' > "$RUNNER_TEMP/exportflow-open-prs.json"
@@ -94,7 +95,9 @@ jobs:
           root = Path(os.environ["GITHUB_WORKSPACE"]) / "exportflow"
           prs = json.loads(Path(os.environ["RUNNER_TEMP"], "exportflow-open-prs.json").read_text())
           safe_env = dict(os.environ)
-          for key in ("GH_TOKEN", "EXPORTFLOW_GITHUB_TOKEN", "NVIDIA_API_KEY"):
+          # GH_TOKEN is limited to this trusted PR-ref fetch subprocess. It is never
+          # passed into the Laguna runner or any verification process.
+          for key in ("EXPORTFLOW_GITHUB_TOKEN", "NVIDIA_API_KEY"):
               safe_env.pop(key, None)
           fetched = []
           for item in prs:
