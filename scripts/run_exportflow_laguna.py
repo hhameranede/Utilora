@@ -73,6 +73,27 @@ def build_run_args(workspace: str, prompt: str, session_id: str = "") -> list[st
     args.append(prompt)
     return args
 
+def load_nvidia_provider() -> dict[str, Any]:
+    """Load the canonical NVIDIA NIM provider/model registry from UTILORA config.
+
+    The ExportFlow checkout intentionally has no provider config. The temporary
+    OPENCODE_CONFIG_CONTENT overlay must therefore carry the registered provider,
+    otherwise OpenCode cannot resolve nvidia-nim/laguna-xs-2-1.
+    """
+    config_path = Path(__file__).resolve().parents[1] / "opencode.json"
+    config = json.loads(config_path.read_text(encoding="utf-8"))
+    providers = config.get("provider")
+    provider = providers.get("nvidia-nim") if isinstance(providers, dict) else None
+    if not isinstance(provider, dict):
+        raise ValueError("UTILORA opencode.json is missing provider.nvidia-nim.")
+    models = provider.get("models")
+    if not isinstance(models, dict) or "laguna-xs-2-1" not in models:
+        raise ValueError("NVIDIA NIM provider is missing the Laguna XS 2.1 model alias.")
+    if provider.get("options", {}).get("apiKey") != "{env:NVIDIA_API_KEY}":
+        raise ValueError("NVIDIA provider must read its API key from NVIDIA_API_KEY.")
+    return provider
+
+
 def build_permission_overlay() -> str:
     permissions: dict[str, Any] = {
         "read": "allow",
@@ -99,6 +120,9 @@ def build_permission_overlay() -> str:
         "lsp": "deny",
     }
     return json.dumps({
+        # Preserve the exact provider/model registry while overlaying the tighter
+        # execution policy. OPENCODE_CONFIG_CONTENT otherwise replaces project config.
+        "provider": {"nvidia-nim": load_nvidia_provider()},
         "permission": permissions,
         "agent": {AGENT: {"permission": permissions}},
         "mcp": {
