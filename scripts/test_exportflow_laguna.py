@@ -10,6 +10,7 @@ from run_exportflow_laguna import (
     build_run_args,
     check_environment,
     contains_credential,
+    load_nvidia_provider,
     protected_path_reason,
 )
 
@@ -34,6 +35,22 @@ class LagunaRunnerTests(unittest.TestCase):
         self.assertEqual(permissions["external_directory"], "deny")
         self.assertEqual(permissions["websearch"], "deny")
         self.assertEqual(permissions["task"], "deny")
+
+        provider = config["provider"]["nvidia-nim"]
+        self.assertEqual(provider["npm"], "@ai-sdk/openai-compatible")
+        self.assertEqual(provider["options"]["baseURL"], "https://integrate.api.nvidia.com/v1")
+        self.assertEqual(provider["options"]["apiKey"], "{env:NVIDIA_API_KEY}")
+        self.assertEqual(
+            provider["models"]["laguna-xs-2-1"]["id"],
+            "poolside/laguna-xs-2.1",
+        )
+
+    def test_nvidia_provider_is_loaded_from_the_canonical_utilora_registry(self):
+        provider = load_nvidia_provider()
+        self.assertEqual(provider["npm"], "@ai-sdk/openai-compatible")
+        self.assertEqual(provider["options"]["baseURL"], "https://integrate.api.nvidia.com/v1")
+        self.assertEqual(provider["options"]["apiKey"], "{env:NVIDIA_API_KEY}")
+        self.assertEqual(provider["models"]["laguna-xs-2-1"]["id"], "poolside/laguna-xs-2.1")
 
     def test_model_process_receives_no_github_or_actions_tokens(self):
         with patch.dict(os.environ, {
