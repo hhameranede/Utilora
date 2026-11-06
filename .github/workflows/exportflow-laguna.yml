@@ -2,6 +2,10 @@ name: ExportFlow — Laguna roadmap execution
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/exportflow-laguna.yml"
 
 permissions:
   contents: read
