@@ -658,3 +658,94 @@ body {
     white-space: normal;
   }
 }
+
+
+/* V4 legacy-component completion: remove the remaining warm palette from
+   older tool workspaces and component-specific CSS that predates the reset. */
+:root {
+  --ul-orange: var(--ul-v4-primary);
+  --ul-orange-dark: var(--ul-v4-primary-strong);
+  --ulx-orange: var(--ul-v4-primary);
+  --ulx-orange-deep: var(--ul-v4-primary-strong);
+  --ref-orange: var(--ul-v4-primary);
+  --ref-orange-dark: var(--ul-v4-primary-strong);
+  --ul-ink: var(--ul-v4-ink);
+  --ulx-ink: var(--ul-v4-ink);
+  --ref-ink: var(--ul-v4-ink);
+  --ul-muted: var(--ul-v4-muted);
+  --ulx-muted: var(--ul-v4-muted);
+  --ref-muted: var(--ul-v4-muted);
+  --ul-border: var(--ul-v4-line);
+  --ulx-line: var(--ul-v4-line);
+  --ref-line: var(--ul-v4-line);
+}
+
+.ulx-site-shell .ul-hero-title span,
+.ulx-site-shell .ul-hero-search-icon,
+.ulx-site-shell .ul-hero-proof svg {
+  color: var(--ul-v4-primary) !important;
+}
+.ulx-site-shell .ul-hero-search:focus-within {
+  border-color: #aab5f6 !important;
+  box-shadow: 0 0 0 4px rgba(70, 88, 216, .09), 0 12px 30px rgba(23, 34, 58, .06) !important;
+}
+.ulx-site-shell .ul-trust-strip {
+  border-color: var(--ul-v4-line) !important;
+  background: #fff !important;
+}
+.ulx-site-shell .ul-trust-icon {
+  background: var(--ul-v4-primary-soft) !important;
+  color: var(--ul-v4-primary) !important;
+}
+.ulx-site-shell .ul-home-section.rounded-\\[28px\\] {
+  border-color: var(--ul-v4-primary-line) !important;
+  background: linear-gradient(110deg, #fff 0%, #f4f6ff 100%) !important;
+}
+.ulx-site-shell .ul-category-band {
+  border-color: var(--ul-v4-line) !important;
+  background: #f0f3fa !important;
+}
+.ulx-site-shell .ul-category-card[data-ul-category] .ul-category-icon,
+.ulx-site-shell .ul-tool-card[data-ul-category] .ul-tool-icon,
+.ulx-site-shell .ul-featured-tool-card .ul-tool-icon {
+  border-color: var(--ul-v4-primary-line) !important;
+  background: var(--ul-v4-primary-soft) !important;
+  color: var(--ul-v4-primary) !important;
+}
+.ulx-site-shell .ul-category-card[data-ul-category="website-domain"] .ul-category-icon,
+.ulx-site-shell .ul-tool-card[data-ul-category="website-domain"] .ul-tool-icon {
+  border-color: #ccebea !important;
+  background: #e8f7f7 !important;
+  color: var(--ul-v4-teal) !important;
+}
+.ulx-site-shell .ul-tool-page input[type="range"],
+.ulx-site-shell #tool-workspace input[type="range"] {
+  accent-color: var(--ul-v4-primary) !important;
+}
+.ulx-site-shell #tool-workspace > .grid > section > button,
+.ulx-site-shell #tool-workspace button[class*="border-dashed"] {
+  border-color: var(--ul-v4-primary-line) !important;
+  background: #f7f8ff !important;
+}
+.ulx-site-shell #tool-workspace button.bg-orange-700,
+.ulx-site-shell .ul-tool-page a.bg-orange-700 {
+  border-color: var(--ul-v4-primary) !important;
+  border-radius: 12px !important;
+  background: linear-gradient(135deg, #5668e7, #3f4fc9) !important;
+  color: #fff !important;
+}
+.ulx-site-shell #tool-workspace button.bg-orange-700:hover,
+.ulx-site-shell .ul-tool-page a.bg-orange-700:hover {
+  background: linear-gradient(135deg, #4759d6, #303faf) !important;
+}
+.ulx-site-shell .ul-tool-page > header nav {
+  border-color: var(--ul-v4-line) !important;
+}
+.ulx-site-shell .ul-content-page .bg-gradient-to-br,
+.ulx-site-shell .ul-content-page .bg-gradient-to-r {
+  background: linear-gradient(112deg, #fff 0%, #f4f6ff 100%) !important;
+}
+.ulx-site-shell .ul-tool-page > header {
+  border-color: var(--ul-v4-line) !important;
+  background: linear-gradient(115deg, #fff 0%, #f3f5ff 100%) !important;
+}
