@@ -39,4 +39,10 @@ test('Arabic image workspace keeps its primary controls localized', async ({ pag
   await expect(page.getByRole('heading', { name: /إعدادات/ })).toBeVisible();
   await expect(page.getByText('Select an image to begin', { exact: true })).toHaveCount(0);
   await expect(page.getByText('Your image preview will appear here', { exact: true })).toHaveCount(0);
+
+  await page.goto('/ar/tools/image-cropper');
+  await expect(page.getByRole('spinbutton', { name: 'X', exact: true })).toBeVisible();
+  await expect(page.getByRole('spinbutton', { name: 'Y', exact: true })).toBeVisible();
+  await expect(page.getByRole('spinbutton', { name: 'العرض', exact: true })).toBeVisible();
+  await expect(page.getByRole('spinbutton', { name: 'الارتفاع', exact: true })).toBeVisible();
 });

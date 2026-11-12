@@ -198,7 +198,9 @@
     "metadataInspected": "Image properties inspected successfully.",
     "done": "Done",
     "sizeChange": "size change",
-    "errorProcessing": "Image processing failed."
+    "errorProcessing": "Image processing failed.",
+    "cropWidth": "Width",
+    "cropHeight": "Height"
   },
   "articles": {
     "title": "Articles, Tutorials & Engineering Guides",

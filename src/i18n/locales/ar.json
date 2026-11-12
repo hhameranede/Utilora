@@ -198,7 +198,9 @@
     "metadataInspected": "تم فحص خصائص الصورة بنجاح.",
     "done": "تم",
     "sizeChange": "تغيير في الحجم",
-    "errorProcessing": "تعذرت معالجة الصورة."
+    "errorProcessing": "تعذرت معالجة الصورة.",
+    "cropWidth": "العرض",
+    "cropHeight": "الارتفاع"
   },
   "articles": {
     "title": "المقالات والشروحات التقنية",
