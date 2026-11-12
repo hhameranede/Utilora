@@ -28,3 +28,15 @@ test('V4 homepage remains RTL-aware and searchable in Arabic', async ({ page }) 
   await expect(page.getByRole('searchbox')).toBeVisible();
   await expect(page.locator('#quick-tools')).toBeVisible();
 });
+
+test('Arabic image workspace keeps its primary controls localized', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/ar/tools/image-converter');
+
+  await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
+  await expect(page.getByRole('button', { name: /اختر صورة للبدء/ })).toBeVisible();
+  await expect(page.getByText('ستظهر معاينة صورتك هنا')).toBeVisible();
+  await expect(page.getByRole('heading', { name: /إعدادات/ })).toBeVisible();
+  await expect(page.getByText('Select an image to begin', { exact: true })).toHaveCount(0);
+  await expect(page.getByText('Your image preview will appear here', { exact: true })).toHaveCount(0);
+});
