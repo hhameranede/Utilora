@@ -574,3 +574,40 @@ body {
     transition-duration: .01ms !important;
   }
 }
+
+
+/* Final brand-tone normalization for older shared page headings and utility variants. */
+.ulx-site-shell .ul-page-kicker,
+.ulx-site-shell .ul-hero-kicker {
+  border-color: var(--ul-v4-primary-line) !important;
+  background: var(--ul-v4-primary-soft) !important;
+  color: var(--ul-v4-primary-strong) !important;
+}
+.ulx-site-shell :is(h1,h2,h3,h4) { color: var(--ul-v4-ink); }
+.ulx-site-shell [class~="hover:bg-orange-700"]:hover,
+.ulx-site-shell [class~="hover:bg-orange-600"]:hover {
+  background-color: var(--ul-v4-primary) !important;
+}
+.ulx-site-shell [class~="hover:bg-orange-800"]:hover {
+  background-color: var(--ul-v4-primary-strong) !important;
+}
+.ulx-site-shell [class~="hover:text-orange-800"]:hover,
+.ulx-site-shell [class~="hover:text-orange-900"]:hover {
+  color: var(--ul-v4-primary-strong) !important;
+}
+.ulx-site-shell [class~="border-orange-200"],
+.ulx-site-shell [class~="border-orange-300"] {
+  border-color: var(--ul-v4-primary-line) !important;
+}
+.ulx-site-shell [class~="bg-orange-300"],
+.ulx-site-shell [class~="bg-orange-400"] {
+  background-color: #aeb9fb !important;
+}
+.ulx-site-shell [class~="bg-orange-900"] { background-color: #29358f !important; }
+.ulx-site-shell [class~="text-orange-300"] { color: #9aa7f7 !important; }
+.ulx-site-shell [class~="text-orange-200"] { color: #8594ef !important; }
+.ulx-site-shell [class~="text-orange-100"] { color: #aeb9fb !important; }
+.ulx-site-shell [class~="text-orange-900"] { color: #29358f !important; }
+.ulx-site-shell [class~="border-orange-400"] { border-color: #aeb9fb !important; }
+.ulx-site-shell::selection,
+.ulx-site-shell ::selection { background: #dfe5ff; color: #1c276f; }
