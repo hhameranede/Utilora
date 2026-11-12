@@ -611,3 +611,50 @@ body {
 .ulx-site-shell [class~="border-orange-400"] { border-color: #aeb9fb !important; }
 .ulx-site-shell::selection,
 .ulx-site-shell ::selection { background: #dfe5ff; color: #1c276f; }
+
+
+/* Playwright feedback: keep useful tools visible above the fold on narrow phones,
+   and let Arabic compact-card titles use the full available text column. */
+@media (max-width: 760px) {
+  .ulv4-hero-visual {
+    display: none !important;
+  }
+  .ulv4-hero {
+    gap: 0;
+    padding-block: 18px 17px;
+  }
+  .ulv4-hero-copy {
+    max-width: none;
+  }
+}
+@media (max-width: 390px) {
+  .ulv4-hero {
+    padding: 16px 14px 14px;
+  }
+  .ulv4-hero-title {
+    font-size: 27px;
+    line-height: 1.12;
+  }
+  .ulv4-hero-description {
+    margin: 9px 0 12px;
+  }
+}
+@media (max-width: 767px) {
+  .ulx-site-shell #quick-tools .ul-compact-tool-card > div:first-child {
+    align-items: stretch !important;
+  }
+  .ulx-site-shell #quick-tools .ul-compact-tool-card > div:first-child > div:last-child {
+    align-self: stretch;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+  .ulx-site-shell #quick-tools .ul-compact-tool-card h4 {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    white-space: normal;
+  }
+}
