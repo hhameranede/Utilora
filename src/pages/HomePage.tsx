@@ -13,7 +13,6 @@ import {
   ShieldCheck,
   Sparkles,
   Video,
-  WandSparkles,
   Zap,
 } from 'lucide-react';
 import { useI18n } from '../i18n';
@@ -104,7 +103,9 @@ export const HomePage: React.FC = () => {
   const isArabic = locale === 'ar';
   const heroTitle = isArabic
     ? <>{'كل مهامك الرقمية'} <span>{'في مكان واحد.'}</span></>
-    : t('hero.title');
+    : locale === 'en'
+      ? <>{'Every Digital Task. '}<span>{'One Place.'}</span></>
+      : t('hero.title');
 
   const trustItems = isArabic
     ? [
