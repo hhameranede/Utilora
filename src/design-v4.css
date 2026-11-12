@@ -697,7 +697,7 @@ body {
   background: var(--ul-v4-primary-soft) !important;
   color: var(--ul-v4-primary) !important;
 }
-.ulx-site-shell .ul-home-section.rounded-\\[28px\\] {
+.ulx-site-shell .ul-home-section[class~="rounded-[28px]"] {
   border-color: var(--ul-v4-primary-line) !important;
   background: linear-gradient(110deg, #fff 0%, #f4f6ff 100%) !important;
 }
