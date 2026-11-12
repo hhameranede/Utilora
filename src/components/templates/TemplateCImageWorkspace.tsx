@@ -380,8 +380,8 @@ export const TemplateCImageWorkspace: React.FC<TemplateCImageWorkspaceProps> = (
               <div className="grid grid-cols-2 gap-3">
                 <NumberField label="X" value={cropX} onChange={setCropX} />
                 <NumberField label="Y" value={cropY} onChange={setCropY} />
-                <NumberField label="Width" value={cropWidth} onChange={setCropWidth} />
-                <NumberField label="Height" value={cropHeight} onChange={setCropHeight} />
+                <NumberField label={t('imageWorkspace.widthPx')} value={cropWidth} onChange={setCropWidth} />
+                <NumberField label={t('imageWorkspace.heightPx')} value={cropHeight} onChange={setCropHeight} />
               </div>
               {metadata && <button type="button" onClick={() => { setCropX(0); setCropY(0); setCropWidth(metadata.width); setCropHeight(metadata.height); }} className="text-xs text-orange-700 underline">{t('imageWorkspace.resetCrop')}</button>}
             </div>
