@@ -488,12 +488,12 @@ body {
 }
 @media (max-width: 760px) {
   .ulx-site-shell main { padding-block: 14px 34px; }
-  .ulv4-home { gap: 37px; }
+  .ulv4-home { gap: 28px; }
   .ulv4-wrap, .ulv4-section, .ulv4-trust { width: min(100% - 28px, 1280px); }
   .ulv4-hero {
     display: flex; flex-direction: column; align-items: stretch; gap: 20px;
     width: min(100% - 24px, 1280px); min-height: unset;
-    margin-top: 3px; padding: 25px 19px 17px; border-radius: 23px;
+    margin-top: 3px; padding: 20px 19px 15px; border-radius: 23px;
   }
   .ulv4-hero::before { display: none; }
   .ulv4-hero-copy { max-width: none; text-align: start; }
@@ -505,9 +505,9 @@ body {
   .ulv4-search > svg { margin-inline-start: 13px; width: 17px; }
   .ulv4-actions { gap: 8px; margin-top: 11px; }
   .ulv4-actions a { min-height: 43px; padding-inline: 14px; font-size: 11px; }
-  .ulv4-quick-links { gap: 9px; margin-top: 14px; font-size: 10px; }
-  .ulv4-proof-row { gap: 10px 14px; margin-top: 12px; font-size: 9px; }
-  .ulv4-hero-visual { min-height: 235px; margin: 0 4px 6px; }
+  .ulv4-quick-links, .ulv4-proof-row { display: none; }
+  .ulv4-hero-visual { min-height: 160px; margin: 0 4px 6px; }
+  .ulv4-window { transform: scale(.72); transform-origin: center; }
   .ulv4-visual-glow { width: 240px; height: 240px; }
   .ulv4-window { width: min(100%, 390px); border-radius: 16px; }
   .ulv4-window-bar { min-height: 36px; }
@@ -553,7 +553,7 @@ body {
   .ulv4-article-card { padding: 16px; }
   .ulv4-article-card h3 { font-size: 13px; }
   .ulv4-article-card p { font-size: 10px; }
-  .ulx-site-shell .ul-tool-card { min-height: 95px; }
+  .ulx-site-shell .ul-tool-card { min-height: 76px; }
   .ulx-site-shell .ul-category-card { min-height: 160px; padding: 15px !important; }
   .ulx-site-shell .ul-featured-tool-card { min-height: 220px; padding: 18px !important; }
   .ulx-site-shell .ul-page-intro,
