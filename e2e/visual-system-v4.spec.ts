@@ -146,3 +146,53 @@ test('V4 homepage localizes SEO metadata and workspace preview across all suppor
     await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', locale.categoriesDescription);
   }
 });
+
+
+test('V4 Arabic homepage fits a 320px RTL viewport without clipping the header or hero', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 740 });
+  await page.goto('/ar');
+
+  await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
+  await expect(page.locator('[data-testid="utilora-home-hero"]')).toBeVisible();
+
+  const metrics = await page.evaluate(() => {
+    const rect = (selector: string) => {
+      const element = document.querySelector(selector);
+      if (!element) return null;
+      const box = element.getBoundingClientRect();
+      return { left: box.left, right: box.right, width: box.width };
+    };
+    const headerButtons = Array.from(document.querySelectorAll('header button'))
+      .map((button) => {
+        const box = button.getBoundingClientRect();
+        return { left: box.left, right: box.right, width: box.width, height: box.height };
+      })
+      .filter((box) => box.width > 0 && box.height > 0);
+
+    return {
+      clientWidth: document.documentElement.clientWidth,
+      documentWidth: document.documentElement.scrollWidth,
+      bodyWidth: document.body.scrollWidth,
+      hero: rect('[data-testid="utilora-home-hero"]'),
+      brand: rect('header .ulx-brand-lockup'),
+      mobileMenu: rect('header button[aria-controls="utilora-mobile-navigation"]'),
+      headerButtons,
+    };
+  });
+
+  expect(metrics.documentWidth).toBeLessThanOrEqual(metrics.clientWidth);
+  expect(metrics.bodyWidth).toBeLessThanOrEqual(metrics.clientWidth);
+  expect(metrics.hero).not.toBeNull();
+  expect(metrics.hero!.left).toBeGreaterThanOrEqual(0);
+  expect(metrics.hero!.right).toBeLessThanOrEqual(metrics.clientWidth);
+  expect(metrics.brand).not.toBeNull();
+  expect(metrics.brand!.left).toBeGreaterThanOrEqual(0);
+  expect(metrics.brand!.right).toBeLessThanOrEqual(metrics.clientWidth);
+  expect(metrics.mobileMenu).not.toBeNull();
+  expect(metrics.mobileMenu!.left).toBeGreaterThanOrEqual(0);
+  expect(metrics.mobileMenu!.right).toBeLessThanOrEqual(metrics.clientWidth);
+  for (const button of metrics.headerButtons) {
+    expect(button.left).toBeGreaterThanOrEqual(0);
+    expect(button.right).toBeLessThanOrEqual(metrics.clientWidth);
+  }
+});
