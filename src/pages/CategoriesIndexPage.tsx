@@ -11,7 +11,7 @@ export const CategoriesIndexPage: React.FC = () => {
   return (
     <>
       <Head
-        title={`\${t('nav.categories')} — \${t('brand.name')}`}
+        title={`${t('nav.categories')} — ${t('brand.name')}`}
         description={t('categories.description')}
         locale={locale}
         routeType="categories-index"
