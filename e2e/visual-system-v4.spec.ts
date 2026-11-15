@@ -95,7 +95,7 @@ test('V4 homepage localizes SEO metadata and workspace preview across all suppor
     {
       locale: 'bn',
       title: 'UTILORA — প্রতিটি ডিজিটাল কাজ। এক ঠিকানায়।',
-      description: 'ছবি, ডকুমেন্ট, টেক্সট, কোড, ওয়েবসাইট এবং ভিডিওর জন্য শক্তিশালী, দ্রুত ও সম্পূর্ণ ফ্রি অনলাইন টুলস。',
+      description: 'ছবি, ডকুমেন্ট, টেক্সট, কোড, ওয়েবসাইট এবং ভিডিওর জন্য শক্তিশালী, দ্রুত ও সম্পূর্ণ ফ্রি অনলাইন টুলস।',
       imageCategory: 'ছবি টুলস',
     },
   ];
