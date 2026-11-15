@@ -22,8 +22,8 @@ export const ToolsIndexPage: React.FC = () => {
   return (
     <>
       <Head
-        title="All 36 Online Digital Tools — UTILORA"
-        description="Browse the complete catalog of 36 free digital tools: Image converter, PDF merger, JSON formatter, DNS lookup, Video trimmer, and more."
+        title={`${t('nav.allTools')} (36) — ${t('brand.name')}`}
+        description={t('tools.description')}
         locale={locale}
         routeType="tools-index"
         isIndexable={true}

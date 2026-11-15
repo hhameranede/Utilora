@@ -11,8 +11,8 @@ export const CategoriesIndexPage: React.FC = () => {
   return (
     <>
       <Head
-        title="Tool Categories — UTILORA"
-        description="Explore 36 digital utilities organized into six purpose-built tool suites: Image, PDF, Text, Developer, Website & Domain, and Video."
+        title={`${t('nav.categories')} — ${t('brand.name')}`}
+        description={t('categories.description')}
         locale={locale}
         routeType="categories-index"
         isIndexable={true}

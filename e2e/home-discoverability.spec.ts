@@ -33,8 +33,8 @@ test('tool catalogue presents button-shaped card actions and visibly selectable 
 
   const action = firstToolCard.locator('span.inline-flex').last();
   await expect(action).toContainText('Open Tool');
-  await expect(action).toHaveClass(/bg-orange-50/);
-  await expect(action).toHaveClass(/border-orange-100/);
+  await expect(action).toHaveCSS('background-color', 'rgb(237, 240, 255)');
+  await expect(action).toHaveCSS('border-color', 'rgb(217, 223, 255)');
 
   const pdfFilter = page.getByRole('button', { name: 'PDF Tools' });
   await expect(pdfFilter).toHaveAttribute('aria-pressed', 'false');
@@ -43,6 +43,6 @@ test('tool catalogue presents button-shaped card actions and visibly selectable 
 
   await pdfFilter.click();
   await expect(pdfFilter).toHaveAttribute('aria-pressed', 'true');
-  await expect(pdfFilter).toHaveClass(/bg-orange-700/);
-  await expect(pdfFilter).toHaveClass(/border-orange-700/);
+  await expect(pdfFilter).toHaveCSS('background-color', 'rgb(70, 88, 216)');
+  await expect(pdfFilter).toHaveCSS('border-color', 'rgb(70, 88, 216)');
 });

@@ -4,6 +4,7 @@ import posthog from 'posthog-js';
 import App from './App';
 import './index.css';
 import './design-v3.css';
+import './design-v4.css';
 
 // Analytics is optional and privacy-conscious: no autocapture, no session replay,
 // and no user-entered text or file metadata is sent as custom event properties.

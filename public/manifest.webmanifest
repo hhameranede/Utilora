@@ -9,8 +9,8 @@
   "scope": "/",
   "display": "standalone",
   "display_override": ["standalone", "minimal-ui"],
-  "background_color": "#f8f9fc",
-  "theme_color": "#f8f9fc",
+  "background_color": "#F5F7FC",
+  "theme_color": "#4658D8",
   "categories": ["utilities", "productivity"],
   "prefer_related_applications": false,
   "icons": [

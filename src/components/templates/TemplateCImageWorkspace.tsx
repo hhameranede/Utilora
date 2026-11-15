@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Image as ImageIcon, Upload, Download, RotateCw, Lock, Unlock, RefreshCw, FileImage, AlertCircle } from 'lucide-react';
 import { readBrowserImageMetadata, transformBrowserImage, BrowserImageMetadata } from '../../engines/image/browser';
+import { useI18n } from '../../i18n';
 
 type ImageFormat = 'webp' | 'jpeg' | 'png';
 
@@ -20,6 +21,7 @@ export const TemplateCImageWorkspace: React.FC<TemplateCImageWorkspaceProps> = (
   defaultFormat = 'webp',
   acceptedFormats = ['.png', '.jpg', '.jpeg', '.webp'],
 }) => {
+  const { locale, t } = useI18n();
   const inputRef = useRef<HTMLInputElement>(null);
   const previewImageRef = useRef<HTMLImageElement>(null);
   const cropDragRef = useRef<{ pointerId: number; startX: number; startY: number } | null>(null);
@@ -83,7 +85,7 @@ export const TemplateCImageWorkspace: React.FC<TemplateCImageWorkspaceProps> = (
     setMessage('');
     if (!selected.type.startsWith('image/')) {
       setPreparingFile(false);
-      setError('Please choose a valid image file.');
+      setError(t('imageWorkspace.errorInvalidImage'));
       return;
     }
     const extension = selected.name.includes('.')
@@ -91,12 +93,12 @@ export const TemplateCImageWorkspace: React.FC<TemplateCImageWorkspaceProps> = (
       : '';
     if (!acceptedExtensions.includes(extension)) {
       setPreparingFile(false);
-      setError(`Unsupported image format. Supported formats: ${acceptedFormatsLabel}.`);
+      setError(`${t('imageWorkspace.errorUnsupportedFormat')} ${acceptedFormatsLabel}.`);
       return;
     }
     if (selected.size > 50 * 1024 * 1024) {
       setPreparingFile(false);
-      setError('Image size exceeds the 50 MB limit.');
+      setError(t('imageWorkspace.errorTooLarge'));
       return;
     }
 
@@ -127,11 +129,11 @@ export const TemplateCImageWorkspace: React.FC<TemplateCImageWorkspaceProps> = (
       setCropWidth(details.width);
       setCropHeight(details.height);
       setPreparingFile(false);
-      if (isMetadata) setMessage('Image properties loaded. EXIF camera and GPS tags are not read by this tool.');
+      if (isMetadata) setMessage(t('imageWorkspace.metadataLoaded'));
     } catch (cause) {
       if (fileRevision === fileRevisionRef.current) {
         setPreparingFile(false);
-        setError(cause instanceof Error ? cause.message : 'Unable to read this image.');
+        setError(locale === 'ar' ? t('imageWorkspace.errorUnableToRead') : cause instanceof Error ? cause.message : t('imageWorkspace.errorUnableToRead'));
       }
     }
   };
@@ -190,11 +192,11 @@ export const TemplateCImageWorkspace: React.FC<TemplateCImageWorkspaceProps> = (
 
   const processImage = async () => {
     if (!file) {
-      setError('Choose an image first.');
+      setError(t('imageWorkspace.errorChooseFirst'));
       return;
     }
     if (!metadata || preparingFile) {
-      setError('The image is still being prepared. Please try again when inspection finishes.');
+      setError(t('imageWorkspace.errorStillPreparing'));
       return;
     }
     const fileRevision = fileRevisionRef.current;
@@ -206,7 +208,7 @@ export const TemplateCImageWorkspace: React.FC<TemplateCImageWorkspaceProps> = (
         const data = await readBrowserImageMetadata(file);
         if (fileRevision !== fileRevisionRef.current) return;
         setMetadata(data);
-        setMessage('Image properties inspected successfully.');
+        setMessage(t('imageWorkspace.metadataInspected'));
         return;
       }
 
@@ -229,10 +231,10 @@ export const TemplateCImageWorkspace: React.FC<TemplateCImageWorkspaceProps> = (
       });
       setResultName(outputName);
       const savings = Math.round((1 - output.blob.size / Math.max(1, file.size)) * 100);
-      setMessage(`Done: ${output.width} × ${output.height}px · ${formatBytes(output.blob.size)}${isCompress ? ` · ${savings}% size change` : ''}`);
+      setMessage(`${t('imageWorkspace.done')}: ${output.width} × ${output.height}px · ${formatBytes(output.blob.size)}${isCompress ? ` · ${savings}% ${t('imageWorkspace.sizeChange')}` : ''}`);
     } catch (cause) {
       if (fileRevision === fileRevisionRef.current) {
-        setError(cause instanceof Error ? cause.message : 'Image processing failed.');
+        setError(locale === 'ar' ? t('imageWorkspace.errorProcessing') : cause instanceof Error ? cause.message : t('imageWorkspace.errorProcessing'));
       }
     } finally {
       if (fileRevision === fileRevisionRef.current) setBusy(false);
@@ -267,8 +269,8 @@ export const TemplateCImageWorkspace: React.FC<TemplateCImageWorkspaceProps> = (
           className="w-full p-5 sm:p-9 rounded-2xl border-2 border-dashed border-stone-300 hover:border-orange-400 bg-white transition-colors text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2"
         >
           <span className="mx-auto w-12 h-12 rounded-xl bg-orange-50 border border-orange-100 text-orange-600 flex items-center justify-center"><Upload size={22} /></span>
-          <span className="block mt-3 text-sm font-semibold text-stone-900">{file ? 'Choose another image' : 'Select an image to begin'}</span>
-          <span className="block mt-1 text-xs text-stone-500">{acceptedFormatsLabel} · Up to 50 MB</span>
+          <span className="block mt-3 text-sm font-semibold text-stone-900">{file ? t('imageWorkspace.chooseAnotherImage') : t('imageWorkspace.selectImage')}</span>
+          <span className="block mt-1 text-xs text-stone-500">{acceptedFormatsLabel} · {t('imageWorkspace.upTo')} 50 MB</span>
         </button>
 
         <div className="rounded-2xl border border-stone-200 bg-stone-50 min-h-[180px] sm:min-h-[260px] p-3 sm:p-4 flex items-center justify-center">
@@ -277,7 +279,7 @@ export const TemplateCImageWorkspace: React.FC<TemplateCImageWorkspaceProps> = (
               <img
                 ref={previewImageRef}
                 src={resultUrl || sourceUrl}
-                alt={resultUrl ? "Processed result preview" : "Original image preview"}
+                alt={resultUrl ? t('imageWorkspace.processedResultPreview') : t('imageWorkspace.originalImagePreview')}
                 className={`block max-w-full max-h-[480px] object-contain rounded-lg ${isCrop && !resultUrl ? 'touch-none cursor-crosshair select-none' : ''}`}
                 draggable={false}
                 onPointerDown={isCrop && !resultUrl ? handleCropPointerDown : undefined}
@@ -287,7 +289,7 @@ export const TemplateCImageWorkspace: React.FC<TemplateCImageWorkspaceProps> = (
               />
               {isCrop && !resultUrl && metadata && (
                 <div
-                  aria-label="Selected crop area"
+                  aria-label={t('imageWorkspace.selectedCropArea')}
                   className="absolute pointer-events-none border-2 border-orange-500 bg-orange-300/10 rounded-sm"
                   style={{
                     left: `${(cropX / metadata.width) * 100}%`,
@@ -301,25 +303,25 @@ export const TemplateCImageWorkspace: React.FC<TemplateCImageWorkspaceProps> = (
           ) : (
             <div className="text-center text-stone-400">
               <ImageIcon size={36} className="mx-auto mb-2 opacity-60" />
-              <p className="text-xs">Your image preview will appear here</p>
+              <p className="text-xs">{t('imageWorkspace.previewPlaceholder')}</p>
             </div>
           )}
         </div>
 
         {metadata && (
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-            <Metric label="Dimensions" value={`${metadata.width} × ${metadata.height}`} />
-            <Metric label="File size" value={formatBytes(metadata.sizeBytes)} />
-            <Metric label="Aspect ratio" value={metadata.aspectRatio} />
-            <Metric label="Alpha sample" value={metadata.hasTransparency ? 'Yes' : 'No'} />
+            <Metric label={t('imageWorkspace.dimensions')} value={`${metadata.width} × ${metadata.height}`} />
+            <Metric label={t('imageWorkspace.fileSize')} value={formatBytes(metadata.sizeBytes)} />
+            <Metric label={t('imageWorkspace.aspectRatio')} value={metadata.aspectRatio} />
+            <Metric label={t('imageWorkspace.alphaSample')} value={metadata.hasTransparency ? t('imageWorkspace.yes') : t('imageWorkspace.no')} />
           </div>
         )}
         {metadata && isMetadata && (
           <div className="p-4 rounded-xl bg-white border border-stone-200 text-xs text-stone-600 space-y-1">
-            <p><strong className="text-stone-900">File:</strong> {metadata.name}</p>
-            <p><strong className="text-stone-900">MIME type:</strong> {metadata.mimeType}</p>
-            <p><strong className="text-stone-900">Last modified:</strong> {metadata.lastModified}</p>
-            <p className="text-stone-500">{metadata.metadataNote}</p>
+            <p><strong className="text-stone-900">{t('imageWorkspace.file')}:</strong> {metadata.name}</p>
+            <p><strong className="text-stone-900">{t('imageWorkspace.mimeType')}:</strong> {metadata.mimeType}</p>
+            <p><strong className="text-stone-900">{t('imageWorkspace.lastModified')}:</strong> {metadata.lastModified}</p>
+            <p className="text-stone-500">{t('imageWorkspace.metadataNote')}</p>
           </div>
         )}
       </section>
@@ -328,16 +330,16 @@ export const TemplateCImageWorkspace: React.FC<TemplateCImageWorkspaceProps> = (
         <div className="p-4 sm:p-6 rounded-2xl bg-white border border-stone-200 shadow-xs space-y-4 sm:space-y-5">
           <div className="flex items-center gap-2 pb-3 border-b border-stone-100">
             <FileImage size={17} className="text-orange-600" />
-            <h2 className="text-sm font-semibold text-stone-900">{toolName} settings</h2>
+            <h2 className="text-sm font-semibold text-stone-900">{locale === 'ar' ? `${t('imageWorkspace.settings')} ${toolName}` : `${toolName} ${t('imageWorkspace.settings')}`}</h2>
           </div>
 
           {!isMetadata && !isCrop && !isRotate && !isResize && (
-            <Field label={isCompress ? 'Output quality' : 'Output format'}>
+            <Field label={isCompress ? t('imageWorkspace.outputQuality') : t('imageWorkspace.outputFormat')}>
               {isCompress ? (
                 <div className="space-y-2">
-                  <div className="flex justify-between text-xs text-stone-500"><span>Smaller</span><strong className="text-orange-700">{quality}%</strong><span>Sharper</span></div>
+                  <div className="flex justify-between text-xs text-stone-500"><span>{t('imageWorkspace.smaller')}</span><strong className="text-orange-700">{quality}%</strong><span>{t('imageWorkspace.sharper')}</span></div>
                   <input type="range" min="10" max="100" value={quality} onChange={(event) => setQuality(Number(event.target.value))} className="w-full accent-orange-600" />
-                  <p className="text-[11px] text-stone-500">Exports WebP. Compression depends on the image content; a smaller file is not guaranteed.</p>
+                  <p className="text-[11px] text-stone-500">{t('imageWorkspace.compressionNote')}</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-3 gap-2">
@@ -350,61 +352,61 @@ export const TemplateCImageWorkspace: React.FC<TemplateCImageWorkspaceProps> = (
           {isResize && (
             <>
               <div className="grid grid-cols-2 gap-2 p-1 bg-stone-100 rounded-xl">
-                <button type="button" onClick={() => setResizeMode('pixels')} className={`py-2 rounded-lg text-xs font-semibold ${resizeMode === 'pixels' ? 'bg-white text-orange-700 shadow-xs' : 'text-stone-500'}`}>Exact pixels</button>
-                <button type="button" onClick={() => setResizeMode('percentage')} className={`py-2 rounded-lg text-xs font-semibold ${resizeMode === 'percentage' ? 'bg-white text-orange-700 shadow-xs' : 'text-stone-500'}`}>Percentage</button>
+                <button type="button" onClick={() => setResizeMode('pixels')} className={`py-2 rounded-lg text-xs font-semibold ${resizeMode === 'pixels' ? 'bg-white text-orange-700 shadow-xs' : 'text-stone-500'}`}>{t('imageWorkspace.exactPixels')}</button>
+                <button type="button" onClick={() => setResizeMode('percentage')} className={`py-2 rounded-lg text-xs font-semibold ${resizeMode === 'percentage' ? 'bg-white text-orange-700 shadow-xs' : 'text-stone-500'}`}>{t('imageWorkspace.percentage')}</button>
               </div>
               {resizeMode === 'percentage' ? (
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between"><span className="text-xs font-semibold text-stone-700">Scale</span><strong className="text-xs text-orange-700">{percentage}%</strong></div>
+                  <div className="flex items-center justify-between"><span className="text-xs font-semibold text-stone-700">{t('imageWorkspace.scale')}</span><strong className="text-xs text-orange-700">{percentage}%</strong></div>
                   <input type="range" min="10" max="200" step="5" value={percentage} onChange={(event) => setPercentage(Number(event.target.value))} className="w-full accent-orange-600" />
-                  {metadata && <p className="text-[11px] text-stone-500">Output: {Math.round(metadata.width * percentage / 100)} × {Math.round(metadata.height * percentage / 100)}px</p>}
+                  {metadata && <p className="text-[11px] text-stone-500">{t('imageWorkspace.output')}: {Math.round(metadata.width * percentage / 100)} × {Math.round(metadata.height * percentage / 100)}px</p>}
                 </div>
               ) : (
                 <>
-                  <div className="flex justify-between items-center"><span className="text-xs font-semibold text-stone-700">Keep aspect ratio</span><button type="button" onClick={() => setLockRatio(!lockRatio)} className="flex items-center gap-1 text-xs text-orange-700">{lockRatio ? <Lock size={14} /> : <Unlock size={14} />}{lockRatio ? 'Locked' : 'Unlocked'}</button></div>
+                  <div className="flex justify-between items-center"><span className="text-xs font-semibold text-stone-700">{t('imageWorkspace.keepAspectRatio')}</span><button type="button" onClick={() => setLockRatio(!lockRatio)} className="flex items-center gap-1 text-xs text-orange-700">{lockRatio ? <Lock size={14} /> : <Unlock size={14} />}{lockRatio ? t('imageWorkspace.locked') : t('imageWorkspace.unlocked')}</button></div>
                   <div className="grid grid-cols-2 gap-3">
-                    <NumberField label="Width (px)" value={width} onChange={updateWidth} />
-                    <NumberField label="Height (px)" value={height} onChange={updateHeight} />
+                    <NumberField label={t('imageWorkspace.widthPx')} value={width} onChange={updateWidth} />
+                    <NumberField label={t('imageWorkspace.heightPx')} value={height} onChange={updateHeight} />
                   </div>
                 </>
               )}
-              {metadata && <p className="text-[11px] text-stone-500">Original: {metadata.width} × {metadata.height}px. Maximum output dimension: 12,000px.</p>}
+              {metadata && <p className="text-[11px] text-stone-500">{t('imageWorkspace.original')}: {metadata.width} × {metadata.height}px. {t('imageWorkspace.maxOutputDimension')}: 12,000px.</p>}
             </>
           )}
 
           {isCrop && (
             <div className="space-y-3">
-              <p className="text-xs text-stone-600">Drag across the image preview to select an area, or enter exact pixel values below. Touch dragging is supported.</p>
+              <p className="text-xs text-stone-600">{t('imageWorkspace.cropInstructions')}</p>
               <div className="grid grid-cols-2 gap-3">
                 <NumberField label="X" value={cropX} onChange={setCropX} />
                 <NumberField label="Y" value={cropY} onChange={setCropY} />
-                <NumberField label="Width" value={cropWidth} onChange={setCropWidth} />
-                <NumberField label="Height" value={cropHeight} onChange={setCropHeight} />
+                <NumberField label={t('imageWorkspace.cropWidth')} value={cropWidth} onChange={setCropWidth} />
+                <NumberField label={t('imageWorkspace.cropHeight')} value={cropHeight} onChange={setCropHeight} />
               </div>
-              {metadata && <button type="button" onClick={() => { setCropX(0); setCropY(0); setCropWidth(metadata.width); setCropHeight(metadata.height); }} className="text-xs text-orange-700 underline">Reset crop to full image</button>}
+              {metadata && <button type="button" onClick={() => { setCropX(0); setCropY(0); setCropWidth(metadata.width); setCropHeight(metadata.height); }} className="text-xs text-orange-700 underline">{t('imageWorkspace.resetCrop')}</button>}
             </div>
           )}
 
           {isRotate && (
             <div className="space-y-2">
-              <Field label="Rotation"><div className="grid grid-cols-4 gap-2">{([0, 90, 180, 270] as const).map((angle) => <button type="button" key={angle} onClick={() => setRotation(angle)} className={`py-2 rounded-lg border text-xs font-semibold ${rotation === angle ? 'border-orange-400 bg-orange-50 text-orange-700' : 'border-stone-200 text-stone-600'}`}>{angle}°</button>)}</div></Field>
-              <button type="button" onClick={() => setRotation((value) => ((value + 90) % 360) as 0 | 90 | 180 | 270)} className="w-full py-2 rounded-lg bg-stone-100 text-xs font-semibold text-stone-700 flex items-center justify-center gap-2"><RotateCw size={14} /> Rotate 90° clockwise</button>
-              <label className="flex items-center justify-between gap-3 p-3 rounded-lg bg-stone-50 border border-stone-200 text-xs text-stone-700"><span>Flip horizontally</span><input type="checkbox" checked={flipHorizontal} onChange={(event) => setFlipHorizontal(event.target.checked)} /></label>
-              <label className="flex items-center justify-between gap-3 p-3 rounded-lg bg-stone-50 border border-stone-200 text-xs text-stone-700"><span>Flip vertically</span><input type="checkbox" checked={flipVertical} onChange={(event) => setFlipVertical(event.target.checked)} /></label>
+              <Field label={t('imageWorkspace.rotation')}><div className="grid grid-cols-4 gap-2">{([0, 90, 180, 270] as const).map((angle) => <button type="button" key={angle} onClick={() => setRotation(angle)} className={`py-2 rounded-lg border text-xs font-semibold ${rotation === angle ? 'border-orange-400 bg-orange-50 text-orange-700' : 'border-stone-200 text-stone-600'}`}>{angle}°</button>)}</div></Field>
+              <button type="button" onClick={() => setRotation((value) => ((value + 90) % 360) as 0 | 90 | 180 | 270)} className="w-full py-2 rounded-lg bg-stone-100 text-xs font-semibold text-stone-700 flex items-center justify-center gap-2"><RotateCw size={14} /> {t('imageWorkspace.rotateClockwise')}</button>
+              <label className="flex items-center justify-between gap-3 p-3 rounded-lg bg-stone-50 border border-stone-200 text-xs text-stone-700"><span>{t('imageWorkspace.flipHorizontally')}</span><input type="checkbox" checked={flipHorizontal} onChange={(event) => setFlipHorizontal(event.target.checked)} /></label>
+              <label className="flex items-center justify-between gap-3 p-3 rounded-lg bg-stone-50 border border-stone-200 text-xs text-stone-700"><span>{t('imageWorkspace.flipVertically')}</span><input type="checkbox" checked={flipVertical} onChange={(event) => setFlipVertical(event.target.checked)} /></label>
             </div>
           )}
 
           <button type="button" onClick={processImage} disabled={!file || !metadata || preparingFile || busy} className="w-full py-3 rounded-xl bg-stone-900 hover:bg-stone-800 disabled:opacity-40 text-white text-xs font-semibold flex items-center justify-center gap-2">
             <RefreshCw size={15} className={busy ? 'animate-spin' : ''} />
-            {preparingFile ? 'Preparing image…' : busy ? 'Processing…' : isMetadata ? 'Inspect image' : 'Process image'}
+            {preparingFile ? t('imageWorkspace.preparingImage') : busy ? t('imageWorkspace.processing') : isMetadata ? t('imageWorkspace.inspectImage') : t('imageWorkspace.processImage')}
           </button>
 
           {resultUrl && (
-            <button type="button" onClick={downloadResult} className="w-full py-3 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-xs font-semibold flex items-center justify-center gap-2"><Download size={15} /> Download {resultName}</button>
+            <button type="button" onClick={downloadResult} className="w-full py-3 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-xs font-semibold flex items-center justify-center gap-2"><Download size={15} /> {t('imageWorkspace.download')} {resultName}</button>
           )}
           {message && <p role="status" className="text-xs text-emerald-700 break-words">{message}</p>}
           {error && <p role="alert" className="text-xs text-red-600 flex items-start gap-1.5"><AlertCircle size={14} className="shrink-0 mt-0.5" />{error}</p>}
-          <p className="pt-3 border-t border-stone-100 text-[11px] leading-relaxed text-stone-500">Processing happens in this browser. Images are not uploaded. Re-encoding may remove EXIF metadata and may not preserve animation in GIF files.</p>
+          <p className="pt-3 border-t border-stone-100 text-[11px] leading-relaxed text-stone-500">{t('imageWorkspace.processingPrivacy')}</p>
         </div>
       </aside>
     </div>

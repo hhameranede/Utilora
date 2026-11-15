@@ -23,7 +23,7 @@ This repository contains the **complete frontend foundation, UI system, reusable
 - **Framework:** React 19 + TypeScript
 - **Bundler:** Vite 8 + Tailwind CSS v4
 - **Icons:** Lucide React
-- **Design Direction:** Warm white (`#FAFAF9`) and white surfaces, stone-gray borders and typography, and a clear orange accent (`#F97316`). Keep the interface calm, readable, responsive, and free of heavy glass effects. Zero-pill metadata discipline.
+- **Design Direction (V4):** Cool mist canvas (`#F5F7FC`), white surfaces, slate typography, Indigo primary (`#4658D8`), and restrained Teal support (`#0B8F91`). See `docs/DESIGN_SYSTEM.md` for the token map and visual rules.
 - **Routing:** Path-based client router with direct link, browser back/forward, and locale persistence (`/:lang/...`).
 - **Internationalization (i18n):** 8 fully translated languages (English, Arabic RTL, French, Spanish, Portuguese, Hindi, Chinese, Bengali).
 - **SEO & Search:** Centralized dynamic metadata, hreflang links for all 8 languages, JSON-LD structured schemas, and controlled `noindex, nofollow` exclusion for unfinished preview tools.
@@ -136,4 +136,4 @@ Comprehensive guides for development and extension:
 - `docs/PRODUCT_EXPERIENCE_STANDARD.md` — Product-page anatomy, tool-specific content, SEO accuracy, privacy rules, and quality gates
 - `docs/IMPLEMENTATION_STATUS.md` — Verified feature checklist
 
-Every registered tool has a localized usage guide at `/:lang/tools/:slug/how-to`. The guide captures the rendered tool workspace at runtime and adds numbered orange annotations; automated browser coverage checks all 36 guides.
+Every registered tool has a localized usage guide at `/:lang/tools/:slug/how-to`. The guide captures the rendered tool workspace at runtime and adds numbered accent annotations; automated browser coverage checks all 36 guides.
