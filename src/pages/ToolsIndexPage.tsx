@@ -22,7 +22,7 @@ export const ToolsIndexPage: React.FC = () => {
   return (
     <>
       <Head
-        title={`\${t('nav.allTools')} (36) — \${t('brand.name')}`}
+        title={`${t('nav.allTools')} (36) — ${t('brand.name')}`}
         description={t('tools.description')}
         locale={locale}
         routeType="tools-index"
