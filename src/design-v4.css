@@ -749,3 +749,50 @@ body {
   border-color: var(--ul-v4-line) !important;
   background: linear-gradient(115deg, #fff 0%, #f3f5ff 100%) !important;
 }
+
+
+/* Narrow RTL viewport correction: the vertical scrollbar reduces the layout
+   client width, so do not keep a 320px minimum canvas at a 320px viewport. */
+.ulx-site-shell .ulx-brand-name {
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+@media (max-width: 335px) {
+  html,
+  body,
+  #root,
+  .ulx-site-shell {
+    min-width: 0 !important;
+    width: 100% !important;
+  }
+  header.sticky > div {
+    padding-inline: 8px !important;
+    gap: 0 !important;
+  }
+  header.sticky > div > div:first-child {
+    min-width: 0 !important;
+    gap: 4px !important;
+  }
+  header.sticky > div > div:first-child > a {
+    min-width: 0 !important;
+    flex-shrink: 1 !important;
+  }
+  header.sticky > div > div:last-child {
+    flex: 0 0 auto !important;
+    gap: 2px !important;
+  }
+  header.sticky .ulx-brand-tagline {
+    display: none !important;
+  }
+  header.sticky .ulx-brand-lockup {
+    gap: 6px !important;
+  }
+  header.sticky .ulx-brand-mark {
+    width: 30px !important;
+    height: 30px !important;
+    flex-basis: 30px !important;
+  }
+  header.sticky .ulx-brand-name {
+    font-size: 16px !important;
+  }
+}
