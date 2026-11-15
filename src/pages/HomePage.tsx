@@ -27,11 +27,11 @@ import { SAMPLE_ARTICLES } from '../data/articles.data';
 import { matchesSearch } from '../utils/search';
 
 const previewTools = [
-  { key: 'image', icon: ImageIcon, title: 'Image tools', subtitle: 'Convert · Resize · Compress' },
-  { key: 'pdf', icon: FileText, title: 'PDF workspace', subtitle: 'Merge · Split · Organize' },
-  { key: 'text', icon: FileImage, title: 'Text utilities', subtitle: 'Count · Clean · Compare' },
-  { key: 'code', icon: Braces, title: 'Developer tools', subtitle: 'Format · Validate · Encode' },
-];
+  { categoryId: 'image', icon: ImageIcon },
+  { categoryId: 'pdf', icon: FileText },
+  { categoryId: 'text', icon: FileImage },
+  { categoryId: 'developer', icon: Braces },
+] as const;
 
 const HeroWorkspace: React.FC<{ locale: string }> = ({ locale }) => {
   const arabic = locale === 'ar';
@@ -58,12 +58,18 @@ const HeroWorkspace: React.FC<{ locale: string }> = ({ locale }) => {
               <span>{arabic ? 'اختر المهمة' : 'CHOOSE A TASK'}</span>
             </div>
             <div className="ulv4-preview-grid">
-              {previewTools.map(({ key, icon: PreviewIcon, title, subtitle }) => (
-                <div className="ulv4-preview-tile" key={key}>
-                  <span className="ulv4-preview-icon"><PreviewIcon size={16} /></span>
-                  <span><b>{title}</b><small>{subtitle}</small></span>
-                </div>
-              ))}
+              {previewTools.map(({ categoryId, icon: PreviewIcon }) => {
+                const category = getCategoryById(categoryId);
+                const title = category?.localizedTitle[locale] ?? category?.localizedTitle.en ?? categoryId;
+                const subtitle = category?.localizedDescription[locale] ?? category?.localizedDescription.en ?? '';
+
+                return (
+                  <div className="ulv4-preview-tile" key={categoryId}>
+                    <span className="ulv4-preview-icon"><PreviewIcon size={16} /></span>
+                    <span><b>{title}</b><small>{subtitle}</small></span>
+                  </div>
+                );
+              })}
             </div>
             <div className="ulv4-window-bottom">
               <span>{arabic ? 'أدوات واضحة لمهام يومية' : 'Useful tools, without the clutter'}</span>
@@ -134,8 +140,8 @@ export const HomePage: React.FC = () => {
   return (
     <>
       <Head
-        title="UTILORA — Every Digital Task. One Place."
-        description="Free online tools for images, documents, text, code, websites and everyday digital tasks."
+        title={`${t('brand.name')} — ${t('brand.slogan')}`}
+        description={t('hero.subtitle')}
         locale={locale}
         routeType="home"
         isIndexable
